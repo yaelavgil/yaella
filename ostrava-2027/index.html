@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Colours of Ostrava 2027, 21–24.7: רובי וויליאמס פותח את הפסטיבל. המלונות שהזמנו עם ביטול חינם, תוכנית ומחשבון עלויות.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="רובי וויליאמס באוסטרבה · מצטרפים?">
+<meta property="og:description" content="פסטיבל Colours of Ostrava, 21–24.7.2027 · מזמינים מלון עם ביטול חינם עכשיו, מחליטים בדצמבר">
+<meta property="og:image" content="https://yaelavgil.github.io/yaella/ostrava-2027/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://yaelavgil.github.io/yaella/ostrava-2027/">
+<meta name="twitter:card" content="summary_large_image">
+<title>רובי באוסטרבה · מצטרפים?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Karantina:wght@400;700&family=Assistant:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: a night-at-the-steelworks festival poster. Full-bleed photo hero, one bold action card, then short scannable sections; detail lives in a calculator and fold-out small print */
+:root{
+  --ink:#f4efe8;        /* text on night */
+  --muted:#b7aea4;
+  --night:#121014;      /* page ground */
+  --plate:#1d1a1f;      /* raised surfaces */
+  --line:#353037;
+  --molten:#ff6a2b;     /* furnace orange, the one loud colour */
+  --ember:#ffc56b;      /* soft highlight */
+  --display:"Karantina","Arial Hebrew",Impact,sans-serif;
+  --body:"Assistant","Arial Hebrew",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{background:var(--night);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;direction:rtl}
+a{color:var(--ember)}
+img{display:block;max-width:100%}
+.wrap{max-width:980px;margin:0 auto;padding-inline:20px}
+section{padding-block:56px 8px}
+.eyebrow{font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--molten);margin:0 0 6px}
+h2{font-family:var(--display);font-weight:700;font-size:clamp(40px,8vw,64px);line-height:.95;margin:0 0 14px;text-wrap:balance}
+h3{margin:0;font-size:19px;font-weight:800;line-height:1.25}
+p{margin:0}
+.lead{color:var(--muted);max-width:58ch;font-size:18px}
+
+/* hero */
+.hero{position:relative;min-height:min(92vh,820px);display:grid;align-items:end;overflow:hidden;background:#000}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 22%;opacity:.88}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,var(--night) 4%,rgba(18,16,20,.75) 38%,rgba(18,16,20,.1) 70%,rgba(18,16,20,.35) 100%)}
+.hero .in{position:relative;z-index:1;padding-block:120px 34px;display:grid;gap:14px}
+.tag{justify-self:start;display:inline-flex;gap:8px;align-items:center;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:5px 14px;font-size:14px;font-weight:700;backdrop-filter:blur(6px);background:rgba(0,0,0,.25)}
+.tag b{color:var(--ember)}
+.hero h1{font-family:var(--display);font-weight:700;font-size:clamp(76px,17vw,168px);line-height:.82;margin:0;letter-spacing:-.01em}
+.hero h1 span{display:block;color:var(--molten)}
+.hero .sub{font-size:clamp(18px,2.6vw,22px);max-width:34ch;color:#efe6dc}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:800;padding:12px 20px;border-radius:999px;font-size:16px}
+.btn.solid{background:var(--molten);color:#1a0d06}
+.btn.ghost{border:1.5px solid rgba(255,255,255,.5);color:var(--ink)}
+.btn:focus-visible{outline:3px solid var(--ember);outline-offset:3px}
+.credit{font-size:11px;color:rgba(255,255,255,.55);direction:ltr;text-align:left}
+.credit a{color:inherit}
+
+/* fact strip */
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-block:1px solid var(--line);margin-top:8px}
+.facts div{padding:18px 14px;display:grid;gap:2px;border-inline-start:1px solid var(--line)}
+.facts div:first-child{border-inline-start:0;padding-inline-start:0}
+.facts b{font-family:var(--display);font-size:38px;line-height:1;color:var(--ember);font-weight:700;font-variant-numeric:tabular-nums}
+.facts span{font-size:14px;color:var(--muted)}
+
+/* the ask */
+.ask{background:var(--molten);color:#1a0d06;border-radius:18px;padding:28px clamp(20px,4vw,40px);display:grid;gap:14px}
+.ask .eyebrow{color:#1a0d06;opacity:.75}
+.ask h2{color:#1a0d06;margin:0}
+.ask ol{margin:0;padding:0;list-style:none;display:grid;gap:12px;counter-reset:s}
+.ask li{display:grid;grid-template-columns:36px minmax(0,1fr);gap:12px;align-items:start;counter-increment:s;font-size:17px}
+.ask li::before{content:counter(s);font-family:var(--display);font-size:26px;font-weight:700;background:#1a0d06;color:var(--molten);width:36px;height:36px;border-radius:50%;display:grid;place-items:center;line-height:1}
+.ask li b{display:block;font-size:18px}
+.ask .why{font-size:14px;opacity:.8}
+
+
+/* stays */
+.stays{display:grid;gap:16px;margin-top:22px}
+.stay{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);background:var(--plate);border-radius:18px;overflow:hidden}
+.stay .ph{display:grid;grid-template-rows:1fr 1fr;min-height:100%}
+.stay .ph.one{grid-template-rows:1fr}
+.stay .ph img{width:100%;height:100%;object-fit:cover;min-height:180px}
+.sb{padding:22px;display:grid;gap:12px;align-content:start;min-width:0}
+.where{font-size:13px;font-weight:800;color:var(--ember);letter-spacing:.04em}
+.stay h3{font-family:var(--display);font-size:40px;line-height:.95;font-weight:700}
+.sc{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.sc li{background:var(--night);border:1px solid var(--line);border-radius:8px;padding:2px 10px;font-size:14px}
+.sc b{color:var(--ember)}
+.opts{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:15px}
+.opts td{padding:9px 0;border-top:1px solid var(--line)}
+.opts td:last-child{text-align:left;font-weight:800;white-space:nowrap;padding-inline-start:12px}
+.opts tr.us td{color:var(--ink);font-weight:700}
+.opts tr.us td:last-child{color:var(--molten)}
+.opts tr:not(.us) td{color:var(--muted)}
+.mini{font-size:13px;color:var(--muted)}
+.mini b{color:var(--ink)}
+.btn.wide{justify-content:center}
+.cal{display:grid;gap:8px;border:1px dashed var(--line);border-radius:12px;padding:10px 12px}
+.cal-l{font-size:14px;font-weight:700}
+.cal-b{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:14px;font-weight:700;color:var(--ink);background:var(--night);border:1px solid var(--line);border-radius:999px;padding:6px 14px;text-decoration:none;cursor:pointer}
+.chip:hover,.chip:focus-visible{border-color:var(--molten);outline:none}
+@media (max-width:760px){.stay{grid-template-columns:1fr}.stay .ph{grid-template-rows:none;grid-template-columns:1fr 1fr}.stay .ph.one{grid-template-columns:1fr}.stay .ph img{min-height:0;aspect-ratio:4/3}}
+
+/* vibe */
+.vibe{display:grid;grid-template-columns:1.4fr 1fr;gap:12px;margin-top:22px}
+.vibe figure{margin:0;position:relative;border-radius:14px;overflow:hidden;min-height:220px}
+.vibe figure img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.vibe figcaption{position:absolute;inset-inline:0;bottom:0;padding:24px 14px 10px;background:linear-gradient(transparent,rgba(0,0,0,.75));font-size:13px;font-weight:700}
+.vibe figcaption small{display:block;font-weight:400;font-size:10px;opacity:.6;direction:ltr;text-align:left}
+.vibe figcaption small a{color:inherit}
+.vibe .tall{grid-row:span 2;min-height:440px}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;padding:0;list-style:none}
+.pills li{border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:15px;background:var(--plate)}
+.pills b{color:var(--ember)}
+
+/* past artists rail */
+.rail{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(200px,1fr);gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:10px;margin-top:20px;scrollbar-width:thin}
+.card{scroll-snap-align:start;background:var(--plate);border-radius:14px;overflow:hidden;display:grid;grid-template-rows:auto 1fr}
+.card img{width:100%;aspect-ratio:4/5;object-fit:cover}
+.card .t{padding:12px 14px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.card .t b{font-size:17px}
+.card .t span{font-family:var(--display);font-size:26px;color:var(--molten);line-height:1}
+.card small{display:block;padding:0 14px 10px;font-size:10px;color:var(--muted);direction:ltr;text-align:left;opacity:.7}
+.card small a{color:inherit}
+.more{margin-top:14px;color:var(--muted);font-size:15px}
+.more b{color:var(--ink);font-weight:600}
+.hint{font-size:13px;color:var(--muted);margin-top:6px}
+
+/* itinerary */
+.days{display:grid;gap:0;margin-top:22px;border-inline-start:2px solid var(--line);padding-inline-start:0}
+.day{display:grid;grid-template-columns:92px minmax(0,1fr);gap:16px;padding:14px 0;position:relative}
+.day::before{content:"";position:absolute;inset-inline-start:-7px;top:22px;width:12px;height:12px;border-radius:50%;background:var(--line)}
+.day.star::before{background:var(--molten);box-shadow:0 0 0 5px rgba(255,106,43,.25)}
+.day.bonus::before{background:var(--ember)}
+.day .d{padding-inline-start:18px;font-family:var(--display);font-size:30px;line-height:1;font-weight:700;font-variant-numeric:tabular-nums}
+.day .d small{display:block;font-family:var(--body);font-size:13px;font-weight:600;color:var(--muted);margin-top:4px}
+.day p{color:var(--muted);font-size:16px;margin-top:2px}
+.badge{display:inline-block;font-size:12px;font-weight:800;border-radius:6px;padding:1px 8px;margin-inline-start:6px;vertical-align:2px}
+.badge.hot{background:var(--molten);color:#1a0d06}
+.badge.opt{background:var(--ember);color:#1a0d06}
+.note{margin-top:14px;background:var(--plate);border-radius:12px;padding:14px 16px;font-size:15px;color:var(--muted)}
+.note b{color:var(--ink)}
+
+/* calculator */
+.calc{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;margin-top:22px;align-items:start}
+.panel{background:var(--plate);border-radius:16px;padding:20px;display:grid;gap:18px}
+.field{display:grid;gap:8px;border:0;padding:0;margin:0;min-width:0}
+.field legend{font-size:14px;font-weight:800;color:var(--muted);padding:0;margin-bottom:8px}
+.seg{display:grid;gap:6px}
+.seg.two{grid-template-columns:1fr 1fr}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1.5px solid var(--line);border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:600;font-size:15px;min-width:0}
+.seg label small{color:var(--muted);font-weight:400;font-size:13px;white-space:nowrap}
+.seg input:checked+label{border-color:var(--molten);background:rgba(255,106,43,.1)}
+.seg input:focus-visible+label{outline:2px solid var(--ember);outline-offset:2px}
+.total{background:var(--ink);color:var(--night);border-radius:16px;padding:22px;display:grid;gap:10px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}
+.total .big{font-family:var(--display);font-size:72px;font-weight:700;line-height:.9;font-variant-numeric:tabular-nums}
+.total .big small{font-family:var(--body);font-size:16px;font-weight:700}
+.total .pair{font-size:15px;font-weight:700;color:#5b524a}
+.total table{width:100%;border-collapse:collapse;font-size:15px;font-variant-numeric:tabular-nums}
+.total td{padding:6px 0;border-top:1px solid #d9d0c6}
+.total td:last-child{text-align:left;font-weight:700;white-space:nowrap}
+.total .fine{font-size:12px;color:#6d645c}
+
+/* mornings */
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:22px}
+.spot{display:grid;gap:8px;min-width:0}
+.spot img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:14px}
+.spot p{font-size:15px;color:var(--muted)}
+.spot .tg{font-size:12px;font-weight:800;color:var(--ember)}
+
+/* small print */
+details{border-top:1px solid var(--line)}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 2px;font-weight:800;font-size:17px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-family:var(--display);font-size:32px;line-height:.6;color:var(--molten);transition:transform .2s}
+details[open] summary::after{transform:rotate(45deg)}
+summary:focus-visible{outline:2px solid var(--ember);outline-offset:2px}
+.dt{padding:0 2px 18px;color:var(--muted);font-size:15px;display:grid;gap:8px}
+.dt ul{margin:0;padding-inline-start:18px;display:grid;gap:6px}
+.dt b{color:var(--ink)}
+
+/* links */
+.links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:20px}
+.links a{display:grid;gap:2px;text-decoration:none;background:var(--plate);border:1px solid var(--line);border-radius:12px;padding:14px 16px;color:var(--ink);min-width:0}
+.links a:hover,.links a:focus-visible{border-color:var(--molten)}
+.links a b{font-size:16px}
+.links a span{font-size:13px;color:var(--muted)}
+.links a b::after{content:" ↖";color:var(--molten)}
+
+footer{padding-block:48px 40px;color:var(--muted);font-size:12px;display:grid;gap:6px}
+footer a{color:inherit}
+
+@media (max-width:760px){
+  .facts{grid-template-columns:1fr 1fr}
+  .facts div:nth-child(3){border-inline-start:0;padding-inline-start:0}
+  .facts div:nth-child(n+3){border-top:1px solid var(--line)}
+  .vibe{grid-template-columns:1fr}
+  .vibe .tall{grid-row:auto;min-height:300px}
+  .calc{grid-template-columns:1fr}
+  .total{position:static}
+  .grid4{grid-template-columns:1fr 1fr}
+  .links{grid-template-columns:1fr}
+  .day{grid-template-columns:78px minmax(0,1fr)}
+}
+</style>
+<style>body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+<header class="hero">
+  <img src="img/robbie.jpg" alt="רובי וויליאמס על הבמה">
+  <div class="wrap in">
+    <span class="tag"><b>Colours of Ostrava</b> · צ׳כיה · <bdi dir="ltr">21–24.7.2027</bdi></span>
+    <h1>רובי וויליאמס<span>מצטרפים?</span></h1>
+    <p class="sub">ארבעה ימי פסטיבל בתוך מפעל פלדה ענק. רובי פותח את הערב הראשון, ואנחנו שם.</p>
+    <div class="cta">
+      <a class="btn solid" href="#now">מה עושים עכשיו</a>
+      <a class="btn ghost" href="#cost">כמה זה עולה</a>
+    </div>
+    <p class="credit">Photo: <a href="https://commons.wikimedia.org/wiki/File:Robbie_Williams,_Roundhouse,_London_(Apple_Music_Festival)_(29312031654).jpg">Drew de F Fawkes</a> · CC BY 2.0</p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="facts" aria-label="בקצרה">
+    <div><b><bdi dir="ltr">21–24.7</bdi></b><span>יולי 2027, רביעי עד שבת</span></div>
+    <div><b>16</b><span>במות, מ־2002</span></div>
+    <div><b>3:45</b><span>שעות טיסה ישירה לקרקוב</span></div>
+    <div><b>≈ ₪650</b><span>כרטיס לכל ארבעת הימים</span></div>
+  </div>
+
+  <section id="now">
+    <div class="ask">
+      <p class="eyebrow">הטריק שלנו</p>
+      <h2>מזמינים מלון עכשיו. מחליטים בדצמבר.</h2>
+      <ol>
+        <li><span><b>היום: לינה עם ביטול חינם בלבד</b>אנחנו כבר הזמנו, והפרטים למטה. בשבוע הפסטיבל אוסטרבה כמעט מלאה, ובשנה שעברה המחירים קפצו עד פי 5.</span></li>
+        <li><span><b>מיד אחרי ההזמנה: תזכורת ביומן</b>לחיצה אחת מוסיפה תזכורת לשבוע לפני מועד הביטול, כדי שלא תשכחו לבטל אם תחליטו לוותר.</span></li>
+        <li><span><b>תחילת דצמבר: הליינאפ מתפרסם</b>אז אנחנו קונים כרטיסים לפסטיבל וטיסות, ואתם מחליטים אם אתם איתנו. לא מתאים? מבטלים, בלי לשלם שקל.</span></li>
+      </ol>
+      <p class="why"><a href="#stay" style="color:inherit;font-weight:800">לפרטי המלונות שלנו ↓</a></p>
+    </div>
+  </section>
+
+
+  <section id="stay">
+    <p class="eyebrow">איפה אנחנו ישנים</p>
+    <h2>הזמנו. אפשר להעתיק אותנו</h2>
+    <p class="lead">שני המקומות עם ביטול חינם. לחצו, בחרו את אותה יחידה או חלופה זולה יותר, ואחר כך הוסיפו תזכורת ליומן.</p>
+    <div class="stays">
+      <article class="stay">
+        <div class="ph"><img src="img/sting-terrace.jpg" alt="טרסה עם ג׳קוזי בדירה ב־Sting Old Town" loading="lazy"><img src="img/sting-loft.jpg" alt="סלון בדירה ב־Sting Old Town" loading="lazy"></div>
+        <div class="sb">
+          <p class="where">אוסטרבה · <bdi dir="ltr">20–25.7</bdi> · 5 לילות</p>
+          <h3>Sting Old Town Ostrava</h3>
+          <ul class="sc"><li><b>9.5</b> ציון</li><li><b>9.8</b> ניקיון</li><li>במרכז העיר, קפה ושופינג ברגל</li><li>2 ק״מ מהפסטיבל</li></ul>
+          <table class="opts">
+            <tr class="us"><td>אנחנו: דירה עם טרסה וג׳קוזי, 74 מ״ר</td><td>₪9,336</td></tr>
+            <tr><td>חלופה: דירה עם חדר שינה, מספיקה לגמרי</td><td>₪6,623</td></tr>
+          </table>
+          <p class="mini">המחירים לזוג, ל־5 לילות. <b>ביטול חינם עד 15.7.2027</b>, ולא משלמים כלום עד 13.7.2027. בזמן שבדקנו כבר לא היו זמינות 73 דירות דומות באוסטרבה.</p>
+          <a class="btn solid wide" href="https://www.booking.com/hotel/cz/rezidence-old-town.he.html?checkin=2027-07-20&amp;checkout=2027-07-25&amp;group_adults=2&amp;no_rooms=1&amp;group_children=0">לצפייה והזמנה ב־Booking</a>
+          <div class="cal"><span class="cal-l">📅 תזכורת ביטול ליומן · 8.7.2027</span><div class="cal-b"><a class="chip" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=%D7%9C%D7%91%D7%98%D7%9C+%D7%90%D7%95+%D7%9C%D7%94%D7%A9%D7%90%D7%99%D7%A8%3F+%D7%9E%D7%9C%D7%95%D7%9F+%D7%91%D7%90%D7%95%D7%A1%D7%98%D7%A8%D7%91%D7%94+%28Colours+2027%29&amp;dates=20270708T090000%2F20270708T091500&amp;ctz=Asia%2FJerusalem&amp;details=%D7%91%D7%99%D7%98%D7%95%D7%9C+%D7%97%D7%99%D7%A0%D7%9D+%D7%91%D6%BESting+Old+Town+Ostrava+%D7%A8%D7%A7+%D7%A2%D7%93+15.7.2027.+%D7%94%D7%94%D7%96%D7%9E%D7%A0%D7%95%D7%AA+%D7%A9%D7%9C%D7%99+%D7%91%D6%BEBooking%3A+https%3A%2F%2Fsecure.booking.com%2Fmytrips.html">Google</a><a class="chip" href="https://outlook.live.com/calendar/0/action/compose?subject=%D7%9C%D7%91%D7%98%D7%9C+%D7%90%D7%95+%D7%9C%D7%94%D7%A9%D7%90%D7%99%D7%A8%3F+%D7%9E%D7%9C%D7%95%D7%9F+%D7%91%D7%90%D7%95%D7%A1%D7%98%D7%A8%D7%91%D7%94+%28Colours+2027%29&amp;startdt=2027-07-08T09%3A00%3A00&amp;enddt=2027-07-08T09%3A15%3A00&amp;body=%D7%91%D7%99%D7%98%D7%95%D7%9C+%D7%97%D7%99%D7%A0%D7%9D+%D7%91%D6%BESting+Old+Town+Ostrava+%D7%A8%D7%A7+%D7%A2%D7%93+15.7.2027.+%D7%94%D7%94%D7%96%D7%9E%D7%A0%D7%95%D7%AA+%D7%A9%D7%9C%D7%99+%D7%91%D6%BEBooking%3A+https%3A%2F%2Fsecure.booking.com%2Fmytrips.html&amp;path=%2Fcalendar%2Faction%2Fcompose&amp;rru=addevent">Outlook</a><button class="chip copy" type="button" data-copy="תזכורת 8.7.2027: לבטל או להשאיר את המלון באוסטרבה. ביטול חינם ב־Sting Old Town רק עד 15.7.2027">העתקה</button></div></div>
+        </div>
+      </article>
+      <article class="stay">
+        <div class="ph one"><img src="img/nomadic.jpg" alt="מרפסת עם נוף לכנסיית מריה הקדושה בקרקוב" loading="lazy"></div>
+        <div class="sb">
+          <p class="where">קרקוב · <bdi dir="ltr">25–26.7</bdi> · לילה אחד · בונוס</p>
+          <h3>Nomadic Urban Premium Suites</h3>
+          <ul class="sc"><li><b>9.4</b> ציון</li><li><b>9.6</b> ניקיון</li><li><b>9.9</b> מיקום</li><li>בלב העיר העתיקה</li></ul>
+          <table class="opts">
+            <tr class="us"><td>אנחנו: יחידה עם פטיו ונוף לעיר העתיקה</td><td>₪1,173</td></tr>
+            <tr><td>חלופה: סטודיו עם נוף לעיר העתיקה</td><td>₪1,090</td></tr>
+            <tr><td>חדרים זוגיים פשוטים יותר</td><td>מ־₪690</td></tr>
+          </table>
+          <p class="mini">המחירים ללילה ליחידה. <b>היחידה שלנו מתאימה ל־4, אז אפשר לחלוק אותה איתנו</b> 😉 <b>ביטול חינם עד 24.7.2027.</b></p>
+          <a class="btn solid wide" href="https://www.booking.com/hotel/pl/nomadic-urban-premium-suits.he.html?checkin=2027-07-25&amp;checkout=2027-07-26&amp;group_adults=2&amp;no_rooms=1&amp;group_children=0">לצפייה והזמנה ב־Booking</a>
+          <div class="cal"><span class="cal-l">📅 תזכורת ביטול ליומן · 17.7.2027</span><div class="cal-b"><a class="chip" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=%D7%9C%D7%91%D7%98%D7%9C+%D7%90%D7%95+%D7%9C%D7%94%D7%A9%D7%90%D7%99%D7%A8%3F+%D7%9C%D7%99%D7%9C%D7%94+%D7%91%D7%A7%D7%A8%D7%A7%D7%95%D7%91+%2825.7.2027%29&amp;dates=20270717T090000%2F20270717T091500&amp;ctz=Asia%2FJerusalem&amp;details=%D7%91%D7%99%D7%98%D7%95%D7%9C+%D7%97%D7%99%D7%A0%D7%9D+%D7%91%D6%BENomadic+Urban+Premium+Suites+%D7%A8%D7%A7+%D7%A2%D7%93+24.7.2027.+%D7%94%D7%94%D7%96%D7%9E%D7%A0%D7%95%D7%AA+%D7%A9%D7%9C%D7%99+%D7%91%D6%BEBooking%3A+https%3A%2F%2Fsecure.booking.com%2Fmytrips.html">Google</a><a class="chip" href="https://outlook.live.com/calendar/0/action/compose?subject=%D7%9C%D7%91%D7%98%D7%9C+%D7%90%D7%95+%D7%9C%D7%94%D7%A9%D7%90%D7%99%D7%A8%3F+%D7%9C%D7%99%D7%9C%D7%94+%D7%91%D7%A7%D7%A8%D7%A7%D7%95%D7%91+%2825.7.2027%29&amp;startdt=2027-07-17T09%3A00%3A00&amp;enddt=2027-07-17T09%3A15%3A00&amp;body=%D7%91%D7%99%D7%98%D7%95%D7%9C+%D7%97%D7%99%D7%A0%D7%9D+%D7%91%D6%BENomadic+Urban+Premium+Suites+%D7%A8%D7%A7+%D7%A2%D7%93+24.7.2027.+%D7%94%D7%94%D7%96%D7%9E%D7%A0%D7%95%D7%AA+%D7%A9%D7%9C%D7%99+%D7%91%D6%BEBooking%3A+https%3A%2F%2Fsecure.booking.com%2Fmytrips.html&amp;path=%2Fcalendar%2Faction%2Fcompose&amp;rru=addevent">Outlook</a><button class="chip copy" type="button" data-copy="תזכורת 17.7.2027: לבטל או להשאיר את הלילה בקרקוב. ביטול חינם ב־Nomadic Urban Premium Suites רק עד 24.7.2027">העתקה</button></div></div>
+        </div>
+      </article>
+    </div>
+    <p class="hint">צילומי המלונות: Booking.com. את הכרטיסים לפסטיבל ואת הטיסות קונים רק בדצמבר, אחרי הליינאפ.</p>
+  </section>
+  <section>
+    <p class="eyebrow">ה־vibe</p>
+    <h2>פסטיבל במפעל פלדה</h2>
+    <p class="lead">Colours of Ostrava הוא הפסטיבל הבינלאומי הגדול בצ׳כיה. הוא מתקיים בין תנורי ההיתוך ומגדלי הפלדה של Dolní Vítkovice: אורות, תעשייה ענקית ועשרות אלפי אנשים. יש מוזיקה מכל הסגנונות, ולצידה הרצאות, תיאטרון, סדנאות ואוכל טוב.</p>
+    <div class="vibe">
+      <figure class="tall"><img src="img/crowd.jpg" alt="קונפטי מעל הקהל מול הבמה הראשית" loading="lazy"><figcaption>הבמה הראשית<small><a href="https://commons.wikimedia.org/wiki/File:Colours_of_Ostrava_2018.jpg">Joy-festiwale</a> · CC BY-SA 4.0</small></figcaption></figure>
+      <figure><img src="img/night.jpg" alt="הופעה בלילה בין מבני הפלדה" loading="lazy"><figcaption>בלילה, בין מבני הפלדה<small><a href="https://commons.wikimedia.org/wiki/File:NeFestival_Colours_of_Ostrava_2020.jpg">Jiri.sedlak.artsm</a> · CC BY-SA 4.0</small></figcaption></figure>
+      <figure><img src="img/krakow.jpg" alt="הכיכר המרכזית בקרקוב" loading="lazy"><figcaption>ובונוס: לילה בקרקוב<small><a href="https://commons.wikimedia.org/wiki/File:Krak%C3%B3w_Cloth_Hall,_Caf%C3%A9_Noworolski,_3_Main_Market_square,_Old_Town,_Krakow,_Poland.jpg">Wikimedia Commons</a> · CC BY-SA 4.0</small></figcaption></figure>
+    </div>
+    <ul class="pills">
+      <li><b>16</b> במות</li>
+      <li>פופ · רוק · אלקטרוני · עולם</li>
+      <li>פורום הרצאות Meltingpot</li>
+      <li>ילדים מתחת ל־140 ס״מ <b>בחינם</b></li>
+      <li><a href="https://www.colours.cz/en/">לאתר הפסטיבל ↖</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <p class="eyebrow">מי כבר הופיע שם</p>
+    <h2>הליינאפ של השנים הקודמות</h2>
+    <p class="lead">ליינאפ 2027 מתפרסם בהדרגה. בינתיים, ככה זה נראה בשנים האחרונות:</p>
+    <div class="rail" tabindex="0" aria-label="אמנים שהופיעו בשנים קודמות">
+      <article class="card"><img src="img/sting.jpg" alt="Sting" loading="lazy"><div class="t"><b>Sting</b><span>2025</span></div><small><a href="https://commons.wikimedia.org/wiki/File:Sting_@_Gent_Jazz_2022.jpg">Haggis MacHaggis</a> · CC0</small></article>
+      <article class="card"><img src="img/kravitz.jpg" alt="Lenny Kravitz" loading="lazy"><div class="t"><b>Lenny Kravitz</b><span>2024</span></div><small><a href="https://commons.wikimedia.org/wiki/File:Lenny_Kravitz.jpg">Alberto Cabello</a> · CC BY 2.0</small></article>
+      <article class="card"><img src="img/lorde.jpg" alt="הופעה של Lorde" loading="lazy"><div class="t"><b>Lorde</b><span>2026</span></div><small><a href="https://commons.wikimedia.org/wiki/File:Lorde_Concert_(15552380662).jpg">Mike Lewis</a> · CC BY 2.0</small></article>
+      <article class="card"><img src="img/killers.jpg" alt="הופעה של The Killers" loading="lazy"><div class="t"><b>The Killers</b><span>2022</span></div><small><a href="https://commons.wikimedia.org/wiki/File:The_Killers_concert_in_Barcelona_(3376022688).jpg">Pedro Cambra</a> · CC BY 2.0</small></article>
+      <article class="card"><img src="img/florence.jpg" alt="Florence Welch" loading="lazy"><div class="t"><b>Florence + The Machine</b><span>2019</span></div><small><a href="https://commons.wikimedia.org/wiki/File:Florence_Welch.jpg">Kevin Utting</a> · CC BY 2.0</small></article>
+      <article class="card"><img src="img/imagine.jpg" alt="Imagine Dragons" loading="lazy"><div class="t"><b>Imagine Dragons</b><span>2017</span></div><small><a href="https://commons.wikimedia.org/wiki/File:RiP2013_ImagineDragons_Dan_Reynolds_0048.jpg">Sven-Sebastian Sajak</a> · CC BY-SA 3.0</small></article>
+    </div>
+    <p class="hint">← אפשר לגלול לצדדים. התמונות הן של האמנים ולא מהפסטיבל עצמו.</p>
+    <p class="more">ועוד: <b>Sam Smith · Twenty One Pilots · Queens of the Stone Age · Sean Paul · Moby · Iggy Pop · Snow Patrol · OneRepublic · Macklemore · Martin Garrix · The Chainsmokers · Franz Ferdinand · Sigur Rós</b>. ומישראל: <b>Infected Mushroom ו־Dennis Lloyd</b> 🇮🇱</p>
+  </section>
+
+  <section>
+    <p class="eyebrow">רובי הוא הסיבה, לא כל הסיפור</p>
+    <h2>יום אחרי יום</h2>
+    <p class="lead">בשבילנו רובי הוא שיא הטיול, אבל הוא ערב אחד מתוך ארבעה. ההופעות הגדולות מתחילות בערב, אז הבקרים פנויים לטייל.</p>
+    <div class="days">
+      <div class="day"><div class="d">20.7<small>שלישי</small></div><div><h3>טסים יום לפני</h3><p>LOT יוצאת 05:40 ונוחתת בקרקוב 08:30. משם שעתיים נסיעה לאוסטרבה, וערב רגוע.</p></div></div>
+      <div class="day star"><div class="d">21.7<small>רביעי</small></div><div><h3>הערב של רובי <span class="badge hot">הדליינר</span></h3><p>פתיחת הפסטיבל. רובי מופיע אחרון על הבמה הראשית, כנראה שעה וחצי עד שעתיים.</p></div></div>
+      <div class="day"><div class="d"><bdi dir="ltr">22–24.7</bdi><small>חמישי–שבת</small></div><div><h3>בבוקר טיול, בערב פסטיבל</h3><p>עיירות, טבע או שופינג, ובערב חוזרים לבמות.</p></div></div>
+      <div class="day bonus"><div class="d">25.7<small>ראשון</small></div><div><h3>לילה בקרקוב <span class="badge opt">בונוס</span></h3><p>נוסעים לקרקוב, ישנים בעיר העתיקה ומסתובבים גם בקז׳ימייז׳. הלינה שם זולה.</p></div></div>
+      <div class="day"><div class="d">26.7<small>שני</small></div><div><h3>עוד יום בקרקוב, וטיסה בלילה</h3><p>LOT יוצאת 23:55 ונוחתת בארץ ב־04:25.</p></div></div>
+    </div>
+    <div class="note"><b>גמישות:</b> אפשר לוותר על קרקוב ולחזור כבר ב־25.7 בלילה. אפשר גם לטוס בבוקר של יום הפסטיבל, עם Wizz שנוחתת 13:50, אבל אז מגיעים עייפים להופעה של רובי. אנחנו בעד לטוס יום לפני.</div>
+  </section>
+
+  <section id="cost">
+    <p class="eyebrow">כמה זה עולה</p>
+    <h2>תבנו לעצמכם</h2>
+    <p class="lead">לפי המלונות שלנו. בחרו את האפשרויות, והמחיר מתעדכן. המחירים לאדם, כשחולקים דירה בזוג.</p>
+    <div class="calc">
+      <div class="panel">
+        <fieldset class="field">
+          <legend>לינה באוסטרבה · Sting Old Town</legend>
+          <div class="seg">
+            <input type="radio" name="hotel" id="h-terrace" value="terrace" checked><label for="h-terrace">דירה עם טרסה וג׳קוזי <small>כמונו</small></label>
+            <input type="radio" name="hotel" id="h-1br" value="onebr"><label for="h-1br">דירה עם חדר שינה <small>חסכוני</small></label>
+          </div>
+        </fieldset>
+        <fieldset class="field">
+          <legend>מתי טסים</legend>
+          <div class="seg two">
+            <input type="radio" name="fly" id="f-before" value="before" checked><label for="f-before">יום לפני</label>
+            <input type="radio" name="fly" id="f-same" value="same"><label for="f-same">ביום הפסטיבל</label>
+          </div>
+        </fieldset>
+        <fieldset class="field">
+          <legend>לילה בקרקוב בחזור · Nomadic</legend>
+          <div class="seg">
+            <input type="radio" name="krk" id="k-share" value="share" checked><label for="k-share">חולקים איתנו את היחידה עם הפטיו <small>4 אנשים</small></label>
+            <input type="radio" name="krk" id="k-own" value="own"><label for="k-own">סטודיו משלכם עם נוף <small>זוג</small></label>
+            <input type="radio" name="krk" id="k-no" value="no"><label for="k-no">בלי קרקוב <small>חוזרים ב־25.7</small></label>
+          </div>
+        </fieldset>
+      </div>
+      <div class="total" aria-live="polite">
+        <div class="big" id="pp">₪0 <small>לאדם</small></div>
+        <div class="pair" id="pair">₪0 לזוג</div>
+        <table>
+          <tr><td>✈️ טיסות ישירות הלוך־חזור</td><td id="r-fl">—</td></tr>
+          <tr><td id="r-hl-l">🏨 מלון באוסטרבה</td><td id="r-hl">—</td></tr>
+          <tr><td>🇵🇱 לילה בקרקוב</td><td id="r-kr">—</td></tr>
+          <tr><td>🎟️ כרטיס לארבעה ימים</td><td id="r-tk">—</td></tr>
+        </table>
+        <p class="fine">המחירים מ־Google Flights ומ־Booking, נבדקו בתחילת אוקטובר 2026, והם עוד ישתנו. לא כולל הסעה מקרקוב לאוסטרבה (אוטובוס או רכב שכור) ואוכל.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">בבקרים</p>
+    <h2>מה עושים לפני הפסטיבל</h2>
+    <p class="lead">אוסטרבה עצמה היא עיר תעשייתית. הקסם נמצא בסביבה, במרחק נסיעה קצר.</p>
+    <div class="grid4">
+      <div class="spot"><img src="img/stramberk.jpg" alt="מגדל Trúba בשטרמברק" loading="lazy"><span class="tg">שעה ברכבת</span><h3>שטרמברק</h3><p>עיירה מאגדות, מגדל תצפית ועוגיות ג׳ינג׳ר בצורת אוזן.</p></div>
+      <div class="spot"><img src="img/deer.jpg" alt="יחמורים בשמורת הוקוואלדי" loading="lazy"><span class="tg">חצי שעה נסיעה</span><h3>הוקוואלדי</h3><p>יחמורים רועים חופשי ליד חורבת טירה גדולה.</p></div>
+      <div class="spot"><img src="img/pustevny.jpg" alt="בקתות עץ בפוסטבני" loading="lazy"><span class="tg">שעה נסיעה</span><h3>הרי הבסקידים</h3><p>בקתות עץ מצוירות ורכבל ותיק מעל היער.</p></div>
+      <div class="spot"><img src="img/krakow.jpg" alt="קרקוב" loading="lazy"><span class="tg">שעתיים נסיעה</span><h3>קרקוב</h3><p>העיר העתיקה, קז׳ימייז׳ וערב זוגי. אנחנו מוסיפים לילה.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">לפרטים הקטנים</p>
+    <h2>טוב לדעת</h2>
+    <details>
+      <summary>✈️ טיסות והגעה</summary>
+      <div class="dt"><ul>
+        <li><b>LOT:</b> יוצאת 05:40 ונוחתת בקרקוב 08:30. בחזור יוצאת 23:55. כולל תיק לתא, ₪1,317 לאדם הלוך־חזור.</li>
+        <li><b>Wizz:</b> מ־₪823 לאדם, בלי תיק לתא. הטיסה חזרה יוצאת ב־05:40 בבוקר, וזה קשה אחרי פסטיבל.</li>
+        <li><b>קרקוב ← אוסטרבה:</b> כשעתיים. יש אוטובוס FlixBus ישיר מהשדה, או רכב שכור, שגם נוח לטיולי הבוקר.</li>
+      </ul></div>
+    </details>
+    <details>
+      <summary>🏨 לינה</summary>
+      <div class="dt"><ul>
+        <li><b>Sting Old Town</b> הוא מלון דירות, בלי קבלה ובלי ארוחת בוקר. נכנסים עם קוד, ובדירות יש מטבחון ומכונת קפה.</li>
+        <li>כבר עכשיו כ־88% מהלינה באוסטרבה לתאריכי הפסטיבל תפוסה ב־Booking. <b>להזמין רק עם ביטול חינם.</b></li>
+        <li>אין מלון בטווח הליכה קצר מהפסטיבל. מהמרכז זו חצי שעה הליכה, או חשמלית קצרה.</li>
+        <li>מעדיפים מלון אחר? <a href="https://www.colours.cz/en/accommodation/hotels/">רשימת המלונות של הפסטיבל</a>, וחלק מהם עוד לא פתחו את יולי 2027 להזמנה.</li>
+      </ul></div>
+    </details>
+    <details>
+      <summary>🎟️ כרטיסים</summary>
+      <div class="dt"><ul>
+        <li>כרטיס לארבעה ימים עולה עכשיו 4,190 קרונות. המחיר עולה בשלבים: ב־2026 הוא עלה מ־3,990 ל־4,590 קרונות בכניסה.</li>
+        <li>ב־2026 לא היו כרטיסים ליום אחד, רק ליומיים או לארבעה ימים.</li>
+        <li>לקנות רק באתר הרשמי. ילדים מתחת ל־140 ס״מ נכנסים בחינם.</li>
+      </ul></div>
+    </details>
+    <details>
+      <summary>🌙 חזרה בלילה</summary>
+      <div class="dt"><ul>
+        <li>בלילות הפסטיבל יש יותר חשמליות (קווים 1, 2, 4, 8, 9). כרטיס נסיעה לכל השבוע עולה 250 קרונות ונטען על הצמיד.</li>
+        <li>המשטרה מתגברת סיורים, ואלפי אנשים הולכים יחד לכיוון המרכז.</li>
+      </ul></div>
+    </details>
+  </section>
+
+  <section>
+    <p class="eyebrow">כל הלינקים</p>
+    <h2>יאללה</h2>
+    <div class="links">
+      <a href="https://www.colours.cz/en/"><b>אתר הפסטיבל</b><span>colours.cz</span></a>
+      <a href="https://shop.colours.cz/event/colours-of-ostrava-2027-hxuy95"><b>כרטיסים</b><span>החנות הרשמית</span></a>
+      <a href="https://www.colours.cz/en/accommodation/hotels/"><b>מלונות מומלצים</b><span>הרשימה של הפסטיבל</span></a>
+      <a href="https://www.booking.com/hotel/cz/rezidence-old-town.he.html?checkin=2027-07-20&amp;checkout=2027-07-25&amp;group_adults=2&amp;no_rooms=1&amp;group_children=0"><b>המלון שלנו באוסטרבה</b><span>Sting Old Town, <bdi dir="ltr">20–25.7</bdi></span></a>
+      <a href="https://www.booking.com/hotel/pl/nomadic-urban-premium-suits.he.html?checkin=2027-07-25&amp;checkout=2027-07-26&amp;group_adults=2&amp;no_rooms=1&amp;group_children=0"><b>המלון שלנו בקרקוב</b><span>Nomadic, <bdi dir="ltr">25–26.7</bdi></span></a>
+      <a href="https://www.google.com/travel/flights?q=Flights%20from%20TLV%20to%20KRK%20on%202027-07-20%20through%202027-07-26%20nonstop"><b>טיסות לקרקוב</b><span>Google Flights</span></a>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">עוד בטיול הזה</p>
+    <h2>להציץ לפני שמחליטים</h2>
+    <div class="links">
+      <a href="map/"><b>הפסטיבל על המפה</b><span>מרחקים למלונות, לקניונים ולמרכז</span></a>
+      <a href="photos/"><b>הסביבה בתמונות</b><span>הבסקידים, שטרמברק והוקוואלדי</span></a>
+    </div>
+  </section>
+
+  <footer>
+    <p><a href="../">← כל הדפים של yaella</a></p>
+    <p>הדף נבנה לחברים שאולי מצטרפים 💛 המחירים נבדקו בתחילת אוקטובר 2026, והם יכולים להשתנות.</p>
+    <p>תמונות: Wikimedia Commons. הקרדיט מופיע ליד כל תמונה, ובנוסף: Kankovaa, Tadeáš Bednarz, Bjalek Michal (CC BY-SA).</p>
+  </footer>
+</main>
+
+<script>
+(function(){
+  // Sting Old Town, per couple: [5 nights 20–25.7, 4 nights 21–25.7]
+  var H={terrace:[9336,7546,'Sting · דירה עם טרסה'],onebr:[6623,5353,'Sting · דירה עם חדר שינה']};
+  var KRK={share:1173/4,own:1090/2,no:0}; // Nomadic, per person
+  var TICKET=650;         // 4,190 CZK per person
+  var FLY={before:1317,same:1311}; // LOT round trip / Wizz out 21.7 + LOT back, per person
+  var f=function(n){return '₪'+Math.round(n).toLocaleString('en-US')};
+  function val(n){var e=document.querySelector('input[name="'+n+'"]:checked');return e?e.value:null}
+  function run(){
+    var h=H[val('hotel')],same=val('fly')==='same',kv=val('krk');
+    var hotelPP=(same?h[1]:h[0])/2, krkPP=KRK[kv], fl=FLY[same?'same':'before'];
+    var pp=fl+hotelPP+krkPP+TICKET;
+    document.getElementById('pp').innerHTML=f(pp)+' <small>לאדם</small>';
+    document.getElementById('pair').textContent=f(pp*2)+' לזוג';
+    document.getElementById('r-fl').textContent=f(fl);
+    document.getElementById('r-hl-l').textContent='🏨 '+h[2]+' · '+(same?4:5)+' לילות';
+    document.getElementById('r-hl').textContent=f(hotelPP);
+    document.getElementById('r-kr').textContent=krkPP?f(krkPP):'—';
+    document.getElementById('r-tk').textContent=f(TICKET);
+  }
+  document.querySelectorAll('.copy').forEach(function(b){b.addEventListener('click',function(){var t=b.getAttribute('data-copy'),o=b.textContent;var done=function(){b.textContent='הועתק ✓';setTimeout(function(){b.textContent=o},1800)};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,fail)}else{fail()}function fail(){var p=b.parentNode.parentNode.querySelector('.cal-t');if(!p){p=document.createElement('p');p.className='cal-t mini';p.style.userSelect='all';p.textContent=t;b.parentNode.parentNode.appendChild(p)}var r=document.createRange();r.selectNodeContents(p);var sel=window.getSelection();sel.removeAllRanges();sel.addRange(r)}})});
+  document.querySelectorAll('.calc input').forEach(function(i){i.addEventListener('change',run)});
+  run();
+})();
+</script>
+</body>
+</html>
