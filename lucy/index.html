@@ -253,7 +253,7 @@ function stackTile(g){
 }
 function tile(i){
   return `<div class="t ${i.no||i.nolucy?'no':''}"><button class="ph" data-o="${i.id}" aria-label="פתיחה"><img data-t="${i.id}" alt=""></button>
-  ${i.kind==='video'?`<span class="tag">▶ ${fmt(i.dur)}</span>`:''}${inSheetTile&&i.cover?'<span class="cov">⭐ שער</span>':''}
+  ${i.kind==='video'?`<span class="tag">▶${i.dur?' '+fmt(i.dur):''}</span>`:''}${inSheetTile&&i.cover?'<span class="cov">⭐ שער</span>':''}
   <div class="st">${i.no?'<span class="s-no">לא רלוונטי</span>':''}${i.nolucy?'<span class="s-nl">בלי לוסי</span>':''}${i.lucy?'<span class="s-l">לוסי ✓</span>':''}</div></div>`;
 }
 let inSheetTile=false;
@@ -288,7 +288,8 @@ async function open(id){
   try{
     if(it.kind==='photo'){const full=await get('full/'+id); if(vlist[idx]===id&&full){$('#frame').innerHTML=`<img src="${full}" alt="">`;paintPin()}}
     else{const parts=[];for(let i=0;i<(it.chunks||0);i++){const c=await get(`vid/${id}/${i}`);parts.push(Uint8Array.from(atob(c),ch=>ch.charCodeAt(0)));if(vlist[idx]!==id)return}
-      objUrl=URL.createObjectURL(new Blob(parts,{type:it.mime||'video/mp4'}));$('#frame').innerHTML=`<video src="${objUrl}" controls playsinline autoplay></video>`;paintPin()}
+      objUrl=URL.createObjectURL(new Blob(parts,{type:it.mime||'video/mp4'}));$('#frame').innerHTML=`<video src="${objUrl}" controls playsinline autoplay></video>`;paintPin();
+      if(!it.dur){const v=$('#frame video');v.onloadedmetadata=()=>{if(isFinite(v.duration)&&v.duration>0)patch('items/'+id,{dur:Math.round(v.duration)}).catch(()=>{})}}}
   }catch(e){toast('הטעינה נכשלה')}
 }
 function paintPin(){
