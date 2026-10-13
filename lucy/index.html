@@ -141,8 +141,9 @@ dialog::backdrop{background:rgba(30,15,20,.55)}
 .cam video{width:100%;border-radius:14px;background:#000;max-height:60vh}
 .cam .rec{color:var(--blush);font-weight:800}
 @media (max-width:420px){.srcs{grid-template-columns:1fr}.src{grid-auto-flow:column;justify-content:start;gap:10px;padding:10px 14px}.src span{font-size:22px}}
-.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:7px 16px;border-radius:999px;font-weight:700;font-size:14px;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none}
-.toast.show{opacity:1}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:7px 8px 7px 16px;border-radius:999px;font-weight:700;font-size:14px;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none;display:flex;align-items:center;gap:10px;white-space:nowrap}
+.toast.show{opacity:1;pointer-events:auto}
+.toast button{border:0;background:var(--blush);color:#fff;border-radius:999px;padding:4px 12px;font-weight:800}
 @media (max-width:520px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.t{border-radius:10px}}
 </style>
 </head>
@@ -223,7 +224,17 @@ const EDH='19a0321f2132e93e2c18b265';
 const isEd=()=>true; // everyone with the access code can mark photos
 let cat='years';
 
-function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2000)}
+function toast(t,undo){const e=$('#toast');e.innerHTML='';e.append(document.createTextNode(t));
+  if(undo){const b=document.createElement('button');b.textContent='↩ בטל';b.onclick=async()=>{e.classList.remove('show');try{await undo();toast('בוטל')}catch(x){toast('הביטול נכשל')}};e.append(b)}
+  e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),undo?7000:2000)}
+/* apply a change to an item locally and in the database, offering undo with the previous values */
+async function change(id,p,msg){
+  const it=items[id]; if(!it)return; const prev={}; Object.keys(p).forEach(k=>prev[k]=it[k]===undefined?null:it[k]);
+  const local=v=>{Object.keys(v).forEach(k=>{if(v[k]===null)delete it[k];else it[k]=v[k]});render();if($('#gs').classList.contains('open'))renderSheet();if($('#vw').classList.contains('open'))paintBot()};
+  local(p);
+  try{await patch('items/'+id,p)}catch(e){local(prev);toast('השמירה נכשלה');return}
+  if(msg) toast(msg,async()=>{local(prev);await patch('items/'+id,prev)});
+}
 async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s.trim().toLowerCase()));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('').slice(0,24)}
 const U=p=>`${DB}/${ROOT}/${p}.json`;
 const get=async p=>{const r=await fetch(U(p));if(!r.ok)throw 0;return r.json()};
@@ -285,7 +296,7 @@ const FRIEND_FILTERS=[
   ['mine','מה שהעליתי',i=>(i.up||i.by)===ME],
 ];
 FILTERS.push(['greet','💌 ברכות',i=>i.cat==='greeting'],['friends','מהחברות',i=>i.src!=='gp']);
-function all(){return Object.entries(items).filter(([,v])=>v&&v.kind).map(([id,v])=>Object.assign({id},v))}
+function all(){return Object.entries(items).filter(([,v])=>v&&v.kind&&!v.deleted).map(([id,v])=>Object.assign({id},v))}
 function render(){
   const A=all();
   const ok=A.filter(i=>ST(i)==='in').length;
@@ -338,16 +349,14 @@ async function setSt(id,v){
   if(!ME){$('#nameDlg').showModal();return}
   const it=items[id]; if(!it)return; const nv=ST(it)===v?null:v;
   const p={st:nv,stBy:nv?ME:null,no:null,noBy:null,nolucy:null,nolucyBy:null}; if(nv==='nolucy')p.lucy=null;
-  Object.assign(it,p); render(); if($('#gs').classList.contains('open'))renderSheet(); if($('#vw').classList.contains('open'))paintBot();
-  try{await patch('items/'+id,p)}catch(e){toast('השמירה נכשלה')}
+  await change(id,p,nv?`סומן: ${STL[nv][0]} ${STL[nv][1]}`:'הסימון הוסר');
 }
 async function toggleQ(id){
   if(!ME){$('#nameDlg').showModal();return}
   const it=items[id]; if(!it)return;
   // tapping on an automatic hint means "checked, quality is fine" (qok); otherwise toggle the manual flag
   const p=(!it.lowq&&it.qauto&&!it.qok)?{qok:true,qokBy:ME}:{lowq:it.lowq?null:true,lowqBy:it.lowq?null:ME};
-  Object.assign(it,p); render(); if($('#gs').classList.contains('open'))renderSheet(); if($('#vw').classList.contains('open'))paintBot();
-  try{await patch('items/'+id,p)}catch(e){toast('השמירה נכשלה')}
+  await change(id,p,p.qok?'סומן: האיכות תקינה':p.lowq?'סומן: ⚠️ איכות לא מומלצת':'סימון האיכות הוסר');
 }
 let inSheetTile=false;
 function openSheet(key){sheetRef=key;$('#gs').classList.add('open');document.body.style.overflow='hidden';renderSheet()}
@@ -445,8 +454,8 @@ $('#stage').addEventListener('click',async e=>{
 function step(d){if(!vlist.length)return;idx=(idx+d+vlist.length)%vlist.length;open(vlist[idx])}
 function close(){$('#vw').classList.remove('open');if(!$('#gs').classList.contains('open'))document.body.style.overflow='';$('#stage').innerHTML='';if(objUrl){URL.revokeObjectURL(objUrl);objUrl=null}}
 $('#vClose').onclick=close;
-$('#vDel').onclick=async()=>{const id=vlist[idx];if(!confirm('למחוק את הפריט לגמרי? אי אפשר לשחזר.'))return;
-  await Promise.all([del('items/'+id),del('thumbs/'+id),del('full/'+id),del('vid/'+id)]);close();toast('נמחק')};
+$('#vDel').onclick=async()=>{const id=vlist[idx];if(!confirm('למחוק את הפריט?'))return;
+  close(); await change(id,{deleted:true,delBy:ME,delAt:Date.now()},'🗑 נמחק');};
 document.addEventListener('keydown',e=>{if(!$('#vw').classList.contains('open')){if(e.key==='Escape'&&$('#gs').classList.contains('open'))closeSheet();return}
   if(e.key==='Escape')close(); if(e.key==='ArrowLeft')step(1); if(e.key==='ArrowRight')step(-1);
   if(e.key==='1')act('st-in'); if(e.key==='2')act('st-maybe'); if(e.key==='3')act('st-no'); if(e.key==='4')act('st-nolucy'); if(e.key==='l'||e.key==='ך')act('mark')});
