@@ -145,7 +145,7 @@ const $=s=>document.querySelector(s);
 const ls={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmt=s=>{s=Math.round(s||0);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
-let ROOT=null, ME=ls.get('lucy_name')||'', items={}, F='todo', list=[], idx=-1, marking=false, objUrl=null;
+let ROOT=null, ME=ls.get('lucy_name')||'', items={}, F='todo', list=[], vlist=[], idx=-1, marking=false, objUrl=null;
 const thumbs={};
 
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2000)}
@@ -212,42 +212,42 @@ function tile(i){
 const io=new IntersectionObserver(es=>es.forEach(async e=>{if(!e.isIntersecting)return;io.unobserve(e.target);const id=e.target.dataset.t;try{const d=await get('thumbs/'+id);if(d){thumbs[id]=d;e.target.src=d}}catch(x){}}),{rootMargin:'300px'});
 document.addEventListener('click',e=>{
   const f=e.target.closest('[data-f]');if(f){F=f.dataset.f;render();return}
-  const o=e.target.closest('[data-o]');if(o){open(o.dataset.o);return}
+  const o=e.target.closest('[data-o]');if(o){vlist=list.slice();open(o.dataset.o);return}
 });
 
 /* viewer */
 async function open(id){
-  idx=list.indexOf(id); marking=false; const it=items[id]; if(!it)return;
+  idx=vlist.indexOf(id); marking=false; const it=items[id]; if(!it)return;
   $('#vw').classList.add('open'); document.body.style.overflow='hidden';
   $('#vTtl').textContent=[it.year,it.caption].filter(Boolean).join(' · ');
   if(objUrl){URL.revokeObjectURL(objUrl);objUrl=null}
   $('#stage').innerHTML=`<button class="ic navb p" data-nav="-1" aria-label="הקודם">›</button><div class="frame" id="frame"><img src="${thumbs[id]||''}" alt="" style="opacity:.6"></div><button class="ic navb n" data-nav="1" aria-label="הבא">‹</button>`;
   paintBot();
   try{
-    if(it.kind==='photo'){const full=await get('full/'+id); if(list[idx]===id&&full){$('#frame').innerHTML=`<img src="${full}" alt="">`;paintPin()}}
-    else{const parts=[];for(let i=0;i<(it.chunks||0);i++){const c=await get(`vid/${id}/${i}`);parts.push(Uint8Array.from(atob(c),ch=>ch.charCodeAt(0)));if(list[idx]!==id)return}
+    if(it.kind==='photo'){const full=await get('full/'+id); if(vlist[idx]===id&&full){$('#frame').innerHTML=`<img src="${full}" alt="">`;paintPin()}}
+    else{const parts=[];for(let i=0;i<(it.chunks||0);i++){const c=await get(`vid/${id}/${i}`);parts.push(Uint8Array.from(atob(c),ch=>ch.charCodeAt(0)));if(vlist[idx]!==id)return}
       objUrl=URL.createObjectURL(new Blob(parts,{type:it.mime||'video/mp4'}));$('#frame').innerHTML=`<video src="${objUrl}" controls playsinline autoplay></video>`;paintPin()}
   }catch(e){toast('הטעינה נכשלה')}
 }
 function paintPin(){
-  const it=items[list[idx]], fr=$('#frame'); if(!fr||!it)return;
+  const it=items[vlist[idx]], fr=$('#frame'); if(!fr||!it)return;
   fr.querySelectorAll('.pin,.mk').forEach(p=>p.remove()); fr.classList.toggle('marking',marking);
   if(it.lucy){const p=document.createElement('div');p.className='pin';p.style.left=(it.lucy.x*100)+'%';p.style.top=(it.lucy.y*100)+'%';fr.appendChild(p)}
   if(marking){const m=document.createElement('div');m.className='mk';m.textContent='לוחצות על הפנים של לוסי';fr.appendChild(m)}
 }
 function paintBot(){
-  const id=list[idx], it=items[id]; if(!it)return;
+  const id=vlist[idx], it=items[id]; if(!it)return;
   const by=[it.noBy&&('לא רלוונטי: '+it.noBy),it.nolucyBy&&('בלי לוסי: '+it.nolucyBy),it.lucy&&it.lucy.by&&('סימנה את לוסי: '+it.lucy.by),it.by&&('העלתה: '+it.by)].filter(Boolean).join(' · ');
   $('#bot').innerHTML=`
     <button class="btn ${marking?'on':''}" data-a="mark">📍 ${it.lucy?'לסמן מחדש את לוסי':'איפה לוסי?'}</button>
     <button class="btn ${it.nolucy?'onnl':''}" data-a="nolucy">🙈 אין כאן לוסי</button>
     <button class="btn ${it.no?'onno':''}" data-a="no">✕ לא רלוונטי</button>
     <button class="btn" data-a="next">הבא ‹</button>
-    <div class="who">${esc(by)} · ${idx+1}/${list.length}</div>`;
+    <div class="who">${esc(by)} · ${idx+1}/${vlist.length}</div>`;
   paintPin();
 }
 async function act(a){
-  const id=list[idx], it=items[id]; if(!ME){$('#nameDlg').showModal();return}
+  const id=vlist[idx], it=items[id]; if(!ME){$('#nameDlg').showModal();return}
   try{
     if(a==='mark'){marking=!marking;paintBot();return}
     if(a==='next'){step(1);return}
@@ -260,13 +260,13 @@ $('#stage').addEventListener('click',async e=>{
   const n=e.target.closest('[data-nav]');if(n){step(+n.dataset.nav);return}
   if(!marking)return; const media=e.target.closest('#frame img,#frame video');if(!media)return;
   const r=media.getBoundingClientRect(); const x=(e.clientX-r.left)/r.width, y=(e.clientY-r.top)/r.height;
-  const id=list[idx]; marking=false;
+  const id=vlist[idx]; marking=false;
   try{await patch('items/'+id,{lucy:{x:+x.toFixed(4),y:+y.toFixed(4),by:ME},nolucy:null,nolucyBy:null});toast('סומן 📍')}catch(x){toast('השמירה נכשלה')}
 });
-function step(d){if(!list.length)return;idx=(idx+d+list.length)%list.length;open(list[idx])}
+function step(d){if(!vlist.length)return;idx=(idx+d+vlist.length)%vlist.length;open(vlist[idx])}
 function close(){$('#vw').classList.remove('open');document.body.style.overflow='';$('#stage').innerHTML='';if(objUrl){URL.revokeObjectURL(objUrl);objUrl=null}}
 $('#vClose').onclick=close;
-$('#vDel').onclick=async()=>{const id=list[idx];if(!confirm('למחוק את הפריט לגמרי? אי אפשר לשחזר.'))return;
+$('#vDel').onclick=async()=>{const id=vlist[idx];if(!confirm('למחוק את הפריט לגמרי? אי אפשר לשחזר.'))return;
   await Promise.all([del('items/'+id),del('thumbs/'+id),del('full/'+id),del('vid/'+id)]);close();toast('נמחק')};
 document.addEventListener('keydown',e=>{if(!$('#vw').classList.contains('open'))return;
   if(e.key==='Escape')close(); if(e.key==='ArrowLeft')step(1); if(e.key==='ArrowRight')step(-1);
