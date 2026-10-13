@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>לוסי בת 12</title>
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="בוחרות ביחד תמונות וסרטונים לסרטון בת המצווה של לוסי">
-<meta property="og:title" content="לוסי בת 12 ✨ בוחרות ביחד">
-<meta property="og:description" content="מעלות תמונות וסרטונים ובוחרות מה נכנס לסרטון">
+<meta name="description" content="יעל וענת אוספות ומסמנות תמונות לסרטון בת המצווה של לוסי">
+<meta property="og:title" content="לוסי בת 12 ✨">
+<meta property="og:description" content="מוסיפות תמונות, מסמנות מה לא רלוונטי ואיפה לוסי">
 <meta property="og:image" content="https://yaelavgil.github.io/yaella/lucy/og.jpg">
 <link rel="icon" href="/yaella/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/yaella/favicon-32.png" sizes="32x32" type="image/png">
@@ -16,418 +16,299 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Assistant:wght@400;600;700;800&display=swap">
 <style>
-/* A warm, celebratory shared board: a hero with Lucy's name, a sticky toolbar (filters + add), then a year-by-year grid of tiles; each tile carries the two people's hearts and an "in the movie" pick. */
+/* Lean two-person sorting app: header, filter chips + add button, a photo grid; tapping a photo opens it big, where you mark relevance and tap Lucy's face. */
 :root{
   --bg:#fbf5ef; --paper:#fffdfb; --ink:#2b2226; --muted:#7d6f74; --line:#efe3da;
-  --blush:#e2708a; --blush-soft:#fbe3e8; --gold:#c99a3c; --gold-soft:#f8ecd2; --mint:#5aa58a; --mint-soft:#dcefe7;
-  --shadow:0 1px 2px rgba(80,40,50,.06),0 8px 24px rgba(80,40,50,.08);
+  --blush:#e2708a; --blush-soft:#fbe3e8; --mint:#4f9d80; --gold:#c99a3c;
   --display:"Amatic SC","Assistant",cursive; --body:"Assistant","Arial Hebrew",system-ui,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#1b1518; --paper:#251d21; --ink:#f6ece8; --muted:#b9a8ad; --line:#3a2e33;
-  --blush:#f08aa1; --blush-soft:#4a2a33; --gold:#e2b45a; --gold-soft:#433620; --mint:#7cc7aa; --mint-soft:#203a31; color-scheme:dark}}
+  --bg:#1b1518; --paper:#251d21; --ink:#f6ece8; --muted:#b9a8ad; --line:#3a2e33; --blush:#f08aa1; --blush-soft:#4a2a33; --mint:#6cc4a2; --gold:#e2b45a; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#1b1518; --paper:#251d21; --ink:#f6ece8; --muted:#b9a8ad; --line:#3a2e33;
-  --blush:#f08aa1; --blush-soft:#4a2a33; --gold:#e2b45a; --gold-soft:#433620; --mint:#7cc7aa; --mint-soft:#203a31; color-scheme:dark}
+  --bg:#1b1518; --paper:#251d21; --ink:#f6ece8; --muted:#b9a8ad; --line:#3a2e33; --blush:#f08aa1; --blush-soft:#4a2a33; --mint:#6cc4a2; --gold:#e2b45a; color-scheme:dark}
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5}
-button{font:inherit;color:inherit}
-button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--blush);outline-offset:2px}
-.hero{position:relative;overflow:hidden;text-align:center;padding:48px 16px 28px}
-.hero h1{font-family:var(--display);font-size:clamp(64px,16vw,124px);line-height:.85;margin:0;letter-spacing:.01em}
-.hero h1 .n{color:var(--blush)}
-.hero p{margin:10px auto 0;max-width:46ch;color:var(--muted);font-size:17px}
-.confetti{position:absolute;inset:0;pointer-events:none}
-.confetti i{position:absolute;width:8px;height:14px;border-radius:2px;opacity:.55}
-.stats{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:18px}
-.stat{background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:5px 14px;font-weight:700;font-size:14px;box-shadow:var(--shadow)}
-.stat b{color:var(--blush)}
-.who{display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-size:14px;color:var(--muted)}
-.who button{border:0;background:none;color:var(--blush);font-weight:700;cursor:pointer;text-decoration:underline;padding:0}
-.bar{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.bar .in{max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;flex:1 1 auto;min-width:0}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--blush);outline-offset:2px}
+header{text-align:center;padding:26px 16px 10px}
+h1{font-family:var(--display);font-size:clamp(54px,13vw,88px);line-height:.85;margin:0}
+h1 span{color:var(--blush)}
+.sum{color:var(--muted);font-size:14px;margin-top:6px}
+.sum b{color:var(--ink)}
+.bar{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar .in{max-width:1100px;margin:0 auto;padding:9px 16px;display:flex;gap:8px;align-items:center}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0}
 .chips::-webkit-scrollbar{display:none}
-.chip{flex:none;border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:5px 13px;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap}
+.chip{flex:none;border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:4px 12px;font-weight:700;font-size:14px;white-space:nowrap}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.add{flex:none;border:0;background:var(--blush);color:#fff;border-radius:999px;padding:8px 18px;font-weight:800;cursor:pointer;box-shadow:var(--shadow)}
-.yrs{max-width:1180px;margin:0 auto;padding:0 16px 8px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
-.yrs .chip{font-size:13px;padding:3px 11px}
-main{max-width:1180px;margin:0 auto;padding:8px 16px 80px}
-.year{margin-top:26px}
-.year h2{font-family:var(--display);font-size:46px;line-height:1;margin:0 0 4px;display:flex;align-items:baseline;gap:12px}
-.year h2 small{font-family:var(--body);font-size:14px;color:var(--muted);font-weight:600}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
-.tile{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);transition:transform .15s}
-.tile:hover{transform:translateY(-2px)}
-.tile.in{border-color:var(--mint);box-shadow:0 0 0 2px var(--mint),var(--shadow)}
-.tile.out{opacity:.45}
-.ph{display:block;width:100%;aspect-ratio:1;object-fit:cover;background:linear-gradient(135deg,var(--blush-soft),var(--gold-soft));border:0;padding:0;cursor:zoom-in}
-.ph img{width:100%;height:100%;object-fit:cover;display:block}
-.badge{position:absolute;top:8px;inset-inline-start:8px;background:rgba(20,10,14,.62);color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:2px 9px}
-.badge.g{background:var(--gold);color:#2b2226}
-.inpill{position:absolute;top:8px;inset-inline-end:8px;background:var(--mint);color:#fff;font-size:12px;font-weight:800;border-radius:999px;padding:2px 9px}
-.tb{display:flex;align-items:center;gap:6px;padding:7px 8px}
-.cap{flex:1;min-width:0;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hearts{display:flex;gap:2px}
-.heart{border:0;background:none;cursor:pointer;font-size:13px;font-weight:800;border-radius:999px;padding:2px 7px;display:flex;align-items:center;gap:3px;color:var(--muted)}
-.heart.on{background:var(--blush-soft);color:var(--blush)}
+.chip small{opacity:.6;font-weight:600}
+.add{flex:none;border:0;background:var(--blush);color:#fff;border-radius:999px;padding:7px 16px;font-weight:800}
+main{max-width:1100px;margin:0 auto;padding:12px 16px 80px}
+h2{font-family:var(--display);font-size:40px;line-height:1;margin:22px 0 8px}
+h2 small{font-family:var(--body);font-size:13px;color:var(--muted);font-weight:600;margin-inline-start:8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.t{position:relative;border-radius:14px;overflow:hidden;background:var(--paper);border:1px solid var(--line)}
+.t button.ph{display:block;width:100%;aspect-ratio:1;border:0;padding:0;background:var(--blush-soft)}
+.t img{width:100%;height:100%;object-fit:cover;display:block}
+.t.no img{filter:grayscale(1);opacity:.35}
+.t .tag{position:absolute;top:6px;inset-inline-start:6px;font-size:11px;font-weight:800;border-radius:999px;padding:1px 8px;background:rgba(20,10,14,.62);color:#fff}
+.t .st{position:absolute;bottom:6px;inset-inline-end:6px;display:flex;gap:4px}
+.t .st span{font-size:12px;font-weight:800;border-radius:999px;padding:1px 7px;color:#fff}
+.s-no{background:#6b5a60}.s-nl{background:var(--gold);color:#2b2226!important}.s-l{background:var(--blush)}
 .empty{text-align:center;color:var(--muted);padding:60px 16px}
-.empty .big{font-family:var(--display);font-size:48px;color:var(--ink)}
-/* dialogs */
-dialog{border:0;border-radius:20px;padding:0;background:var(--paper);color:var(--ink);box-shadow:0 30px 80px rgba(0,0,0,.35);max-width:min(560px,calc(100vw - 24px));width:100%}
-dialog::backdrop{background:rgba(30,15,20,.55);backdrop-filter:blur(3px)}
-.dl{padding:22px;display:grid;gap:14px}
-.dl h3{font-family:var(--display);font-size:40px;line-height:1;margin:0}
+.empty b{display:block;font-family:var(--display);font-size:46px;color:var(--ink);font-weight:700}
+dialog{border:0;border-radius:20px;padding:0;background:var(--paper);color:var(--ink);box-shadow:0 30px 80px rgba(0,0,0,.35);width:min(480px,calc(100vw - 24px))}
+dialog::backdrop{background:rgba(30,15,20,.55)}
+.dl{padding:20px;display:grid;gap:12px}
+.dl h3{font-family:var(--display);font-size:38px;line-height:1;margin:0}
 .dl label{display:grid;gap:4px;font-weight:700;font-size:14px}
-.dl input,.dl select,.dl textarea{font:inherit;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:12px;padding:9px 12px}
-.row2{display:flex;gap:8px;justify-content:flex-start;flex-wrap:wrap}
-.btn{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:8px 18px;font-weight:800;cursor:pointer}
+.dl input,.dl select{font:inherit;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:12px;padding:9px 12px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:8px 16px;font-weight:800}
 .btn.pri{background:var(--blush);border-color:var(--blush);color:#fff}
-.seg{display:flex;gap:6px;flex-wrap:wrap}
-.seg button{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:6px 14px;font-weight:700;cursor:pointer}
-.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.drop{border:2px dashed var(--line);border-radius:16px;padding:22px;text-align:center;color:var(--muted);cursor:pointer}
-.drop.over{border-color:var(--blush);background:var(--blush-soft)}
-.q{display:grid;gap:6px;max-height:200px;overflow:auto}
-.qi{display:flex;gap:8px;align-items:center;font-size:13px}
-.qi .bar2{flex:1;height:6px;background:var(--line);border-radius:9px;overflow:hidden}
-.qi .bar2 i{display:block;height:100%;width:0;background:var(--blush);transition:width .2s}
+.drop{border:2px dashed var(--line);border-radius:14px;padding:20px;text-align:center;color:var(--muted)}
+.q{display:grid;gap:4px;max-height:160px;overflow:auto;font-size:13px}
+.q div{display:flex;justify-content:space-between;gap:8px}
 .hint{font-size:13px;color:var(--muted);margin:0}
 /* viewer */
-.vw{position:fixed;inset:0;z-index:20;background:rgba(18,10,14,.94);display:none;grid-template-rows:auto 1fr auto;color:#fff}
+.vw{position:fixed;inset:0;z-index:20;background:#140c10;color:#fff;display:none;grid-template-rows:auto 1fr auto}
 .vw.open{display:grid}
-.vw .top{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;gap:10px}
-.vw .top .t{font-weight:700;opacity:.85;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.vw .ic{border:0;background:rgba(255,255,255,.12);color:#fff;border-radius:999px;width:42px;height:42px;font-size:20px;cursor:pointer;flex:none}
-.vw .stage{position:relative;display:grid;place-items:center;min-height:0;padding:0 8px}
-.vw .stage img,.vw .stage video{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px}
-.vw .nav{position:absolute;top:50%;transform:translateY(-50%)}
-.vw .nav.p{inset-inline-start:10px}.vw .nav.n{inset-inline-end:10px}
-.vw .bot{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;padding:12px 14px calc(14px + env(safe-area-inset-bottom))}
-.vw .bot .btn{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff}
-.vw .bot .btn.on-in{background:var(--mint);border-color:var(--mint)}
-.vw .bot .btn.on-maybe{background:var(--gold);border-color:var(--gold);color:#2b2226}
-.vw .bot .btn.on-out{background:#6b5a60;border-color:#6b5a60}
-.vw .bot .btn.on-h{background:var(--blush);border-color:var(--blush)}
-.vw .who2{font-size:13px;opacity:.75;width:100%;text-align:center}
-.vw .loading{opacity:.7}
-.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:999px;font-weight:700;font-size:14px;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none}
+.vw .top{display:flex;align-items:center;gap:10px;padding:10px 12px}
+.vw .top .ttl{flex:1;min-width:0;font-weight:700;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ic{border:0;background:rgba(255,255,255,.12);color:#fff;border-radius:999px;width:40px;height:40px;font-size:18px;flex:none}
+.stage{position:relative;display:grid;place-items:center;min-height:0;overflow:hidden}
+.frame{position:relative;max-width:100%;max-height:100%;display:inline-block;line-height:0}
+.frame img,.frame video{max-width:100vw;max-height:calc(100dvh - 170px);display:block;object-fit:contain}
+.frame.marking{cursor:crosshair}
+.pin{position:absolute;width:56px;height:56px;margin:-28px 0 0 -28px;border:3px solid var(--blush);border-radius:50%;box-shadow:0 0 0 3px rgba(0,0,0,.35);pointer-events:none}
+.pin::after{content:"לוסי";position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:3px;background:var(--blush);color:#fff;font-size:12px;font-weight:800;border-radius:999px;padding:0 7px;line-height:1.6;white-space:nowrap}
+.navb{position:absolute;top:50%;transform:translateY(-50%)}
+.navb.p{inset-inline-start:8px}.navb.n{inset-inline-end:8px}
+.bot{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding:10px 12px calc(12px + env(safe-area-inset-bottom))}
+.bot .btn{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.22);color:#fff}
+.bot .btn.on{background:var(--blush);border-color:var(--blush)}
+.bot .btn.onno{background:#6b5a60;border-color:#6b5a60}
+.bot .btn.onnl{background:var(--gold);border-color:var(--gold);color:#2b2226}
+.bot .who{width:100%;text-align:center;font-size:12px;opacity:.7}
+.mk{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:var(--blush);color:#fff;font-weight:800;font-size:14px;border-radius:999px;padding:4px 14px;z-index:2}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:7px 16px;border-radius:999px;font-weight:700;font-size:14px;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.show{opacity:1}
-@media (max-width:560px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.year h2{font-size:38px}}
+@media (max-width:520px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.t{border-radius:10px}}
 </style>
 </head>
 <body>
-
-<header class="hero">
-  <div class="confetti" id="confetti" aria-hidden="true"></div>
-  <h1>לוסי <span class="n">בת 12</span> ✨</h1>
-  <p>כאן אוספות ביחד תמונות וסרטונים מכל השנים ואת הברכות מהחברים, ובוחרות מה נכנס לסרטון.</p>
-  <div class="stats" id="stats"></div>
-  <div class="who" id="whoLine"></div>
+<header>
+  <h1>לוסי <span>בת 12</span> ✨</h1>
+  <div class="sum" id="sum"></div>
 </header>
-
 <div class="bar"><div class="in">
-  <div class="chips" id="filters" role="group" aria-label="סינון"></div>
+  <div class="chips" id="chips" role="group" aria-label="סינון"></div>
   <button class="add" id="addBtn">+ הוספה</button>
-</div>
-<div class="yrs" id="years" role="group" aria-label="שנים"></div>
-</div>
+</div></div>
+<main id="main"><div class="empty"><b>רגע…</b>טוענות</div></main>
 
-<main id="main"><div class="empty"><div class="big">רגע…</div>טוענות</div></main>
-
-<!-- gate -->
 <dialog id="gate"><form class="dl" method="dialog" id="gateForm">
   <h3>ברוכה הבאה 💛</h3>
-  <p class="hint">כדי להיכנס צריך את קוד הגישה. הוא מופיע בסוף הקישור ששלחו לך.</p>
+  <p class="hint">קוד הגישה נמצא בסוף הקישור ששלחו לך.</p>
   <label>קוד גישה<input id="gateCode" autocomplete="off" required></label>
-  <label>איך קוראים לך?<input id="gateName" autocomplete="given-name" required></label>
-  <div class="row2"><button class="btn pri" type="submit">כניסה</button></div>
+  <div class="row"><button class="btn pri">כניסה</button></div>
 </form></dialog>
 
-<!-- name -->
 <dialog id="nameDlg"><form class="dl" method="dialog" id="nameForm">
-  <h3>איך קוראים לך?</h3>
-  <p class="hint">כדי שנדע מי סימנה לב על מה.</p>
-  <label>שם<input id="nameInp" autocomplete="given-name" required></label>
-  <div class="row2"><button class="btn pri" type="submit">יאללה</button></div>
+  <h3>מי את?</h3>
+  <div class="row" id="nameQuick"><button class="btn" value="יעל">יעל</button><button class="btn" value="ענת">ענת</button></div>
+  <label>או שם אחר<input id="nameInp" autocomplete="given-name"></label>
+  <div class="row"><button class="btn pri" value="">המשך</button></div>
 </form></dialog>
 
-<!-- add -->
 <dialog id="addDlg"><div class="dl">
-  <h3>הוספת תמונות וסרטונים</h3>
-  <div><div class="hint" style="margin-bottom:6px">מה מעלות?</div>
-    <div class="seg" id="catSeg">
-      <button type="button" data-v="years" aria-pressed="true">📸 מהשנים</button>
-      <button type="button" data-v="greeting" aria-pressed="false">🎥 ברכה מחבר/ה</button>
-    </div></div>
+  <h3>הוספת תמונות</h3>
   <label>שנה<select id="addYear"></select></label>
-  <label>כיתוב (לא חובה)<input id="addCap" placeholder="למשל: טיול שנתי, יום הולדת 9, ברכה מנועה"></label>
-  <div class="drop" id="drop" tabindex="0" role="button">גוררות לכאן או <b>לוחצות לבחירה</b><br><span class="hint">תמונות, וסרטונים עד 45MB לכל סרטון</span></div>
+  <button class="drop" id="drop" type="button">לוחצות כאן לבחירת תמונות וסרטונים<br><span class="hint">או גוררות לכאן · סרטון עד 45MB</span></button>
   <input type="file" id="file" accept="image/*,video/*" multiple hidden>
   <div class="q" id="queue"></div>
-  <div class="row2"><button class="btn" type="button" id="addClose">סגירה</button></div>
+  <div class="row"><button class="btn" type="button" id="addClose">סיום</button></div>
 </div></dialog>
 
-<!-- viewer -->
-<div class="vw" id="vw" role="dialog" aria-modal="true" aria-label="צפייה">
-  <div class="top"><button class="ic" id="vwClose" aria-label="סגירה">✕</button><div class="t" id="vwTitle"></div><button class="ic" id="vwMore" aria-label="עריכה">✎</button></div>
-  <div class="stage" id="vwStage"></div>
-  <div class="bot" id="vwBot"></div>
+<div class="vw" id="vw" role="dialog" aria-modal="true" aria-label="צפייה בתמונה">
+  <div class="top"><button class="ic" id="vClose" aria-label="סגירה">✕</button><div class="ttl" id="vTtl"></div><button class="ic" id="vDel" aria-label="מחיקה">🗑</button></div>
+  <div class="stage" id="stage"></div>
+  <div class="bot" id="bot"></div>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script>
 (function(){
-const DB = 'https://home-picks-47450-default-rtdb.europe-west1.firebasedatabase.app';
-const PHOTO_SEC = 4;          // assumed screen time per photo in the final movie
-const VIDEO_MAX = 45*1024*1024;
-const CHUNK = 600*1024;       // raw bytes per stored chunk
-const $ = s => document.querySelector(s);
-const store = { get(k){ try{return localStorage.getItem(k)}catch(e){return null} }, set(k,v){ try{localStorage.setItem(k,v)}catch(e){} } };
+const DB='https://home-picks-47450-default-rtdb.europe-west1.firebasedatabase.app';
+const VIDEO_MAX=45*1024*1024, CHUNK=600*1024;
+const $=s=>document.querySelector(s);
+const ls={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=s=>{s=Math.round(s||0);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+let ROOT=null, ME=ls.get('lucy_name')||'', items={}, F='todo', list=[], idx=-1, marking=false, objUrl=null;
+const thumbs={};
 
-let ROOT = null, ME = store.get('lucy_name') || '';
-let items = {};               // id -> item
-let filter = 'all', yearF = 'all';
-let cat = 'years';
-let viewList = [], viewIdx = -1;
-const thumbCache = {};
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2000)}
+async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s.trim().toLowerCase()));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('').slice(0,24)}
+const U=p=>`${DB}/${ROOT}/${p}.json`;
+const get=async p=>{const r=await fetch(U(p));if(!r.ok)throw 0;return r.json()};
+const put=async(p,v)=>{const r=await fetch(U(p),{method:'PUT',body:JSON.stringify(v)});if(!r.ok)throw 0};
+const patch=async(p,v)=>{const r=await fetch(U(p),{method:'PATCH',body:JSON.stringify(v)});if(!r.ok)throw 0};
+const del=p=>fetch(U(p),{method:'DELETE'});
 
-/* ---------- confetti ---------- */
-(function(){ const c=$('#confetti'), cols=['#e2708a','#c99a3c','#5aa58a','#f3b6c4','#f2d48c'];
-  for(let i=0;i<34;i++){ const e=document.createElement('i'); e.style.left=Math.random()*100+'%'; e.style.top=Math.random()*100+'%';
-    e.style.background=cols[i%cols.length]; e.style.transform='rotate('+(Math.random()*180)+'deg)'; c.appendChild(e); } })();
-
-/* ---------- helpers ---------- */
-function toast(t){ const el=$('#toast'); el.textContent=t; el.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>el.classList.remove('show'),2200); }
-async function sha(s){ const b=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s.trim().toLowerCase())); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('').slice(0,24); }
-const url = p => `${DB}/${ROOT}/${p}.json`;
-async function get(p){ const r=await fetch(url(p)); if(!r.ok) throw new Error(r.status); return r.json(); }
-async function put(p,v){ const r=await fetch(url(p),{method:'PUT',body:JSON.stringify(v)}); if(!r.ok) throw new Error(r.status); }
-async function patch(p,v){ const r=await fetch(url(p),{method:'PATCH',body:JSON.stringify(v)}); if(!r.ok) throw new Error(r.status); }
-async function del(p){ await fetch(url(p),{method:'DELETE'}); }
-const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
-const fmtDur = s => { s=Math.round(s); const m=Math.floor(s/60); return m+':'+String(s%60).padStart(2,'0'); };
-const esc = s => String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-
-/* ---------- entry ---------- */
+/* entry: code comes from the link (#k=...) and is remembered on this device */
 async function boot(){
-  const m = location.hash.match(/k=([^&]+)/);
-  let code = m ? decodeURIComponent(m[1]) : store.get('lucy_code');
-  if(m){ store.set('lucy_code', code); history.replaceState(null,'',location.pathname); }
-  if(!code){ $('#gateName').value = ME; $('#gate').showModal(); return; }
-  ROOT = 'lucy_' + await sha(code);
-  if(!ME){ $('#nameDlg').showModal(); }
-  start();
+  const m=location.hash.match(/k=([^&]+)/); let code=m?decodeURIComponent(m[1]):ls.get('lucy_code');
+  if(m){ls.set('lucy_code',code);history.replaceState(null,'',location.pathname)}
+  if(!code){$('#gate').showModal();return}
+  ROOT='lucy_'+await sha(code);
+  try{ if(!await get('meta')){ls.set('lucy_code','');$('#main').innerHTML='<div class="empty"><b>אופס</b>הקוד לא נכון</div>';return} }
+  catch(e){$('#main').innerHTML='<div class="empty"><b>אין חיבור</b>נסי לרענן</div>';return}
+  if(!ME) $('#nameDlg').showModal();
+  const es=new EventSource(U('items'));
+  const on=ev=>{const {path,data}=JSON.parse(ev.data);apply(path,data,ev.type==='patch');render();if($('#vw').classList.contains('open'))paintBot()};
+  es.addEventListener('put',on);es.addEventListener('patch',on);
 }
-$('#gateForm').addEventListener('submit', async e=>{
-  const code=$('#gateCode').value.trim(); ME=$('#gateName').value.trim();
-  store.set('lucy_code',code); store.set('lucy_name',ME);
-  ROOT='lucy_'+await sha(code); start();
-});
-$('#nameForm').addEventListener('submit', ()=>{ ME=$('#nameInp').value.trim(); store.set('lucy_name',ME); render(); });
+function apply(path,data,isPatch){
+  const ps=path.split('/').filter(Boolean);
+  if(!ps.length){items=isPatch?Object.assign(items,data||{}):(data||{});return}
+  let o=items;for(let i=0;i<ps.length-1;i++){o[ps[i]]=o[ps[i]]||{};o=o[ps[i]]}
+  const k=ps[ps.length-1]; if(data===null)delete o[k]; else if(isPatch)o[k]=Object.assign(o[k]||{},data); else o[k]=data;
+}
+$('#gateForm').onsubmit=async()=>{ls.set('lucy_code',$('#gateCode').value.trim());boot()};
+$('#nameForm').onsubmit=e=>{const v=e.submitter&&e.submitter.value||$('#nameInp').value.trim();if(!v){e.preventDefault();return}ME=v;ls.set('lucy_name',ME);render()};
 
-async function start(){
-  try{
-    const ok = await get('meta');
-    if(!ok){ $('#main').innerHTML='<div class="empty"><div class="big">אופס</div>הקוד לא נכון. בדקי שוב את הקישור.</div>'; store.set('lucy_code',''); return; }
-  }catch(e){ $('#main').innerHTML='<div class="empty"><div class="big">אין חיבור</div>נסי לרענן בעוד רגע.</div>'; return; }
-  if(ME) patch('people',{[ME]:Date.now()}).catch(()=>{});
-  listen();
-}
-
-/* live sync via the database's event stream */
-function listen(){
-  const es = new EventSource(url('items'));
-  const apply = (ev)=>{ const {path,data}=JSON.parse(ev.data); setAt(path,data,ev.type==='patch'); render(); };
-  es.addEventListener('put',apply); es.addEventListener('patch',apply);
-  es.onerror = ()=>{ /* EventSource retries on its own */ };
-}
-function setAt(path,data,isPatch){
-  const parts = path.split('/').filter(Boolean);
-  if(!parts.length){ if(isPatch) Object.assign(items,data||{}); else items = data||{}; return; }
-  let o = items; for(let i=0;i<parts.length-1;i++){ o[parts[i]] = o[parts[i]] || {}; o = o[parts[i]]; }
-  const k = parts[parts.length-1];
-  if(data===null) delete o[k];
-  else if(isPatch){ o[k] = Object.assign(o[k]||{}, data); }
-  else o[k] = data;
-}
-
-/* ---------- render ---------- */
-const FILTERS = [['all','הכל'],['in','✓ בסרטון'],['maybe','🤔 אולי'],['new','לא הוחלט'],['photo','📸 תמונות'],['video','🎬 סרטונים'],['greeting','💌 ברכות']];
-function passes(it){
-  if(yearF!=='all' && String(it.year)!==yearF) return false;
-  switch(filter){
-    case 'in': return it.pick==='in'; case 'maybe': return it.pick==='maybe';
-    case 'new': return !it.pick; case 'photo': return it.kind==='photo'; case 'video': return it.kind==='video';
-    case 'greeting': return it.cat==='greeting'; default: return it.pick!=='out' || filter==='all';
-  }
-}
+/* status of an item: no = not relevant, nolucy = Lucy isn't in it, lucy = where she is */
+const FILTERS=[
+  ['todo','לבדוק',i=>!i.no&&!i.nolucy&&!i.lucy],
+  ['all','הכל',i=>true],
+  ['ok','רלוונטי',i=>!i.no&&!i.nolucy],
+  ['marked','לוסי מסומנת',i=>!!i.lucy],
+  ['no','לא רלוונטי',i=>!!i.no],
+  ['nolucy','בלי לוסי',i=>!!i.nolucy],
+  ['video','סרטונים',i=>i.kind==='video'],
+];
+function all(){return Object.entries(items).filter(([,v])=>v&&v.kind).map(([id,v])=>Object.assign({id},v))}
 function render(){
-  const all = Object.entries(items).filter(([,v])=>v&&v.kind).map(([id,v])=>Object.assign({id},v));
-  // stats
-  const ins = all.filter(i=>i.pick==='in');
-  const secs = ins.reduce((s,i)=>s+(i.kind==='video'?(i.dur||8):PHOTO_SEC),0);
-  $('#stats').innerHTML = `<span class="stat"><b>${all.length}</b> בסך הכל</span><span class="stat">נכנסו לסרטון: <b>${ins.length}</b></span><span class="stat">משך משוער: <b>${fmtDur(secs)}</b></span>`;
-  $('#whoLine').innerHTML = ME ? `מחוברת בתור <b>${esc(ME)}</b> · <button id="chg">החלפה</button>` : '';
-  const chg=$('#chg'); if(chg) chg.onclick=()=>{ $('#nameInp').value=ME; $('#nameDlg').showModal(); };
-  // filters
-  $('#filters').innerHTML = FILTERS.map(([k,l])=>`<button class="chip" data-f="${k}" aria-pressed="${filter===k}">${l}</button>`).join('');
-  const years = [...new Set(all.map(i=>i.year).filter(Boolean))].sort();
-  $('#years').innerHTML = `<button class="chip" data-y="all" aria-pressed="${yearF==='all'}">כל השנים</button>` + years.map(y=>`<button class="chip" data-y="${y}" aria-pressed="${yearF===String(y)}">${y}</button>`).join('');
-  // grid
-  const vis = all.filter(passes).sort((a,b)=> (a.cat==='greeting')-(b.cat==='greeting') || (a.year||0)-(b.year||0) || (a.taken||a.at||0)-(b.taken||b.at||0));
-  viewList = vis.map(i=>i.id);
-  if(!all.length){ $('#main').innerHTML = `<div class="empty"><div class="big">עוד ריק כאן</div>לוחצות על „+ הוספה” ומעלות את התמונות הראשונות</div>`; return; }
-  if(!vis.length){ $('#main').innerHTML = `<div class="empty"><div class="big">אין כאן כלום</div>נסי סינון אחר</div>`; return; }
-  const groups = {};
-  vis.forEach(i=>{ const g = i.cat==='greeting' ? 'ברכות' : (i.year||'בלי שנה'); (groups[g]=groups[g]||[]).push(i); });
-  const age = y => (typeof y==='number' || /^\d+$/.test(y)) ? ` · לוסי בת ${Math.max(0,y-2014)}` : '';
-  $('#main').innerHTML = Object.entries(groups).map(([g,list])=>`
-    <section class="year"><h2>${g}<small>${list.length} פריטים${age(g)}</small></h2>
-    <div class="grid">${list.map(tile).join('')}</div></section>`).join('');
-  document.querySelectorAll('[data-thumb]').forEach(loadThumb);
+  const A=all();
+  const ok=A.filter(i=>!i.no&&!i.nolucy).length;
+  $('#sum').innerHTML=A.length?`<b>${A.length}</b> פריטים · <b>${ok}</b> רלוונטיים · <b>${A.filter(i=>i.lucy).length}</b> עם לוסי מסומנת${ME?` · את <b>${esc(ME)}</b> (<a href="#" id="chg" style="color:inherit">החלפה</a>)`:''}`:'';
+  const c=$('#chg'); if(c) c.onclick=e=>{e.preventDefault();$('#nameDlg').showModal()};
+  $('#chips').innerHTML=FILTERS.map(([k,l,fn])=>`<button class="chip" data-f="${k}" aria-pressed="${F===k}">${l} <small>${A.filter(fn).length}</small></button>`).join('');
+  const fn=FILTERS.find(f=>f[0]===F)[2];
+  const vis=A.filter(fn).sort((a,b)=>(a.year||0)-(b.year||0)||(a.taken||a.at||0)-(b.taken||b.at||0));
+  list=vis.map(i=>i.id);
+  if(!A.length){$('#main').innerHTML='<div class="empty"><b>עוד ריק כאן</b>לוחצות על „+ הוספה” ומעלות תמונות</div>';return}
+  if(!vis.length){$('#main').innerHTML=`<div class="empty"><b>${F==='todo'?'הכל נבדק 🎉':'אין כאן כלום'}</b></div>`;return}
+  const g={}; vis.forEach(i=>(g[i.year||'—']=g[i.year||'—']||[]).push(i));
+  $('#main').innerHTML=Object.entries(g).map(([y,l])=>`<h2>${y}<small>${/^\d+$/.test(y)?'לוסי בת '+Math.max(0,y-2014)+' · ':''}${l.length}</small></h2><div class="grid">${l.map(tile).join('')}</div>`).join('');
+  document.querySelectorAll('img[data-t]').forEach(img=>{const id=img.dataset.t;thumbs[id]?img.src=thumbs[id]:io.observe(img)});
 }
 function tile(i){
-  const likes = i.likes||{};
-  const names = Object.keys(likes).filter(n=>likes[n]);
-  const mine = !!likes[ME];
-  return `<article class="tile ${i.pick==='in'?'in':''} ${i.pick==='out'?'out':''}">
-    <button class="ph" data-open="${i.id}" aria-label="פתיחה"><img data-thumb="${i.id}" alt=""></button>
-    ${i.kind==='video'?`<span class="badge">▶ ${fmtDur(i.dur||0)}</span>`:''}
-    ${i.cat==='greeting'?`<span class="badge g" style="${i.kind==='video'?'top:34px':''}">💌 ברכה</span>`:''}
-    ${i.pick==='in'?'<span class="inpill">✓ בסרטון</span>':i.pick==='maybe'?'<span class="inpill" style="background:var(--gold);color:#2b2226">אולי</span>':''}
-    <div class="tb"><span class="cap" title="${esc(i.caption)}">${esc(i.caption||(i.by?'הועלה ע״י '+i.by:''))}</span>
-      <div class="hearts"><button class="heart ${mine?'on':''}" data-like="${i.id}" title="${esc(names.join(', ')||'אף אחת עוד')}">${mine?'♥':'♡'} ${names.length||''}</button></div></div>
-  </article>`;
+  return `<div class="t ${i.no||i.nolucy?'no':''}"><button class="ph" data-o="${i.id}" aria-label="פתיחה"><img data-t="${i.id}" alt=""></button>
+  ${i.kind==='video'?`<span class="tag">▶ ${fmt(i.dur)}</span>`:''}
+  <div class="st">${i.no?'<span class="s-no">לא רלוונטי</span>':''}${i.nolucy?'<span class="s-nl">בלי לוסי</span>':''}${i.lucy?'<span class="s-l">לוסי ✓</span>':''}</div></div>`;
 }
-const io = new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ io.unobserve(e.target); fetchThumb(e.target); } }),{rootMargin:'400px'});
-function loadThumb(img){ const id=img.dataset.thumb; if(thumbCache[id]) img.src=thumbCache[id]; else io.observe(img); }
-async function fetchThumb(img){ const id=img.dataset.thumb; try{ const d=await get('thumbs/'+id); if(d){ thumbCache[id]=d; img.src=d; } }catch(e){} }
-
-document.addEventListener('click', e=>{
-  const f=e.target.closest('[data-f]'); if(f){ filter=f.dataset.f; render(); return; }
-  const y=e.target.closest('[data-y]'); if(y){ yearF=y.dataset.y; render(); return; }
-  const l=e.target.closest('[data-like]'); if(l){ toggleLike(l.dataset.like); return; }
-  const o=e.target.closest('[data-open]'); if(o){ openViewer(o.dataset.open); return; }
+const io=new IntersectionObserver(es=>es.forEach(async e=>{if(!e.isIntersecting)return;io.unobserve(e.target);const id=e.target.dataset.t;try{const d=await get('thumbs/'+id);if(d){thumbs[id]=d;e.target.src=d}}catch(x){}}),{rootMargin:'300px'});
+document.addEventListener('click',e=>{
+  const f=e.target.closest('[data-f]');if(f){F=f.dataset.f;render();return}
+  const o=e.target.closest('[data-o]');if(o){open(o.dataset.o);return}
 });
-async function toggleLike(id){
-  if(!ME){ $('#nameDlg').showModal(); return; }
-  const on = !(items[id].likes||{})[ME];
-  items[id].likes = Object.assign({}, items[id].likes, {[ME]: on||null}); render();
-  await put(`items/${id}/likes/${encodeURIComponent(ME)}`, on||null).catch(()=>toast('השמירה נכשלה'));
-}
-async function setPick(id,v){
-  const nv = items[id].pick===v ? null : v;
-  items[id].pick = nv; render(); openViewer(id,true);
-  await put(`items/${id}/pick`, nv).catch(()=>toast('השמירה נכשלה'));
-  await put(`items/${id}/pickBy`, nv?ME:null).catch(()=>{});
-}
 
-/* ---------- viewer ---------- */
-let curObj = null;
-async function openViewer(id,keep){
-  viewIdx = viewList.indexOf(id); const it = items[id]; if(!it) return;
+/* viewer */
+async function open(id){
+  idx=list.indexOf(id); marking=false; const it=items[id]; if(!it)return;
   $('#vw').classList.add('open'); document.body.style.overflow='hidden';
-  $('#vwTitle').textContent = [it.cat==='greeting'?'ברכה':it.year, it.caption].filter(Boolean).join(' · ');
-  const likes = Object.keys(it.likes||{}).filter(n=>it.likes[n]);
-  const mine = !!(it.likes||{})[ME];
-  $('#vwBot').innerHTML = `
-    <button class="btn ${mine?'on-h':''}" data-vlike="${id}">${mine?'♥ אהבתי':'♡ אהבתי'}</button>
-    <button class="btn ${it.pick==='in'?'on-in':''}" data-vpick="in">✓ בסרטון</button>
-    <button class="btn ${it.pick==='maybe'?'on-maybe':''}" data-vpick="maybe">🤔 אולי</button>
-    <button class="btn ${it.pick==='out'?'on-out':''}" data-vpick="out">✕ לא</button>
-    <div class="who2">${likes.length?'♥ '+esc(likes.join(', ')):''}${it.pick&&it.pickBy?' · סומן ע״י '+esc(it.pickBy):''}${it.by?' · הועלה ע״י '+esc(it.by):''}</div>`;
-  if(keep) return;
-  const st=$('#vwStage'); if(curObj){ URL.revokeObjectURL(curObj); curObj=null; }
-  st.innerHTML = `<img class="loading" src="${thumbCache[id]||''}" alt="">`;
+  $('#vTtl').textContent=[it.year,it.caption].filter(Boolean).join(' · ');
+  if(objUrl){URL.revokeObjectURL(objUrl);objUrl=null}
+  $('#stage').innerHTML=`<button class="ic navb p" data-nav="-1" aria-label="הקודם">›</button><div class="frame" id="frame"><img src="${thumbs[id]||''}" alt="" style="opacity:.6"></div><button class="ic navb n" data-nav="1" aria-label="הבא">‹</button>`;
+  paintBot();
   try{
-    if(it.kind==='photo'){
-      const full = await get('full/'+id); if(viewList[viewIdx]===id && full) st.innerHTML=`<img src="${full}" alt="">`;
-    } else {
-      st.insertAdjacentHTML('beforeend','<div style="position:absolute;bottom:10px">טוען סרטון…</div>');
-      const parts=[]; for(let i=0;i<(it.chunks||0);i++){ const c=await get(`vid/${id}/${i}`); parts.push(Uint8Array.from(atob(c),ch=>ch.charCodeAt(0))); if(viewList[viewIdx]!==id) return; }
-      curObj = URL.createObjectURL(new Blob(parts,{type:it.mime||'video/mp4'}));
-      st.innerHTML = `<video src="${curObj}" controls autoplay playsinline poster="${thumbCache[id]||''}"></video>`;
-    }
-  }catch(e){ toast('הטעינה נכשלה'); }
+    if(it.kind==='photo'){const full=await get('full/'+id); if(list[idx]===id&&full){$('#frame').innerHTML=`<img src="${full}" alt="">`;paintPin()}}
+    else{const parts=[];for(let i=0;i<(it.chunks||0);i++){const c=await get(`vid/${id}/${i}`);parts.push(Uint8Array.from(atob(c),ch=>ch.charCodeAt(0)));if(list[idx]!==id)return}
+      objUrl=URL.createObjectURL(new Blob(parts,{type:it.mime||'video/mp4'}));$('#frame').innerHTML=`<video src="${objUrl}" controls playsinline autoplay></video>`;paintPin()}
+  }catch(e){toast('הטעינה נכשלה')}
 }
-function closeViewer(){ $('#vw').classList.remove('open'); document.body.style.overflow=''; $('#vwStage').innerHTML=''; if(curObj){URL.revokeObjectURL(curObj);curObj=null;} }
-function step(d){ if(!viewList.length) return; viewIdx=(viewIdx+d+viewList.length)%viewList.length; openViewer(viewList[viewIdx]); }
-$('#vwClose').onclick=closeViewer;
-$('#vw').addEventListener('click',e=>{
-  const p=e.target.closest('[data-vpick]'); if(p){ setPick(viewList[viewIdx],p.dataset.vpick); return; }
-  const l=e.target.closest('[data-vlike]'); if(l){ toggleLike(l.dataset.vlike).then(()=>openViewer(l.dataset.vlike,true)); return; }
+function paintPin(){
+  const it=items[list[idx]], fr=$('#frame'); if(!fr||!it)return;
+  fr.querySelectorAll('.pin,.mk').forEach(p=>p.remove()); fr.classList.toggle('marking',marking);
+  if(it.lucy){const p=document.createElement('div');p.className='pin';p.style.left=(it.lucy.x*100)+'%';p.style.top=(it.lucy.y*100)+'%';fr.appendChild(p)}
+  if(marking){const m=document.createElement('div');m.className='mk';m.textContent='לוחצות על הפנים של לוסי';fr.appendChild(m)}
+}
+function paintBot(){
+  const id=list[idx], it=items[id]; if(!it)return;
+  const by=[it.noBy&&('לא רלוונטי: '+it.noBy),it.nolucyBy&&('בלי לוסי: '+it.nolucyBy),it.lucy&&it.lucy.by&&('סימנה את לוסי: '+it.lucy.by),it.by&&('העלתה: '+it.by)].filter(Boolean).join(' · ');
+  $('#bot').innerHTML=`
+    <button class="btn ${marking?'on':''}" data-a="mark">📍 ${it.lucy?'לסמן מחדש את לוסי':'איפה לוסי?'}</button>
+    <button class="btn ${it.nolucy?'onnl':''}" data-a="nolucy">🙈 אין כאן לוסי</button>
+    <button class="btn ${it.no?'onno':''}" data-a="no">✕ לא רלוונטי</button>
+    <button class="btn" data-a="next">הבא ‹</button>
+    <div class="who">${esc(by)} · ${idx+1}/${list.length}</div>`;
+  paintPin();
+}
+async function act(a){
+  const id=list[idx], it=items[id]; if(!ME){$('#nameDlg').showModal();return}
+  try{
+    if(a==='mark'){marking=!marking;paintBot();return}
+    if(a==='next'){step(1);return}
+    if(a==='no'){const v=!it.no;await patch('items/'+id,{no:v||null,noBy:v?ME:null})}
+    if(a==='nolucy'){const v=!it.nolucy;await patch('items/'+id,{nolucy:v||null,nolucyBy:v?ME:null,lucy:v?null:(it.lucy||null)})}
+  }catch(e){toast('השמירה נכשלה')}
+}
+$('#bot').onclick=e=>{const b=e.target.closest('[data-a]');if(b)act(b.dataset.a)};
+$('#stage').addEventListener('click',async e=>{
+  const n=e.target.closest('[data-nav]');if(n){step(+n.dataset.nav);return}
+  if(!marking)return; const media=e.target.closest('#frame img,#frame video');if(!media)return;
+  const r=media.getBoundingClientRect(); const x=(e.clientX-r.left)/r.width, y=(e.clientY-r.top)/r.height;
+  const id=list[idx]; marking=false;
+  try{await patch('items/'+id,{lucy:{x:+x.toFixed(4),y:+y.toFixed(4),by:ME},nolucy:null,nolucyBy:null});toast('סומן 📍')}catch(x){toast('השמירה נכשלה')}
 });
-$('#vwStage').insertAdjacentHTML('afterend','');
-document.addEventListener('keydown',e=>{ if(!$('#vw').classList.contains('open')) return;
-  if(e.key==='Escape') closeViewer(); if(e.key==='ArrowLeft') step(1); if(e.key==='ArrowRight') step(-1); });
-let tx=null; $('#vwStage').addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
-$('#vwStage').addEventListener('touchend',e=>{ if(tx==null) return; const dx=e.changedTouches[0].clientX-tx; if(Math.abs(dx)>50) step(dx>0?1:-1); tx=null; });
-$('#vwMore').onclick = async ()=>{
-  const id=viewList[viewIdx], it=items[id];
-  const c = prompt('כיתוב (או כתבי "מחק" כדי למחוק את הפריט):', it.caption||''); if(c===null) return;
-  if(c.trim()==='מחק'){ if(!confirm('למחוק לגמרי? אי אפשר לשחזר.')) return;
-    await Promise.all([del('items/'+id),del('thumbs/'+id),del('full/'+id),del('vid/'+id)]); closeViewer(); toast('נמחק'); return; }
-  const y = prompt('שנה:', it.year||'');
-  await patch('items/'+id,{caption:c.trim(), year: y&&/^\d{4}$/.test(y.trim())?+y.trim():(it.year||null)}); toast('נשמר');
-};
+function step(d){if(!list.length)return;idx=(idx+d+list.length)%list.length;open(list[idx])}
+function close(){$('#vw').classList.remove('open');document.body.style.overflow='';$('#stage').innerHTML='';if(objUrl){URL.revokeObjectURL(objUrl);objUrl=null}}
+$('#vClose').onclick=close;
+$('#vDel').onclick=async()=>{const id=list[idx];if(!confirm('למחוק את הפריט לגמרי? אי אפשר לשחזר.'))return;
+  await Promise.all([del('items/'+id),del('thumbs/'+id),del('full/'+id),del('vid/'+id)]);close();toast('נמחק')};
+document.addEventListener('keydown',e=>{if(!$('#vw').classList.contains('open'))return;
+  if(e.key==='Escape')close(); if(e.key==='ArrowLeft')step(1); if(e.key==='ArrowRight')step(-1);
+  if(e.key==='x'||e.key==='ס')act('no'); if(e.key==='l'||e.key==='ך')act('mark')});
+let tx=null;$('#stage').addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
+$('#stage').addEventListener('touchend',e=>{if(tx==null||marking)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>60)step(dx>0?1:-1);tx=null});
 
-/* ---------- add ---------- */
-const now = new Date().getFullYear();
-$('#addYear').innerHTML = Array.from({length:now-2013},(_,i)=>now-i).map(y=>`<option value="${y}">${y} · לוסי בת ${y-2014}</option>`).join('') + '<option value="auto" selected>לפי תאריך הקובץ</option>';
-$('#addBtn').onclick=()=>{ if(!ME){ $('#nameDlg').showModal(); return; } $('#addDlg').showModal(); };
+/* add */
+const Y=new Date().getFullYear();
+$('#addYear').innerHTML='<option value="auto">לפי תאריך הקובץ</option>'+Array.from({length:Y-2013},(_,i)=>Y-i).map(y=>`<option value="${y}">${y} · לוסי בת ${y-2014}</option>`).join('');
+$('#addBtn').onclick=()=>ME?$('#addDlg').showModal():$('#nameDlg').showModal();
 $('#addClose').onclick=()=>$('#addDlg').close();
-$('#catSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; cat=b.dataset.v;
-  $('#catSeg').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b)); });
-const drop=$('#drop'), fileInp=$('#file');
-drop.onclick=()=>fileInp.click(); drop.onkeydown=e=>{ if(e.key==='Enter'||e.key===' ') fileInp.click(); };
-drop.ondragover=e=>{e.preventDefault();drop.classList.add('over')}; drop.ondragleave=()=>drop.classList.remove('over');
-drop.ondrop=e=>{e.preventDefault();drop.classList.remove('over'); handle([...e.dataTransfer.files]);};
-fileInp.onchange=()=>{ handle([...fileInp.files]); fileInp.value=''; };
-
-async function handle(files){
-  for(const f of files){
-    const row=document.createElement('div'); row.className='qi'; row.innerHTML=`<span style="max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(f.name)}</span><span class="bar2"><i></i></span><span class="st">…</span>`;
-    $('#queue').prepend(row); const bar=row.querySelector('i'), st=row.querySelector('.st');
-    try{ await uploadOne(f, p=>{bar.style.width=Math.round(p*100)+'%'}); st.textContent='✓'; }
-    catch(e){ st.textContent = e.message||'נכשל'; bar.style.background='#999'; }
-  }
-}
-function loadImg(src){ return new Promise((ok,no)=>{ const i=new Image(); i.onload=()=>ok(i); i.onerror=()=>no(new Error('פורמט לא נתמך')); i.src=src; }); }
-function toJpeg(src,max,q){ const s=Math.min(1,max/Math.max(src.width||src.videoWidth,src.height||src.videoHeight));
-  const w=Math.round((src.width||src.videoWidth)*s), h=Math.round((src.height||src.videoHeight)*s);
-  const c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(src,0,0,w,h); return {data:c.toDataURL('image/jpeg',q),w,h}; }
-function squareThumb(src){ const W=src.width||src.videoWidth, H=src.height||src.videoHeight, s=Math.min(W,H);
-  const c=document.createElement('canvas'); c.width=c.height=420; c.getContext('2d').drawImage(src,(W-s)/2,(H-s)/2,s,s,0,0,420,420); return c.toDataURL('image/jpeg',.8); }
-const b64 = buf => { let s=''; const a=new Uint8Array(buf); for(let i=0;i<a.length;i+=0x8000) s+=String.fromCharCode.apply(null,a.subarray(i,i+0x8000)); return btoa(s); };
-
-async function uploadOne(f,prog){
-  const id=newId(); const yrSel=$('#addYear').value;
-  const year = yrSel==='auto' ? new Date(f.lastModified||Date.now()).getFullYear() : +yrSel;
-  const base={cat, year, caption:$('#addCap').value.trim(), by:ME, at:Date.now(), taken:f.lastModified||Date.now(), src:'upload'};
-  const ou = URL.createObjectURL(f);
+const fileInp=$('#file'), drop=$('#drop');
+drop.onclick=()=>fileInp.click();
+drop.ondragover=e=>e.preventDefault(); drop.ondrop=e=>{e.preventDefault();handle([...e.dataTransfer.files])};
+fileInp.onchange=()=>{handle([...fileInp.files]);fileInp.value=''};
+async function handle(files){for(const f of files){const row=document.createElement('div');row.innerHTML=`<span>${esc(f.name)}</span><span>…</span>`;$('#queue').prepend(row);const st=row.lastChild;
+  try{await upload(f,p=>st.textContent=Math.round(p*100)+'%');st.textContent='✓'}catch(e){st.textContent=e.message||'נכשל'}}}
+const img=src=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>no(new Error('פורמט לא נתמך'));i.src=src});
+function jpg(s,max){const W=s.width||s.videoWidth,H=s.height||s.videoHeight,k=Math.min(1,max/Math.max(W,H)),c=document.createElement('canvas');c.width=Math.round(W*k);c.height=Math.round(H*k);c.getContext('2d').drawImage(s,0,0,c.width,c.height);return c.toDataURL('image/jpeg',.86)}
+function sq(s){const W=s.width||s.videoWidth,H=s.height||s.videoHeight,m=Math.min(W,H),c=document.createElement('canvas');c.width=c.height=400;c.getContext('2d').drawImage(s,(W-m)/2,(H-m)/2,m,m,0,0,400,400);return c.toDataURL('image/jpeg',.8)}
+const b64=buf=>{let s='';const a=new Uint8Array(buf);for(let i=0;i<a.length;i+=0x8000)s+=String.fromCharCode.apply(null,a.subarray(i,i+0x8000));return btoa(s)};
+async function upload(f,prog){
+  const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6), ys=$('#addYear').value;
+  const meta={year:ys==='auto'?new Date(f.lastModified||Date.now()).getFullYear():+ys,by:ME,at:Date.now(),taken:f.lastModified||Date.now()};
+  const u=URL.createObjectURL(f);
   try{
-    if(f.type.startsWith('image/') || /\.(heic|heif)$/i.test(f.name)){
-      const img=await loadImg(ou); prog(.3);
-      const full=toJpeg(img,1800,.86), th=squareThumb(img); prog(.6);
-      await put('full/'+id, full.data); await put('thumbs/'+id, th); prog(.9);
-      await put('items/'+id, Object.assign(base,{kind:'photo',w:full.w,h:full.h}));
-    } else if(f.type.startsWith('video/') || /\.(mov|mp4|m4v)$/i.test(f.name)){
-      if(f.size>VIDEO_MAX) throw new Error('גדול מדי (מעל 45MB) — קצרי ונסי שוב');
-      const v=document.createElement('video'); v.muted=true; v.playsInline=true; v.preload='auto'; v.src=ou;
-      await new Promise((ok,no)=>{ v.onloadeddata=ok; v.onerror=()=>no(new Error('פורמט לא נתמך')); });
-      v.currentTime=Math.min(1,(v.duration||2)/3); await new Promise(ok=>{ v.onseeked=ok; setTimeout(ok,1500); });
-      const th=squareThumb(v); await put('thumbs/'+id, th);
-      const buf=await f.arrayBuffer(); const n=Math.ceil(buf.byteLength/CHUNK);
-      for(let i=0;i<n;i++){ await put(`vid/${id}/${i}`, b64(buf.slice(i*CHUNK,(i+1)*CHUNK))); prog((i+1)/n*.95); }
-      await put('items/'+id, Object.assign(base,{kind:'video',dur:Math.round(v.duration||0),chunks:n,mime:f.type||'video/mp4',size:f.size}));
-    } else throw new Error('סוג קובץ לא נתמך');
-    prog(1);
-  } finally { URL.revokeObjectURL(ou); }
+    if(f.type.startsWith('image/')||/\.(heic|heif)$/i.test(f.name)){
+      const i=await img(u);prog(.4);await put('thumbs/'+id,sq(i));await put('full/'+id,jpg(i,1800));prog(.9);
+      await put('items/'+id,Object.assign(meta,{kind:'photo'}));
+    }else if(f.type.startsWith('video/')||/\.(mov|mp4|m4v)$/i.test(f.name)){
+      if(f.size>VIDEO_MAX)throw new Error('מעל 45MB');
+      const v=document.createElement('video');v.muted=true;v.playsInline=true;v.preload='auto';v.src=u;
+      await new Promise((ok,no)=>{v.onloadeddata=ok;v.onerror=()=>no(new Error('פורמט לא נתמך'))});
+      v.currentTime=Math.min(1,(v.duration||2)/3);await new Promise(ok=>{v.onseeked=ok;setTimeout(ok,1500)});
+      await put('thumbs/'+id,sq(v));
+      const buf=await f.arrayBuffer(),n=Math.ceil(buf.byteLength/CHUNK);
+      for(let i=0;i<n;i++){await put(`vid/${id}/${i}`,b64(buf.slice(i*CHUNK,(i+1)*CHUNK)));prog((i+1)/n*.95)}
+      await put('items/'+id,Object.assign(meta,{kind:'video',dur:Math.round(v.duration||0),chunks:n,mime:f.type||'video/mp4'}));
+    }else throw new Error('סוג לא נתמך');
+  }finally{URL.revokeObjectURL(u)}
 }
-
 boot();
 })();
 </script>
