@@ -273,7 +273,7 @@ function stackTile(g){
     ${others[1]?`<span class="bk b2"><img data-t="${others[1].id}" alt=""></span>`:''}${others[0]?`<span class="bk b1"><img data-t="${others[0].id}" alt=""></span>`:''}
     <span class="cv"><img data-t="${g.cover.id}" alt=""></span></button>
     <span class="cnt">${g.items.length} מאותו יום</span>
-    <div class="st">${todo?`<span class="s-l" style="background:var(--ink);color:var(--bg)">${todo} לבדוק</span>`:'<span class="s-l" style="background:var(--mint)">נבדק ✓</span>'}</div></div>`;
+    ${isEd()?`<div class="st">${todo?`<span class="s-l" style="background:var(--ink);color:var(--bg)">${todo} לבדוק</span>`:'<span class="s-l" style="background:var(--mint)">נבדק ✓</span>'}</div>`:''}</div>`;
 }
 function tile(i){
   return `<div class="t ${i.no||i.nolucy?'no':''}"><button class="ph" data-o="${i.id}" aria-label="פתיחה"><img data-t="${i.id}" alt=""></button>
