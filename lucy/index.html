@@ -219,7 +219,7 @@ const fmt=s=>{s=Math.round(s||0);return Math.floor(s/60)+':'+String(s%60).padSta
 let ROOT=null, ME=ls.get('lucy_name')||'', items={}, F=null, list=[], vlist=[], idx=-1, marking=false, objUrl=null, GROUPS=[], sheetRef=null, inGroup=false;
 const thumbs={};
 const EDH='19a0321f2132e93e2c18b265';
-const isEd=()=>ls.get('lucy_ed')==='1';
+const isEd=()=>true; // everyone with the access code can mark photos
 let cat='years';
 
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2000)}
@@ -239,8 +239,11 @@ async function boot(){
   try{ if(!await get('meta')){ls.set('lucy_code','');$('#main').innerHTML='<div class="empty"><b>אופס</b>הקוד לא נכון, נסי שוב</div>';$('#gateCode').value='';$('#gate').showModal();return} }
   catch(e){$('#main').innerHTML='<div class="empty"><b>אין חיבור</b>נסי לרענן</div>';return}
   if(!ME) $('#nameDlg').showModal();
+  let gotStream=false;
   const es=new EventSource(U('items'));
-  const on=ev=>{const {path,data}=JSON.parse(ev.data);apply(path,data,ev.type==='patch');render();if($('#gs').classList.contains('open'))renderSheet();if($('#vw').classList.contains('open'))paintBot()};
+  const poll=async()=>{if(gotStream)return;try{items=(await get('items'))||{};render();if($('#gs').classList.contains('open'))renderSheet()}catch(e){}};
+  setTimeout(()=>{if(!gotStream){poll();setInterval(poll,8000)}},5000);
+  const on=ev=>{gotStream=true;const {path,data}=JSON.parse(ev.data);apply(path,data,ev.type==='patch');render();if($('#gs').classList.contains('open'))renderSheet();if($('#vw').classList.contains('open'))paintBot()};
   es.addEventListener('put',on);es.addEventListener('patch',on);
 }
 function apply(path,data,isPatch){
@@ -276,7 +279,7 @@ function all(){return Object.entries(items).filter(([,v])=>v&&v.kind).map(([id,v
 function render(){
   const A=all();
   const ok=A.filter(i=>ST(i)==='in').length;
-  $('#sum').innerHTML=!isEd()?(ME?`שלום <b>${esc(ME)}</b> (<a href="#" id="chg" style="color:inherit">לא את?</a>)`:'')+`<br><button class="edtop" id="edBtn">🔑 כניסת עורכות (יעל וענת)</button>`:A.length?`<b>${A.length}</b> פריטים · <b>${ok}</b> למצגת · <b>${A.filter(i=>ST(i)==='maybe').length}</b> בהתלבטות · <b>${A.filter(i=>!ST(i)).length}</b> לבדוק · <b>${A.filter(i=>i.cat==='greeting').length}</b> ברכות${ME?` · את <b>${esc(ME)}</b> (<a href="#" id="chg" style="color:inherit">החלפה</a>)`:''}`:'';
+  $('#sum').innerHTML=!isEd()?(ME?`שלום <b>${esc(ME)}</b> (<a href="#" id="chg" style="color:inherit">לא את?</a>)`:''):A.length?`<b>${A.length}</b> פריטים · <b>${ok}</b> למצגת · <b>${A.filter(i=>ST(i)==='maybe').length}</b> בהתלבטות · <b>${A.filter(i=>!ST(i)).length}</b> לבדוק · <b>${A.filter(i=>i.cat==='greeting').length}</b> ברכות${ME?` · את <b>${esc(ME)}</b> (<a href="#" id="chg" style="color:inherit">החלפה</a>)`:''}`:'';
   const c=$('#chg'); if(c) c.onclick=e=>{e.preventDefault();$('#nameDlg').showModal()};
   const FL=isEd()?FILTERS:FRIEND_FILTERS; if(!F||!FL.some(f=>f[0]===F)) F=FL[0][0];
   $('#chips').innerHTML=FL.map(([k,l,fn])=>`<button class="chip" data-f="${k}" aria-pressed="${F===k}">${l} <small>${A.filter(fn).length}</small></button>`).join('');
@@ -290,7 +293,6 @@ function render(){
   if(!vis.length){$('#main').innerHTML=`<div class="empty"><b>${F==='todo'?'הכל נבדק 🎉':'אין כאן כלום'}</b></div>`;return}
   const g={}; vg.forEach(x=>{const y=x.cover.year||'—';(g[y]=g[y]||[]).push(x)});
   $('#main').innerHTML=(GR.length?`<section class="gsec"><h2>💌 ברכות<small>${GR.length}</small></h2><div class="grid">${GR.map(tile).join('')}</div></section>`:'')+Object.entries(g).map(([y,l])=>`<h2>${y}<small>${/^\d+$/.test(y)?'לוסי בת '+Math.max(0,y-2014)+' · ':''}${l.reduce((n,x)=>n+x.hit.length,0)}</small></h2><div class="grid">${l.map(x=>x.items.length>1?stackTile(x):tile(x.items[0])).join('')}</div>`).join('');
-  if(isEd())$('#main').insertAdjacentHTML('beforeend',`<button class="edlink" id="edBtn">יציאה ממצב עורכות</button>`);
   document.querySelectorAll('img[data-t]').forEach(img=>{const id=img.dataset.t;thumbs[id]?img.src=thumbs[id]:io.observe(img)});
 }
 /* events: same calendar day, split when there's a gap of more than 2 hours or someone split it by hand (splitHere) */
@@ -382,7 +384,7 @@ function paintBot(){
   const by=[ST(it)&&(STL[ST(it)][1]+': '+(it.stBy||it.noBy||it.nolucyBy||'')),it.lucy&&it.lucy.by&&('סימנה את לוסי: '+it.lucy.by),it.by&&('העלתה: '+it.by)].filter(Boolean).join(' · ');
   if(!isEd()){$('#bot').innerHTML=`<button class="btn" data-a="next">הבא ‹</button><div class="who">${it.cat==='greeting'?'💌 ברכה מ'+esc(it.by||''):it.by&&it.src!=='gp'?'העלתה: '+esc(it.by):''} · ${idx+1}/${vlist.length}</div>`;
     $('#vDel').style.visibility=(it.up||it.by)===ME&&it.src!=='gp'?'visible':'hidden';paintPin();return}
-  $('#vDel').style.visibility='visible';
+  $('#vDel').style.visibility=(it.up||it.by)===ME&&it.src!=='gp'?'visible':'hidden';
   $('#bot').innerHTML=`
     <button class="btn ${marking?'on':''}" data-a="mark">📍 ${it.lucy?'לסמן מחדש את לוסי':'איפה לוסי?'}</button>
     ${Object.entries(STL).map(([k,[ic,l]])=>`<button class="btn ${ST(it)===k?({in:'onin',maybe:'onmaybe',no:'onno',nolucy:'onnl'})[k]:''}" data-a="st-${k}">${ic} ${l}</button>`).join('')}
