@@ -116,6 +116,15 @@ dialog::backdrop{background:rgba(30,15,20,.55)}
 .btn.gold{background:var(--gold);border-color:var(--gold);color:#2b2226}
 .edlink{display:block;margin:30px auto 0;border:0;background:none;color:var(--muted);font-size:13px;text-decoration:underline}
 .gsec h2{display:flex;align-items:baseline}
+.srcs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.src{display:grid;gap:2px;justify-items:center;text-align:center;border:2px dashed var(--line);background:var(--bg);border-radius:14px;padding:14px 6px;font-weight:800;font-size:14px;line-height:1.25}
+.src span{font-size:28px}
+.src small{font-weight:600;color:var(--muted);font-size:12px}
+.srcs.over .src{border-color:var(--blush);background:var(--blush-soft)}
+.cam{display:grid;gap:10px}
+.cam video{width:100%;border-radius:14px;background:#000;max-height:60vh}
+.cam .rec{color:var(--blush);font-weight:800}
+@media (max-width:420px){.srcs{grid-template-columns:1fr}.src{grid-auto-flow:column;justify-content:start;gap:10px;padding:10px 14px}.src span{font-size:22px}}
 .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:7px 16px;border-radius:999px;font-weight:700;font-size:14px;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.show{opacity:1}
 @media (max-width:520px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.t{border-radius:10px}}
@@ -154,12 +163,25 @@ dialog::backdrop{background:rgba(30,15,20,.55)}
   <p class="hint" id="addHint"></p>
   <label id="yearLbl">שנה<select id="addYear"></select></label>
   <label><span id="capLbl">כמה מילים (לא חובה)</span><input id="addCap"></label>
-  <button class="drop" id="drop" type="button">לוחצות כאן לבחירה מהטלפון<br><span class="hint">אפשר כמה ביחד · סרטון עד 45MB</span></button>
+  <div class="srcs" id="drop">
+    <button type="button" class="src" data-src="pick"><span>🖼️</span>בחירה מהטלפון או מהמחשב<small>אפשר כמה ביחד</small></button>
+    <button type="button" class="src" data-src="photo"><span>📷</span>צילום תמונה</button>
+    <button type="button" class="src" data-src="video"><span>🎥</span>צילום וידאו<small>עד דקה</small></button>
+  </div>
+  <p class="hint" style="text-align:center">אפשר גם לגרור קבצים לכאן · סרטון עד 45MB</p>
   <input type="file" id="file" accept="image/*,video/*" multiple hidden>
+  <input type="file" id="capP" accept="image/*" capture="environment" hidden>
+  <input type="file" id="capV" accept="video/*" capture="environment" hidden>
   <div class="q" id="queue"></div>
   <div class="row"><button class="btn" type="button" id="addClose">סיום</button></div>
 </div></dialog>
 
+<dialog id="camDlg"><div class="dl cam">
+  <h3 id="camTtl">מצלמה</h3>
+  <video id="camV" autoplay muted playsinline></video>
+  <div class="hint" id="camSt"></div>
+  <div class="row" id="camBtns"></div>
+</div></dialog>
 <div class="gs" id="gs" role="dialog" aria-modal="true" aria-label="אירוע">
   <div class="hd"><h3 id="gsTtl"></h3><button class="x" id="gsClose" aria-label="סגירה">✕</button></div>
   <div class="in"><p class="hint edonly">לוחצות על תמונה כדי לסמן אותה. בתוך התמונה: ⭐ בוחרת את תמונת השער, ✂ פותחת קבוצה חדשה מהתמונה הזאת והלאה (כשיש ביום כמה אירועים).</p><div class="grid" id="gsGrid"></div></div>
@@ -393,9 +415,50 @@ $('#catSeg').onclick=e=>{const b=e.target.closest('[data-c]');if(b)setCat(b.data
 $('#addBtn').onclick=()=>openAdd('years');
 $('#addClose').onclick=()=>$('#addDlg').close();
 const fileInp=$('#file'), drop=$('#drop');
-drop.onclick=()=>fileInp.click();
-drop.ondragover=e=>e.preventDefault(); drop.ondrop=e=>{e.preventDefault();handle([...e.dataTransfer.files])};
-fileInp.onchange=()=>{handle([...fileInp.files]);fileInp.value=''};
+const touch=matchMedia('(pointer:coarse)').matches;
+drop.onclick=e=>{const b=e.target.closest('[data-src]');if(!b)return;const k=b.dataset.src;
+  if(k==='pick')return fileInp.click();
+  if(touch){const i=k==='photo'?$('#capP'):$('#capV');i.setAttribute('capture',cat==='greeting'?'user':'environment');return i.click()}
+  openCam(k)};
+const addBox=$('#addDlg');
+addBox.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('over')});
+addBox.addEventListener('dragleave',()=>drop.classList.remove('over'));
+addBox.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('over');handle([...e.dataTransfer.files])});
+[fileInp,$('#capP'),$('#capV')].forEach(i=>i.onchange=()=>{handle([...i.files]);i.value=''});
+
+/* in-page camera for computers (phones use the native camera through the capture inputs) */
+let camStream=null, rec=null, recChunks=[], recT=0, recTimer=null;
+async function openCam(kind){
+  const vid=kind==='video';
+  $('#camTtl').textContent=vid?'🎥 הקלטת וידאו':'📷 צילום תמונה';
+  try{camStream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:1280},height:{ideal:720},facingMode:'user'},audio:vid})}
+  catch(e){toast('אין גישה למצלמה. אפשר לבחור קובץ במקום');return}
+  const v=$('#camV');v.srcObject=camStream;v.muted=true;v.controls=false;$('#camDlg').showModal();camButtons(vid?'ready':'photo');
+}
+function camButtons(st){
+  const B={photo:'<button class="btn pri" data-cam="snap">📷 צלמי</button>',
+    ready:'<button class="btn pri" data-cam="start">⏺ התחלת הקלטה</button>',
+    rec:'<button class="btn pri" data-cam="stop">⏹ עצירה</button>',
+    done:'<button class="btn pri" data-cam="send">⬆ העלאה</button><button class="btn" data-cam="again">שוב</button>'}[st];
+  $('#camBtns').innerHTML=B+'<button class="btn" data-cam="close">ביטול</button>';
+  $('#camSt').innerHTML=st==='rec'?'<span class="rec">● מקליטה</span> <span id="recT">0:00</span> / 1:00':st==='ready'?'מסתכלות למצלמה ומתחילות כשמוכנות 💛':'';
+}
+function stopCam(){if(rec&&rec.state!=='inactive')rec.stop();clearInterval(recTimer);if(camStream)camStream.getTracks().forEach(t=>t.stop());camStream=null;$('#camV').srcObject=null;$('#camV').removeAttribute('src')}
+let lastRec=null;
+$('#camBtns').onclick=async e=>{const b=e.target.closest('[data-cam]');if(!b)return;const a=b.dataset.cam,v=$('#camV');
+  if(a==='close'){stopCam();$('#camDlg').close();return}
+  if(a==='snap'){const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);
+    c.toBlob(bl=>{stopCam();$('#camDlg').close();handle([new File([bl],'צילום.jpg',{type:'image/jpeg',lastModified:Date.now()})])},'image/jpeg',.9);return}
+  if(a==='start'){recChunks=[];const mt=['video/mp4','video/webm;codecs=vp9,opus','video/webm'].find(t=>window.MediaRecorder&&MediaRecorder.isTypeSupported(t))||'';
+    rec=new MediaRecorder(camStream,mt?{mimeType:mt,videoBitsPerSecond:2500000}:{});rec.ondataavailable=ev=>ev.data.size&&recChunks.push(ev.data);
+    rec.onstop=()=>{const type=(rec.mimeType||'video/webm').split(';')[0];lastRec=new File([new Blob(recChunks,{type})],'ברכה.'+(type.includes('mp4')?'mp4':'webm'),{type,lastModified:Date.now()});lastRec._dur=recT;
+      v.srcObject=null;v.src=URL.createObjectURL(lastRec);v.muted=false;v.controls=true;camButtons('done')};
+    rec.start(1000);recT=0;camButtons('rec');recTimer=setInterval(()=>{recT++;const el=$('#recT');if(el)el.textContent=fmt(recT);if(recT>=60)rec.stop()},1000);return}
+  if(a==='stop'){clearInterval(recTimer);rec.stop();camStream.getTracks().forEach(t=>t.stop());return}
+  if(a==='again'){stopCam();openCam('video');return}
+  if(a==='send'){stopCam();$('#camDlg').close();handle([lastRec]);return}
+};
+$('#camDlg').addEventListener('close',stopCam);
 async function handle(files){for(const f of files){const row=document.createElement('div');row.innerHTML=`<span>${esc(f.name)}</span><span>…</span>`;$('#queue').prepend(row);const st=row.lastChild;
   try{await upload(f,p=>st.textContent=Math.round(p*100)+'%');st.textContent='✓'}catch(e){st.textContent=e.message||'נכשל'}}}
 const img=src=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>no(new Error('פורמט לא נתמך'));i.src=src});
@@ -419,7 +482,7 @@ async function upload(f,prog){
       await put('thumbs/'+id,sq(v));
       const buf=await f.arrayBuffer(),n=Math.ceil(buf.byteLength/CHUNK);
       for(let i=0;i<n;i++){await put(`vid/${id}/${i}`,b64(buf.slice(i*CHUNK,(i+1)*CHUNK)));prog((i+1)/n*.95)}
-      await put('items/'+id,Object.assign(meta,{kind:'video',dur:Math.round(v.duration||0),chunks:n,mime:f.type||'video/mp4'}));
+      await put('items/'+id,Object.assign(meta,{kind:'video',dur:Math.round(isFinite(v.duration)&&v.duration?v.duration:(f._dur||0)),chunks:n,mime:f.type||'video/mp4'}));
     }else throw new Error('סוג לא נתמך');
   }finally{URL.revokeObjectURL(u)}
 }
