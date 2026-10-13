@@ -187,6 +187,7 @@ const FILTERS=[
   ['no','לא רלוונטי',i=>!!i.no],
   ['nolucy','בלי לוסי',i=>!!i.nolucy],
   ['video','סרטונים',i=>i.kind==='video'],
+  ['sameday','נוספו מאותו יום',i=>!!i.sameDay],
 ];
 function all(){return Object.entries(items).filter(([,v])=>v&&v.kind).map(([id,v])=>Object.assign({id},v))}
 function render(){
@@ -206,7 +207,7 @@ function render(){
 }
 function tile(i){
   return `<div class="t ${i.no||i.nolucy?'no':''}"><button class="ph" data-o="${i.id}" aria-label="פתיחה"><img data-t="${i.id}" alt=""></button>
-  ${i.kind==='video'?`<span class="tag">▶ ${fmt(i.dur)}</span>`:''}
+  ${i.kind==='video'?`<span class="tag">▶ ${fmt(i.dur)}</span>`:''}${i.sameDay?`<span class="tag" style="top:auto;bottom:6px;background:var(--mint)">מאותו יום</span>`:''}
   <div class="st">${i.no?'<span class="s-no">לא רלוונטי</span>':''}${i.nolucy?'<span class="s-nl">בלי לוסי</span>':''}${i.lucy?'<span class="s-l">לוסי ✓</span>':''}</div></div>`;
 }
 const io=new IntersectionObserver(es=>es.forEach(async e=>{if(!e.isIntersecting)return;io.unobserve(e.target);const id=e.target.dataset.t;try{const d=await get('thumbs/'+id);if(d){thumbs[id]=d;e.target.src=d}}catch(x){}}),{rootMargin:'300px'});
@@ -219,7 +220,8 @@ document.addEventListener('click',e=>{
 async function open(id){
   idx=vlist.indexOf(id); marking=false; const it=items[id]; if(!it)return;
   $('#vw').classList.add('open'); document.body.style.overflow='hidden';
-  $('#vTtl').textContent=[it.year,it.caption].filter(Boolean).join(' · ');
+  const d=it.taken?new Date(it.taken):null;
+  $('#vTtl').textContent=[d&&d.getFullYear()>2000?`${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`:it.year,it.caption].filter(Boolean).join(' · ');
   if(objUrl){URL.revokeObjectURL(objUrl);objUrl=null}
   $('#stage').innerHTML=`<button class="ic navb p" data-nav="-1" aria-label="הקודם">›</button><div class="frame" id="frame"><img src="${thumbs[id]||''}" alt="" style="opacity:.6"></div><button class="ic navb n" data-nav="1" aria-label="הבא">‹</button>`;
   paintBot();
@@ -237,12 +239,14 @@ function paintPin(){
 }
 function paintBot(){
   const id=vlist[idx], it=items[id]; if(!it)return;
-  const by=[it.noBy&&('לא רלוונטי: '+it.noBy),it.nolucyBy&&('בלי לוסי: '+it.nolucyBy),it.lucy&&it.lucy.by&&('סימנה את לוסי: '+it.lucy.by),it.by&&('העלתה: '+it.by)].filter(Boolean).join(' · ');
+  const by=[it.sameDay&&'נוספה מאותו יום',it.noBy&&('לא רלוונטי: '+it.noBy),it.nolucyBy&&('בלי לוסי: '+it.nolucyBy),it.lucy&&it.lucy.by&&('סימנה את לוסי: '+it.lucy.by),it.by&&('העלתה: '+it.by)].filter(Boolean).join(' · ');
   $('#bot').innerHTML=`
     <button class="btn ${marking?'on':''}" data-a="mark">📍 ${it.lucy?'לסמן מחדש את לוסי':'איפה לוסי?'}</button>
     <button class="btn ${it.nolucy?'onnl':''}" data-a="nolucy">🙈 אין כאן לוסי</button>
     <button class="btn ${it.no?'onno':''}" data-a="no">✕ לא רלוונטי</button>
     <button class="btn" data-a="next">הבא ‹</button>
+    ${it.gid?`<button class="btn ${it.moreReq?'on':''}" data-a="more">➕ ${it.moreReq?(it.moreDone?'נוספו תמונות מהיום הזה':'ביקשת עוד מהיום הזה'):'עוד מאותו יום'}</button>
+    <a class="btn" href="https://photos.google.com/photo/${encodeURIComponent(it.gid)}" target="_blank" rel="noopener" style="text-decoration:none">🔎 פתיחה בגוגל פוטוס <small style="opacity:.7">(אצל יעל)</small></a>`:''}
     <div class="who">${esc(by)} · ${idx+1}/${vlist.length}</div>`;
   paintPin();
 }
@@ -251,6 +255,8 @@ async function act(a){
   try{
     if(a==='mark'){marking=!marking;paintBot();return}
     if(a==='next'){step(1);return}
+    if(a==='more'){if(it.moreReq&&!it.moreDone){await patch('items/'+id,{moreReq:null,moreAt:null});return}
+      if(!it.moreReq){await patch('items/'+id,{moreReq:ME,moreAt:Date.now()});toast('נרשם! Claude יוסיף את שאר התמונות מהיום הזה')}return}
     if(a==='no'){const v=!it.no;await patch('items/'+id,{no:v||null,noBy:v?ME:null})}
     if(a==='nolucy'){const v=!it.nolucy;await patch('items/'+id,{nolucy:v||null,nolucyBy:v?ME:null,lucy:v?null:(it.lucy||null)})}
   }catch(e){toast('השמירה נכשלה')}
