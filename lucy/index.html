@@ -162,7 +162,7 @@ async function boot(){
   if(m){ls.set('lucy_code',code);history.replaceState(null,'',location.pathname)}
   if(!code){$('#gate').showModal();return}
   ROOT='lucy_'+await sha(code);
-  try{ if(!await get('meta')){ls.set('lucy_code','');$('#main').innerHTML='<div class="empty"><b>אופס</b>הקוד לא נכון</div>';return} }
+  try{ if(!await get('meta')){ls.set('lucy_code','');$('#main').innerHTML='<div class="empty"><b>אופס</b>הקוד לא נכון, נסי שוב</div>';$('#gateCode').value='';$('#gate').showModal();return} }
   catch(e){$('#main').innerHTML='<div class="empty"><b>אין חיבור</b>נסי לרענן</div>';return}
   if(!ME) $('#nameDlg').showModal();
   const es=new EventSource(U('items'));
