@@ -109,6 +109,13 @@ dialog::backdrop{background:rgba(30,15,20,.55)}
 .gs .hd .x{border:1px solid var(--line);background:var(--paper);border-radius:999px;width:40px;height:40px;font-size:18px}
 .gs .in{max-width:1100px;margin:0 auto;padding:12px 16px 60px}
 .gs .hint{margin-bottom:10px}
+.intro{max-width:44ch;margin:10px auto 0;color:var(--muted);font-size:16px}
+.intro b{color:var(--ink)}
+.cta{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:14px 0 4px}
+.cta .btn{padding:10px 18px}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:#2b2226}
+.edlink{display:block;margin:30px auto 0;border:0;background:none;color:var(--muted);font-size:13px;text-decoration:underline}
+.gsec h2{display:flex;align-items:baseline}
 .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:7px 16px;border-radius:999px;font-weight:700;font-size:14px;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.show{opacity:1}
 @media (max-width:520px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.t{border-radius:10px}}
@@ -117,6 +124,8 @@ dialog::backdrop{background:rgba(30,15,20,.55)}
 <body>
 <header>
   <h1>לוסי <span>בת 12</span> ✨</h1>
+  <p class="intro" id="intro">מכינות ללוסי סרטון לבת המצווה 💛<br>מעלות לכאן <b>תמונות וסרטונים של לוסי מכל השנים</b>, וגם <b>ברכה מצולמת</b> בשבילה.</p>
+  <div class="cta" id="cta"><button class="btn pri" data-add="years">📸 תמונות וסרטונים של לוסי</button><button class="btn pri gold" data-add="greeting">💌 ברכה מצולמת</button></div>
   <div class="sum" id="sum"></div>
 </header>
 <div class="bar"><div class="in">
@@ -133,16 +142,19 @@ dialog::backdrop{background:rgba(30,15,20,.55)}
 </form></dialog>
 
 <dialog id="nameDlg"><form class="dl" method="dialog" id="nameForm">
-  <h3>מי את?</h3>
-  <div class="row" id="nameQuick"><button class="btn" value="יעל">יעל</button><button class="btn" value="ענת">ענת</button></div>
-  <label>או שם אחר<input id="nameInp" autocomplete="given-name"></label>
+  <h3>איך קוראים לך?</h3>
+  <p class="hint">כדי שנדע ממי הגיעו התמונות והברכות.</p>
+  <label>שם<input id="nameInp" autocomplete="given-name" required></label>
   <div class="row"><button class="btn pri" value="">המשך</button></div>
 </form></dialog>
 
 <dialog id="addDlg"><div class="dl">
-  <h3>הוספת תמונות</h3>
-  <label>שנה<select id="addYear"></select></label>
-  <button class="drop" id="drop" type="button">לוחצות כאן לבחירת תמונות וסרטונים<br><span class="hint">או גוררות לכאן · סרטון עד 45MB</span></button>
+  <h3 id="addTtl">הוספה</h3>
+  <div class="seg row" id="catSeg"><button type="button" class="btn" data-c="years">📸 תמונות של לוסי</button><button type="button" class="btn" data-c="greeting">💌 ברכה מצולמת</button></div>
+  <p class="hint" id="addHint"></p>
+  <label id="yearLbl">שנה<select id="addYear"></select></label>
+  <label><span id="capLbl">כמה מילים (לא חובה)</span><input id="addCap"></label>
+  <button class="drop" id="drop" type="button">לוחצות כאן לבחירה מהטלפון<br><span class="hint">אפשר כמה ביחד · סרטון עד 45MB</span></button>
   <input type="file" id="file" accept="image/*,video/*" multiple hidden>
   <div class="q" id="queue"></div>
   <div class="row"><button class="btn" type="button" id="addClose">סיום</button></div>
@@ -150,7 +162,7 @@ dialog::backdrop{background:rgba(30,15,20,.55)}
 
 <div class="gs" id="gs" role="dialog" aria-modal="true" aria-label="אירוע">
   <div class="hd"><h3 id="gsTtl"></h3><button class="x" id="gsClose" aria-label="סגירה">✕</button></div>
-  <div class="in"><p class="hint">לוחצות על תמונה כדי לסמן אותה. בתוך התמונה: ⭐ בוחרת את תמונת השער, ✂ פותחת קבוצה חדשה מהתמונה הזאת והלאה (כשיש ביום כמה אירועים).</p><div class="grid" id="gsGrid"></div></div>
+  <div class="in"><p class="hint edonly">לוחצות על תמונה כדי לסמן אותה. בתוך התמונה: ⭐ בוחרת את תמונת השער, ✂ פותחת קבוצה חדשה מהתמונה הזאת והלאה (כשיש ביום כמה אירועים).</p><div class="grid" id="gsGrid"></div></div>
 </div>
 <div class="vw" id="vw" role="dialog" aria-modal="true" aria-label="צפייה בתמונה">
   <div class="top"><button class="ic" id="vClose" aria-label="סגירה">✕</button><div class="ttl" id="vTtl"></div><button class="ic" id="vDel" aria-label="מחיקה">🗑</button></div>
@@ -167,8 +179,11 @@ const $=s=>document.querySelector(s);
 const ls={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmt=s=>{s=Math.round(s||0);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
-let ROOT=null, ME=ls.get('lucy_name')||'', items={}, F='todo', list=[], vlist=[], idx=-1, marking=false, objUrl=null, GROUPS=[], sheetRef=null, inGroup=false;
+let ROOT=null, ME=ls.get('lucy_name')||'', items={}, F=null, list=[], vlist=[], idx=-1, marking=false, objUrl=null, GROUPS=[], sheetRef=null, inGroup=false;
 const thumbs={};
+const EDH='19a0321f2132e93e2c18b265';
+const isEd=()=>ls.get('lucy_ed')==='1';
+let cat='years';
 
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2000)}
 async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s.trim().toLowerCase()));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('').slice(0,24)}
@@ -198,7 +213,7 @@ function apply(path,data,isPatch){
   const k=ps[ps.length-1]; if(data===null)delete o[k]; else if(isPatch)o[k]=Object.assign(o[k]||{},data); else o[k]=data;
 }
 $('#gateForm').onsubmit=async()=>{ls.set('lucy_code',$('#gateCode').value.trim());boot()};
-$('#nameForm').onsubmit=e=>{const v=e.submitter&&e.submitter.value||$('#nameInp').value.trim();if(!v){e.preventDefault();return}ME=v;ls.set('lucy_name',ME);render()};
+$('#nameForm').onsubmit=e=>{const v=$('#nameInp').value.trim();if(!v){e.preventDefault();return}ME=v;ls.set('lucy_name',ME);render()};
 
 /* status of an item: no = not relevant, nolucy = Lucy isn't in it, lucy = where she is */
 const FILTERS=[
@@ -210,22 +225,31 @@ const FILTERS=[
   ['nolucy','בלי לוסי',i=>!!i.nolucy],
   ['video','סרטונים',i=>i.kind==='video'],
 ];
+const FRIEND_FILTERS=[
+  ['all','הכל',i=>!i.no&&!i.nolucy],
+  ['greet','💌 ברכות',i=>i.cat==='greeting'],
+  ['mine','מה שהעליתי',i=>(i.up||i.by)===ME],
+];
+FILTERS.push(['greet','💌 ברכות',i=>i.cat==='greeting'],['friends','מהחברות',i=>i.src!=='gp']);
 function all(){return Object.entries(items).filter(([,v])=>v&&v.kind).map(([id,v])=>Object.assign({id},v))}
 function render(){
   const A=all();
   const ok=A.filter(i=>!i.no&&!i.nolucy).length;
-  $('#sum').innerHTML=A.length?`<b>${A.length}</b> פריטים · <b>${ok}</b> רלוונטיים · <b>${A.filter(i=>i.lucy).length}</b> עם לוסי מסומנת${ME?` · את <b>${esc(ME)}</b> (<a href="#" id="chg" style="color:inherit">החלפה</a>)`:''}`:'';
+  $('#sum').innerHTML=!isEd()?(ME?`שלום <b>${esc(ME)}</b> (<a href="#" id="chg" style="color:inherit">לא את?</a>)`:''):A.length?`<b>${A.length}</b> פריטים · <b>${ok}</b> רלוונטיים · <b>${A.filter(i=>i.lucy).length}</b> עם לוסי מסומנת · <b>${A.filter(i=>i.cat==='greeting').length}</b> ברכות${ME?` · את <b>${esc(ME)}</b> (<a href="#" id="chg" style="color:inherit">החלפה</a>)`:''}`:'';
   const c=$('#chg'); if(c) c.onclick=e=>{e.preventDefault();$('#nameDlg').showModal()};
-  $('#chips').innerHTML=FILTERS.map(([k,l,fn])=>`<button class="chip" data-f="${k}" aria-pressed="${F===k}">${l} <small>${A.filter(fn).length}</small></button>`).join('');
-  const fn=FILTERS.find(f=>f[0]===F)[2];
-  GROUPS=buildGroups(A);
+  const FL=isEd()?FILTERS:FRIEND_FILTERS; if(!F||!FL.some(f=>f[0]===F)) F=FL[0][0];
+  $('#chips').innerHTML=FL.map(([k,l,fn])=>`<button class="chip" data-f="${k}" aria-pressed="${F===k}">${l} <small>${A.filter(fn).length}</small></button>`).join('');
+  const fn=FL.find(f=>f[0]===F)[2];
+  const GR=A.filter(i=>i.cat==='greeting'&&fn(i)).sort((a,b)=>(a.at||0)-(b.at||0));
+  GROUPS=buildGroups(A.filter(i=>i.cat!=='greeting'));
   const vg=GROUPS.map(g=>Object.assign({},g,{hit:g.items.filter(fn)})).filter(g=>g.hit.length);
-  const vis=vg.flatMap(g=>g.hit);
+  const vis=GR.concat(vg.flatMap(g=>g.hit));
   list=vis.map(i=>i.id);
   if(!A.length){$('#main').innerHTML='<div class="empty"><b>עוד ריק כאן</b>לוחצות על „+ הוספה” ומעלות תמונות</div>';return}
   if(!vis.length){$('#main').innerHTML=`<div class="empty"><b>${F==='todo'?'הכל נבדק 🎉':'אין כאן כלום'}</b></div>`;return}
   const g={}; vg.forEach(x=>{const y=x.cover.year||'—';(g[y]=g[y]||[]).push(x)});
-  $('#main').innerHTML=Object.entries(g).map(([y,l])=>`<h2>${y}<small>${/^\d+$/.test(y)?'לוסי בת '+Math.max(0,y-2014)+' · ':''}${l.reduce((n,x)=>n+x.hit.length,0)}</small></h2><div class="grid">${l.map(x=>x.items.length>1?stackTile(x):tile(x.items[0])).join('')}</div>`).join('');
+  $('#main').innerHTML=(GR.length?`<section class="gsec"><h2>💌 ברכות<small>${GR.length}</small></h2><div class="grid">${GR.map(tile).join('')}</div></section>`:'')+Object.entries(g).map(([y,l])=>`<h2>${y}<small>${/^\d+$/.test(y)?'לוסי בת '+Math.max(0,y-2014)+' · ':''}${l.reduce((n,x)=>n+x.hit.length,0)}</small></h2><div class="grid">${l.map(x=>x.items.length>1?stackTile(x):tile(x.items[0])).join('')}</div>`).join('');
+  $('#main').insertAdjacentHTML('beforeend',`<button class="edlink" id="edBtn">${isEd()?'יציאה ממצב עורכות':'כניסת עורכות'}</button>`);
   document.querySelectorAll('img[data-t]').forEach(img=>{const id=img.dataset.t;thumbs[id]?img.src=thumbs[id]:io.observe(img)});
 }
 /* events: same calendar day, split when there's a gap of more than 2 hours or someone split it by hand (splitHere) */
@@ -253,7 +277,7 @@ function stackTile(g){
 }
 function tile(i){
   return `<div class="t ${i.no||i.nolucy?'no':''}"><button class="ph" data-o="${i.id}" aria-label="פתיחה"><img data-t="${i.id}" alt=""></button>
-  ${i.kind==='video'?`<span class="tag">▶${i.dur?' '+fmt(i.dur):''}</span>`:''}${inSheetTile&&i.cover?'<span class="cov">⭐ שער</span>':''}
+  ${i.kind==='video'?`<span class="tag">▶${i.dur?' '+fmt(i.dur):''}</span>`:''}${inSheetTile&&i.cover?'<span class="cov">⭐ שער</span>':''}${i.cat==='greeting'?`<span class="cov" style="background:var(--blush);color:#fff">💌 ${esc(i.by||'')}</span>`:''}
   <div class="st">${i.no?'<span class="s-no">לא רלוונטי</span>':''}${i.nolucy?'<span class="s-nl">בלי לוסי</span>':''}${i.lucy?'<span class="s-l">לוסי ✓</span>':''}</div></div>`;
 }
 let inSheetTile=false;
@@ -263,6 +287,7 @@ function renderSheet(){
   const g=sheetGroup(); if(!g){closeSheet();return}
   if(!g.items.some(i=>i.cover)&&g.items[0].id!==sheetRef) sheetRef=g.items[0].id;
   $('#gsTtl').innerHTML=`${dstr(g.items[0].taken)||g.cover.year||''}<small>${g.items.length} פריטים</small>`;
+  document.querySelectorAll('.edonly').forEach(e=>e.style.display=isEd()?'':'none');
   inSheetTile=true; $('#gsGrid').innerHTML=g.items.map(i=>tile(i).replace('data-o=','data-so=')).join(''); inSheetTile=false;
   $('#gsGrid').querySelectorAll('img[data-t]').forEach(img=>{const id=img.dataset.t;thumbs[id]?img.src=thumbs[id]:io.observe(img)});
 }
@@ -271,6 +296,9 @@ $('#gsClose').onclick=closeSheet;
 const io=new IntersectionObserver(es=>es.forEach(async e=>{if(!e.isIntersecting)return;io.unobserve(e.target);const id=e.target.dataset.t;try{const d=await get('thumbs/'+id);if(d){thumbs[id]=d;e.target.src=d}}catch(x){}}),{rootMargin:'300px'});
 document.addEventListener('click',e=>{
   const f=e.target.closest('[data-f]');if(f){F=f.dataset.f;render();return}
+  if(e.target.id==='edBtn'){if(isEd()){ls.set('lucy_ed','');render();return}
+    const c=prompt('קוד עורכות:');if(!c)return;sha('ed-'+c.trim()).then(h=>{if(h===EDH){ls.set('lucy_ed','1');F=null;render();toast('מצב עורכות ✓')}else toast('קוד לא נכון')});return}
+  const ad=e.target.closest('[data-add]');if(ad){openAdd(ad.dataset.add);return}
   const so=e.target.closest('[data-so]');if(so){const g=sheetGroup();vlist=g?g.items.map(i=>i.id):[so.dataset.so];inGroup=true;open(so.dataset.so);return}
   const gg=e.target.closest('[data-g]');if(gg){openSheet(gg.dataset.g);return}
   const o=e.target.closest('[data-o]');if(o){vlist=list.slice();inGroup=false;open(o.dataset.o);return}
@@ -294,6 +322,7 @@ async function open(id){
 }
 function paintPin(){
   const it=items[vlist[idx]], fr=$('#frame'); if(!fr||!it)return;
+  if(!isEd()){fr.querySelectorAll('.pin,.mk').forEach(p=>p.remove());return}
   fr.querySelectorAll('.pin,.mk').forEach(p=>p.remove()); fr.classList.toggle('marking',marking);
   if(it.lucy){const p=document.createElement('div');p.className='pin';p.style.left=(it.lucy.x*100)+'%';p.style.top=(it.lucy.y*100)+'%';fr.appendChild(p)}
   if(marking){const m=document.createElement('div');m.className='mk';m.textContent='לוחצות על הפנים של לוסי';fr.appendChild(m)}
@@ -301,6 +330,9 @@ function paintPin(){
 function paintBot(){
   const id=vlist[idx], it=items[id]; if(!it)return;
   const by=[it.sameDay&&'נוספה מאותו יום',it.noBy&&('לא רלוונטי: '+it.noBy),it.nolucyBy&&('בלי לוסי: '+it.nolucyBy),it.lucy&&it.lucy.by&&('סימנה את לוסי: '+it.lucy.by),it.by&&('העלתה: '+it.by)].filter(Boolean).join(' · ');
+  if(!isEd()){$('#bot').innerHTML=`<button class="btn" data-a="next">הבא ‹</button><div class="who">${it.cat==='greeting'?'💌 ברכה מ'+esc(it.by||''):it.by&&it.src!=='gp'?'העלתה: '+esc(it.by):''} · ${idx+1}/${vlist.length}</div>`;
+    $('#vDel').style.visibility=(it.up||it.by)===ME&&it.src!=='gp'?'visible':'hidden';paintPin();return}
+  $('#vDel').style.visibility='visible';
   $('#bot').innerHTML=`
     <button class="btn ${marking?'on':''}" data-a="mark">📍 ${it.lucy?'לסמן מחדש את לוסי':'איפה לוסי?'}</button>
     <button class="btn ${it.nolucy?'onnl':''}" data-a="nolucy">🙈 אין כאן לוסי</button>
@@ -350,7 +382,15 @@ $('#stage').addEventListener('touchend',e=>{if(tx==null||marking)return;const dx
 /* add */
 const Y=new Date().getFullYear();
 $('#addYear').innerHTML='<option value="auto">לפי תאריך הקובץ</option>'+Array.from({length:Y-2013},(_,i)=>Y-i).map(y=>`<option value="${y}">${y} · לוסי בת ${y-2014}</option>`).join('');
-$('#addBtn').onclick=()=>ME?$('#addDlg').showModal():$('#nameDlg').showModal();
+function setCat(c){cat=c;$('#catSeg').querySelectorAll('[data-c]').forEach(b=>b.classList.toggle('pri',b.dataset.c===c));
+  const g=c==='greeting';$('#yearLbl').style.display=g?'none':'';
+  $('#addTtl').textContent=g?'ברכה מצולמת ללוסי 💌':'תמונות וסרטונים של לוסי';
+  $('#addHint').innerHTML=g?'מצלמות סרטון קצר בטלפון (עד דקה, <b>לא ב־4K</b>) ומעלות כאן. אפשר גם לבחור סרטון שכבר צילמתן.':'בוחרות תמונות וסרטונים מכל השנים. אם יודעות מאיזו שנה, בחרו אותה; אחרת זה לפי תאריך הקובץ.';
+  $('#capLbl').textContent=g?'ממי הברכה':'מאיזה אירוע / מי בתמונה (לא חובה)';
+  $('#addCap').value=g?(ME||''):'';}
+function openAdd(c){if(!ME){$('#nameDlg').showModal();return}setCat(c||'years');$('#queue').innerHTML='';$('#addDlg').showModal()}
+$('#catSeg').onclick=e=>{const b=e.target.closest('[data-c]');if(b)setCat(b.dataset.c)};
+$('#addBtn').onclick=()=>openAdd('years');
 $('#addClose').onclick=()=>$('#addDlg').close();
 const fileInp=$('#file'), drop=$('#drop');
 drop.onclick=()=>fileInp.click();
@@ -364,14 +404,15 @@ function sq(s){const W=s.width||s.videoWidth,H=s.height||s.videoHeight,m=Math.mi
 const b64=buf=>{let s='';const a=new Uint8Array(buf);for(let i=0;i<a.length;i+=0x8000)s+=String.fromCharCode.apply(null,a.subarray(i,i+0x8000));return btoa(s)};
 async function upload(f,prog){
   const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6), ys=$('#addYear').value;
-  const meta={year:ys==='auto'?new Date(f.lastModified||Date.now()).getFullYear():+ys,by:ME,at:Date.now(),taken:f.lastModified||Date.now()};
+  const meta={year:cat==='greeting'?new Date().getFullYear():ys==='auto'?new Date(f.lastModified||Date.now()).getFullYear():+ys,by:ME,at:Date.now(),taken:f.lastModified||Date.now(),cat,caption:$('#addCap').value.trim()||null,up:ME};
+  if(cat==='greeting'&&meta.caption)meta.by=meta.caption;
   const u=URL.createObjectURL(f);
   try{
     if(f.type.startsWith('image/')||/\.(heic|heif)$/i.test(f.name)){
       const i=await img(u);prog(.4);await put('thumbs/'+id,sq(i));await put('full/'+id,jpg(i,1800));prog(.9);
       await put('items/'+id,Object.assign(meta,{kind:'photo'}));
     }else if(f.type.startsWith('video/')||/\.(mov|mp4|m4v)$/i.test(f.name)){
-      if(f.size>VIDEO_MAX)throw new Error('מעל 45MB');
+      if(f.size>VIDEO_MAX)throw new Error('הסרטון גדול מדי ('+Math.round(f.size/1048576)+'MB). צלמי שוב קצר יותר או באיכות HD, או שלחי אותו ליעל בוואטסאפ');
       const v=document.createElement('video');v.muted=true;v.playsInline=true;v.preload='auto';v.src=u;
       await new Promise((ok,no)=>{v.onloadeddata=ok;v.onerror=()=>no(new Error('פורמט לא נתמך'))});
       v.currentTime=Math.min(1,(v.duration||2)/3);await new Promise(ok=>{v.onseeked=ok;setTimeout(ok,1500)});
