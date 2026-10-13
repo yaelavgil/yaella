@@ -226,8 +226,8 @@ function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');cl
 async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s.trim().toLowerCase()));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('').slice(0,24)}
 const U=p=>`${DB}/${ROOT}/${p}.json`;
 const get=async p=>{const r=await fetch(U(p));if(!r.ok)throw 0;return r.json()};
-const put=async(p,v)=>{const r=await fetch(U(p),{method:'PUT',body:JSON.stringify(v)});if(!r.ok)throw 0};
-const patch=async(p,v)=>{const r=await fetch(U(p),{method:'PATCH',body:JSON.stringify(v)});if(!r.ok)throw 0};
+const put=async(p,v)=>{const r=await fetch(U(p),{method:'PUT',body:JSON.stringify(v)});if(!r.ok)throw 0;if(p.startsWith('items/'))window.__refreshSoon&&window.__refreshSoon()};
+const patch=async(p,v)=>{const r=await fetch(U(p),{method:'PATCH',body:JSON.stringify(v)});if(!r.ok)throw 0;window.__refreshSoon&&window.__refreshSoon()};
 const del=p=>fetch(U(p),{method:'DELETE'});
 
 /* entry: code comes from the link (#k=...) and is remembered on this device */
@@ -238,18 +238,19 @@ async function boot(){
   if(location.hash) history.replaceState(null,'',location.pathname);
   const show=t=>{$('#main').innerHTML=`<div class="empty"><b>${t}</b><button class="btn" onclick="location.reload()">לנסות שוב</button></div>`};
   const ctl=new AbortController(); const to=setTimeout(()=>ctl.abort(),20000);
-  try{ const r=await fetch(U('items'),{signal:ctl.signal}); if(!r.ok) throw 0; items=(await r.json())||{}; }
+  try{ const r=await fetch(U('items'),{signal:ctl.signal,cache:'no-store'}); if(!r.ok) throw 0; items=(await r.json())||{}; }
   catch(e){ show('לא הצלחנו לטעון'); return } finally{ clearTimeout(to) }
   render();
   if(!ME) $('#nameDlg').showModal();
   const refresh=()=>{ render(); if($('#gs').classList.contains('open'))renderSheet(); if($('#vw').classList.contains('open'))paintBot(); };
-  let live=false;
-  try{
-    const es=new EventSource(U('items'));
-    const on=ev=>{live=true;const {path,data}=JSON.parse(ev.data);apply(path,data,ev.type==='patch');refresh()};
-    es.addEventListener('put',on);es.addEventListener('patch',on);
-  }catch(e){}
-  setInterval(async()=>{ if(live)return; try{ items=(await get('items'))||{}; refresh() }catch(e){} },10000);
+  /* short polling instead of a held-open stream: browsers allow only ~6 connections per server, and a stream per open tab used them up */
+  let busy=false;
+  const tick=async()=>{ if(busy||document.hidden)return; busy=true;
+    const c=new AbortController(); const t=setTimeout(()=>c.abort(),15000);
+    try{ const r=await fetch(U('items'),{signal:c.signal,cache:'no-store'}); if(r.ok){ items=(await r.json())||{}; refresh() } }catch(e){} finally{ clearTimeout(t); busy=false } };
+  setInterval(tick,15000);
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden) tick() });
+  window.__refreshSoon=()=>setTimeout(tick,600);
 }
 function apply(path,data,isPatch){
   const ps=path.split('/').filter(Boolean);
