@@ -91,6 +91,23 @@ dialog::backdrop{background:rgba(30,15,20,.55)}
 .bot .btn.onnl{background:var(--gold);border-color:var(--gold);color:#2b2226}
 .bot .who{width:100%;text-align:center;font-size:12px;opacity:.7}
 .mk{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:var(--blush);color:#fff;font-weight:800;font-size:14px;border-radius:999px;padding:4px 14px;z-index:2}
+/* event stacks: cover on top, two siblings peeking behind, all inside the same square */
+.stack .ph{position:relative;overflow:hidden;background:var(--paper)}
+.stack .ph .bk,.stack .ph .cv{position:absolute;inset:9% 9% 9% 9%;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(40,20,30,.25)}
+.stack .ph .bk img,.stack .ph .cv img{width:100%;height:100%;object-fit:cover}
+.stack .ph .b1{transform:rotate(-7deg) translate(-5%,-2%)}
+.stack .ph .b2{transform:rotate(6deg) translate(5%,1%)}
+.stack .ph .cv{border:3px solid var(--paper)}
+.stack .cnt{position:absolute;bottom:6px;inset-inline-start:6px;background:var(--ink);color:var(--bg);font-size:12px;font-weight:800;border-radius:999px;padding:1px 9px}
+.t .cov{position:absolute;top:6px;inset-inline-end:6px;background:var(--gold);color:#2b2226;font-size:11px;font-weight:800;border-radius:999px;padding:1px 7px}
+.gs{position:fixed;inset:0;z-index:15;background:var(--bg);display:none;overflow:auto}
+.gs.open{display:block}
+.gs .hd{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:10px;padding:10px 16px;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.gs .hd h3{font-family:var(--display);font-size:40px;line-height:1;margin:0;flex:1}
+.gs .hd h3 small{font-family:var(--body);font-size:14px;color:var(--muted);font-weight:600;margin-inline-start:8px}
+.gs .hd .x{border:1px solid var(--line);background:var(--paper);border-radius:999px;width:40px;height:40px;font-size:18px}
+.gs .in{max-width:1100px;margin:0 auto;padding:12px 16px 60px}
+.gs .hint{margin-bottom:10px}
 .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:7px 16px;border-radius:999px;font-weight:700;font-size:14px;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.show{opacity:1}
 @media (max-width:520px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.t{border-radius:10px}}
@@ -130,6 +147,10 @@ dialog::backdrop{background:rgba(30,15,20,.55)}
   <div class="row"><button class="btn" type="button" id="addClose">סיום</button></div>
 </div></dialog>
 
+<div class="gs" id="gs" role="dialog" aria-modal="true" aria-label="אירוע">
+  <div class="hd"><h3 id="gsTtl"></h3><button class="x" id="gsClose" aria-label="סגירה">✕</button></div>
+  <div class="in"><p class="hint">לוחצות על תמונה כדי לסמן אותה. בתוך התמונה: ⭐ בוחרת את תמונת השער, ✂ פותחת קבוצה חדשה מהתמונה הזאת והלאה (כשיש ביום כמה אירועים).</p><div class="grid" id="gsGrid"></div></div>
+</div>
 <div class="vw" id="vw" role="dialog" aria-modal="true" aria-label="צפייה בתמונה">
   <div class="top"><button class="ic" id="vClose" aria-label="סגירה">✕</button><div class="ttl" id="vTtl"></div><button class="ic" id="vDel" aria-label="מחיקה">🗑</button></div>
   <div class="stage" id="stage"></div>
@@ -145,7 +166,7 @@ const $=s=>document.querySelector(s);
 const ls={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmt=s=>{s=Math.round(s||0);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
-let ROOT=null, ME=ls.get('lucy_name')||'', items={}, F='todo', list=[], vlist=[], idx=-1, marking=false, objUrl=null;
+let ROOT=null, ME=ls.get('lucy_name')||'', items={}, F='todo', list=[], vlist=[], idx=-1, marking=false, objUrl=null, GROUPS=[], sheetRef=null, inGroup=false;
 const thumbs={};
 
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2000)}
@@ -166,7 +187,7 @@ async function boot(){
   catch(e){$('#main').innerHTML='<div class="empty"><b>אין חיבור</b>נסי לרענן</div>';return}
   if(!ME) $('#nameDlg').showModal();
   const es=new EventSource(U('items'));
-  const on=ev=>{const {path,data}=JSON.parse(ev.data);apply(path,data,ev.type==='patch');render();if($('#vw').classList.contains('open'))paintBot()};
+  const on=ev=>{const {path,data}=JSON.parse(ev.data);apply(path,data,ev.type==='patch');render();if($('#gs').classList.contains('open'))renderSheet();if($('#vw').classList.contains('open'))paintBot()};
   es.addEventListener('put',on);es.addEventListener('patch',on);
 }
 function apply(path,data,isPatch){
@@ -187,7 +208,6 @@ const FILTERS=[
   ['no','לא רלוונטי',i=>!!i.no],
   ['nolucy','בלי לוסי',i=>!!i.nolucy],
   ['video','סרטונים',i=>i.kind==='video'],
-  ['sameday','נוספו מאותו יום',i=>!!i.sameDay],
 ];
 function all(){return Object.entries(items).filter(([,v])=>v&&v.kind).map(([id,v])=>Object.assign({id},v))}
 function render(){
@@ -197,23 +217,62 @@ function render(){
   const c=$('#chg'); if(c) c.onclick=e=>{e.preventDefault();$('#nameDlg').showModal()};
   $('#chips').innerHTML=FILTERS.map(([k,l,fn])=>`<button class="chip" data-f="${k}" aria-pressed="${F===k}">${l} <small>${A.filter(fn).length}</small></button>`).join('');
   const fn=FILTERS.find(f=>f[0]===F)[2];
-  const vis=A.filter(fn).sort((a,b)=>(a.year||0)-(b.year||0)||(a.taken||a.at||0)-(b.taken||b.at||0));
+  GROUPS=buildGroups(A);
+  const vg=GROUPS.map(g=>Object.assign({},g,{hit:g.items.filter(fn)})).filter(g=>g.hit.length);
+  const vis=vg.flatMap(g=>g.hit);
   list=vis.map(i=>i.id);
   if(!A.length){$('#main').innerHTML='<div class="empty"><b>עוד ריק כאן</b>לוחצות על „+ הוספה” ומעלות תמונות</div>';return}
   if(!vis.length){$('#main').innerHTML=`<div class="empty"><b>${F==='todo'?'הכל נבדק 🎉':'אין כאן כלום'}</b></div>`;return}
-  const g={}; vis.forEach(i=>(g[i.year||'—']=g[i.year||'—']||[]).push(i));
-  $('#main').innerHTML=Object.entries(g).map(([y,l])=>`<h2>${y}<small>${/^\d+$/.test(y)?'לוסי בת '+Math.max(0,y-2014)+' · ':''}${l.length}</small></h2><div class="grid">${l.map(tile).join('')}</div>`).join('');
+  const g={}; vg.forEach(x=>{const y=x.cover.year||'—';(g[y]=g[y]||[]).push(x)});
+  $('#main').innerHTML=Object.entries(g).map(([y,l])=>`<h2>${y}<small>${/^\d+$/.test(y)?'לוסי בת '+Math.max(0,y-2014)+' · ':''}${l.reduce((n,x)=>n+x.hit.length,0)}</small></h2><div class="grid">${l.map(x=>x.items.length>1?stackTile(x):tile(x.items[0])).join('')}</div>`).join('');
   document.querySelectorAll('img[data-t]').forEach(img=>{const id=img.dataset.t;thumbs[id]?img.src=thumbs[id]:io.observe(img)});
+}
+/* events: same calendar day, split when there's a gap of more than 2 hours or someone split it by hand (splitHere) */
+const dayKey=t=>{const d=new Date(t);return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()};
+const GAP=2*3600e3;
+function buildGroups(A){
+  const s=A.slice().sort((a,b)=>(a.taken||a.at||0)-(b.taken||b.at||0)); const out=[]; let cur=null, prev=null;
+  for(const i of s){
+    const t=i.taken||0;
+    const fresh=!cur||!t||!prev.taken||dayKey(t)!==dayKey(prev.taken)||t-prev.taken>GAP||i.splitHere;
+    if(fresh){cur={items:[]};out.push(cur)} cur.items.push(i); prev=i;
+  }
+  out.forEach(g=>{g.key=g.items[0].id;g.cover=g.items.find(i=>i.cover)||g.items[0]});
+  return out.sort((a,b)=>(a.cover.year||0)-(b.cover.year||0)||(a.items[0].taken||0)-(b.items[0].taken||0));
+}
+const dstr=t=>{if(!t)return '';const d=new Date(t);return d.getFullYear()>2000?`${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`:''};
+function stackTile(g){
+  const others=g.items.filter(i=>i!==g.cover).slice(0,2);
+  const todo=g.items.filter(i=>!i.no&&!i.nolucy&&!i.lucy).length;
+  return `<div class="t stack"><button class="ph" data-g="${g.key}" aria-label="פתיחת האירוע">
+    ${others[1]?`<span class="bk b2"><img data-t="${others[1].id}" alt=""></span>`:''}${others[0]?`<span class="bk b1"><img data-t="${others[0].id}" alt=""></span>`:''}
+    <span class="cv"><img data-t="${g.cover.id}" alt=""></span></button>
+    <span class="cnt">${g.items.length} מאותו יום</span>
+    <div class="st">${todo?`<span class="s-l" style="background:var(--ink);color:var(--bg)">${todo} לבדוק</span>`:'<span class="s-l" style="background:var(--mint)">נבדק ✓</span>'}</div></div>`;
 }
 function tile(i){
   return `<div class="t ${i.no||i.nolucy?'no':''}"><button class="ph" data-o="${i.id}" aria-label="פתיחה"><img data-t="${i.id}" alt=""></button>
-  ${i.kind==='video'?`<span class="tag">▶ ${fmt(i.dur)}</span>`:''}${i.sameDay?`<span class="tag" style="top:auto;bottom:6px;background:var(--mint)">מאותו יום</span>`:''}
+  ${i.kind==='video'?`<span class="tag">▶ ${fmt(i.dur)}</span>`:''}${inSheetTile&&i.cover?'<span class="cov">⭐ שער</span>':''}
   <div class="st">${i.no?'<span class="s-no">לא רלוונטי</span>':''}${i.nolucy?'<span class="s-nl">בלי לוסי</span>':''}${i.lucy?'<span class="s-l">לוסי ✓</span>':''}</div></div>`;
 }
+let inSheetTile=false;
+function openSheet(key){sheetRef=key;$('#gs').classList.add('open');document.body.style.overflow='hidden';renderSheet()}
+function sheetGroup(){return GROUPS.find(g=>g.items.some(i=>i.id===sheetRef))}
+function renderSheet(){
+  const g=sheetGroup(); if(!g){closeSheet();return}
+  if(!g.items.some(i=>i.cover)&&g.items[0].id!==sheetRef) sheetRef=g.items[0].id;
+  $('#gsTtl').innerHTML=`${dstr(g.items[0].taken)||g.cover.year||''}<small>${g.items.length} פריטים</small>`;
+  inSheetTile=true; $('#gsGrid').innerHTML=g.items.map(i=>tile(i).replace('data-o=','data-so=')).join(''); inSheetTile=false;
+  $('#gsGrid').querySelectorAll('img[data-t]').forEach(img=>{const id=img.dataset.t;thumbs[id]?img.src=thumbs[id]:io.observe(img)});
+}
+function closeSheet(){$('#gs').classList.remove('open');sheetRef=null;if(!$('#vw').classList.contains('open'))document.body.style.overflow=''}
+$('#gsClose').onclick=closeSheet;
 const io=new IntersectionObserver(es=>es.forEach(async e=>{if(!e.isIntersecting)return;io.unobserve(e.target);const id=e.target.dataset.t;try{const d=await get('thumbs/'+id);if(d){thumbs[id]=d;e.target.src=d}}catch(x){}}),{rootMargin:'300px'});
 document.addEventListener('click',e=>{
   const f=e.target.closest('[data-f]');if(f){F=f.dataset.f;render();return}
-  const o=e.target.closest('[data-o]');if(o){vlist=list.slice();open(o.dataset.o);return}
+  const so=e.target.closest('[data-so]');if(so){const g=sheetGroup();vlist=g?g.items.map(i=>i.id):[so.dataset.so];inGroup=true;open(so.dataset.so);return}
+  const gg=e.target.closest('[data-g]');if(gg){openSheet(gg.dataset.g);return}
+  const o=e.target.closest('[data-o]');if(o){vlist=list.slice();inGroup=false;open(o.dataset.o);return}
 });
 
 /* viewer */
@@ -245,6 +304,8 @@ function paintBot(){
     <button class="btn ${it.nolucy?'onnl':''}" data-a="nolucy">🙈 אין כאן לוסי</button>
     <button class="btn ${it.no?'onno':''}" data-a="no">✕ לא רלוונטי</button>
     <button class="btn" data-a="next">הבא ‹</button>
+    ${inGroup&&vlist.length>1?`<button class="btn ${it.cover?'onnl':''}" data-a="cover">⭐ ${it.cover?'תמונת השער':'לבחור כתמונת שער'}</button>`:''}
+    ${inGroup&&(idx>0||it.splitHere)?`<button class="btn" data-a="split">${it.splitHere?'↩ לבטל את הפיצול':'✂ קבוצה חדשה מכאן'}</button>`:''}
     ${it.gid?`<button class="btn ${it.moreReq?'on':''}" data-a="more">➕ ${it.moreReq?(it.moreDone?'נוספו תמונות מהיום הזה':'ביקשת עוד מהיום הזה'):'עוד מאותו יום'}</button>
     <a class="btn" href="https://photos.google.com/photo/${encodeURIComponent(it.gid)}" target="_blank" rel="noopener" style="text-decoration:none">🔎 פתיחה בגוגל פוטוס <small style="opacity:.7">(אצל יעל)</small></a>`:''}
     <div class="who">${esc(by)} · ${idx+1}/${vlist.length}</div>`;
@@ -255,6 +316,10 @@ async function act(a){
   try{
     if(a==='mark'){marking=!marking;paintBot();return}
     if(a==='next'){step(1);return}
+    if(a==='cover'){const g=GROUPS.find(g=>g.items.some(i=>i.id===id));const ops=(g?g.items:[]).filter(i=>i.cover&&i.id!==id).map(i=>patch('items/'+i.id,{cover:null}));
+      await Promise.all(ops);await patch('items/'+id,{cover:it.cover?null:true});if(!it.cover)toast('⭐ נבחרה תמונת שער');return}
+    if(a==='split'){const v=!it.splitHere;await patch('items/'+id,{splitHere:v||null,splitBy:v?ME:null});
+      if(v){vlist=vlist.slice(0,idx);close();toast('✂ פוצל לשתי קבוצות')}else{close();toast('הקבוצות אוחדו')}return}
     if(a==='more'){if(it.moreReq&&!it.moreDone){await patch('items/'+id,{moreReq:null,moreAt:null});return}
       if(!it.moreReq){await patch('items/'+id,{moreReq:ME,moreAt:Date.now()});toast('נרשם! Claude יוסיף את שאר התמונות מהיום הזה')}return}
     if(a==='no'){const v=!it.no;await patch('items/'+id,{no:v||null,noBy:v?ME:null})}
@@ -270,11 +335,11 @@ $('#stage').addEventListener('click',async e=>{
   try{await patch('items/'+id,{lucy:{x:+x.toFixed(4),y:+y.toFixed(4),by:ME},nolucy:null,nolucyBy:null});toast('סומן 📍')}catch(x){toast('השמירה נכשלה')}
 });
 function step(d){if(!vlist.length)return;idx=(idx+d+vlist.length)%vlist.length;open(vlist[idx])}
-function close(){$('#vw').classList.remove('open');document.body.style.overflow='';$('#stage').innerHTML='';if(objUrl){URL.revokeObjectURL(objUrl);objUrl=null}}
+function close(){$('#vw').classList.remove('open');if(!$('#gs').classList.contains('open'))document.body.style.overflow='';$('#stage').innerHTML='';if(objUrl){URL.revokeObjectURL(objUrl);objUrl=null}}
 $('#vClose').onclick=close;
 $('#vDel').onclick=async()=>{const id=vlist[idx];if(!confirm('למחוק את הפריט לגמרי? אי אפשר לשחזר.'))return;
   await Promise.all([del('items/'+id),del('thumbs/'+id),del('full/'+id),del('vid/'+id)]);close();toast('נמחק')};
-document.addEventListener('keydown',e=>{if(!$('#vw').classList.contains('open'))return;
+document.addEventListener('keydown',e=>{if(!$('#vw').classList.contains('open')){if(e.key==='Escape'&&$('#gs').classList.contains('open'))closeSheet();return}
   if(e.key==='Escape')close(); if(e.key==='ArrowLeft')step(1); if(e.key==='ArrowRight')step(-1);
   if(e.key==='x'||e.key==='ס')act('no'); if(e.key==='l'||e.key==='ך')act('mark')});
 let tx=null;$('#stage').addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
