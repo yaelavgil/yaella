@@ -231,20 +231,25 @@ const patch=async(p,v)=>{const r=await fetch(U(p),{method:'PATCH',body:JSON.stri
 const del=p=>fetch(U(p),{method:'DELETE'});
 
 /* entry: code comes from the link (#k=...) and is remembered on this device */
+/* no access code: the board lives at a fixed path. Load once with a plain request, then follow live changes. */
+const FIXED_ROOT='lucy_1a1c42b7b08c8cb5f5640993';
 async function boot(){
-  const m=location.hash.match(/k=([^&]+)/); let code=m?decodeURIComponent(m[1]):ls.get('lucy_code');
-  if(m){ls.set('lucy_code',code);history.replaceState(null,'',location.pathname)}
-  if(!code){$('#gate').showModal();return}
-  ROOT='lucy_'+await sha(code);
-  try{ if(!await get('meta')){ls.set('lucy_code','');$('#main').innerHTML='<div class="empty"><b>אופס</b>הקוד לא נכון, נסי שוב</div>';$('#gateCode').value='';$('#gate').showModal();return} }
-  catch(e){$('#main').innerHTML='<div class="empty"><b>אין חיבור</b>נסי לרענן</div>';return}
+  ROOT=FIXED_ROOT;
+  if(location.hash) history.replaceState(null,'',location.pathname);
+  const show=t=>{$('#main').innerHTML=`<div class="empty"><b>${t}</b><button class="btn" onclick="location.reload()">לנסות שוב</button></div>`};
+  const ctl=new AbortController(); const to=setTimeout(()=>ctl.abort(),20000);
+  try{ const r=await fetch(U('items'),{signal:ctl.signal}); if(!r.ok) throw 0; items=(await r.json())||{}; }
+  catch(e){ show('לא הצלחנו לטעון'); return } finally{ clearTimeout(to) }
+  render();
   if(!ME) $('#nameDlg').showModal();
-  let gotStream=false;
-  const es=new EventSource(U('items'));
-  const poll=async()=>{if(gotStream)return;try{items=(await get('items'))||{};render();if($('#gs').classList.contains('open'))renderSheet()}catch(e){}};
-  setTimeout(()=>{if(!gotStream){poll();setInterval(poll,8000)}},5000);
-  const on=ev=>{gotStream=true;const {path,data}=JSON.parse(ev.data);apply(path,data,ev.type==='patch');render();if($('#gs').classList.contains('open'))renderSheet();if($('#vw').classList.contains('open'))paintBot()};
-  es.addEventListener('put',on);es.addEventListener('patch',on);
+  const refresh=()=>{ render(); if($('#gs').classList.contains('open'))renderSheet(); if($('#vw').classList.contains('open'))paintBot(); };
+  let live=false;
+  try{
+    const es=new EventSource(U('items'));
+    const on=ev=>{live=true;const {path,data}=JSON.parse(ev.data);apply(path,data,ev.type==='patch');refresh()};
+    es.addEventListener('put',on);es.addEventListener('patch',on);
+  }catch(e){}
+  setInterval(async()=>{ if(live)return; try{ items=(await get('items'))||{}; refresh() }catch(e){} },10000);
 }
 function apply(path,data,isPatch){
   const ps=path.split('/').filter(Boolean);
@@ -252,7 +257,7 @@ function apply(path,data,isPatch){
   let o=items;for(let i=0;i<ps.length-1;i++){o[ps[i]]=o[ps[i]]||{};o=o[ps[i]]}
   const k=ps[ps.length-1]; if(data===null)delete o[k]; else if(isPatch)o[k]=Object.assign(o[k]||{},data); else o[k]=data;
 }
-$('#gateForm').onsubmit=async()=>{ls.set('lucy_code',$('#gateCode').value.trim());boot()};
+
 $('#nameForm').onsubmit=e=>{const v=$('#nameInp').value.trim();if(!v){e.preventDefault();return}ME=v;ls.set('lucy_name',ME);render()};
 
 /* status of an item: no = not relevant, nolucy = Lucy isn't in it, lucy = where she is */
