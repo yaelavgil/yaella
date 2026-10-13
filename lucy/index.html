@@ -51,6 +51,19 @@ h2 small{font-family:var(--body);font-size:13px;color:var(--muted);font-weight:6
 .t button.ph{display:block;width:100%;aspect-ratio:1;border:0;padding:0;background:var(--blush-soft)}
 .t img{width:100%;height:100%;object-fit:cover;display:block}
 .t.no img{filter:grayscale(1);opacity:.35}
+.t.in{border-color:var(--mint);box-shadow:0 0 0 2px var(--mint)}
+.t.maybe{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold)}
+.acts{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line)}
+.acts button{border:0;background:none;padding:6px 0;font-size:16px;line-height:1;opacity:.45;filter:grayscale(.6)}
+.acts button+button{border-inline-start:1px solid var(--line)}
+.acts button.on{opacity:1;filter:none}
+.acts button.on[data-s="in"]{background:var(--mint)}
+.acts button.on[data-s="maybe"]{background:var(--gold)}
+.acts button.on[data-s="no"]{background:#6b5a60}
+.acts button.on[data-s="nolucy"]{background:var(--blush-soft)}
+.bot .btn.onin{background:var(--mint);border-color:var(--mint)}
+.bot .btn.onmaybe{background:var(--gold);border-color:var(--gold);color:#2b2226}
+.edtop{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:5px 14px;font-weight:700;font-size:13px;margin-top:8px}
 .t .tag{position:absolute;top:6px;inset-inline-start:6px;font-size:11px;font-weight:800;border-radius:999px;padding:1px 8px;background:rgba(20,10,14,.62);color:#fff}
 .t .st{position:absolute;bottom:6px;inset-inline-end:6px;display:flex;gap:4px}
 .t .st span{font-size:12px;font-weight:800;border-radius:999px;padding:1px 7px;color:#fff}
@@ -117,8 +130,10 @@ dialog::backdrop{background:rgba(30,15,20,.55)}
 .edlink{display:block;margin:30px auto 0;border:0;background:none;color:var(--muted);font-size:13px;text-decoration:underline}
 .gsec h2{display:flex;align-items:baseline}
 .srcs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.src{display:grid;gap:2px;justify-items:center;text-align:center;border:2px dashed var(--line);background:var(--bg);border-radius:14px;padding:14px 6px;font-weight:800;font-size:14px;line-height:1.25}
-.src span{font-size:28px}
+.src{display:grid;gap:2px;justify-items:center;text-align:center;border:2px solid var(--blush);background:var(--blush-soft);color:var(--ink);border-radius:14px;padding:14px 6px;font-weight:800;font-size:14px;line-height:1.25}
+.src span{font-size:28px;line-height:1.1}
+.src:hover{background:var(--blush);color:#fff}
+.src:hover small{color:#fff}
 .src small{font-weight:600;color:var(--muted);font-size:12px}
 .srcs.over .src{border-color:var(--blush);background:var(--blush-soft)}
 .cam{display:grid;gap:10px}
@@ -134,12 +149,12 @@ dialog::backdrop{background:rgba(30,15,20,.55)}
 <header>
   <h1>לוסי <span>בת 12</span> ✨</h1>
   <p class="intro" id="intro">מכינות ללוסי סרטון לבת המצווה 💛<br>מעלות לכאן <b>תמונות וסרטונים של לוסי מכל השנים</b>, וגם <b>ברכה מצולמת</b> בשבילה.</p>
-  <div class="cta" id="cta"><button class="btn pri" data-add="years">📸 תמונות וסרטונים של לוסי</button><button class="btn pri gold" data-add="greeting">💌 ברכה מצולמת</button></div>
+  <div class="cta" id="cta"><button class="btn pri" data-add="years">⬆ העלאת תמונות וסרטונים של לוסי</button><button class="btn pri gold" data-add="greeting">💌 העלאת ברכה מצולמת</button></div>
   <div class="sum" id="sum"></div>
 </header>
 <div class="bar"><div class="in">
   <div class="chips" id="chips" role="group" aria-label="סינון"></div>
-  <button class="add" id="addBtn">+ הוספה</button>
+  <button class="add" id="addBtn">⬆ העלאה</button>
 </div></div>
 <main id="main"><div class="empty"><b>רגע…</b>טוענות</div></main>
 
@@ -164,16 +179,16 @@ dialog::backdrop{background:rgba(30,15,20,.55)}
   <label id="yearLbl">שנה<select id="addYear"></select></label>
   <label><span id="capLbl">כמה מילים (לא חובה)</span><input id="addCap"></label>
   <div class="srcs" id="drop">
-    <button type="button" class="src" data-src="pick"><span>🖼️</span>בחירה מהטלפון או מהמחשב<small>אפשר כמה ביחד</small></button>
-    <button type="button" class="src" data-src="photo"><span>📷</span>צילום תמונה</button>
-    <button type="button" class="src" data-src="video"><span>🎥</span>צילום וידאו<small>עד דקה</small></button>
+    <button type="button" class="src" data-src="pick"><span>⬆</span>העלאה מהטלפון או מהמחשב<small>בוחרות קבצים, אפשר כמה ביחד</small></button>
+    <button type="button" class="src" data-src="photo"><span>📷</span>לצלם עכשיו<small>תמונה, ומיד עולה</small></button>
+    <button type="button" class="src" data-src="video"><span>🎥</span>להקליט וידאו<small>עד דקה, ומיד עולה</small></button>
   </div>
   <p class="hint" style="text-align:center">אפשר גם לגרור קבצים לכאן · סרטון עד 45MB</p>
   <input type="file" id="file" accept="image/*,video/*" multiple hidden>
   <input type="file" id="capP" accept="image/*" capture="environment" hidden>
   <input type="file" id="capV" accept="video/*" capture="environment" hidden>
   <div class="q" id="queue"></div>
-  <div class="row"><button class="btn" type="button" id="addClose">סיום</button></div>
+  <div class="row"><button class="btn" type="button" id="addClose">סגירה</button></div>
 </div></dialog>
 
 <dialog id="camDlg"><div class="dl cam">
@@ -238,17 +253,21 @@ $('#gateForm').onsubmit=async()=>{ls.set('lucy_code',$('#gateCode').value.trim()
 $('#nameForm').onsubmit=e=>{const v=$('#nameInp').value.trim();if(!v){e.preventDefault();return}ME=v;ls.set('lucy_name',ME);render()};
 
 /* status of an item: no = not relevant, nolucy = Lucy isn't in it, lucy = where she is */
+/* one status per item: in (למצגת) · maybe (בהתלבטות) · no (לא למצגת) · nolucy (לא לוסי). Older items stored no/nolucy flags. */
+const ST=i=>i.st||(i.no?'no':i.nolucy?'nolucy':null);
+const STL={in:['✓','למצגת'],maybe:['🤔','בהתלבטות'],no:['✕','לא למצגת'],nolucy:['🙈','לא לוסי']};
 const FILTERS=[
-  ['todo','לבדוק',i=>!i.no&&!i.nolucy&&!i.lucy],
+  ['todo','לבדוק',i=>!ST(i)],
+  ['in','✓ למצגת',i=>ST(i)==='in'],
+  ['maybe','🤔 בהתלבטות',i=>ST(i)==='maybe'],
+  ['no','✕ לא למצגת',i=>ST(i)==='no'],
+  ['nolucy','🙈 לא לוסי',i=>ST(i)==='nolucy'],
   ['all','הכל',i=>true],
-  ['ok','רלוונטי',i=>!i.no&&!i.nolucy],
-  ['marked','לוסי מסומנת',i=>!!i.lucy],
-  ['no','לא רלוונטי',i=>!!i.no],
-  ['nolucy','בלי לוסי',i=>!!i.nolucy],
+  ['marked','📍 לוסי מסומנת',i=>!!i.lucy],
   ['video','סרטונים',i=>i.kind==='video'],
 ];
 const FRIEND_FILTERS=[
-  ['all','הכל',i=>!i.no&&!i.nolucy],
+  ['all','הכל',i=>!['no','nolucy'].includes(ST(i))],
   ['greet','💌 ברכות',i=>i.cat==='greeting'],
   ['mine','מה שהעליתי',i=>(i.up||i.by)===ME],
 ];
@@ -256,8 +275,8 @@ FILTERS.push(['greet','💌 ברכות',i=>i.cat==='greeting'],['friends','מה�
 function all(){return Object.entries(items).filter(([,v])=>v&&v.kind).map(([id,v])=>Object.assign({id},v))}
 function render(){
   const A=all();
-  const ok=A.filter(i=>!i.no&&!i.nolucy).length;
-  $('#sum').innerHTML=!isEd()?(ME?`שלום <b>${esc(ME)}</b> (<a href="#" id="chg" style="color:inherit">לא את?</a>)`:''):A.length?`<b>${A.length}</b> פריטים · <b>${ok}</b> רלוונטיים · <b>${A.filter(i=>i.lucy).length}</b> עם לוסי מסומנת · <b>${A.filter(i=>i.cat==='greeting').length}</b> ברכות${ME?` · את <b>${esc(ME)}</b> (<a href="#" id="chg" style="color:inherit">החלפה</a>)`:''}`:'';
+  const ok=A.filter(i=>ST(i)==='in').length;
+  $('#sum').innerHTML=!isEd()?(ME?`שלום <b>${esc(ME)}</b> (<a href="#" id="chg" style="color:inherit">לא את?</a>)`:'')+`<br><button class="edtop" id="edBtn">🔑 כניסת עורכות (יעל וענת)</button>`:A.length?`<b>${A.length}</b> פריטים · <b>${ok}</b> למצגת · <b>${A.filter(i=>ST(i)==='maybe').length}</b> בהתלבטות · <b>${A.filter(i=>!ST(i)).length}</b> לבדוק · <b>${A.filter(i=>i.cat==='greeting').length}</b> ברכות${ME?` · את <b>${esc(ME)}</b> (<a href="#" id="chg" style="color:inherit">החלפה</a>)`:''}`:'';
   const c=$('#chg'); if(c) c.onclick=e=>{e.preventDefault();$('#nameDlg').showModal()};
   const FL=isEd()?FILTERS:FRIEND_FILTERS; if(!F||!FL.some(f=>f[0]===F)) F=FL[0][0];
   $('#chips').innerHTML=FL.map(([k,l,fn])=>`<button class="chip" data-f="${k}" aria-pressed="${F===k}">${l} <small>${A.filter(fn).length}</small></button>`).join('');
@@ -271,7 +290,7 @@ function render(){
   if(!vis.length){$('#main').innerHTML=`<div class="empty"><b>${F==='todo'?'הכל נבדק 🎉':'אין כאן כלום'}</b></div>`;return}
   const g={}; vg.forEach(x=>{const y=x.cover.year||'—';(g[y]=g[y]||[]).push(x)});
   $('#main').innerHTML=(GR.length?`<section class="gsec"><h2>💌 ברכות<small>${GR.length}</small></h2><div class="grid">${GR.map(tile).join('')}</div></section>`:'')+Object.entries(g).map(([y,l])=>`<h2>${y}<small>${/^\d+$/.test(y)?'לוסי בת '+Math.max(0,y-2014)+' · ':''}${l.reduce((n,x)=>n+x.hit.length,0)}</small></h2><div class="grid">${l.map(x=>x.items.length>1?stackTile(x):tile(x.items[0])).join('')}</div>`).join('');
-  $('#main').insertAdjacentHTML('beforeend',`<button class="edlink" id="edBtn">${isEd()?'יציאה ממצב עורכות':'כניסת עורכות'}</button>`);
+  if(isEd())$('#main').insertAdjacentHTML('beforeend',`<button class="edlink" id="edBtn">יציאה ממצב עורכות</button>`);
   document.querySelectorAll('img[data-t]').forEach(img=>{const id=img.dataset.t;thumbs[id]?img.src=thumbs[id]:io.observe(img)});
 }
 /* events: same calendar day, split when there's a gap of more than 2 hours or someone split it by hand (splitHere) */
@@ -290,17 +309,25 @@ function buildGroups(A){
 const dstr=t=>{if(!t)return '';const d=new Date(t);return d.getFullYear()>2000?`${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`:''};
 function stackTile(g){
   const others=g.items.filter(i=>i!==g.cover).slice(0,2);
-  const todo=g.items.filter(i=>!i.no&&!i.nolucy&&!i.lucy).length;
+  const todo=g.items.filter(i=>!ST(i)).length, nin=g.items.filter(i=>ST(i)==='in').length;
   return `<div class="t stack"><button class="ph" data-g="${g.key}" aria-label="פתיחת האירוע">
     ${others[1]?`<span class="bk b2"><img data-t="${others[1].id}" alt=""></span>`:''}${others[0]?`<span class="bk b1"><img data-t="${others[0].id}" alt=""></span>`:''}
     <span class="cv"><img data-t="${g.cover.id}" alt=""></span></button>
     <span class="cnt">${g.items.length} מאותו יום</span>
-    ${isEd()?`<div class="st">${todo?`<span class="s-l" style="background:var(--ink);color:var(--bg)">${todo} לבדוק</span>`:'<span class="s-l" style="background:var(--mint)">נבדק ✓</span>'}</div>`:''}</div>`;
+    ${isEd()?`<div class="st">${todo?`<span class="s-l" style="background:var(--ink);color:var(--bg)">${todo} לבדוק</span>`:'<span class="s-l" style="background:var(--mint)">נבדק ✓</span>'}${nin?`<span class="s-l" style="background:var(--mint)">✓ ${nin}</span>`:''}</div>`:''}</div>`;
 }
 function tile(i){
-  return `<div class="t ${i.no||i.nolucy?'no':''}"><button class="ph" data-o="${i.id}" aria-label="פתיחה"><img data-t="${i.id}" alt=""></button>
+  const st=ST(i);
+  return `<div class="t ${st==='no'||st==='nolucy'?'no':st||''}"><button class="ph" data-o="${i.id}" aria-label="פתיחה"><img data-t="${i.id}" alt=""></button>
   ${i.kind==='video'?`<span class="tag">▶${i.dur?' '+fmt(i.dur):''}</span>`:''}${inSheetTile&&i.cover?'<span class="cov">⭐ שער</span>':''}${i.cat==='greeting'?`<span class="cov" style="background:var(--blush);color:#fff">💌 ${esc(i.by||'')}</span>`:''}
-  <div class="st">${i.no?'<span class="s-no">לא רלוונטי</span>':''}${i.nolucy?'<span class="s-nl">בלי לוסי</span>':''}${i.lucy?'<span class="s-l">לוסי ✓</span>':''}</div></div>`;
+  ${isEd()?`<div class="acts">${Object.entries(STL).map(([k,[ic,l]])=>`<button class="${st===k?'on':''}" data-s="${k}" data-id="${i.id}" title="${l}" aria-label="${l}" aria-pressed="${st===k}">${ic}</button>`).join('')}</div>`:''}</div>`;
+}
+async function setSt(id,v){
+  if(!ME){$('#nameDlg').showModal();return}
+  const it=items[id]; if(!it)return; const nv=ST(it)===v?null:v;
+  const p={st:nv,stBy:nv?ME:null,no:null,noBy:null,nolucy:null,nolucyBy:null}; if(nv==='nolucy')p.lucy=null;
+  Object.assign(it,p); render(); if($('#gs').classList.contains('open'))renderSheet(); if($('#vw').classList.contains('open'))paintBot();
+  try{await patch('items/'+id,p)}catch(e){toast('השמירה נכשלה')}
 }
 let inSheetTile=false;
 function openSheet(key){sheetRef=key;$('#gs').classList.add('open');document.body.style.overflow='hidden';renderSheet()}
@@ -320,6 +347,7 @@ document.addEventListener('click',e=>{
   const f=e.target.closest('[data-f]');if(f){F=f.dataset.f;render();return}
   if(e.target.id==='edBtn'){if(isEd()){ls.set('lucy_ed','');render();return}
     const c=prompt('קוד עורכות:');if(!c)return;sha('ed-'+c.trim()).then(h=>{if(h===EDH){ls.set('lucy_ed','1');F=null;render();toast('מצב עורכות ✓')}else toast('קוד לא נכון')});return}
+  const qs=e.target.closest('.acts [data-s]');if(qs){setSt(qs.dataset.id,qs.dataset.s);return}
   const ad=e.target.closest('[data-add]');if(ad){openAdd(ad.dataset.add);return}
   const so=e.target.closest('[data-so]');if(so){const g=sheetGroup();vlist=g?g.items.map(i=>i.id):[so.dataset.so];inGroup=true;open(so.dataset.so);return}
   const gg=e.target.closest('[data-g]');if(gg){openSheet(gg.dataset.g);return}
@@ -351,14 +379,13 @@ function paintPin(){
 }
 function paintBot(){
   const id=vlist[idx], it=items[id]; if(!it)return;
-  const by=[it.sameDay&&'נוספה מאותו יום',it.noBy&&('לא רלוונטי: '+it.noBy),it.nolucyBy&&('בלי לוסי: '+it.nolucyBy),it.lucy&&it.lucy.by&&('סימנה את לוסי: '+it.lucy.by),it.by&&('העלתה: '+it.by)].filter(Boolean).join(' · ');
+  const by=[ST(it)&&(STL[ST(it)][1]+': '+(it.stBy||it.noBy||it.nolucyBy||'')),it.lucy&&it.lucy.by&&('סימנה את לוסי: '+it.lucy.by),it.by&&('העלתה: '+it.by)].filter(Boolean).join(' · ');
   if(!isEd()){$('#bot').innerHTML=`<button class="btn" data-a="next">הבא ‹</button><div class="who">${it.cat==='greeting'?'💌 ברכה מ'+esc(it.by||''):it.by&&it.src!=='gp'?'העלתה: '+esc(it.by):''} · ${idx+1}/${vlist.length}</div>`;
     $('#vDel').style.visibility=(it.up||it.by)===ME&&it.src!=='gp'?'visible':'hidden';paintPin();return}
   $('#vDel').style.visibility='visible';
   $('#bot').innerHTML=`
     <button class="btn ${marking?'on':''}" data-a="mark">📍 ${it.lucy?'לסמן מחדש את לוסי':'איפה לוסי?'}</button>
-    <button class="btn ${it.nolucy?'onnl':''}" data-a="nolucy">🙈 אין כאן לוסי</button>
-    <button class="btn ${it.no?'onno':''}" data-a="no">✕ לא רלוונטי</button>
+    ${Object.entries(STL).map(([k,[ic,l]])=>`<button class="btn ${ST(it)===k?({in:'onin',maybe:'onmaybe',no:'onno',nolucy:'onnl'})[k]:''}" data-a="st-${k}">${ic} ${l}</button>`).join('')}
     <button class="btn" data-a="next">הבא ‹</button>
     ${inGroup&&vlist.length>1?`<button class="btn ${it.cover?'onnl':''}" data-a="cover">⭐ ${it.cover?'תמונת השער':'לבחור כתמונת שער'}</button>`:''}
     ${inGroup&&(idx>0||it.splitHere)?`<button class="btn" data-a="split">${it.splitHere?'↩ לבטל את הפיצול':'✂ קבוצה חדשה מכאן'}</button>`:''}
@@ -378,8 +405,7 @@ async function act(a){
       if(v){vlist=vlist.slice(0,idx);close();toast('✂ פוצל לשתי קבוצות')}else{close();toast('הקבוצות אוחדו')}return}
     if(a==='more'){if(it.moreReq&&!it.moreDone){await patch('items/'+id,{moreReq:null,moreAt:null});return}
       if(!it.moreReq){await patch('items/'+id,{moreReq:ME,moreAt:Date.now()});toast('נרשם! Claude יוסיף את שאר התמונות מהיום הזה')}return}
-    if(a==='no'){const v=!it.no;await patch('items/'+id,{no:v||null,noBy:v?ME:null})}
-    if(a==='nolucy'){const v=!it.nolucy;await patch('items/'+id,{nolucy:v||null,nolucyBy:v?ME:null,lucy:v?null:(it.lucy||null)})}
+    if(a.startsWith('st-')){await setSt(id,a.slice(3));return}
   }catch(e){toast('השמירה נכשלה')}
 }
 $('#bot').onclick=e=>{const b=e.target.closest('[data-a]');if(b)act(b.dataset.a)};
@@ -388,7 +414,7 @@ $('#stage').addEventListener('click',async e=>{
   if(!marking)return; const media=e.target.closest('#frame img,#frame video');if(!media)return;
   const r=media.getBoundingClientRect(); const x=(e.clientX-r.left)/r.width, y=(e.clientY-r.top)/r.height;
   const id=vlist[idx]; marking=false;
-  try{await patch('items/'+id,{lucy:{x:+x.toFixed(4),y:+y.toFixed(4),by:ME},nolucy:null,nolucyBy:null});toast('סומן 📍')}catch(x){toast('השמירה נכשלה')}
+  try{await patch('items/'+id,Object.assign({lucy:{x:+x.toFixed(4),y:+y.toFixed(4),by:ME},nolucy:null,nolucyBy:null},ST(items[id])==='nolucy'?{st:null,stBy:null}:{}));toast('סומן 📍')}catch(x){toast('השמירה נכשלה')}
 });
 function step(d){if(!vlist.length)return;idx=(idx+d+vlist.length)%vlist.length;open(vlist[idx])}
 function close(){$('#vw').classList.remove('open');if(!$('#gs').classList.contains('open'))document.body.style.overflow='';$('#stage').innerHTML='';if(objUrl){URL.revokeObjectURL(objUrl);objUrl=null}}
@@ -397,7 +423,7 @@ $('#vDel').onclick=async()=>{const id=vlist[idx];if(!confirm('למחוק את ה
   await Promise.all([del('items/'+id),del('thumbs/'+id),del('full/'+id),del('vid/'+id)]);close();toast('נמחק')};
 document.addEventListener('keydown',e=>{if(!$('#vw').classList.contains('open')){if(e.key==='Escape'&&$('#gs').classList.contains('open'))closeSheet();return}
   if(e.key==='Escape')close(); if(e.key==='ArrowLeft')step(1); if(e.key==='ArrowRight')step(-1);
-  if(e.key==='x'||e.key==='ס')act('no'); if(e.key==='l'||e.key==='ך')act('mark')});
+  if(e.key==='1')act('st-in'); if(e.key==='2')act('st-maybe'); if(e.key==='3')act('st-no'); if(e.key==='4')act('st-nolucy'); if(e.key==='l'||e.key==='ך')act('mark')});
 let tx=null;$('#stage').addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
 $('#stage').addEventListener('touchend',e=>{if(tx==null||marking)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>60)step(dx>0?1:-1);tx=null});
 
@@ -406,7 +432,7 @@ const Y=new Date().getFullYear();
 $('#addYear').innerHTML='<option value="auto">לפי תאריך הקובץ</option>'+Array.from({length:Y-2013},(_,i)=>Y-i).map(y=>`<option value="${y}">${y} · לוסי בת ${y-2014}</option>`).join('');
 function setCat(c){cat=c;$('#catSeg').querySelectorAll('[data-c]').forEach(b=>b.classList.toggle('pri',b.dataset.c===c));
   const g=c==='greeting';$('#yearLbl').style.display=g?'none':'';
-  $('#addTtl').textContent=g?'ברכה מצולמת ללוסי 💌':'תמונות וסרטונים של לוסי';
+  $('#addTtl').textContent=g?'העלאת ברכה ללוסי 💌':'העלאת תמונות וסרטונים';
   $('#addHint').innerHTML=g?'מצלמות סרטון קצר בטלפון (עד דקה, <b>לא ב־4K</b>) ומעלות כאן. אפשר גם לבחור סרטון שכבר צילמתן.':'בוחרות תמונות וסרטונים מכל השנים. אם יודעות מאיזו שנה, בחרו אותה; אחרת זה לפי תאריך הקובץ.';
   $('#capLbl').textContent=g?'ממי הברכה':'מאיזה אירוע / מי בתמונה (לא חובה)';
   $('#addCap').value=g?(ME||''):'';}
@@ -459,8 +485,8 @@ $('#camBtns').onclick=async e=>{const b=e.target.closest('[data-cam]');if(!b)ret
   if(a==='send'){stopCam();$('#camDlg').close();handle([lastRec]);return}
 };
 $('#camDlg').addEventListener('close',stopCam);
-async function handle(files){for(const f of files){const row=document.createElement('div');row.innerHTML=`<span>${esc(f.name)}</span><span>…</span>`;$('#queue').prepend(row);const st=row.lastChild;
-  try{await upload(f,p=>st.textContent=Math.round(p*100)+'%');st.textContent='✓'}catch(e){st.textContent=e.message||'נכשל'}}}
+async function handle(files){for(const f of files){const row=document.createElement('div');row.innerHTML=`<span>${esc(f.name)}</span><span>מעלה…</span>`;$('#queue').prepend(row);const st=row.lastChild;
+  try{await upload(f,p=>st.textContent=Math.round(p*100)+'%');st.textContent='✓ עלה'}catch(e){st.textContent=e.message||'נכשל'}}}
 const img=src=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>no(new Error('פורמט לא נתמך'));i.src=src});
 function jpg(s,max){const W=s.width||s.videoWidth,H=s.height||s.videoHeight,k=Math.min(1,max/Math.max(W,H)),c=document.createElement('canvas');c.width=Math.round(W*k);c.height=Math.round(H*k);c.getContext('2d').drawImage(s,0,0,c.width,c.height);return c.toDataURL('image/jpeg',.86)}
 function sq(s){const W=s.width||s.videoWidth,H=s.height||s.videoHeight,m=Math.min(W,H),c=document.createElement('canvas');c.width=c.height=400;c.getContext('2d').drawImage(s,(W-m)/2,(H-m)/2,m,m,0,0,400,400);return c.toDataURL('image/jpeg',.8)}
