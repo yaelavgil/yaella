@@ -279,13 +279,15 @@ const ST=i=>i.st||(i.no?'no':i.nolucy?'nolucy':null);
 const LOWQ=i=>!!(i.lowq||(i.qauto&&!i.qok));
 const QTXT={res:'רזולוציה נמוכה',sharp:'כדאי לבדוק חדות'};
 const STL={in:['✓','למצגת'],maybe:['🤔','בהתלבטות'],no:['✕','לא למצגת'],nolucy:['🙈','לא לוסי']};
+const HIDDEN=i=>['no','nolucy'].includes(ST(i));
 const FILTERS=[
+  ['all','הכל',i=>!HIDDEN(i)],
   ['todo','לבדוק',i=>!ST(i)],
   ['in','✓ למצגת',i=>ST(i)==='in'],
   ['maybe','🤔 בהתלבטות',i=>ST(i)==='maybe'],
   ['no','✕ לא למצגת',i=>ST(i)==='no'],
   ['nolucy','🙈 לא לוסי',i=>ST(i)==='nolucy'],
-  ['all','הכל',i=>true],
+  ['everything','הכל כולל מוסתרות',i=>true],
   ['marked','📍 לוסי מסומנת',i=>!!i.lucy],
   ['video','סרטונים',i=>i.kind==='video'],
   ['lowq','⚠️ איכות',i=>LOWQ(i)],
@@ -313,7 +315,7 @@ function render(){
   if(!A.length){$('#main').innerHTML='<div class="empty"><b>עוד ריק כאן</b>לוחצות על „+ הוספה” ומעלות תמונות</div>';return}
   if(!vis.length){$('#main').innerHTML=`<div class="empty"><b>${F==='todo'?'הכל נבדק 🎉':'אין כאן כלום'}</b></div>`;return}
   const g={}; vg.forEach(x=>{const y=x.cover.year||'—';(g[y]=g[y]||[]).push(x)});
-  $('#main').innerHTML=(GR.length?`<section class="gsec"><h2>💌 ברכות<small>${GR.length}</small></h2><div class="grid">${GR.map(tile).join('')}</div></section>`:'')+Object.entries(g).map(([y,l])=>`<h2>${y}<small>${/^\d+$/.test(y)?'לוסי בת '+Math.max(0,y-2014)+' · ':''}${l.reduce((n,x)=>n+x.hit.length,0)}</small></h2><div class="grid">${l.map(x=>x.items.length>1?stackTile(x):tile(x.items[0])).join('')}</div>`).join('');
+  $('#main').innerHTML=(GR.length?`<section class="gsec"><h2>💌 ברכות<small>${GR.length}</small></h2><div class="grid">${GR.map(tile).join('')}</div></section>`:'')+Object.entries(g).map(([y,l])=>`<h2>${y}<small>${/^\d+$/.test(y)?'לוסי בת '+Math.max(0,y-2014)+' · ':''}${l.reduce((n,x)=>n+x.hit.length,0)}</small></h2><div class="grid">${l.map(x=>{const v={key:x.key,items:x.hit,cover:x.hit.includes(x.cover)?x.cover:x.hit[0]};return v.items.length>1?stackTile(v):tile(v.items[0])}).join('')}</div>`).join('');
   document.querySelectorAll('img[data-t]').forEach(img=>{const id=img.dataset.t;thumbs[id]?img.src=thumbs[id]:io.observe(img)});
 }
 /* events: same calendar day, split when there's a gap of more than 2 hours or someone split it by hand (splitHere) */
