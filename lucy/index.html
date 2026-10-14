@@ -309,14 +309,15 @@ function render(){
   $('#chips').innerHTML=FL.map(([k,l,fn])=>`<button class="chip" data-f="${k}" aria-pressed="${F===k}">${l} <small>${A.filter(fn).length}</small></button>`).join('');
   const fn=FL.find(f=>f[0]===F)[2];
   const GR=A.filter(i=>i.cat==='greeting'&&fn(i)).sort((a,b)=>(a.at||0)-(b.at||0));
-  GROUPS=buildGroups(A.filter(i=>i.cat!=='greeting'));
+  const UNK=A.filter(i=>i.cat!=='greeting'&&!i.year&&fn(i)).sort((a,b)=>(a.at||0)-(b.at||0));
+  GROUPS=buildGroups(A.filter(i=>i.cat!=='greeting'&&i.year));
   const vg=GROUPS.map(g=>Object.assign({},g,{hit:g.items.filter(fn)})).filter(g=>g.hit.length);
-  const vis=GR.concat(vg.flatMap(g=>g.hit));
+  const vis=GR.concat(UNK,vg.flatMap(g=>g.hit));
   list=vis.map(i=>i.id);
   if(!A.length){$('#main').innerHTML='<div class="empty"><b>עוד ריק כאן</b>לוחצות על „+ הוספה” ומעלות תמונות</div>';return}
   if(!vis.length){$('#main').innerHTML=`<div class="empty"><b>${F==='todo'?'הכל נבדק 🎉':'אין כאן כלום'}</b></div>`;return}
   const g={}; vg.forEach(x=>{const y=x.cover.year||'—';(g[y]=g[y]||[]).push(x)});
-  $('#main').innerHTML=(GR.length?`<section class="gsec"><h2>💌 ברכות<small>${GR.length}</small></h2><div class="grid">${GR.map(tile).join('')}</div></section>`:'')+Object.entries(g).map(([y,l])=>`<h2>${y}<small>${/^\d+$/.test(y)?'לוסי בת '+Math.max(0,y-2014)+' · ':''}${l.reduce((n,x)=>n+x.hit.length,0)}</small></h2><div class="grid">${l.map(x=>{const v={key:x.key,items:x.hit,cover:x.hit.includes(x.cover)?x.cover:x.hit[0]};return v.items.length>1?stackTile(v):tile(v.items[0])}).join('')}</div>`).join('');
+  $('#main').innerHTML=(GR.length?`<section class="gsec"><h2>💌 ברכות<small>${GR.length}</small></h2><div class="grid">${GR.map(tile).join('')}</div></section>`:'')+(UNK.length?`<section class="gsec"><h2>📅 שנה לא ידועה<small>${UNK.length} · יודעות מאיזו שנה? פותחות ולוחצות על „📅 שנה”</small></h2><div class="grid">${UNK.map(tile).join('')}</div></section>`:'')+Object.entries(g).map(([y,l])=>`<h2>${y}<small>${/^\d+$/.test(y)?'לוסי בת '+Math.max(0,y-2014)+' · ':''}${l.reduce((n,x)=>n+x.hit.length,0)}</small></h2><div class="grid">${l.map(x=>{const v={key:x.key,items:x.hit,cover:x.hit.includes(x.cover)?x.cover:x.hit[0]};return v.items.length>1?stackTile(v):tile(v.items[0])}).join('')}</div>`).join('');
   document.querySelectorAll('img[data-t]').forEach(img=>{const id=img.dataset.t;thumbs[id]?img.src=thumbs[id]:io.observe(img)});
 }
 /* events: same calendar day, split when there's a gap of more than 2 hours or someone split it by hand (splitHere) */
@@ -325,7 +326,7 @@ const GAP=2*3600e3;
 function buildGroups(A){
   const s=A.slice().sort((a,b)=>(a.taken||a.at||0)-(b.taken||b.at||0)); const out=[]; let cur=null, prev=null;
   for(const i of s){
-    const t=i.taken||0;
+    const t=i.taken||i.at||0;
     const fresh=!cur||!t||!prev.taken||dayKey(t)!==dayKey(prev.taken)||t-prev.taken>GAP||i.splitHere;
     if(fresh){cur={items:[]};out.push(cur)} cur.items.push(i); prev=i;
   }
@@ -422,6 +423,7 @@ function paintBot(){
   $('#bot').innerHTML=`
     <button class="btn ${marking?'on':''}" data-a="mark">📍 ${it.lucy?'לסמן מחדש את לוסי':'איפה לוסי?'}</button>
     ${Object.entries(STL).map(([k,[ic,l]])=>`<button class="btn ${ST(it)===k?({in:'onin',maybe:'onmaybe',no:'onno',nolucy:'onnl'})[k]:''}" data-a="st-${k}">${ic} ${l}</button>`).join('')}
+    <button class="btn ${it.year?'':'onmaybe'}" data-a="year">📅 ${it.year?'שנה: '+it.year:'מאיזו שנה?'}</button>
     <button class="btn ${it.lowq?'onno':''}" data-a="lowq">⚠️ ${it.lowq?'סומן: איכות לא מומלצת':(it.qauto&&!it.qok)?QTXT[it.qauto]+' · לחצי אם תקין':'איכות לא מומלצת'}</button>
     <button class="btn" data-a="next">הבא ‹</button>
     ${inGroup&&vlist.length>1?`<button class="btn ${it.cover?'onnl':''}" data-a="cover">⭐ ${it.cover?'תמונת השער':'לבחור כתמונת שער'}</button>`:''}
@@ -444,6 +446,9 @@ async function act(a){
       if(!it.moreReq){await patch('items/'+id,{moreReq:ME,moreAt:Date.now()});toast('נרשם! Claude יוסיף את שאר התמונות מהיום הזה')}return}
     if(a.startsWith('st-')){await setSt(id,a.slice(3));return}
     if(a==='lowq'){await toggleQ(id);return}
+    if(a==='year'){const Y=new Date().getFullYear();const y=prompt('באיזו שנה צולמה? (למשל 2019)',it.year||'');if(y===null)return;
+      const n=parseInt(y,10);if(!(n>=2013&&n<=Y)){toast('שנה לא תקינה');return}
+      await change(id,{year:n,yearUnknown:null},'📅 עודכן ל־'+n);return}
   }catch(e){toast('השמירה נכשלה')}
 }
 $('#bot').onclick=e=>{const b=e.target.closest('[data-a]');if(b)act(b.dataset.a)};
@@ -525,21 +530,37 @@ $('#camBtns').onclick=async e=>{const b=e.target.closest('[data-cam]');if(!b)ret
 $('#camDlg').addEventListener('close',stopCam);
 async function handle(files){for(const f of files){const row=document.createElement('div');row.innerHTML=`<span>${esc(f.name)}</span><span>מעלה…</span>`;$('#queue').prepend(row);const st=row.lastChild;
   try{await upload(f,p=>st.textContent=Math.round(p*100)+'%');st.textContent='✓ עלה'}catch(e){st.textContent=e.message||'נכשל'}}}
+/* DateTimeOriginal from a JPEG's EXIF block (null if none — e.g. WhatsApp strips it) */
+async function exifDate(f){
+  try{const b=new DataView(await f.slice(0,262144).arrayBuffer());if(b.getUint16(0)!==0xFFD8)return null;let o=2;
+    while(o<b.byteLength-4){const m=b.getUint16(o),len=b.getUint16(o+2);
+      if(m===0xFFE1&&b.getUint32(o+4)===0x45786966){const t=o+10,le=b.getUint16(t)===0x4949,u16=x=>b.getUint16(x,le),u32=x=>b.getUint32(x,le);
+        const ifd=(start,want)=>{const n=u16(start);for(let i=0;i<n;i++){const e=start+2+i*12;if(u16(e)===want)return e}return null};
+        let e=ifd(t+u32(t+4),0x8769);if(!e)return null;const ex=t+u32(e+8);e=ifd(ex,0x9003)||ifd(ex,0x9004);if(!e)return null;
+        let s='';const off=t+u32(e+8);for(let i=0;i<19;i++)s+=String.fromCharCode(b.getUint8(off+i));
+        const m2=s.match(/(\d{4}):(\d\d):(\d\d) (\d\d):(\d\d):(\d\d)/);return m2?new Date(+m2[1],m2[2]-1,+m2[3],+m2[4],+m2[5],+m2[6]).getTime():null}
+      if(m===0xFFDA)break;o+=2+len}}catch(e){}return null}
 const img=src=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>no(new Error('פורמט לא נתמך'));i.src=src});
 function jpg(s,max){const W=s.width||s.videoWidth,H=s.height||s.videoHeight,k=Math.min(1,max/Math.max(W,H)),c=document.createElement('canvas');c.width=Math.round(W*k);c.height=Math.round(H*k);c.getContext('2d').drawImage(s,0,0,c.width,c.height);return c.toDataURL('image/jpeg',.86)}
 function sq(s){const W=s.width||s.videoWidth,H=s.height||s.videoHeight,m=Math.min(W,H),c=document.createElement('canvas');c.width=c.height=400;c.getContext('2d').drawImage(s,(W-m)/2,(H-m)/2,m,m,0,0,400,400);return c.toDataURL('image/jpeg',.8)}
 const b64=buf=>{let s='';const a=new Uint8Array(buf);for(let i=0;i<a.length;i+=0x8000)s+=String.fromCharCode.apply(null,a.subarray(i,i+0x8000));return btoa(s)};
 async function upload(f,prog){
   const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6), ys=$('#addYear').value;
-  const meta={year:cat==='greeting'?new Date().getFullYear():ys==='auto'?new Date(f.lastModified||Date.now()).getFullYear():+ys,by:ME,at:Date.now(),taken:f.lastModified||Date.now(),cat,caption:$('#addCap').value.trim()||null,up:ME};
+  const ex=await exifDate(f), fresh=/-WA\d|whatsapp/i.test(f.name)||(Date.now()-(f.lastModified||0)<3*864e5);
+  const fileT=ex||(fresh?null:f.lastModified||null);
+  const year=cat==='greeting'?new Date().getFullYear():ys!=='auto'?+ys:fileT?new Date(fileT).getFullYear():null;
+  const meta={year,yearUnknown:year?null:true,by:ME,at:Date.now(),taken:fileT,cat,caption:$('#addCap').value.trim()||null,up:ME};
   if(cat==='greeting'&&meta.caption)meta.by=meta.caption;
   const u=URL.createObjectURL(f);
   try{
     if(f.type.startsWith('image/')||/\.(heic|heif)$/i.test(f.name)){
-      const i=await img(u);prog(.1);await put('thumbs/'+id,sq(i));await put('full/'+id,jpg(i,1800));prog(.25);
-      const W=i.naturalWidth,H=i.naturalHeight, buf=await f.arrayBuffer(), n=Math.ceil(buf.byteLength/CHUNK);
+      let i=null;try{i=await img(u)}catch(e){}
+      if(i){await put('thumbs/'+id,sq(i));await put('full/'+id,jpg(i,1800))}
+      else{const c=document.createElement('canvas');c.width=c.height=400;const x=c.getContext('2d');x.fillStyle='#f3e3da';x.fillRect(0,0,400,400);x.fillStyle='#7d6f74';x.font='bold 30px sans-serif';x.textAlign='center';x.fillText('⏳ בעיבוד',200,210);await put('thumbs/'+id,c.toDataURL('image/jpeg',.8))}
+      prog(.25);
+      const W=i?i.naturalWidth:0,H=i?i.naturalHeight:0, buf=await f.arrayBuffer(), n=Math.ceil(buf.byteLength/CHUNK);
       for(let k=0;k<n;k++){await put(`orig/${id}/${k}`,b64(buf.slice(k*CHUNK,(k+1)*CHUNK)));prog(.25+(k+1)/n*.7)}
-      await put('items/'+id,Object.assign(meta,{kind:'photo',srcW:W,srcH:H,orig:{chunks:n,name:f.name,type:f.type||'image/jpeg',size:f.size},qauto:Math.max(W,H)<1200?'res':null}));
+      await put('items/'+id,Object.assign(meta,{kind:'photo',srcW:W,srcH:H,orig:{chunks:n,name:f.name,type:f.type||'image/jpeg',size:f.size},needsConvert:i?null:true,qauto:i&&Math.max(W,H)<1200?'res':null}));
     }else if(f.type.startsWith('video/')||/\.(mov|mp4|m4v)$/i.test(f.name)){
       if(f.size>VIDEO_MAX)throw new Error('הסרטון גדול מדי ('+Math.round(f.size/1048576)+'MB). צלמי שוב קצר יותר או באיכות HD, או שלחי אותו ליעל בוואטסאפ');
       const v=document.createElement('video');v.muted=true;v.playsInline=true;v.preload='auto';v.src=u;
