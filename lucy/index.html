@@ -289,7 +289,8 @@ const FILTERS=[
   ['nolucy','🙈 לא לוסי',i=>ST(i)==='nolucy'],
   ['everything','הכל כולל מוסתרות',i=>true],
   ['marked','📍 לוסי מסומנת',i=>!!i.lucy],
-  ['video','סרטונים',i=>i.kind==='video'],
+  ['video','🎬 סרטונים',i=>i.kind==='video'],
+  ['fvideo','🎬 סרטונים מהחברות',i=>i.kind==='video'&&i.src!=='gp'],
   ['lowq','⚠️ איכות',i=>LOWQ(i)],
 ];
 const FRIEND_FILTERS=[
@@ -302,7 +303,7 @@ function all(){return Object.entries(items).filter(([,v])=>v&&v.kind&&!v.deleted
 function render(){
   const A=all();
   const ok=A.filter(i=>ST(i)==='in').length;
-  $('#sum').innerHTML=!isEd()?(ME?`שלום <b>${esc(ME)}</b> (<a href="#" id="chg" style="color:inherit">לא את?</a>)`:''):A.length?`<b>${A.length}</b> פריטים · <b>${ok}</b> למצגת · <b>${A.filter(i=>ST(i)==='maybe').length}</b> בהתלבטות · <b>${A.filter(i=>!ST(i)).length}</b> לבדוק · <b>${A.filter(i=>i.cat==='greeting').length}</b> ברכות${ME?` · את <b>${esc(ME)}</b> (<a href="#" id="chg" style="color:inherit">החלפה</a>)`:''}`:'';
+  $('#sum').innerHTML=!isEd()?(ME?`שלום <b>${esc(ME)}</b> (<a href="#" id="chg" style="color:inherit">לא את?</a>)`:''):A.length?`<b>${A.length}</b> פריטים · <b>${ok}</b> למצגת · <b>${A.filter(i=>ST(i)==='maybe').length}</b> בהתלבטות · <b>${A.filter(i=>!ST(i)).length}</b> לבדוק · 🎬 <b>${A.filter(i=>i.kind==='video').length}</b> סרטונים (<b>${A.filter(i=>i.kind==='video'&&i.src!=='gp').length}</b> מהחברות) · 💌 <b>${A.filter(i=>i.cat==='greeting').length}</b> ברכות${ME?` · את <b>${esc(ME)}</b> (<a href="#" id="chg" style="color:inherit">החלפה</a>)`:''}`:'';
   const c=$('#chg'); if(c) c.onclick=e=>{e.preventDefault();$('#nameDlg').showModal()};
   const FL=isEd()?FILTERS:FRIEND_FILTERS; if(!F||!FL.some(f=>f[0]===F)) F=FL[0][0];
   $('#chips').innerHTML=FL.map(([k,l,fn])=>`<button class="chip" data-f="${k}" aria-pressed="${F===k}">${l} <small>${A.filter(fn).length}</small></button>`).join('');
