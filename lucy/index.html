@@ -478,7 +478,7 @@ $('#addYear').innerHTML='<option value="auto">לפי תאריך הקובץ</opti
 function setCat(c){cat=c;$('#catSeg').querySelectorAll('[data-c]').forEach(b=>b.classList.toggle('pri',b.dataset.c===c));
   const g=c==='greeting';$('#yearLbl').style.display=g?'none':'';
   $('#addTtl').textContent=g?'העלאת ברכה ללוסי 💌':'העלאת תמונות וסרטונים';
-  $('#addHint').innerHTML=g?'מצלמות סרטון קצר בטלפון (עד דקה, <b>לא ב־4K</b>) ומעלות כאן. אפשר גם לבחור סרטון שכבר צילמתן.':'בוחרות תמונות וסרטונים מכל השנים. <b>תמונות שהגיעו מוואטסאפ לא שומרות תאריך</b>, אז אם יודעות מאיזו שנה הן, בחרו אותה כאן לפני ההעלאה.';
+  $('#addHint').innerHTML=g?'מצלמות סרטון קצר בטלפון (עד דקה, <b>לא ב־4K</b>) ומעלות כאן. אפשר גם לבחור סרטון שכבר צילמתן, <b>מהגלריה ולא מוואטסאפ</b>, כדי שהאיכות תישמר.':'בוחרות תמונות וסרטונים מכל השנים. <b>הכי טוב להעלות ישר מגלריית התמונות בטלפון ולא מוואטסאפ</b>: וואטסאפ מקטין את התמונות ומוחק את התאריך. אם בכל זאת מעלות מוואטסאפ, בחרו כאן את השנה.';
   $('#capLbl').textContent=g?'ממי הברכה':'מאיזה אירוע / מי בתמונה (לא חובה)';
   $('#addCap').value=g?(ME||''):'';}
 function openAdd(c){if(!ME){$('#nameDlg').showModal();return}setCat(c||'years');$('#queue').innerHTML='';$('#addDlg').showModal()}
