@@ -141,6 +141,11 @@ dialog::backdrop{background:rgba(30,15,20,.55)}
 .cam video{width:100%;border-radius:14px;background:#000;max-height:60vh}
 .cam .rec{color:var(--blush);font-weight:800}
 @media (max-width:420px){.srcs{grid-template-columns:1fr}.src{grid-auto-flow:column;justify-content:start;gap:10px;padding:10px 14px}.src span{font-size:22px}}
+.tips{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.tips li{display:flex;align-items:center;gap:12px;font-size:17px;line-height:1.3}
+.tips .ti{flex:none;width:44px;height:44px;border-radius:50%;background:var(--blush-soft);display:grid;place-items:center;font-size:24px}
+.tips b{display:block;font-weight:800}
+.tips small{display:block;color:var(--muted);font-size:14px;font-weight:600}
 .nodate{background:var(--gold-soft,#f8ecd2);border-radius:10px;padding:6px 10px;font-size:13px;font-weight:700;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .nodate select{font:inherit;border:1px solid var(--line);border-radius:8px;padding:2px 6px;background:var(--paper);color:var(--ink)}
 .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:7px 8px 7px 16px;border-radius:999px;font-weight:700;font-size:14px;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none;display:flex;align-items:center;gap:10px;white-space:nowrap}
@@ -179,7 +184,7 @@ dialog::backdrop{background:rgba(30,15,20,.55)}
 <dialog id="addDlg"><div class="dl">
   <h3 id="addTtl">הוספה</h3>
   <div class="seg row" id="catSeg"><button type="button" class="btn" data-c="years">📸 תמונות של לוסי</button><button type="button" class="btn" data-c="greeting">💌 ברכה מצולמת</button></div>
-  <p class="hint" id="addHint"></p>
+  <div id="addHint"></div>
   <label id="yearLbl">שנה<select id="addYear"></select></label>
   <label><span id="capLbl">כמה מילים (לא חובה)</span><input id="addCap"></label>
   <div class="srcs" id="drop">
@@ -478,7 +483,19 @@ $('#addYear').innerHTML='<option value="auto">לפי תאריך הקובץ</opti
 function setCat(c){cat=c;$('#catSeg').querySelectorAll('[data-c]').forEach(b=>b.classList.toggle('pri',b.dataset.c===c));
   const g=c==='greeting';$('#yearLbl').style.display=g?'none':'';
   $('#addTtl').textContent=g?'העלאת ברכה ללוסי 💌':'העלאת תמונות וסרטונים';
-  $('#addHint').innerHTML=g?'מצלמות סרטון קצר בטלפון (עד דקה, <b>לא ב־4K</b>) ומעלות כאן. אפשר גם לבחור סרטון שכבר צילמתן, <b>מהגלריה ולא מוואטסאפ</b>, כדי שהאיכות תישמר.':'בוחרות תמונות וסרטונים מכל השנים. <b>הכי טוב להעלות ישר מגלריית התמונות בטלפון ולא מוואטסאפ</b>: וואטסאפ מקטין את התמונות ומוחק את התאריך. אם בכל זאת מעלות מוואטסאפ, בחרו כאן את השנה.';
+  const tip=(e,t,sub)=>`<li><span class="ti">${e}</span><span><b>${t}</b>${sub?`<small>${sub}</small>`:''}</span></li>`;
+  $('#addHint').innerHTML='<ul class="tips">'+(g?[
+      tip('🎥','סרטון קצר, עד דקה'),
+      tip('↔️','מחזיקים את הטלפון לרוחב'),
+      tip('☀️','עומדים מול האור','לא עם הגב לחלון'),
+      tip('🔊','מקום שקט, מדברים חזק וברור'),
+      tip('🚫','לא מוואטסאפ','שם הסרטון מאבד איכות'),
+    ]:[
+      tip('📱','מעלים ישר מהגלריה בטלפון'),
+      tip('🚫','לא מוואטסאפ','וואטסאפ מקטין את התמונה ומוחק את התאריך'),
+      tip('📅','יודעים מאיזו שנה? בוחרים למטה'),
+      tip('✨','אפשר לבחור הרבה תמונות ביחד'),
+    ]).join('')+'</ul>';
   $('#capLbl').textContent=g?'ממי הברכה':'מאיזה אירוע / מי בתמונה (לא חובה)';
   $('#addCap').value=g?(ME||''):'';}
 function openAdd(c){if(!ME){$('#nameDlg').showModal();return}setCat(c||'years');$('#queue').innerHTML='';$('#addDlg').showModal()}
