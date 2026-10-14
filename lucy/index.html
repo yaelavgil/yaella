@@ -141,6 +141,8 @@ dialog::backdrop{background:rgba(30,15,20,.55)}
 .cam video{width:100%;border-radius:14px;background:#000;max-height:60vh}
 .cam .rec{color:var(--blush);font-weight:800}
 @media (max-width:420px){.srcs{grid-template-columns:1fr}.src{grid-auto-flow:column;justify-content:start;gap:10px;padding:10px 14px}.src span{font-size:22px}}
+.nodate{background:var(--gold-soft,#f8ecd2);border-radius:10px;padding:6px 10px;font-size:13px;font-weight:700;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.nodate select{font:inherit;border:1px solid var(--line);border-radius:8px;padding:2px 6px;background:var(--paper);color:var(--ink)}
 .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:7px 8px 7px 16px;border-radius:999px;font-weight:700;font-size:14px;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none;display:flex;align-items:center;gap:10px;white-space:nowrap}
 .toast.show{opacity:1;pointer-events:auto}
 .toast button{border:0;background:var(--blush);color:#fff;border-radius:999px;padding:4px 12px;font-weight:800}
@@ -346,7 +348,7 @@ function stackTile(g){
 function tile(i){
   const st=ST(i);
   return `<div class="t ${st==='no'||st==='nolucy'?'no':st||''}"><button class="ph" data-o="${i.id}" aria-label="פתיחה"><img data-t="${i.id}" alt=""></button>
-  ${i.kind==='video'?`<span class="tag">▶${i.dur?' '+fmt(i.dur):''}</span>`:''}${inSheetTile&&i.cover?'<span class="cov">⭐ שער</span>':''}${LOWQ(i)?`<span class="tag" style="top:auto;bottom:40px;background:#b5651d" title="${i.lowq?'סומן: איכות לא מומלצת':QTXT[i.qauto]||''}">⚠️ ${i.lowq?'איכות':QTXT[i.qauto]||''}</span>`:''}${i.cat==='greeting'?`<span class="cov" style="background:var(--blush);color:#fff">💌 ${esc(i.by||'')}</span>`:''}
+  ${i.kind==='video'?`<span class="tag">▶${i.dur?' '+fmt(i.dur):''}</span>`:''}${inSheetTile&&i.cover?'<span class="cov">⭐ שער</span>':''}${!i.year&&i.cat!=='greeting'?`<span class="tag" style="top:auto;bottom:66px;background:var(--gold);color:#2b2226">📅 ללא תאריך</span>`:''}${LOWQ(i)?`<span class="tag" style="top:auto;bottom:40px;background:#b5651d" title="${i.lowq?'סומן: איכות לא מומלצת':QTXT[i.qauto]||''}">⚠️ ${i.lowq?'איכות':QTXT[i.qauto]||''}</span>`:''}${i.cat==='greeting'?`<span class="cov" style="background:var(--blush);color:#fff">💌 ${esc(i.by||'')}</span>`:''}
   ${isEd()?`<div class="acts">${Object.entries(STL).map(([k,[ic,l]])=>`<button class="${st===k?'on':''}" data-s="${k}" data-id="${i.id}" title="${l}" aria-label="${l}" aria-pressed="${st===k}">${ic}</button>`).join('')}<button class="${i.lowq?'on':''}" data-q="${i.id}" title="איכות לא מומלצת לסרטון" aria-label="איכות לא מומלצת" aria-pressed="${!!i.lowq}">⚠️</button></div>`:''}</div>`;
 }
 async function setSt(id,v){
@@ -476,7 +478,7 @@ $('#addYear').innerHTML='<option value="auto">לפי תאריך הקובץ</opti
 function setCat(c){cat=c;$('#catSeg').querySelectorAll('[data-c]').forEach(b=>b.classList.toggle('pri',b.dataset.c===c));
   const g=c==='greeting';$('#yearLbl').style.display=g?'none':'';
   $('#addTtl').textContent=g?'העלאת ברכה ללוסי 💌':'העלאת תמונות וסרטונים';
-  $('#addHint').innerHTML=g?'מצלמות סרטון קצר בטלפון (עד דקה, <b>לא ב־4K</b>) ומעלות כאן. אפשר גם לבחור סרטון שכבר צילמתן.':'בוחרות תמונות וסרטונים מכל השנים. אם יודעות מאיזו שנה, בחרו אותה; אחרת זה לפי תאריך הקובץ.';
+  $('#addHint').innerHTML=g?'מצלמות סרטון קצר בטלפון (עד דקה, <b>לא ב־4K</b>) ומעלות כאן. אפשר גם לבחור סרטון שכבר צילמתן.':'בוחרות תמונות וסרטונים מכל השנים. <b>תמונות שהגיעו מוואטסאפ לא שומרות תאריך</b>, אז אם יודעות מאיזו שנה הן, בחרו אותה כאן לפני ההעלאה.';
   $('#capLbl').textContent=g?'ממי הברכה':'מאיזה אירוע / מי בתמונה (לא חובה)';
   $('#addCap').value=g?(ME||''):'';}
 function openAdd(c){if(!ME){$('#nameDlg').showModal();return}setCat(c||'years');$('#queue').innerHTML='';$('#addDlg').showModal()}
@@ -529,7 +531,12 @@ $('#camBtns').onclick=async e=>{const b=e.target.closest('[data-cam]');if(!b)ret
 };
 $('#camDlg').addEventListener('close',stopCam);
 async function handle(files){for(const f of files){const row=document.createElement('div');row.innerHTML=`<span>${esc(f.name)}</span><span>מעלה…</span>`;$('#queue').prepend(row);const st=row.lastChild;
-  try{await upload(f,p=>st.textContent=Math.round(p*100)+'%');st.textContent='✓ עלה'}catch(e){st.textContent=e.message||'נכשל'}}}
+  try{const r=await upload(f,p=>st.textContent=Math.round(p*100)+'%');st.textContent='✓ עלה';
+    if(r&&!r.year){const Y=new Date().getFullYear();const w=document.createElement('div');w.className='nodate';
+      w.innerHTML=`⚠️ אין בקובץ תאריך צילום. מאיזו שנה? <select><option value="">לא יודעת</option>${Array.from({length:Y-2013},(_,i)=>Y-i).map(y=>`<option>${y}</option>`).join('')}</select>`;
+      w.querySelector('select').onchange=async e=>{const y=+e.target.value;if(!y)return;try{await patch('items/'+r.id,{year:y,yearUnknown:null});w.innerHTML='📅 נשמר: '+y}catch(x){toast('השמירה נכשלה')}};
+      row.after(w)}
+  }catch(e){st.textContent=e.message||'נכשל'}}}
 /* DateTimeOriginal from a JPEG's EXIF block (null if none — e.g. WhatsApp strips it) */
 async function exifDate(f){
   try{const b=new DataView(await f.slice(0,262144).arrayBuffer());if(b.getUint16(0)!==0xFFD8)return null;let o=2;
@@ -572,6 +579,7 @@ async function upload(f,prog){
       await put('items/'+id,Object.assign(meta,{kind:'video',dur:Math.round(isFinite(v.duration)&&v.duration?v.duration:(f._dur||0)),chunks:n,mime:f.type||'video/mp4',srcW:v.videoWidth,srcH:v.videoHeight,origInVid:{name:f.name,size:f.size},qauto:Math.min(v.videoWidth,v.videoHeight)&&Math.min(v.videoWidth,v.videoHeight)<480?'res':null}));
     }else throw new Error('סוג לא נתמך');
   }finally{URL.revokeObjectURL(u)}
+  return {id,year:meta.year};
 }
 boot();
 })();
