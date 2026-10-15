@@ -400,7 +400,7 @@ function closeSheet(){$('#gs').classList.remove('open');sheetRef=null;if(!$('#vw
 $('#gsClose').onclick=closeSheet;
 const io=new IntersectionObserver(es=>es.forEach(async e=>{if(!e.isIntersecting)return;io.unobserve(e.target);const id=e.target.dataset.t;try{const d=await get('thumbs/'+id);if(d){thumbs[id]=d;e.target.src=d}}catch(x){}}),{rootMargin:'300px'});
 document.addEventListener('click',e=>{
-  const f=e.target.closest('[data-f]');if(f){F=f.dataset.f;render();return}
+  const f=e.target.closest('[data-f]');if(f){F=(F===f.dataset.f?'all':f.dataset.f);render();return} // tapping the active filter clears it
   if(e.target.id==='edBtn'){if(isEd()){ls.set('lucy_ed','');render();return}
     const c=prompt('קוד עורכות:');if(!c)return;sha('ed-'+c.trim()).then(h=>{if(h===EDH){ls.set('lucy_ed','1');F=null;render();toast('מצב עורכות ✓')}else toast('קוד לא נכון')});return}
   const qq=e.target.closest('.acts [data-q]');if(qq){toggleQ(qq.dataset.q);return}
