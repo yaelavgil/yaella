@@ -200,7 +200,7 @@ dialog::backdrop{background:rgba(30,15,20,.55)}
     <button type="button" class="src" data-src="video"><span>🎥</span>להקליט וידאו<small>עד דקה, ומיד עולה</small></button>
   </div>
   <p class="hint" style="text-align:center">אפשר גם לגרור קבצים לכאן · סרטון עד 45MB</p>
-  <input type="file" id="file" accept="image/*,video/*" multiple hidden>
+  <input type="file" id="file" accept="image/*,video/*,.heic,.heif,.dng,.cr2,.cr3,.nef,.arw,.raf,.orf,.rw2,.tif,.tiff,.mov,.mkv,.avi,.3gp,.mts,.m2ts,.wmv,.mpg" multiple hidden>
   <input type="file" id="capP" accept="image/*" capture="environment" hidden>
   <input type="file" id="capV" accept="video/*" capture="environment" hidden>
   <div class="q" id="queue"></div>
@@ -597,6 +597,11 @@ const img=src=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.on
 function jpg(s,max){const W=s.width||s.videoWidth,H=s.height||s.videoHeight,k=Math.min(1,max/Math.max(W,H)),c=document.createElement('canvas');c.width=Math.round(W*k);c.height=Math.round(H*k);c.getContext('2d').drawImage(s,0,0,c.width,c.height);return c.toDataURL('image/jpeg',.86)}
 function sq(s){const W=s.width||s.videoWidth,H=s.height||s.videoHeight,m=Math.min(W,H),c=document.createElement('canvas');c.width=c.height=400;c.getContext('2d').drawImage(s,(W-m)/2,(H-m)/2,m,m,0,0,400,400);return c.toDataURL('image/jpeg',.8)}
 const b64=buf=>{let s='';const a=new Uint8Array(buf);for(let i=0;i<a.length;i+=0x8000)s+=String.fromCharCode.apply(null,a.subarray(i,i+0x8000));return btoa(s)};
+/* formats: the browser previews what it can; anything else is kept as the original and converted on Yael's Mac (sips / ffmpeg) */
+const IMG_EXT=/\.(jpe?g|png|gif|webp|avif|heic|heif|bmp|tiff?|dng|cr2|cr3|nef|arw|raf|orf|rw2)$/i;
+const VID_EXT=/\.(mp4|mov|m4v|3gp|3g2|webm|mkv|avi|mpe?g|mts|m2ts|wmv)$/i;
+const PHOTO_MAX=60*1024*1024;
+const kindOf=f=>f.type.startsWith('image/')||IMG_EXT.test(f.name)?'photo':f.type.startsWith('video/')||VID_EXT.test(f.name)?'video':null;
 async function upload(f,prog){
   const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6), ys=$('#addYear').value;
   const ex=await exifDate(f), fresh=/-WA\d|whatsapp/i.test(f.name)||(Date.now()-(f.lastModified||0)<3*864e5);
@@ -606,7 +611,8 @@ async function upload(f,prog){
   if(cat==='greeting'&&meta.caption)meta.by=meta.caption;
   const u=URL.createObjectURL(f);
   try{
-    if(f.type.startsWith('image/')||/\.(heic|heif)$/i.test(f.name)){
+    if(kindOf(f)==='photo'){
+      if(f.size>PHOTO_MAX)throw new UpErr('BIG','התמונה גדולה מדי ('+Math.round(f.size/1048576)+'MB, המקסימום 60MB)','מעלים את התמונה מהטלפון במקום קובץ RAW, או שולחים ליעל');
       let i=null;try{i=await img(u)}catch(e){}
       if(i){await put('thumbs/'+id,sq(i));await put('full/'+id,jpg(i,1800))}
       else{const c=document.createElement('canvas');c.width=c.height=400;const x=c.getContext('2d');x.fillStyle='#f3e3da';x.fillRect(0,0,400,400);x.fillStyle='#7d6f74';x.font='bold 30px sans-serif';x.textAlign='center';x.fillText('⏳ בעיבוד',200,210);await put('thumbs/'+id,c.toDataURL('image/jpeg',.8))}
@@ -614,7 +620,7 @@ async function upload(f,prog){
       const W=i?i.naturalWidth:0,H=i?i.naturalHeight:0, buf=await f.arrayBuffer(), n=Math.ceil(buf.byteLength/CHUNK);
       for(let k=0;k<n;k++){await put(`orig/${id}/${k}`,b64(buf.slice(k*CHUNK,(k+1)*CHUNK)));prog(.25+(k+1)/n*.7)}
       await put('items/'+id,Object.assign(meta,{kind:'photo',srcW:W,srcH:H,orig:{chunks:n,name:f.name,type:f.type||'image/jpeg',size:f.size},needsConvert:i?null:true,qauto:i&&Math.max(W,H)<1200?'res':null}));
-    }else if(f.type.startsWith('video/')||/\.(mov|mp4|m4v)$/i.test(f.name)){
+    }else if(kindOf(f)==='video'){
       if(f.size>VIDEO_MAX)throw new UpErr('BIG','הסרטון גדול מדי ('+Math.round(f.size/1048576)+'MB, המקסימום 45MB)','מצלמים שוב קצר יותר (עד דקה) ולא ב־4K, או שולחים את הסרטון ישירות ליעל');
       const v=document.createElement('video');v.muted=true;v.playsInline=true;v.preload='auto';v.src=u;
       const vok=await new Promise(ok=>{v.onloadeddata=()=>ok(true);v.onerror=()=>ok(false);setTimeout(()=>ok(false),15000)});
@@ -623,7 +629,8 @@ async function upload(f,prog){
       const buf=await f.arrayBuffer(),n=Math.ceil(buf.byteLength/CHUNK);
       for(let i=0;i<n;i++){await put(`vid/${id}/${i}`,b64(buf.slice(i*CHUNK,(i+1)*CHUNK)));prog((i+1)/n*.95)}
       await put('items/'+id,Object.assign(meta,{kind:'video',dur:Math.round(isFinite(v.duration)&&v.duration?v.duration:(f._dur||0)),chunks:n,mime:f.type||'video/mp4',srcW:v.videoWidth,srcH:v.videoHeight,origInVid:{name:f.name,size:f.size},needsConvert:vok?null:true,qauto:Math.min(v.videoWidth,v.videoHeight)&&Math.min(v.videoWidth,v.videoHeight)<480?'res':null}));
-    }else throw new UpErr('TYPE','זה לא קובץ של תמונה או סרטון'+(f.type?' ('+f.type+')':''),'בוחרים קובץ מגלריית התמונות');
+    }else{const ext=(f.name.match(/\.([^.]+)$/)||[])[1];
+      throw new UpErr('TYPE',`סוג הקובץ ${ext?'.'+ext.toLowerCase():f.type||'הזה'} לא נתמך, ולכן הוא לא עלה`,'אפשר להעלות תמונות (JPG, PNG, HEIC, WebP, GIF, TIFF, RAW) וסרטונים (MP4, MOV, WebM, AVI, MKV, 3GP). בוחרים קובץ מגלריית התמונות')}
   }finally{URL.revokeObjectURL(u)}
   return {id,year:meta.year};
 }
