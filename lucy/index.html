@@ -81,7 +81,7 @@ dialog::backdrop{background:rgba(30,15,20,.55)}
 .btn{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:8px 16px;font-weight:800}
 .btn.pri{background:var(--blush);border-color:var(--blush);color:#fff}
 .drop{border:2px dashed var(--line);border-radius:14px;padding:20px;text-align:center;color:var(--muted)}
-.q{display:grid;gap:4px;max-height:160px;overflow:auto;font-size:13px}
+.q{display:grid;gap:6px;max-height:45vh;overflow:auto;font-size:13px}
 .q div{display:flex;justify-content:space-between;gap:8px}
 .hint{font-size:13px;color:var(--muted);margin:0}
 /* viewer */
@@ -146,6 +146,9 @@ dialog::backdrop{background:rgba(30,15,20,.55)}
 .tips .ti{flex:none;width:44px;height:44px;border-radius:50%;background:var(--blush-soft);display:grid;place-items:center;font-size:24px}
 .tips b{display:block;font-weight:800}
 .tips small{display:block;color:var(--muted);font-size:14px;font-weight:600}
+.q .fail,.q .nodate{display:grid;justify-content:stretch}
+.q .fail .row{display:flex;gap:8px;flex-wrap:wrap}
+.q .nodate{display:flex;justify-content:flex-start}
 .fail{background:#fde4e4;color:#5b1d1d;border-radius:12px;padding:10px 12px;display:grid;gap:4px;font-size:15px}
 .fail b{font-size:16px}
 .fail small{font-family:ui-monospace,Menlo,monospace;opacity:.8;direction:ltr;text-align:right}
