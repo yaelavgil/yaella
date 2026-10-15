@@ -568,6 +568,7 @@ async function handle(files){for(const f of files){const row=document.createElem
       row.after(w)}
   }catch(e){showFail(row,st,f,e)}}}
 function showFail(row,st,f,e){
+  if(!e.code&&(e.name==='NotReadableError'||e.name==='NotFoundError'))e=new UpErr('READ','הטלפון לא הצליח לקרוא את הקובץ','אם התמונות שמורות ב־iCloud: פותחים את התמונה בגלריה, מחכים שתיטען במלואה, ואז „נסו שוב”',e.name+': '+e.message);
   const code='L-'+(e.code||'X')+'-'+Date.now().toString(36).slice(-4).toUpperCase();
   const he=e.he||'משהו השתבש בהעלאה', todo=e.todo||'לוחצים „נסו שוב”. אם זה חוזר, מעתיקים את פרטי התקלה ושולחים ליעל';
   const rep_=[`קוד תקלה: ${code}`,`קובץ: ${f.name}`,`סוג: ${f.type||'?'} · ${(f.size/1048576).toFixed(1)}MB`,`מה קרה: ${he}`,`פרטים: ${e.detail||e.message||e}`,`שם: ${ME}`,`דפדפן: ${navigator.userAgent}`,`זמן: ${new Date().toLocaleString('he-IL')}`].join('\n');
