@@ -36,10 +36,10 @@ h1 span{color:var(--blush)}
 .sum{color:var(--muted);font-size:14px;margin-top:6px}
 .sum b{color:var(--ink)}
 .bar{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.bar .in{max-width:1100px;margin:0 auto;padding:9px 16px;display:flex;gap:8px;align-items:center}
-.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0}
+.bar .in{max-width:1100px;margin:0 auto;padding:8px 16px;display:flex;gap:8px;align-items:flex-start}
+.chips{display:flex;flex-wrap:wrap;gap:5px;flex:1;min-width:0}
 .chips::-webkit-scrollbar{display:none}
-.chip{flex:none;border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:4px 12px;font-weight:700;font-size:14px;white-space:nowrap}
+.chip{flex:none;border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:3px 10px;font-weight:700;font-size:13px;white-space:nowrap}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .chip small{opacity:.6;font-weight:600}
 .add{flex:none;border:0;background:var(--blush);color:#fff;border-radius:999px;padding:7px 16px;font-weight:800}
