@@ -146,6 +146,10 @@ dialog::backdrop{background:rgba(30,15,20,.55)}
 .tips .ti{flex:none;width:44px;height:44px;border-radius:50%;background:var(--blush-soft);display:grid;place-items:center;font-size:24px}
 .tips b{display:block;font-weight:800}
 .tips small{display:block;color:var(--muted);font-size:14px;font-weight:600}
+.fail{background:#fde4e4;color:#5b1d1d;border-radius:12px;padding:10px 12px;display:grid;gap:4px;font-size:15px}
+.fail b{font-size:16px}
+.fail small{font-family:ui-monospace,Menlo,monospace;opacity:.8;direction:ltr;text-align:right}
+.fail .row{margin-top:4px}
 .nodate{background:var(--gold-soft,#f8ecd2);border-radius:10px;padding:6px 10px;font-size:13px;font-weight:700;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .nodate select{font:inherit;border:1px solid var(--line);border-radius:8px;padding:2px 6px;background:var(--paper);color:var(--ink)}
 .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:7px 8px 7px 16px;border-radius:999px;font-weight:700;font-size:14px;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none;display:flex;align-items:center;gap:10px;white-space:nowrap}
@@ -245,7 +249,16 @@ async function change(id,p,msg){
 async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s.trim().toLowerCase()));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('').slice(0,24)}
 const U=p=>`${DB}/${ROOT}/${p}.json`;
 const get=async p=>{const r=await fetch(U(p));if(!r.ok)throw 0;return r.json()};
-const put=async(p,v)=>{const r=await fetch(U(p),{method:'PUT',body:JSON.stringify(v)});if(!r.ok)throw 0;if(p.startsWith('items/'))window.__refreshSoon&&window.__refreshSoon()};
+class UpErr extends Error{constructor(code,he,todo,detail){super(he);this.code=code;this.he=he;this.todo=todo;this.detail=detail||''}}
+const put=async(p,v)=>{let last;
+  for(let a=0;a<4;a++){const c=new AbortController(),t=setTimeout(()=>c.abort(),60000);
+    try{const r=await fetch(U(p),{method:'PUT',body:JSON.stringify(v),signal:c.signal});clearTimeout(t);
+      if(r.ok){if(p.startsWith('items/'))window.__refreshSoon&&window.__refreshSoon();return}
+      last=new UpErr('S'+r.status,r.status===413?'הקובץ גדול מדי לשמירה':'השרת סירב לשמור ('+r.status+')',r.status===413?'נסו קובץ קטן יותר, או שלחו ליעל':'נסו שוב בעוד כמה דקות. אם זה חוזר, שלחו את קוד התקלה ליעל',await r.text().catch(()=>''));
+      if(r.status<500&&r.status!==429)break}
+    catch(e){clearTimeout(t);last=new UpErr(navigator.onLine?'NET':'OFFLINE',navigator.onLine?'החיבור לשרת נקטע':'אין חיבור לאינטרנט','בודקים שיש אינטרנט (וייפיי או סלולר) ולוחצים „נסו שוב”',e.name+': '+e.message)}
+    await new Promise(r=>setTimeout(r,1500*(a+1)))}
+  throw last};
 const patch=async(p,v)=>{const r=await fetch(U(p),{method:'PATCH',body:JSON.stringify(v)});if(!r.ok)throw 0;window.__refreshSoon&&window.__refreshSoon()};
 const del=p=>fetch(U(p),{method:'DELETE'});
 
@@ -553,7 +566,19 @@ async function handle(files){for(const f of files){const row=document.createElem
       w.innerHTML=`⚠️ אין בקובץ תאריך צילום. מאיזו שנה? <select><option value="">לא יודעת</option>${Array.from({length:Y-2013},(_,i)=>Y-i).map(y=>`<option>${y}</option>`).join('')}</select>`;
       w.querySelector('select').onchange=async e=>{const y=+e.target.value;if(!y)return;try{await patch('items/'+r.id,{year:y,yearUnknown:null});w.innerHTML='📅 נשמר: '+y}catch(x){toast('השמירה נכשלה')}};
       row.after(w)}
-  }catch(e){st.textContent=e.message||'נכשל'}}}
+  }catch(e){showFail(row,st,f,e)}}}
+function showFail(row,st,f,e){
+  const code='L-'+(e.code||'X')+'-'+Date.now().toString(36).slice(-4).toUpperCase();
+  const he=e.he||'משהו השתבש בהעלאה', todo=e.todo||'לוחצים „נסו שוב”. אם זה חוזר, מעתיקים את פרטי התקלה ושולחים ליעל';
+  const rep_=[`קוד תקלה: ${code}`,`קובץ: ${f.name}`,`סוג: ${f.type||'?'} · ${(f.size/1048576).toFixed(1)}MB`,`מה קרה: ${he}`,`פרטים: ${e.detail||e.message||e}`,`שם: ${ME}`,`דפדפן: ${navigator.userAgent}`,`זמן: ${new Date().toLocaleString('he-IL')}`].join('\n');
+  st.textContent='✕ לא עלה';
+  const w=document.createElement('div');w.className='fail';
+  w.innerHTML=`<b>✕ ${esc(he)}</b><span>👉 ${esc(todo)}</span><small>קוד תקלה: ${code}</small><div class="row"><button class="btn pri" data-r>↻ נסו שוב</button><button class="btn" data-c>📋 העתקת פרטי התקלה</button></div>`;
+  w.querySelector('[data-r]').onclick=()=>{w.remove();row.remove();handle([f])};
+  w.querySelector('[data-c]').onclick=async()=>{try{await navigator.clipboard.writeText(rep_);toast('הועתק. אפשר להדביק בוואטסאפ ליעל')}catch(x){prompt('העתיקו את הטקסט:',rep_)}};
+  row.after(w);
+  fetch(U('errors/'+code),{method:'PUT',body:JSON.stringify({code,name:f.name,type:f.type,size:f.size,he,detail:String(e.detail||e.message||e).slice(0,500),by:ME,ua:navigator.userAgent,at:Date.now()})}).catch(()=>{});
+}
 /* DateTimeOriginal from a JPEG's EXIF block (null if none — e.g. WhatsApp strips it) */
 async function exifDate(f){
   try{const b=new DataView(await f.slice(0,262144).arrayBuffer());if(b.getUint16(0)!==0xFFD8)return null;let o=2;
@@ -586,15 +611,15 @@ async function upload(f,prog){
       for(let k=0;k<n;k++){await put(`orig/${id}/${k}`,b64(buf.slice(k*CHUNK,(k+1)*CHUNK)));prog(.25+(k+1)/n*.7)}
       await put('items/'+id,Object.assign(meta,{kind:'photo',srcW:W,srcH:H,orig:{chunks:n,name:f.name,type:f.type||'image/jpeg',size:f.size},needsConvert:i?null:true,qauto:i&&Math.max(W,H)<1200?'res':null}));
     }else if(f.type.startsWith('video/')||/\.(mov|mp4|m4v)$/i.test(f.name)){
-      if(f.size>VIDEO_MAX)throw new Error('הסרטון גדול מדי ('+Math.round(f.size/1048576)+'MB). צלמי שוב קצר יותר או באיכות HD, או שלחי אותו ליעל בוואטסאפ');
+      if(f.size>VIDEO_MAX)throw new UpErr('BIG','הסרטון גדול מדי ('+Math.round(f.size/1048576)+'MB, המקסימום 45MB)','מצלמים שוב קצר יותר (עד דקה) ולא ב־4K, או שולחים את הסרטון ישירות ליעל');
       const v=document.createElement('video');v.muted=true;v.playsInline=true;v.preload='auto';v.src=u;
-      await new Promise((ok,no)=>{v.onloadeddata=ok;v.onerror=()=>no(new Error('פורמט לא נתמך'))});
-      v.currentTime=Math.min(1,(v.duration||2)/3);await new Promise(ok=>{v.onseeked=ok;setTimeout(ok,1500)});
-      await put('thumbs/'+id,sq(v));
+      const vok=await new Promise(ok=>{v.onloadeddata=()=>ok(true);v.onerror=()=>ok(false);setTimeout(()=>ok(false),15000)});
+      if(vok){v.currentTime=Math.min(1,(v.duration||2)/3);await new Promise(ok=>{v.onseeked=ok;setTimeout(ok,1500)});await put('thumbs/'+id,sq(v))}
+      else{const c=document.createElement('canvas');c.width=c.height=400;const x=c.getContext('2d');x.fillStyle='#f3e3da';x.fillRect(0,0,400,400);x.fillStyle='#7d6f74';x.font='bold 30px sans-serif';x.textAlign='center';x.fillText('🎬 ⏳ בעיבוד',200,210);await put('thumbs/'+id,c.toDataURL('image/jpeg',.8))}
       const buf=await f.arrayBuffer(),n=Math.ceil(buf.byteLength/CHUNK);
       for(let i=0;i<n;i++){await put(`vid/${id}/${i}`,b64(buf.slice(i*CHUNK,(i+1)*CHUNK)));prog((i+1)/n*.95)}
-      await put('items/'+id,Object.assign(meta,{kind:'video',dur:Math.round(isFinite(v.duration)&&v.duration?v.duration:(f._dur||0)),chunks:n,mime:f.type||'video/mp4',srcW:v.videoWidth,srcH:v.videoHeight,origInVid:{name:f.name,size:f.size},qauto:Math.min(v.videoWidth,v.videoHeight)&&Math.min(v.videoWidth,v.videoHeight)<480?'res':null}));
-    }else throw new Error('סוג לא נתמך');
+      await put('items/'+id,Object.assign(meta,{kind:'video',dur:Math.round(isFinite(v.duration)&&v.duration?v.duration:(f._dur||0)),chunks:n,mime:f.type||'video/mp4',srcW:v.videoWidth,srcH:v.videoHeight,origInVid:{name:f.name,size:f.size},needsConvert:vok?null:true,qauto:Math.min(v.videoWidth,v.videoHeight)&&Math.min(v.videoWidth,v.videoHeight)<480?'res':null}));
+    }else throw new UpErr('TYPE','זה לא קובץ של תמונה או סרטון'+(f.type?' ('+f.type+')':''),'בוחרים קובץ מגלריית התמונות');
   }finally{URL.revokeObjectURL(u)}
   return {id,year:meta.year};
 }
