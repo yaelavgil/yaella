@@ -159,6 +159,11 @@ dialog::backdrop{background:rgba(30,15,20,.55)}
 body.sel .t{cursor:pointer}
 .t .ck{position:absolute;top:6px;inset-inline-end:6px;width:28px;height:28px;border-radius:50%;border:2px solid #fff;background:rgba(20,10,14,.35);display:none;place-items:center;color:#fff;font-weight:900;font-size:16px;box-shadow:0 1px 4px rgba(0,0,0,.3);pointer-events:none}
 body.sel .t .ck{display:grid}
+.t .ckall{pointer-events:auto;width:auto;min-width:28px;height:30px;border-radius:999px;padding:0 10px;font-size:13px;font-family:inherit;cursor:pointer;z-index:2}
+.t .ckall::before{content:'☑ כולן'}
+.t.picked .ckall::before{content:''}
+.gs .selall{display:none}
+body.sel .gs .selall{display:inline-block}
 body.sel .t.picked .ck{background:var(--blush);border-color:var(--blush)}
 body.sel .t.picked{box-shadow:0 0 0 3px var(--blush)}
 body.sel .t .acts{display:none}
@@ -249,7 +254,7 @@ body.sel main{padding-bottom:190px}
   <div class="row" id="camBtns"></div>
 </div></dialog>
 <div class="gs" id="gs" role="dialog" aria-modal="true" aria-label="אירוע">
-  <div class="hd"><h3 id="gsTtl"></h3><button class="x" id="gsClose" aria-label="סגירה">✕</button></div>
+  <div class="hd"><h3 id="gsTtl"></h3><button class="btn selall" data-gall>☑ בחירת כל הקבוצה</button><button class="x" id="gsClose" aria-label="סגירה">✕</button></div>
   <div class="in"><p class="hint edonly">לוחצים על תמונה כדי לסמן אותה. בתוך התמונה: ⭐ בוחרת את תמונת השער, ✂ פותחת קבוצה חדשה מהתמונה הזאת והלאה (כשיש ביום כמה אירועים).</p><div class="grid" id="gsGrid"></div></div>
 </div>
 <div class="vw" id="vw" role="dialog" aria-modal="true" aria-label="צפייה בתמונה">
@@ -427,7 +432,7 @@ const dstr=t=>{if(!t)return '';const d=new Date(t);return d.getFullYear()>2000?`
 function stackTile(g){
   const others=g.items.filter(i=>i!==g.cover).slice(0,2);
   const todo=g.items.filter(i=>!ST(i)).length, nin=g.items.filter(i=>ST(i)==='in').length;
-  return `<div class="t stack" data-ids="${g.items.map(i=>i.id).join(',')}"><span class="ck" aria-hidden="true"></span><button class="ph" data-g="${g.key}" aria-label="פתיחת האירוע">
+  return `<div class="t stack" data-ids="${g.items.map(i=>i.id).join(',')}"><button class="ck ckall" aria-label="בחירת כל הקבוצה"></button><button class="ph" data-g="${g.key}" aria-label="פתיחת האירוע">
     ${others[1]?`<span class="bk b2"><img data-t="${others[1].id}" alt=""></span>`:''}${others[0]?`<span class="bk b1"><img data-t="${others[0].id}" alt=""></span>`:''}
     <span class="cv"><img data-t="${g.cover.id}" alt=""></span></button>
     <span class="cnt">${g.items.length} מאותו יום</span>
@@ -463,7 +468,7 @@ function paintSel(){
   $('#selSize').textContent=n?`בערך ${mb(sz)}`:'';
   $('#selGo').disabled=!n;
   document.querySelectorAll('.t[data-id]').forEach(t=>t.classList.toggle('picked',PICK.has(t.dataset.id)));
-  document.querySelectorAll('.t.stack[data-ids]').forEach(t=>{const m=t.dataset.ids.split(','),k=m.filter(x=>PICK.has(x)).length;t.classList.toggle('picked',k>0);const c=t.querySelector('.ck');if(c)c.textContent=k?(k===m.length?'✓':k):''});
+  document.querySelectorAll('.t.stack[data-ids]').forEach(t=>{const m=t.dataset.ids.split(','),k=m.filter(x=>PICK.has(x)).length;t.classList.toggle('picked',k>0);const c=t.querySelector('.ck');if(c)c.textContent=k?(k===m.length?'✓ כולן':`${k}/${m.length}`):''});
 }
 function togglePick(ids){const all=ids.every(x=>PICK.has(x));ids.forEach(x=>all?PICK.delete(x):PICK.add(x));paintSel()}
 function openSheet(key){sheetRef=key;$('#gs').classList.add('open');document.body.style.overflow='hidden';renderSheet()}
@@ -474,6 +479,8 @@ function renderSheet(){
   $('#gsTtl').innerHTML=`${dstr(g.items[0].taken)||g.cover.year||''}<small>${g.items.length} פריטים</small>`;
   document.querySelectorAll('.edonly').forEach(e=>e.style.display=isEd()?'':'none');
   inSheetTile=true; $('#gsGrid').innerHTML=g.items.map(i=>tile(i).replace('data-o=','data-so=')).join(''); inSheetTile=false;
+  const allIn=g.items.every(i=>PICK.has(i.id)); const sa=$('#gs [data-gall]'); if(sa) sa.textContent=allIn?'☐ ביטול בחירת הקבוצה':'☑ בחירת כל הקבוצה';
+  paintSel();
   $('#gsGrid').querySelectorAll('img[data-t]').forEach(img=>{const id=img.dataset.t;thumbs[id]?img.src=thumbs[id]:io.observe(img)});
 }
 function closeSheet(){$('#gs').classList.remove('open');sheetRef=null;if(!$('#vw').classList.contains('open'))document.body.style.overflow=''}
@@ -486,8 +493,11 @@ document.addEventListener('click',e=>{
   const qq=e.target.closest('.acts [data-q]');if(qq){toggleQ(qq.dataset.q);return}
   const qs=e.target.closest('.acts [data-s]');if(qs){setSt(qs.dataset.id,qs.dataset.s);return}
   const ad=e.target.closest('[data-add]');if(ad){openAdd(ad.dataset.add);return}
-  if(SEL&&!e.target.closest('.selbar,dialog,.vw,.gs')){const t=e.target.closest('.t');
-    if(t){e.preventDefault();togglePick(t.dataset.ids?t.dataset.ids.split(','):[t.dataset.id]);return}}
+  if(SEL&&e.target.closest('[data-gall]')){const g=sheetGroup();if(g)togglePick(g.items.map(i=>i.id));renderSheet();return}
+  if(SEL&&!e.target.closest('.selbar,dialog,.vw')){const t=e.target.closest('.t');
+    if(t){e.preventDefault();
+      if(t.dataset.ids&&!e.target.closest('.ckall')){const gg=t.querySelector('[data-g]');if(gg){openSheet(gg.dataset.g);return}}
+      togglePick(t.dataset.ids?t.dataset.ids.split(','):[t.dataset.id]);if($('#gs').classList.contains('open'))renderSheet();return}}
   const sq_=e.target.closest('[data-sel]');if(sq_){const k=sq_.dataset.sel;
     if(k==='none')PICK.clear(); else if(k==='shown')list.forEach(x=>PICK.add(x)); else if(k==='in')all().filter(i=>ST(i)==='in').forEach(i=>PICK.add(i.id)); else if(k==='greet')all().filter(i=>i.cat==='greeting').forEach(i=>PICK.add(i.id));
     paintSel();return}
