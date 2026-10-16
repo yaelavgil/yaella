@@ -155,6 +155,27 @@ dialog::backdrop{background:rgba(30,15,20,.55)}
 .fail .row{margin-top:4px}
 .nodate{background:var(--gold-soft,#f8ecd2);border-radius:10px;padding:6px 10px;font-size:13px;font-weight:700;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .nodate select{font:inherit;border:1px solid var(--line);border-radius:8px;padding:2px 6px;background:var(--paper);color:var(--ink)}
+.add.ghost{background:var(--paper);color:var(--ink);border:1px solid var(--line);box-shadow:none}
+body.sel .t{cursor:pointer}
+.t .ck{position:absolute;top:6px;inset-inline-end:6px;width:28px;height:28px;border-radius:50%;border:2px solid #fff;background:rgba(20,10,14,.35);display:none;place-items:center;color:#fff;font-weight:900;font-size:16px;box-shadow:0 1px 4px rgba(0,0,0,.3);pointer-events:none}
+body.sel .t .ck{display:grid}
+body.sel .t.picked .ck{background:var(--blush);border-color:var(--blush)}
+body.sel .t.picked{box-shadow:0 0 0 3px var(--blush)}
+body.sel .t .acts{display:none}
+.selbar{position:fixed;inset-inline:0;bottom:0;z-index:12;background:var(--paper);border-top:1px solid var(--line);box-shadow:0 -6px 24px rgba(40,20,30,.15);padding:10px 16px calc(10px + env(safe-area-inset-bottom));display:none;gap:8px}
+body.sel .selbar{display:grid}
+body.sel main{padding-bottom:190px}
+.sb-top{display:flex;gap:10px;align-items:baseline;font-size:17px}
+.sb-top span{color:var(--muted);font-size:14px}
+.sb-quick{display:flex;gap:6px;flex-wrap:wrap}
+.sb-act{display:flex;gap:8px;justify-content:space-between}
+.btn.big{padding:12px 20px;font-size:16px;flex:1}
+.btn[disabled]{opacity:.45}
+.dllist{display:grid;gap:8px;max-height:45vh;overflow:auto}
+.dli{border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:grid;gap:4px}
+.dli .h{display:flex;justify-content:space-between;gap:8px;font-weight:800}
+.dli small{color:var(--muted)}
+.dli a.btn{text-decoration:none;text-align:center}
 .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:7px 8px 7px 16px;border-radius:999px;font-weight:700;font-size:14px;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none;display:flex;align-items:center;gap:10px;white-space:nowrap}
 .toast.show{opacity:1;pointer-events:auto}
 .toast button{border:0;background:var(--blush);color:#fff;border-radius:999px;padding:4px 12px;font-weight:800}
@@ -170,7 +191,7 @@ dialog::backdrop{background:rgba(30,15,20,.55)}
 </header>
 <div class="bar"><div class="in">
   <div class="chips" id="chips" role="group" aria-label="סינון"></div>
-  <button class="add" id="addBtn">⬆ העלאה</button>
+  <button class="add ghost" id="selBtn">☑️ בחירה להורדה</button><button class="add ghost" id="dlBtn">📦 הורדות</button><button class="add" id="addBtn">⬆ העלאה</button>
 </div></div>
 <main id="main"><div class="empty"><b>רגע…</b>טוענות</div></main>
 
@@ -222,6 +243,21 @@ dialog::backdrop{background:rgba(30,15,20,.55)}
   <div class="stage" id="stage"></div>
   <div class="bot" id="bot"></div>
 </div>
+<div class="selbar" id="selbar" role="region" aria-label="בחירה להורדה">
+  <div class="sb-top"><b id="selCount">לא נבחר כלום</b><span id="selSize"></span></div>
+  <div class="sb-quick"><button class="chip" data-sel="shown">כל מה שמוצג</button><button class="chip" data-sel="in">כל ה־✓ למצגת</button><button class="chip" data-sel="greet">כל הברכות</button><button class="chip" data-sel="none">ניקוי</button></div>
+  <div class="sb-act"><button class="btn" id="selCancel">ביטול</button><button class="btn pri big" id="selGo" disabled>⬇ הכינו לי הורדה באיכות מקורית</button></div>
+</div>
+<dialog id="dlDlg"><div class="dl">
+  <h3>📦 הורדות</h3>
+  <div class="tips" style="margin-bottom:4px">
+    <li><span class="ti">☑️</span><span><b>בוחרים תמונות וסרטונים</b><small>„בחירה להורדה” למעלה</small></span></li>
+    <li><span class="ti">⏳</span><span><b>מכינים קובץ ZIP באיכות מקורית</b><small>לוקח עד שעה. אפשר לסגור את הדף בינתיים</small></span></li>
+    <li><span class="ti">⬇️</span><span><b>מורידים בלחיצה אחת</b><small>ההורדה ממשיכה גם ברקע</small></span></li>
+  </div>
+  <div id="dlList" class="dllist"></div>
+  <div class="row"><button class="btn" type="button" id="dlClose">סגירה</button></div>
+</div></dialog>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -342,6 +378,7 @@ function render(){
   const g={}; vg.forEach(x=>{const y=x.cover.year||'—';(g[y]=g[y]||[]).push(x)});
   $('#main').innerHTML=(GR.length?`<section class="gsec"><h2>💌 ברכות<small>${GR.length}</small></h2><div class="grid">${GR.map(tile).join('')}</div></section>`:'')+(UNK.length?`<section class="gsec"><h2>📅 שנה לא ידועה<small>${UNK.length} · יודעות מאיזו שנה? פותחות ולוחצות על „📅 שנה”</small></h2><div class="grid">${UNK.map(tile).join('')}</div></section>`:'')+Object.entries(g).map(([y,l])=>`<h2>${y}<small>${/^\d+$/.test(y)?'לוסי בת '+Math.max(0,y-2014)+' · ':''}${l.reduce((n,x)=>n+x.hit.length,0)}</small></h2><div class="grid">${l.map(x=>{const v={key:x.key,items:x.hit,cover:x.hit.includes(x.cover)?x.cover:x.hit[0]};return v.items.length>1?stackTile(v):tile(v.items[0])}).join('')}</div>`).join('');
   document.querySelectorAll('img[data-t]').forEach(img=>{const id=img.dataset.t;thumbs[id]?img.src=thumbs[id]:io.observe(img)});
+  paintSel();
 }
 /* events: same calendar day, split when there's a gap of more than 2 hours or someone split it by hand (splitHere) */
 const dayKey=t=>{const d=new Date(t);return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()};
@@ -360,7 +397,7 @@ const dstr=t=>{if(!t)return '';const d=new Date(t);return d.getFullYear()>2000?`
 function stackTile(g){
   const others=g.items.filter(i=>i!==g.cover).slice(0,2);
   const todo=g.items.filter(i=>!ST(i)).length, nin=g.items.filter(i=>ST(i)==='in').length;
-  return `<div class="t stack"><button class="ph" data-g="${g.key}" aria-label="פתיחת האירוע">
+  return `<div class="t stack" data-ids="${g.items.map(i=>i.id).join(',')}"><span class="ck" aria-hidden="true"></span><button class="ph" data-g="${g.key}" aria-label="פתיחת האירוע">
     ${others[1]?`<span class="bk b2"><img data-t="${others[1].id}" alt=""></span>`:''}${others[0]?`<span class="bk b1"><img data-t="${others[0].id}" alt=""></span>`:''}
     <span class="cv"><img data-t="${g.cover.id}" alt=""></span></button>
     <span class="cnt">${g.items.length} מאותו יום</span>
@@ -368,7 +405,7 @@ function stackTile(g){
 }
 function tile(i){
   const st=ST(i);
-  return `<div class="t ${st==='no'||st==='nolucy'?'no':st||''}"><button class="ph" data-o="${i.id}" aria-label="פתיחה"><img data-t="${i.id}" alt=""></button>
+  return `<div class="t ${st==='no'||st==='nolucy'?'no':st||''}" data-id="${i.id}"><button class="ph" data-o="${i.id}" aria-label="פתיחה"><img data-t="${i.id}" alt=""></button><span class="ck" aria-hidden="true">✓</span>
   ${i.kind==='video'?`<span class="tag">▶${i.dur?' '+fmt(i.dur):''}</span>`:''}${inSheetTile&&i.cover?'<span class="cov">⭐ שער</span>':''}${!i.year&&i.cat!=='greeting'?`<span class="tag" style="top:auto;bottom:66px;background:var(--gold);color:#2b2226">📅 ללא תאריך</span>`:''}${LOWQ(i)?`<span class="tag" style="top:auto;bottom:40px;background:#b5651d" title="${i.lowq?'סומן: איכות לא מומלצת':QTXT[i.qauto]||''}">⚠️ ${i.lowq?'איכות':QTXT[i.qauto]||''}</span>`:''}${i.cat==='greeting'?`<span class="cov" style="background:var(--blush);color:#fff">💌 ${esc(i.by||'')}</span>`:''}
   ${isEd()?`<div class="acts">${Object.entries(STL).map(([k,[ic,l]])=>`<button class="${st===k?'on':''}" data-s="${k}" data-id="${i.id}" title="${l}" aria-label="${l}" aria-pressed="${st===k}">${ic}</button>`).join('')}<button class="${i.lowq?'on':''}" data-q="${i.id}" title="איכות לא מומלצת לסרטון" aria-label="איכות לא מומלצת" aria-pressed="${!!i.lowq}">⚠️</button></div>`:''}</div>`;
 }
@@ -386,6 +423,19 @@ async function toggleQ(id){
   await change(id,p,p.qok?'סומן: האיכות תקינה':p.lowq?'סומן: ⚠️ איכות לא מומלצת':'סימון האיכות הוסר');
 }
 let inSheetTile=false;
+let SEL=false; const PICK=new Set();
+const osize=i=>i.osize||(i.orig&&i.orig.size)||(i.origInVid&&i.origInVid.size)||(i.kind==='video'?Math.max(4e6,(i.dur||20)*1.2e6):3.5e6);
+const mb=b=>b>=1e9?(b/1e9).toFixed(1)+'GB':Math.round(b/1e6)+'MB';
+function paintSel(){
+  document.body.classList.toggle('sel',SEL);
+  const ids=[...PICK].filter(id=>items[id]&&!items[id].deleted), n=ids.length, sz=ids.reduce((a,id)=>a+osize(items[id]),0);
+  $('#selCount').textContent=n?`נבחרו ${n}`:'לוחצות על תמונות כדי לבחור';
+  $('#selSize').textContent=n?`בערך ${mb(sz)}`:'';
+  $('#selGo').disabled=!n;
+  document.querySelectorAll('.t[data-id]').forEach(t=>t.classList.toggle('picked',PICK.has(t.dataset.id)));
+  document.querySelectorAll('.t.stack[data-ids]').forEach(t=>{const m=t.dataset.ids.split(','),k=m.filter(x=>PICK.has(x)).length;t.classList.toggle('picked',k>0);const c=t.querySelector('.ck');if(c)c.textContent=k?(k===m.length?'✓':k):''});
+}
+function togglePick(ids){const all=ids.every(x=>PICK.has(x));ids.forEach(x=>all?PICK.delete(x):PICK.add(x));paintSel()}
 function openSheet(key){sheetRef=key;$('#gs').classList.add('open');document.body.style.overflow='hidden';renderSheet()}
 function sheetGroup(){return GROUPS.find(g=>g.items.some(i=>i.id===sheetRef))}
 function renderSheet(){
@@ -406,6 +456,11 @@ document.addEventListener('click',e=>{
   const qq=e.target.closest('.acts [data-q]');if(qq){toggleQ(qq.dataset.q);return}
   const qs=e.target.closest('.acts [data-s]');if(qs){setSt(qs.dataset.id,qs.dataset.s);return}
   const ad=e.target.closest('[data-add]');if(ad){openAdd(ad.dataset.add);return}
+  if(SEL&&!e.target.closest('.selbar,dialog,.vw,.gs')){const t=e.target.closest('.t');
+    if(t){e.preventDefault();togglePick(t.dataset.ids?t.dataset.ids.split(','):[t.dataset.id]);return}}
+  const sq_=e.target.closest('[data-sel]');if(sq_){const k=sq_.dataset.sel;
+    if(k==='none')PICK.clear(); else if(k==='shown')list.forEach(x=>PICK.add(x)); else if(k==='in')all().filter(i=>ST(i)==='in').forEach(i=>PICK.add(i.id)); else if(k==='greet')all().filter(i=>i.cat==='greeting').forEach(i=>PICK.add(i.id));
+    paintSel();return}
   const so=e.target.closest('[data-so]');if(so){const g=sheetGroup();vlist=g?g.items.map(i=>i.id):[so.dataset.so];inGroup=true;open(so.dataset.so);return}
   const gg=e.target.closest('[data-g]');if(gg){openSheet(gg.dataset.g);return}
   const o=e.target.closest('[data-o]');if(o){vlist=list.slice();inGroup=false;open(o.dataset.o);return}
@@ -517,6 +572,30 @@ function setCat(c){cat=c;$('#catSeg').querySelectorAll('[data-c]').forEach(b=>b.
 function openAdd(c){if(!ME){$('#nameDlg').showModal();return}setCat(c||'years');$('#queue').innerHTML='';$('#addDlg').showModal()}
 $('#catSeg').onclick=e=>{const b=e.target.closest('[data-c]');if(b)setCat(b.dataset.c)};
 $('#addBtn').onclick=()=>openAdd('years');
+$('#selBtn').onclick=()=>{SEL=!SEL;$('#selBtn').textContent=SEL?'✕ סיום בחירה':'☑️ בחירה להורדה';paintSel();if(SEL)toast('לוחצות על תמונות וקבוצות כדי לבחור')};
+$('#selCancel').onclick=()=>{SEL=false;PICK.clear();$('#selBtn').textContent='☑️ בחירה להורדה';paintSel()};
+$('#selGo').onclick=async()=>{
+  if(!ME){$('#nameDlg').showModal();return}
+  const ids=[...PICK].filter(id=>items[id]&&!items[id].deleted); if(!ids.length)return;
+  const rid=Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+  try{await fetch(U('dl/'+rid),{method:'PUT',body:JSON.stringify({by:ME,at:Date.now(),ids,count:ids.length,est:ids.reduce((a,id)=>a+osize(items[id]),0),status:'pending'})});
+    SEL=false;PICK.clear();$('#selBtn').textContent='☑️ בחירה להורדה';paintSel();openDl();toast('📦 ההורדה בהכנה. נודיע כאן כשהיא מוכנה')}
+  catch(e){toast('לא הצלחנו לשלוח את הבקשה, נסו שוב')}};
+let DL={},dlTimer=null;
+async function loadDl(){try{DL=(await get('dl'))||{}}catch(e){}paintDl()}
+function paintDl(){
+  const L=Object.entries(DL).sort((a,b)=>b[1].at-a[1].at);
+  const pend=L.filter(([,d])=>d.status!=='ready'&&d.status!=='error').length;
+  $('#dlBtn').textContent='📦 הורדות'+(pend?` (⏳${pend})`:L.length?` (${L.length})`:'');
+  $('#dlList').innerHTML=L.length?L.map(([k,d])=>`<div class="dli"><div class="h"><span>${esc(d.by)} · ${d.count} פריטים</span><span>${new Date(d.at).toLocaleDateString('he-IL')}</span></div>
+    ${d.status==='ready'?`<a class="btn pri" href="${esc(d.url)}" target="_blank" rel="noopener">⬇ הורדה (${mb(d.size||d.est)})</a><small>${d.missing?`⚠️ ${d.missing} פריטים עוד לא היו זמינים ולא נכללו`:'✓ כל הפריטים כלולים'} · קובץ ZIP, מסודר לפי שנים</small>`
+      :d.status==='error'?`<small>✕ ההכנה נכשלה: ${esc(d.error||'')}. בקשו מיעל</small>`
+      :`<small>⏳ בהכנה (בערך ${mb(d.est||0)}). זה לוקח עד שעה, ואפשר לסגור את הדף בינתיים</small>`}</div>`).join(''):'<p class="hint">עוד אין הורדות. לוחצים על „☑️ בחירה להורדה”, בוחרים, ו„הכינו לי הורדה”.</p>';
+  clearTimeout(dlTimer); if(pend) dlTimer=setTimeout(loadDl,30000);
+}
+function openDl(){$('#dlDlg').showModal();loadDl()}
+$('#dlBtn').onclick=openDl; $('#dlClose').onclick=()=>$('#dlDlg').close();
+setTimeout(loadDl,1500);
 $('#addClose').onclick=()=>$('#addDlg').close();
 const fileInp=$('#file'), drop=$('#drop');
 const touch=matchMedia('(pointer:coarse)').matches;
