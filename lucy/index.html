@@ -176,6 +176,20 @@ body.sel main{padding-bottom:190px}
 .dli .h{display:flex;justify-content:space-between;gap:8px;font-weight:800}
 .dli small{color:var(--muted)}
 .dli a.btn{text-decoration:none;text-align:center}
+.rvsec h2{font-family:var(--display);font-size:34px;margin:16px 0 8px}
+.rvsec h2 small{font-family:var(--body);font-size:13px;color:var(--muted);margin-inline-start:8px}
+.rvt{position:relative;border-radius:12px;overflow:hidden;border:2px solid var(--line);background:var(--paper)}
+.rvt img{display:block;width:100%;aspect-ratio:1;object-fit:cover}
+.rvt.maybe{border-color:var(--gold)} .rvt.drop{border-color:#6b5a60} .rvt.drop img{filter:grayscale(1);opacity:.35}
+.rvt .rb{display:grid;grid-template-columns:repeat(3,1fr)}
+.rvt .rb button{border:0;background:none;padding:7px 0;font-size:17px;opacity:.4}
+.rvt .rb button.on{opacity:1}
+.rvt .rb button.on[data-v="keep"]{background:var(--mint);color:#fff}
+.rvt .rb button.on[data-v="maybe"]{background:var(--gold)}
+.rvt .rb button.on[data-v="drop"]{background:#6b5a60;color:#fff}
+.rvfoot{position:sticky;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding:12px 0 calc(12px + env(safe-area-inset-bottom));display:grid;gap:8px;margin-top:16px}
+.rvfoot label{display:grid;gap:4px;font-weight:700}
+.rvfoot input{font:inherit;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:12px;padding:10px 12px;direction:ltr;text-align:right}
 .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:7px 8px 7px 16px;border-radius:999px;font-weight:700;font-size:14px;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none;display:flex;align-items:center;gap:10px;white-space:nowrap}
 .toast.show{opacity:1;pointer-events:auto}
 .toast button{border:0;background:var(--blush);color:#fff;border-radius:999px;padding:4px 12px;font-weight:800}
@@ -246,18 +260,34 @@ body.sel main{padding-bottom:190px}
 <div class="selbar" id="selbar" role="region" aria-label="בחירה להורדה">
   <div class="sb-top"><b id="selCount">לא נבחר כלום</b><span id="selSize"></span></div>
   <div class="sb-quick"><button class="chip" data-sel="shown">כל מה שמוצג</button><button class="chip" data-sel="in">כל ה־✓ למצגת</button><button class="chip" data-sel="greet">כל הברכות</button><button class="chip" data-sel="none">ניקוי</button></div>
-  <div class="sb-act"><button class="btn" id="selCancel">ביטול</button><button class="btn pri big" id="selGo" disabled>⬇ הכינו לי הורדה באיכות מקורית</button></div>
+  <div class="sb-act"><button class="btn" id="selCancel">ביטול</button><button class="btn pri big" id="selGo" disabled>📋 לסקירת הבחירה ולהורדה ›</button></div>
 </div>
 <dialog id="dlDlg"><div class="dl">
   <h3>📦 הורדות</h3>
-  <div class="tips" style="margin-bottom:4px">
+  <ul class="tips" style="margin-bottom:4px">
     <li><span class="ti">☑️</span><span><b>בוחרים תמונות וסרטונים</b><small>„בחירה להורדה” למעלה</small></span></li>
-    <li><span class="ti">⏳</span><span><b>מכינים קובץ ZIP באיכות מקורית</b><small>לוקח עד שעה. אפשר לסגור את הדף בינתיים</small></span></li>
-    <li><span class="ti">⬇️</span><span><b>מורידים בלחיצה אחת</b><small>ההורדה ממשיכה גם ברקע</small></span></li>
-  </div>
+    <li><span class="ti">📋</span><span><b>עוברים על הבחירה</b><small>✓ להשאיר · ❓ מתלבטות · ✕ להסיר</small></span></li>
+    <li><span class="ti">📂</span><span><b>מקבלות תיקייה ב־Google Drive במייל</b><small>באיכות מקורית, אחרי אישור של יעל. ההורדה מ־Drive ממשיכה גם ברקע</small></span></li>
+  </ul>
   <div id="dlList" class="dllist"></div>
   <div class="row"><button class="btn" type="button" id="dlClose">סגירה</button></div>
 </div></dialog>
+<div class="gs" id="rv" role="dialog" aria-modal="true" aria-label="סקירת הבחירה">
+  <div class="hd"><h3>סקירה לפני הורדה<small id="rvSum"></small></h3><button class="x" id="rvClose" aria-label="חזרה">✕</button></div>
+  <div class="in">
+    <ul class="tips" style="margin-bottom:12px">
+      <li><span class="ti">✓</span><span><b>מה שנשאר מסומן ✓ יורד באיכות מלאה</b></span></li>
+      <li><span class="ti">❓</span><span><b>מתלבטות? סמנו ❓</b><small>בסוף זה יורד יחד עם השאר, אלא אם תסמנו ✕</small></span></li>
+      <li><span class="ti">✕</span><span><b>לא צריך? סמנו ✕</b><small>יוסר מהבחירה כשתאשרו</small></span></li>
+    </ul>
+    <div id="rvBody"></div>
+    <div class="rvfoot">
+      <label>המייל שלך (לשם נשתף תיקייה ב־Google Drive)<input id="rvEmail" type="email" inputmode="email" autocomplete="email" placeholder="name@gmail.com" required></label>
+      <p class="hint">התיקייה תכיל את כל מה שבחרת באיכות המקורית, מסודר לפי שנים. נשתף אותה עם המייל הזה אחרי אישור של יעל.</p>
+      <button class="btn pri big" id="rvGo"></button>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -574,23 +604,48 @@ $('#catSeg').onclick=e=>{const b=e.target.closest('[data-c]');if(b)setCat(b.data
 $('#addBtn').onclick=()=>openAdd('years');
 $('#selBtn').onclick=()=>{SEL=!SEL;$('#selBtn').textContent=SEL?'✕ סיום בחירה':'☑️ בחירה להורדה';paintSel();if(SEL)toast('לוחצות על תמונות וקבוצות כדי לבחור')};
 $('#selCancel').onclick=()=>{SEL=false;PICK.clear();$('#selBtn').textContent='☑️ בחירה להורדה';paintSel()};
-$('#selGo').onclick=async()=>{
+/* review before download: ✓ keep (default) · ❓ maybe (still downloaded) · ✕ drop (removed on approve) */
+const RV={};
+function openReview(){const ids=[...PICK].filter(id=>items[id]&&!items[id].deleted);ids.forEach(id=>RV[id]=RV[id]||'keep');
+  $('#rvEmail').value=ls.get('lucy_email')||'';$('#rv').classList.add('open');document.body.style.overflow='hidden';paintReview()}
+function paintReview(){
+  const ids=[...PICK].filter(id=>items[id]&&!items[id].deleted);
+  const by=v=>ids.filter(id=>RV[id]===v), keep=by('keep'), maybe=by('maybe'), drop=by('drop');
+  const sz=a=>a.reduce((t,id)=>t+osize(items[id]),0);
+  const sec=(title,sub,arr)=>arr.length?`<section class="rvsec"><h2>${title}<small>${arr.length} · ${sub}</small></h2><div class="grid">${arr.map(id=>`<div class="rvt ${RV[id]}" data-rv="${id}"><img data-t="${id}" alt=""><div class="rb">${[['keep','✓'],['maybe','❓'],['drop','✕']].map(([v,ic])=>`<button class="${RV[id]===v?'on':''}" data-v="${v}" aria-label="${v}">${ic}</button>`).join('')}</div></div>`).join('')}</div></section>`:'';
+  $('#rvBody').innerHTML=sec('❓ בהתלבטות','יורדות בסוף, אלא אם תסמנו ✕',maybe)+sec('✕ יוסרו','יוסרו מהבחירה באישור',drop)+sec('✓ נבחרו','',keep);
+  $('#rvBody').querySelectorAll('img[data-t]').forEach(img=>{const id=img.dataset.t;thumbs[id]?img.src=thumbs[id]:io.observe(img)});
+  const n=keep.length+maybe.length;
+  $('#rvSum').textContent=` ${n} יורדו · ${mb(sz(keep)+sz(maybe))}`;
+  $('#rvGo').textContent=n?`✅ אישור והורדה של ${n} פריטים${maybe.length?` (כולל ${maybe.length} בהתלבטות)`:''}${drop.length?` · ${drop.length} יוסרו`:''}`:'לא נשאר כלום להורדה';
+  $('#rvGo').disabled=!n;
+}
+$('#rvBody').addEventListener('click',e=>{const b=e.target.closest('[data-v]');if(!b)return;const t=b.closest('[data-rv]');RV[t.dataset.rv]=b.dataset.v;paintReview()});
+$('#rvClose').onclick=()=>{$('#rv').classList.remove('open');document.body.style.overflow='';paintSel()};
+$('#selGo').onclick=openReview;
+$('#rvGo').onclick=async()=>{
   if(!ME){$('#nameDlg').showModal();return}
-  const ids=[...PICK].filter(id=>items[id]&&!items[id].deleted); if(!ids.length)return;
+  const email=$('#rvEmail').value.trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){toast('צריך מייל תקין, כדי שנוכל לשתף את התיקייה');$('#rvEmail').focus();return}
+  ls.set('lucy_email',email);
+  const ids=[...PICK].filter(id=>items[id]&&!items[id].deleted&&RV[id]!=='drop');
+  [...PICK].forEach(id=>{if(RV[id]==='drop')PICK.delete(id)});
   const rid=Date.now().toString(36)+Math.random().toString(36).slice(2,5);
-  try{await fetch(U('dl/'+rid),{method:'PUT',body:JSON.stringify({by:ME,at:Date.now(),ids,count:ids.length,est:ids.reduce((a,id)=>a+osize(items[id]),0),status:'pending'})});
-    SEL=false;PICK.clear();$('#selBtn').textContent='☑️ בחירה להורדה';paintSel();openDl();toast('📦 ההורדה בהכנה. נודיע כאן כשהיא מוכנה')}
+  try{await fetch(U('dl/'+rid),{method:'PUT',body:JSON.stringify({by:ME,email,at:Date.now(),ids,count:ids.length,est:ids.reduce((a,id)=>a+osize(items[id]),0),status:'pending'})});
+    $('#rv').classList.remove('open');document.body.style.overflow='';SEL=false;PICK.clear();Object.keys(RV).forEach(k=>delete RV[k]);
+    $('#selBtn').textContent='☑️ בחירה להורדה';paintSel();openDl();toast('📦 הבקשה נשלחה')}
   catch(e){toast('לא הצלחנו לשלוח את הבקשה, נסו שוב')}};
 let DL={},dlTimer=null;
 async function loadDl(){try{DL=(await get('dl'))||{}}catch(e){}paintDl()}
 function paintDl(){
   const L=Object.entries(DL).sort((a,b)=>b[1].at-a[1].at);
-  const pend=L.filter(([,d])=>d.status!=='ready'&&d.status!=='error').length;
+  const pend=L.filter(([,d])=>!['shared','error'].includes(d.status)).length;
   $('#dlBtn').textContent='📦 הורדות'+(pend?` (⏳${pend})`:L.length?` (${L.length})`:'');
   $('#dlList').innerHTML=L.length?L.map(([k,d])=>`<div class="dli"><div class="h"><span>${esc(d.by)} · ${d.count} פריטים</span><span>${new Date(d.at).toLocaleDateString('he-IL')}</span></div>
-    ${d.status==='ready'?`<a class="btn pri" href="${esc(d.url)}" target="_blank" rel="noopener">⬇ הורדה (${mb(d.size||d.est)})</a><small>${d.missing?`⚠️ ${d.missing} פריטים עוד לא היו זמינים ולא נכללו`:'✓ כל הפריטים כלולים'} · קובץ ZIP, מסודר לפי שנים</small>`
+    ${d.status==='shared'?`<a class="btn pri" href="${esc(d.folderUrl)}" target="_blank" rel="noopener">📂 פתיחת התיקייה ב־Google Drive</a><small>שותפה עם ${esc(d.email)} · ${d.missing?`⚠️ ${d.missing} פריטים עוד לא היו זמינים`:'✓ כל הפריטים בפנים'} · ב־Drive: לחיצה ימנית על התיקייה ← „הורדה”</small>`
+      :d.status==='built'?`<small>✓ התיקייה מוכנה (${mb(d.size||d.est)}). ⏳ ממתינה לאישור של יעל כדי לשתף אותה עם ${esc(d.email)}</small>`
       :d.status==='error'?`<small>✕ ההכנה נכשלה: ${esc(d.error||'')}. בקשו מיעל</small>`
-      :`<small>⏳ בהכנה (בערך ${mb(d.est||0)}). זה לוקח עד שעה, ואפשר לסגור את הדף בינתיים</small>`}</div>`).join(''):'<p class="hint">עוד אין הורדות. לוחצים על „☑️ בחירה להורדה”, בוחרים, ו„הכינו לי הורדה”.</p>';
+      :`<small>⏳ מכינים תיקייה באיכות מקורית (בערך ${mb(d.est||0)}) בשביל ${esc(d.email||'')}. אפשר לסגור את הדף בינתיים</small>`}</div>`).join(''):'<p class="hint">עוד אין הורדות. לוחצים על „☑️ בחירה להורדה”, בוחרים, ו„הכינו לי הורדה”.</p>';
   clearTimeout(dlTimer); if(pend) dlTimer=setTimeout(loadDl,30000);
 }
 function openDl(){$('#dlDlg').showModal();loadDl()}
