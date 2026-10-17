@@ -195,6 +195,20 @@ body.sel main{padding-bottom:190px}
 .rvfoot{position:sticky;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding:12px 0 calc(12px + env(safe-area-inset-bottom));display:grid;gap:8px;margin-top:16px}
 .rvfoot label{display:grid;gap:4px;font-weight:700}
 .rvfoot input{font:inherit;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:12px;padding:10px 12px;direction:ltr;text-align:right}
+.fsel{display:none}
+@media (max-width:640px){
+  .bar .in{flex-wrap:wrap;gap:6px;padding:8px 12px}
+  .chips{display:none}
+  .fsel{display:flex;align-items:center;gap:6px;flex:1 1 100%;order:2;font-weight:700;font-size:14px}
+  .fsel select{flex:1;font:inherit;font-weight:700;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:6px 12px}
+  .add{padding:7px 12px;font-size:14px}
+  #selBtn,#dlBtn{font-size:13px;padding:7px 10px}
+  header{padding:16px 12px 6px}
+  .intro{font-size:14px;margin-top:6px}
+  .cta{margin:10px 0 2px;gap:6px}
+  .cta .btn{padding:8px 12px;font-size:14px}
+  .sum{font-size:12px}
+}
 .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:7px 8px 7px 16px;border-radius:999px;font-weight:700;font-size:14px;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none;display:flex;align-items:center;gap:10px;white-space:nowrap}
 .toast.show{opacity:1;pointer-events:auto}
 .toast button{border:0;background:var(--blush);color:#fff;border-radius:999px;padding:4px 12px;font-weight:800}
@@ -210,6 +224,7 @@ body.sel main{padding-bottom:190px}
 </header>
 <div class="bar"><div class="in">
   <div class="chips" id="chips" role="group" aria-label="סינון"></div>
+  <label class="fsel"><span>סינון</span><select id="fsel" aria-label="סינון"></select></label>
   <button class="add ghost" id="selBtn">☑️ בחירה להורדה</button><button class="add ghost" id="dlBtn">📦 הורדות</button><button class="add" id="addBtn">⬆ העלאה</button>
 </div></div>
 <main id="main"><div class="empty"><b>רגע…</b>טוענים</div></main>
@@ -383,23 +398,20 @@ const STL={in:['✓','למצגת'],maybe:['🤔','בהתלבטות'],no:['✕','
 const HIDDEN=i=>['no','nolucy'].includes(ST(i));
 const FILTERS=[
   ['all','הכל',i=>!HIDDEN(i)],
+  ['show','🎞 למצגת',i=>ST(i)!=='no'],
   ['todo','לבדוק',i=>!ST(i)],
-  ['in','✓ למצגת',i=>ST(i)==='in'],
+  ['in','✓ נבחרו',i=>ST(i)==='in'],
   ['maybe','🤔 בהתלבטות',i=>ST(i)==='maybe'],
   ['no','✕ לא למצגת',i=>ST(i)==='no'],
   ['nolucy','🙈 לא לוסי',i=>ST(i)==='nolucy'],
-  ['everything','הכל כולל מוסתרות',i=>true],
-  ['marked','📍 לוסי מסומנת',i=>!!i.lucy],
   ['video','🎬 סרטונים',i=>i.kind==='video'],
-  ['fvideo','🎬 סרטונים מהחברים',i=>i.kind==='video'&&i.src!=='gp'],
-  ['lowq','⚠️ איכות',i=>LOWQ(i)],
 ];
 const FRIEND_FILTERS=[
   ['all','הכל',i=>!['no','nolucy'].includes(ST(i))],
   ['greet','💌 ברכות',i=>i.cat==='greeting'],
   ['mine','מה שהעליתי',i=>(i.up||i.by)===ME],
 ];
-FILTERS.push(['greet','💌 ברכות',i=>i.cat==='greeting'],['friends','מהחברים',i=>i.src!=='gp']);
+FILTERS.push(['greet','💌 ברכות',i=>i.cat==='greeting']);
 function all(){return Object.entries(items).filter(([,v])=>v&&v.kind&&!v.deleted).map(([id,v])=>Object.assign({id},v))}
 function render(){
   const A=all();
@@ -408,6 +420,7 @@ function render(){
   const c=$('#chg'); if(c) c.onclick=e=>{e.preventDefault();$('#nameDlg').showModal()};
   const FL=isEd()?FILTERS:FRIEND_FILTERS; if(!F||!FL.some(f=>f[0]===F)) F=FL[0][0];
   $('#chips').innerHTML=FL.map(([k,l,fn])=>`<button class="chip" data-f="${k}" aria-pressed="${F===k}">${l} <small>${A.filter(fn).length}</small></button>`).join('');
+  $('#fsel').innerHTML=FL.map(([k,l,fn])=>`<option value="${k}" ${F===k?'selected':''}>${l} (${A.filter(fn).length})</option>`).join('');
   const fn=FL.find(f=>f[0]===F)[2];
   const GR=A.filter(i=>i.cat==='greeting'&&fn(i)).sort((a,b)=>(a.at||0)-(b.at||0));
   const UNK=A.filter(i=>i.cat!=='greeting'&&!i.year&&fn(i)).sort((a,b)=>(a.at||0)-(b.at||0));
@@ -621,6 +634,7 @@ function setCat(c){cat=c;$('#catSeg').querySelectorAll('[data-c]').forEach(b=>b.
 function openAdd(c){if(!ME){$('#nameDlg').showModal();return}setCat(c||'years');$('#queue').innerHTML='';$('#addDlg').showModal()}
 $('#catSeg').onclick=e=>{const b=e.target.closest('[data-c]');if(b)setCat(b.dataset.c)};
 $('#addBtn').onclick=()=>openAdd('years');
+$('#fsel').onchange=e=>{F=e.target.value;render()};
 $('#selBtn').onclick=()=>{SEL=!SEL;$('#selBtn').textContent=SEL?'✕ סיום בחירה':'☑️ בחירה להורדה';paintSel();if(SEL)toast('לוחצים על תמונות וקבוצות כדי לבחור')};
 $('#selCancel').onclick=()=>{SEL=false;PICK.clear();$('#selBtn').textContent='☑️ בחירה להורדה';paintSel()};
 /* review before download: ✓ keep (default) · ❓ maybe (still downloaded) · ✕ drop (removed on approve) */
