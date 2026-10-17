@@ -173,6 +173,10 @@ body.sel main{padding-bottom:190px}
 .sb-top{display:flex;gap:10px;align-items:baseline;font-size:17px}
 .sb-top span{color:var(--muted);font-size:14px}
 .sb-quick{display:flex;gap:6px;flex-wrap:wrap}
+.sb-bulk{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:13px;font-weight:700}
+.sb-bulk .btn{padding:5px 11px;font-size:13px}
+.sb-bulk [data-bulk="del"]{color:#a3262f;border-color:#e8b4b8}
+body.sel main{padding-bottom:240px}
 .sb-act{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap}
 .btn.big{padding:12px 20px;font-size:16px;flex:1}
 .btn[disabled]{opacity:.45}
@@ -228,7 +232,7 @@ body.sel main{padding-bottom:190px}
 <div class="bar"><div class="in">
   <div class="chips" id="chips" role="group" aria-label="סינון"></div>
   <label class="fsel"><span>סינון</span><select id="fsel" aria-label="סינון"></select></label>
-  <button class="add ghost" id="selBtn">☑️ בחירה להורדה</button><button class="add ghost" id="dlBtn">📦 הורדות</button><button class="add" id="addBtn">⬆ העלאה</button>
+  <button class="add ghost" id="selBtn">☑️ בחירה</button><button class="add ghost" id="dlBtn">📦 הורדות</button><button class="add" id="addBtn">⬆ העלאה</button>
 </div></div>
 <main id="main"><div class="empty"><b>רגע…</b>טוענים</div></main>
 
@@ -283,6 +287,7 @@ body.sel main{padding-bottom:190px}
 <div class="selbar" id="selbar" role="region" aria-label="בחירה להורדה">
   <div class="sb-top"><b id="selCount">לא נבחר כלום</b><span id="selSize"></span></div>
   <div class="sb-quick"><button class="chip" data-sel="shown">כל מה שמוצג</button><button class="chip" data-sel="in">כל מה שלמצגת</button><button class="chip" data-sel="greet">כל הברכות</button><button class="chip" data-sel="none">ניקוי</button></div>
+  <div class="sb-bulk"><span>לכל הנבחרים:</span><button class="btn" data-bulk="no">✕ לא למצגת</button><button class="btn" data-bulk="nolucy">🙈 לא לוסי</button><button class="btn" data-bulk="maybe">🤔 בהתלבטות</button><button class="btn" data-bulk="clear">↺ ניקוי סימון</button><button class="btn" data-bulk="del">🗑 מחיקה</button></div>
   <div class="sb-act"><button class="btn" id="selCancel">ביטול</button><button class="btn" id="selSave" disabled>📱 שמירה לטלפון</button><button class="btn pri big" id="selGo" disabled>📋 איכות מקורית: סקירה והורדה ›</button></div>
 </div>
 <dialog id="dlDlg"><div class="dl">
@@ -488,7 +493,7 @@ function paintSel(){
   const ids=[...PICK].filter(id=>items[id]&&!items[id].deleted), n=ids.length, sz=ids.reduce((a,id)=>a+osize(items[id]),0);
   $('#selCount').textContent=n?`נבחרו ${n}`:'לוחצים על תמונות כדי לבחור';
   $('#selSize').textContent=n?`בערך ${mb(sz)}`:'';
-  $('#selGo').disabled=!n; $('#selSave').disabled=!n;
+  $('#selGo').disabled=!n; $('#selSave').disabled=!n; document.querySelectorAll('[data-bulk]').forEach(b=>b.disabled=!n);
   document.querySelectorAll('.t[data-id]').forEach(t=>t.classList.toggle('picked',PICK.has(t.dataset.id)));
   document.querySelectorAll('.t.stack[data-ids]').forEach(t=>{const m=t.dataset.ids.split(','),k=m.filter(x=>PICK.has(x)).length;t.classList.toggle('picked',k>0);const c=t.querySelector('.ck');if(c)c.textContent=k?(k===m.length?'✓ כולן':`${k}/${m.length}`):''});
 }
@@ -637,8 +642,8 @@ function openAdd(c){if(!ME){$('#nameDlg').showModal();return}setCat(c||'years');
 $('#catSeg').onclick=e=>{const b=e.target.closest('[data-c]');if(b)setCat(b.dataset.c)};
 $('#addBtn').onclick=()=>openAdd('years');
 $('#fsel').onchange=e=>{F=e.target.value;render()};
-$('#selBtn').onclick=()=>{SEL=!SEL;$('#selBtn').textContent=SEL?'✕ סיום בחירה':'☑️ בחירה להורדה';paintSel();if(SEL)toast('לוחצים על תמונות וקבוצות כדי לבחור')};
-$('#selCancel').onclick=()=>{SEL=false;PICK.clear();$('#selBtn').textContent='☑️ בחירה להורדה';paintSel()};
+$('#selBtn').onclick=()=>{SEL=!SEL;$('#selBtn').textContent=SEL?'✕ סיום בחירה':'☑️ בחירה';paintSel();if(SEL)toast('לוחצים על תמונות וקבוצות כדי לבחור')};
+$('#selCancel').onclick=()=>{SEL=false;PICK.clear();$('#selBtn').textContent='☑️ בחירה';paintSel()};
 /* review before download: ✓ keep (default) · ❓ maybe (still downloaded) · ✕ drop (removed on approve) */
 const RV={};
 function openReview(){const ids=[...PICK].filter(id=>items[id]&&!items[id].deleted);ids.forEach(id=>RV[id]=RV[id]||'keep');
@@ -668,7 +673,7 @@ $('#rvGo').onclick=async()=>{
   const rid=Date.now().toString(36)+Math.random().toString(36).slice(2,5);
   try{await fetch(U('dl/'+rid),{method:'PUT',body:JSON.stringify({by:ME,email,at:Date.now(),ids,count:ids.length,est:ids.reduce((a,id)=>a+osize(items[id]),0),status:'pending'})});
     $('#rv').classList.remove('open');document.body.style.overflow='';SEL=false;PICK.clear();Object.keys(RV).forEach(k=>delete RV[k]);
-    $('#selBtn').textContent='☑️ בחירה להורדה';paintSel();openDl();toast('📦 הבקשה נשלחה')}
+    $('#selBtn').textContent='☑️ בחירה';paintSel();openDl();toast('📦 הבקשה נשלחה')}
   catch(e){toast('לא הצלחנו לשלוח את הבקשה, נסו שוב')}};
 /* save the site's copies (photos up to 1800px, videos 540p) straight to the phone's gallery via the share sheet; download on computers */
 const SAVE_MAX=40, SAVE_BYTES=300e6;
@@ -696,6 +701,23 @@ $('#svGo').onclick=async()=>{
   toast('⬇ ההורדה התחילה');};
 $('#svClose').onclick=()=>$('#svDlg').close();
 $('#selSave').onclick=()=>saveFiles([...PICK]);
+async function bulk(kind){
+  if(!ME){$('#nameDlg').showModal();return}
+  const ids=[...PICK].filter(id=>items[id]&&!items[id].deleted); if(!ids.length)return;
+  if(kind==='del'&&!confirm(`למחוק ${ids.length} פריטים? אפשר לבטל מיד אחרי.`))return;
+  const P=kind==='del'?{deleted:true,delBy:ME,delAt:Date.now()}
+    :kind==='clear'?{st:null,stBy:null,no:null,noBy:null,nolucy:null,nolucyBy:null}
+    :{st:kind,stBy:ME,no:null,noBy:null,nolucy:null,nolucyBy:null,...(kind==='nolucy'?{lucy:null}:{})};
+  const upd={},prev={};
+  ids.forEach(id=>Object.entries(P).forEach(([k,v])=>{upd[`${id}/${k}`]=v;prev[`${id}/${k}`]=items[id][k]===undefined?null:items[id][k]}));
+  const local=m=>{Object.entries(m).forEach(([path,v])=>{const [id,k]=path.split('/');if(!items[id])return;if(v===null)delete items[id][k];else items[id][k]=v});render()};
+  local(upd);
+  try{await patch('items',upd)}catch(e){local(prev);toast('השמירה נכשלה');return}
+  const label={no:'✕ לא למצגת',nolucy:'🙈 לא לוסי',maybe:'🤔 בהתלבטות',clear:'הסימון נוקה',del:'🗑 נמחקו'}[kind];
+  PICK.clear();paintSel();
+  toast(`${ids.length} פריטים: ${label}`,async()=>{local(prev);await patch('items',prev);ids.forEach(id=>PICK.add(id));paintSel()});
+}
+document.querySelector('.sb-bulk').addEventListener('click',e=>{const b=e.target.closest('[data-bulk]');if(b&&!b.disabled)bulk(b.dataset.bulk)});
 let DL={},dlTimer=null;
 async function loadDl(){try{DL=(await get('dl'))||{}}catch(e){}paintDl()}
 function paintDl(){
