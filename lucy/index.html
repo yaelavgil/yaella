@@ -286,7 +286,7 @@ body.sel main{padding-bottom:240px}
 </div>
 <div class="selbar" id="selbar" role="region" aria-label="בחירה להורדה">
   <div class="sb-top"><b id="selCount">לא נבחר כלום</b><span id="selSize"></span></div>
-  <div class="sb-quick"><button class="chip" data-sel="shown">כל מה שמוצג</button><button class="chip" data-sel="in">כל מה שלמצגת</button><button class="chip" data-sel="greet">כל הברכות</button><button class="chip" data-sel="none">ניקוי</button></div>
+  <div class="sb-quick"><button class="chip" data-sel="shown" id="selAll">☑ בחירת הכל</button><button class="chip" data-sel="none">ניקוי הבחירה</button></div>
   <div class="sb-bulk"><span>לכל הנבחרים:</span><button class="btn" data-bulk="no">✕ לא למצגת</button><button class="btn" data-bulk="nolucy">🙈 לא לוסי</button><button class="btn" data-bulk="maybe">🤔 בהתלבטות</button><button class="btn" data-bulk="clear">↺ ניקוי סימון</button><button class="btn" data-bulk="del">🗑 מחיקה</button></div>
   <div class="sb-act"><button class="btn" id="selCancel">ביטול</button><button class="btn" id="selSave" disabled>📱 שמירה לטלפון</button><button class="btn pri big" id="selGo" disabled>📋 איכות מקורית: סקירה והורדה ›</button></div>
 </div>
@@ -493,6 +493,8 @@ function paintSel(){
   const ids=[...PICK].filter(id=>items[id]&&!items[id].deleted), n=ids.length, sz=ids.reduce((a,id)=>a+osize(items[id]),0);
   $('#selCount').textContent=n?`נבחרו ${n}`:'לוחצים על תמונות כדי לבחור';
   $('#selSize').textContent=n?`בערך ${mb(sz)}`:'';
+  const fl=(FILTERS.find(f=>f[0]===F)||FILTERS[0])[1], allIn=list.length&&list.every(x=>PICK.has(x));
+  $('#selAll').textContent=allIn?`☐ ביטול בחירת הכל (${list.length})`:`☑ בחירת הכל ב„${fl}” (${list.length})`;
   $('#selGo').disabled=!n; $('#selSave').disabled=!n; document.querySelectorAll('[data-bulk]').forEach(b=>b.disabled=!n);
   document.querySelectorAll('.t[data-id]').forEach(t=>t.classList.toggle('picked',PICK.has(t.dataset.id)));
   document.querySelectorAll('.t.stack[data-ids]').forEach(t=>{const m=t.dataset.ids.split(','),k=m.filter(x=>PICK.has(x)).length;t.classList.toggle('picked',k>0);const c=t.querySelector('.ck');if(c)c.textContent=k?(k===m.length?'✓ כולן':`${k}/${m.length}`):''});
@@ -526,7 +528,7 @@ document.addEventListener('click',e=>{
       if(t.dataset.ids&&!e.target.closest('.ckall')){const gg=t.querySelector('[data-g]');if(gg){openSheet(gg.dataset.g);return}}
       togglePick(t.dataset.ids?t.dataset.ids.split(','):[t.dataset.id]);if($('#gs').classList.contains('open'))renderSheet();return}}
   const sq_=e.target.closest('[data-sel]');if(sq_){const k=sq_.dataset.sel;
-    if(k==='none')PICK.clear(); else if(k==='shown')list.forEach(x=>PICK.add(x)); else if(k==='in')all().filter(i=>!HIDDEN(i)).forEach(i=>PICK.add(i.id)); else if(k==='greet')all().filter(i=>i.cat==='greeting').forEach(i=>PICK.add(i.id));
+    if(k==='none')PICK.clear(); else if(k==='shown'){const allIn=list.length&&list.every(x=>PICK.has(x));list.forEach(x=>allIn?PICK.delete(x):PICK.add(x))} else if(k==='in')all().filter(i=>!HIDDEN(i)).forEach(i=>PICK.add(i.id)); else if(k==='greet')all().filter(i=>i.cat==='greeting').forEach(i=>PICK.add(i.id));
     paintSel();return}
   const so=e.target.closest('[data-so]');if(so){const g=sheetGroup();vlist=g?g.items.map(i=>i.id):[so.dataset.so];inGroup=true;open(so.dataset.so);return}
   const gg=e.target.closest('[data-g]');if(gg){openSheet(gg.dataset.g);return}
