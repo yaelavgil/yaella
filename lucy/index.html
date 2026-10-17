@@ -173,7 +173,7 @@ body.sel main{padding-bottom:190px}
 .sb-top{display:flex;gap:10px;align-items:baseline;font-size:17px}
 .sb-top span{color:var(--muted);font-size:14px}
 .sb-quick{display:flex;gap:6px;flex-wrap:wrap}
-.sb-act{display:flex;gap:8px;justify-content:space-between}
+.sb-act{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap}
 .btn.big{padding:12px 20px;font-size:16px;flex:1}
 .btn[disabled]{opacity:.45}
 .dllist{display:grid;gap:8px;max-height:45vh;overflow:auto}
@@ -265,7 +265,7 @@ body.sel main{padding-bottom:190px}
 <div class="selbar" id="selbar" role="region" aria-label="בחירה להורדה">
   <div class="sb-top"><b id="selCount">לא נבחר כלום</b><span id="selSize"></span></div>
   <div class="sb-quick"><button class="chip" data-sel="shown">כל מה שמוצג</button><button class="chip" data-sel="in">כל ה־✓ למצגת</button><button class="chip" data-sel="greet">כל הברכות</button><button class="chip" data-sel="none">ניקוי</button></div>
-  <div class="sb-act"><button class="btn" id="selCancel">ביטול</button><button class="btn pri big" id="selGo" disabled>📋 לסקירת הבחירה ולהורדה ›</button></div>
+  <div class="sb-act"><button class="btn" id="selCancel">ביטול</button><button class="btn" id="selSave" disabled>📱 שמירה לטלפון</button><button class="btn pri big" id="selGo" disabled>📋 איכות מקורית: סקירה והורדה ›</button></div>
 </div>
 <dialog id="dlDlg"><div class="dl">
   <h3>📦 הורדות</h3>
@@ -293,6 +293,13 @@ body.sel main{padding-bottom:190px}
     </div>
   </div>
 </div>
+<dialog id="svDlg"><div class="dl">
+  <h3>📱 שמירה לטלפון</h3>
+  <p id="svMsg" style="margin:0;font-size:17px"></p>
+  <div class="qi"><span class="bar2" style="flex:1;height:8px;background:var(--line);border-radius:9px;overflow:hidden"><i id="svBar" style="display:block;height:100%;width:0;background:var(--blush);transition:width .2s"></i></span></div>
+  <ul class="tips" id="svTips"></ul>
+  <div class="row"><button class="btn pri big" id="svGo" disabled>שמירה</button><button class="btn" id="svClose">סגירה</button></div>
+</div></dialog>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -466,7 +473,7 @@ function paintSel(){
   const ids=[...PICK].filter(id=>items[id]&&!items[id].deleted), n=ids.length, sz=ids.reduce((a,id)=>a+osize(items[id]),0);
   $('#selCount').textContent=n?`נבחרו ${n}`:'לוחצים על תמונות כדי לבחור';
   $('#selSize').textContent=n?`בערך ${mb(sz)}`:'';
-  $('#selGo').disabled=!n;
+  $('#selGo').disabled=!n; $('#selSave').disabled=!n;
   document.querySelectorAll('.t[data-id]').forEach(t=>t.classList.toggle('picked',PICK.has(t.dataset.id)));
   document.querySelectorAll('.t.stack[data-ids]').forEach(t=>{const m=t.dataset.ids.split(','),k=m.filter(x=>PICK.has(x)).length;t.classList.toggle('picked',k>0);const c=t.querySelector('.ck');if(c)c.textContent=k?(k===m.length?'✓ כולן':`${k}/${m.length}`):''});
 }
@@ -535,7 +542,7 @@ function paintPin(){
 function paintBot(){
   const id=vlist[idx], it=items[id]; if(!it)return;
   const by=[ST(it)&&(STL[ST(it)][1]+': '+(it.stBy||it.noBy||it.nolucyBy||'')),it.lucy&&it.lucy.by&&('לוסי סומנה ע״י '+it.lucy.by),it.by&&('הועלה ע״י '+it.by)].filter(Boolean).join(' · ');
-  if(!isEd()){$('#bot').innerHTML=`<button class="btn" data-a="next">הבא ‹</button><div class="who">${it.cat==='greeting'?'💌 ברכה מ'+esc(it.by||''):it.by&&it.src!=='gp'?'הועלה ע״י '+esc(it.by):''} · ${idx+1}/${vlist.length}</div>`;
+  if(!isEd()){$('#bot').innerHTML=`<button class="btn" data-a="save">📱 שמירה לטלפון</button><button class="btn" data-a="next">הבא ‹</button><div class="who">${it.cat==='greeting'?'💌 ברכה מ'+esc(it.by||''):it.by&&it.src!=='gp'?'הועלה ע״י '+esc(it.by):''} · ${idx+1}/${vlist.length}</div>`;
     $('#vDel').style.visibility=(it.up||it.by)===ME&&it.src!=='gp'?'visible':'hidden';paintPin();return}
   $('#vDel').style.visibility=(it.up||it.by)===ME&&it.src!=='gp'?'visible':'hidden';
   $('#bot').innerHTML=`
@@ -543,6 +550,7 @@ function paintBot(){
     ${Object.entries(STL).map(([k,[ic,l]])=>`<button class="btn ${ST(it)===k?({in:'onin',maybe:'onmaybe',no:'onno',nolucy:'onnl'})[k]:''}" data-a="st-${k}">${ic} ${l}</button>`).join('')}
     <button class="btn ${it.year?'':'onmaybe'}" data-a="year">📅 ${it.year?'שנה: '+it.year:'מאיזו שנה?'}</button>
     <button class="btn ${it.lowq?'onno':''}" data-a="lowq">⚠️ ${it.lowq?'סומן: איכות לא מומלצת':(it.qauto&&!it.qok)?QTXT[it.qauto]+' · לחצו אם תקין':'איכות לא מומלצת'}</button>
+    <button class="btn" data-a="save">📱 שמירה לטלפון</button>
     <button class="btn" data-a="next">הבא ‹</button>
     ${inGroup&&vlist.length>1?`<button class="btn ${it.cover?'onnl':''}" data-a="cover">⭐ ${it.cover?'תמונת השער':'לבחור כתמונת שער'}</button>`:''}
     ${inGroup&&(idx>0||it.splitHere)?`<button class="btn" data-a="split">${it.splitHere?'↩ לבטל את הפיצול':'✂ קבוצה חדשה מכאן'}</button>`:''}
@@ -556,6 +564,7 @@ async function act(a){
   try{
     if(a==='mark'){marking=!marking;paintBot();return}
     if(a==='next'){step(1);return}
+    if(a==='save'){saveFiles([id]);return}
     if(a==='cover'){const g=GROUPS.find(g=>g.items.some(i=>i.id===id));const ops=(g?g.items:[]).filter(i=>i.cover&&i.id!==id).map(i=>patch('items/'+i.id,{cover:null}));
       await Promise.all(ops);await patch('items/'+id,{cover:it.cover?null:true});if(!it.cover)toast('⭐ נבחרה תמונת שער');return}
     if(a==='split'){const v=!it.splitHere;await patch('items/'+id,{splitHere:v||null,splitBy:v?ME:null});
@@ -645,6 +654,32 @@ $('#rvGo').onclick=async()=>{
     $('#rv').classList.remove('open');document.body.style.overflow='';SEL=false;PICK.clear();Object.keys(RV).forEach(k=>delete RV[k]);
     $('#selBtn').textContent='☑️ בחירה להורדה';paintSel();openDl();toast('📦 הבקשה נשלחה')}
   catch(e){toast('לא הצלחנו לשלוח את הבקשה, נסו שוב')}};
+/* save the site's copies (photos up to 1800px, videos 540p) straight to the phone's gallery via the share sheet; download on computers */
+const SAVE_MAX=40, SAVE_BYTES=300e6;
+let svFiles=[];
+const isPhone=matchMedia('(pointer:coarse)').matches;
+async function fileFor(id){const it=items[id];const d=dstr(it.taken).replace(/\./g,'-')||it.year||'';
+  if(it.kind==='photo'){const u=await get('full/'+id)||await get('thumbs/'+id);const b=await (await fetch(u)).blob();return new File([b],`לוסי ${d} ${id}.jpg`,{type:'image/jpeg'})}
+  const n=it.chunks||0,parts=new Array(n);let k=0;await Promise.all(Array.from({length:Math.min(4,n)},async()=>{while(k<n){const i=k++;parts[i]=Uint8Array.from(atob(await get(`vid/${id}/${i}`)),c=>c.charCodeAt(0))}}));
+  return new File(parts,`לוסי ${d} ${id}.mp4`,{type:it.mime||'video/mp4'})}
+async function saveFiles(ids){
+  ids=ids.filter(id=>items[id]&&!items[id].deleted);
+  if(ids.length>SAVE_MAX){toast(`אפשר לשמור עד ${SAVE_MAX} בבת אחת. לשאר: „איכות מקורית”`);ids=ids.slice(0,SAVE_MAX)}
+  svFiles=[];$('#svGo').disabled=true;$('#svBar').style.width='0';
+  $('#svTips').innerHTML=isPhone?`<li><span class="ti">1</span><span><b>מחכים שהכל ייטען</b></span></li><li><span class="ti">2</span><span><b>לוחצים „שמירה”</b><small>נפתח חלון השיתוף של הטלפון</small></span></li><li><span class="ti">3</span><span><b>בוחרים „שמירת תמונה/סרטון”</b><small>באנדרואיד: „שמירה בגלריה” או Google Photos</small></span></li>`:'<li><span class="ti">⬇️</span><span><b>הקבצים יורדו לתיקיית ההורדות</b></span></li>';
+  $('#svMsg').textContent=`טוענים ${ids.length} קבצים…`;$('#svDlg').showModal();
+  let bytes=0;
+  for(let i=0;i<ids.length;i++){try{const f=await fileFor(ids[i]);bytes+=f.size;svFiles.push(f);if(bytes>SAVE_BYTES){toast('הגענו לגבול הגודל, שומרים את מה שנטען');break}}catch(e){}
+    $('#svBar').style.width=Math.round((i+1)/ids.length*100)+'%';$('#svMsg').textContent=`נטענו ${svFiles.length} מתוך ${ids.length}`}
+  $('#svMsg').textContent=svFiles.length?`מוכן: ${svFiles.length} קבצים (${mb(bytes)})`:'לא הצלחנו לטעון את הקבצים';
+  $('#svGo').textContent=isPhone?'📱 שמירה עכשיו':'⬇ הורדה עכשיו';$('#svGo').disabled=!svFiles.length;
+}
+$('#svGo').onclick=async()=>{
+  if(navigator.canShare&&navigator.canShare({files:svFiles})){try{await navigator.share({files:svFiles});toast('נשמר 🎉');$('#svDlg').close();return}catch(e){if(e.name==='AbortError')return}}
+  svFiles.forEach((f,i)=>setTimeout(()=>{const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;document.body.appendChild(a);a.click();a.remove()},i*400));
+  toast('⬇ ההורדה התחילה');};
+$('#svClose').onclick=()=>$('#svDlg').close();
+$('#selSave').onclick=()=>saveFiles([...PICK]);
 let DL={},dlTimer=null;
 async function loadDl(){try{DL=(await get('dl'))||{}}catch(e){}paintDl()}
 function paintDl(){
