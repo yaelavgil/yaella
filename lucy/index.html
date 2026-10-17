@@ -253,7 +253,7 @@ body.sel main{padding-bottom:190px}
   <label id="yearLbl">שנה<select id="addYear"></select></label>
   <label><span id="capLbl">כמה מילים (לא חובה)</span><input id="addCap"></label>
   <div class="srcs" id="drop">
-    <button type="button" class="src" data-src="pick"><span>⬆</span>העלאה מהטלפון או מהמחשב<small>בוחרים קבצים, אפשר כמה ביחד</small></button>
+    <button type="button" class="src" data-src="pick"><span>🖼️</span>מהגלריה<small>בוחרים תמונות וסרטונים, אפשר כמה ביחד</small></button>
     <button type="button" class="src" data-src="photo"><span>📷</span>לצלם עכשיו<small>תמונה, ומיד עולה</small></button>
     <button type="button" class="src" data-src="video"><span>🎥</span>להקליט וידאו<small>עד דקה, ומיד עולה</small></button>
   </div>
@@ -715,6 +715,8 @@ $('#dlBtn').onclick=openDl; $('#dlClose').onclick=()=>$('#dlDlg').close();
 setTimeout(loadDl,1500);
 $('#addClose').onclick=()=>$('#addDlg').close();
 const fileInp=$('#file'), drop=$('#drop');
+/* phones: a plain image/video request opens the photo gallery; listing file extensions makes Android (Samsung) open the file manager instead */
+if(matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad/i.test(navigator.userAgent)) fileInp.setAttribute('accept','image/*,video/*');
 const touch=matchMedia('(pointer:coarse)').matches;
 drop.onclick=e=>{const b=e.target.closest('[data-src]');if(!b)return;const k=b.dataset.src;
   if(k==='pick')return fileInp.click();
