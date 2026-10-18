@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="מפה אינטראקטיבית של שביל אבני המדרך בחצר: גוררים ומסובבים אבנים ורואים מיד איך השביל ייראה מהכניסה.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="שביל אבני המדרך">
+<meta property="og:description" content="גוררים אבנים במפה ורואים מיד איך השביל ייראה מהכניסה">
+<meta property="og:image" content="https://yaelavgil.github.io/yaella/stepping-stones/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://yaelavgil.github.io/yaella/stepping-stones/">
+<link rel="icon" href="/yaella/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/yaella/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/yaella/apple-touch-icon.png">
+<style>*,*::before,*::after{box-sizing:border-box}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}</style>
+<title>שביל אבני המדרך</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Secular+One&display=swap">
+<style>
+[hidden]{display:none!important}
+/* Layout: the top-down map runs full width (like the photo from above); below it the walk-in view and a side panel. */
+:root{
+  --bg:#eceee9; --surface:#f8f9f6; --ink:#1c231e; --muted:#5c665f; --line:#d3d8d0;
+  --accent:#2f5c3c; --accent-ink:#ffffff; --soil:#a8502b; --sel:#f2d36b;
+  --f-display:"Secular One","Assistant",system-ui,sans-serif;
+  --f-body:"Assistant",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#131915; --surface:#1b231d; --ink:#e3e9e3; --muted:#9aa69d; --line:#2e3a31;
+  --accent:#8cc59a; --accent-ink:#0f1a12; --soil:#d87a52; --sel:#f2d36b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#131915; --surface:#1b231d; --ink:#e3e9e3; --muted:#9aa69d; --line:#2e3a31;
+  --accent:#8cc59a; --accent-ink:#0f1a12; --soil:#d87a52; --sel:#f2d36b; color-scheme:dark}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--f-body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:20px 40px}
+.wrap{max-width:1320px;margin-inline:auto;display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+.wrap>*,.lower>*{min-width:0}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 20px}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(26px,4vw,38px);line-height:1.1;margin:0;text-wrap:balance}
+header p{margin:0;color:var(--muted);max-width:62ch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;min-width:0}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.bar .sp{flex:1 1 auto}
+.lbl{font-size:13px;letter-spacing:.04em;color:var(--muted);font-weight:600}
+button{font:inherit;font-size:15px;font-weight:600;color:var(--ink);background:transparent;border:1px solid var(--line);
+  border-radius:999px;padding:6px 14px;cursor:pointer;line-height:1.3;min-height:36px}
+button:hover{border-color:var(--accent)}
+button:focus-visible,.stone:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button:disabled{opacity:.4;cursor:default}
+.icon{min-width:40px;padding-inline:10px}
+
+/* map */
+.map-scroll{overflow:auto;border-radius:10px;margin-top:10px;touch-action:pan-x pan-y;background:#2a2a24;direction:ltr}
+.stage{position:relative;transform-origin:0 0}
+.sizer{position:relative;overflow:hidden}
+#plan img.bg{position:absolute;inset:0;width:100%;height:100%;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.stone{position:absolute;user-select:none;-webkit-user-drag:none;touch-action:none;cursor:grab;
+  filter:drop-shadow(0 3px 3px rgba(0,0,0,.45))}
+.stone.dragging{cursor:grabbing;filter:drop-shadow(0 12px 10px rgba(0,0,0,.45))}
+.stone.sel{filter:drop-shadow(0 0 0 var(--sel)) drop-shadow(0 0 5px var(--sel)) drop-shadow(0 4px 4px rgba(0,0,0,.5))}
+.ghost{position:absolute;pointer-events:none;opacity:.33;filter:grayscale(1) brightness(1.6) contrast(.6)}
+#ghosts[hidden]{display:none}
+#rotHandle{position:absolute;border-radius:50%;background:var(--sel);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.5);
+  cursor:grab;touch-action:none;display:grid;place-items:center}
+#rotHandle svg{width:62%;height:62%}
+#rotLine{position:absolute;background:var(--sel);pointer-events:none;transform-origin:50% 100%}
+.hint{color:var(--muted);font-size:14px;margin:8px 2px 0}
+
+/* lower row */
+.lower{display:grid;grid-template-columns:minmax(0,520px) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:860px){.lower{grid-template-columns:minmax(0,1fr)}}
+.viewbox{position:relative;width:100%;aspect-ratio:3/4;max-width:100%;overflow:hidden;border-radius:10px;margin-top:10px;background:#222;direction:ltr}
+#view{position:absolute;left:0;top:0;width:1500px;height:2000px}
+#view>img{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.clip{position:absolute;inset:0}
+.layer{position:absolute;left:0;top:0;transform-origin:0 0;pointer-events:none}
+.layer img{position:absolute;max-width:none}
+.l-shadow{filter:brightness(0) blur(4px);opacity:.42}
+.l-side{filter:brightness(.6) saturate(.65)}
+.l-top img.sel{filter:brightness(1.08) drop-shadow(0 0 8px rgba(255,236,150,.95))}
+.side h2{font-family:var(--f-display);font-weight:400;font-size:22px;margin:0 0 6px}
+.side{display:grid;gap:14px;align-content:start}
+.side p,.side li{margin:0;color:var(--muted)}
+.side ul{margin:0;padding-inline-start:18px;display:grid;gap:4px}
+kbd{font-family:ui-monospace,Menlo,monospace;font-size:13px;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 5px;color:var(--ink)}
+.versions{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:2px;border:1px solid var(--line);border-radius:999px;padding-inline:4px}
+.chip button{border:0;min-height:32px;padding:4px 10px}
+.chip button.x{padding:4px 8px;color:var(--muted);font-weight:400}
+.empty{font-size:14px;color:var(--muted)}
+.toast{position:fixed;inset-inline:0;bottom:calc(18px + env(safe-area-inset-bottom,0px));margin-inline:auto;width:max-content;max-width:calc(100% - 32px);
+  background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:999px;font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+
+</head>
+<body>
+<div class="wrap" dir="rtl">
+  <header>
+    <h1>שביל אבני המדרך</h1>
+    <p>גררי אבנים במפה כמו בפאזל וסובבי אותן. ההדמיה למטה מתעדכנת מיד ומראה את השביל מהכניסה, עם פינת הישיבה בקצה.</p>
+  </header>
+
+  <section class="card" aria-label="מפה מלמעלה">
+    <div class="bar">
+      <span class="lbl">מבט מלמעלה</span>
+      <span class="sp"></span>
+      <button class="icon" id="rotL" title="סיבוב נגד כיוון השעון" aria-label="סיבוב נגד כיוון השעון" disabled>↺</button>
+      <button class="icon" id="rotR" title="סיבוב עם כיוון השעון" aria-label="סיבוב עם כיוון השעון" disabled>↻</button>
+      <button id="undo" disabled>ביטול</button>
+      <button id="ghostBtn" aria-pressed="false">מיקום מקורי</button>
+      <button id="reset">חזרה לסידור הקיים</button>
+      <button class="icon" id="zoomOut" aria-label="הקטנה">−</button>
+      <button class="icon" id="zoomIn" aria-label="הגדלה">+</button>
+    </div>
+    <div class="map-scroll" id="mapScroll">
+      <div class="sizer" id="planSizer">
+        <div class="stage" id="plan">
+          <img class="bg" src="img/plan_bg.webp" alt="">
+          <div id="ghosts" hidden></div>
+          <div id="stones"></div>
+          <div id="rotLine" hidden></div>
+          <div id="rotHandle" hidden title="גררי כדי לסובב"><svg viewBox="0 0 24 24" fill="none" stroke="#3b2f00" stroke-width="2.6" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v5h-5"/></svg></div>
+        </div>
+      </div>
+    </div>
+    <p class="hint">משיח (גדר חיה) למעלה, קיר הבית למטה. הכניסה לשביל משמאל ופינת הישיבה מימין.</p>
+  </section>
+
+  <div class="lower">
+    <section class="card" aria-label="הדמיה מהכניסה לשביל">
+      <div class="bar">
+        <span class="lbl">מהכניסה לשביל</span>
+        <span class="sp"></span>
+        <button id="showAfter" aria-pressed="true">הסידור החדש</button>
+        <button id="showBefore" aria-pressed="false">התמונה המקורית</button>
+      </div>
+      <div class="viewbox" id="viewBox">
+        <div id="view">
+          <img id="viewBg" src="img/view_bg.webp" alt="השביל מהכניסה, עם האבנים בסידור החדש">
+          <div class="clip" id="clip"></div>
+          <img id="viewOrig" src="img/view_orig.webp" alt="התמונה המקורית של השביל" hidden>
+        </div>
+      </div>
+    </section>
+
+    <aside class="card side">
+      <div>
+        <h2>איך משתמשים</h2>
+        <ul>
+          <li>גוררים אבן כדי להזיז אותה. אבן שנבחרה מסומנת בצהוב גם בהדמיה.</li>
+          <li>מסובבים בעזרת הידית הצהובה, בכפתורים ↺ ↻, או בגלגלת העכבר מעל האבן.</li>
+          <li>במקלדת: חיצים להזזה, <kbd>[</kbd> ו־<kbd>]</kbd> לסיבוב, <kbd>⌘Z</kbd> לביטול.</li>
+          <li>“מיקום מקורי” מראה בשקיפות איפה כל אבן עומדת היום.</li>
+        </ul>
+      </div>
+      <div>
+        <h2>גרסאות</h2>
+        <p style="margin-bottom:10px">שמרי כמה סידורים והשווי ביניהם. הסידור הנוכחי נשמר אוטומטית בדפדפן הזה.</p>
+        <div class="bar" style="margin-bottom:10px"><button class="primary" id="saveVer">שמירת הסידור כגרסה</button></div>
+        <div class="versions" id="versions"></div>
+      </div>
+      <p style="font-size:14px">ההדמיה מחושבת מהשוואה בין שתי התמונות, ולכן הגדלים והמרחקים קרובים למציאות אבל לא מדויקים לסנטימטר. האבנים הרחוקות בתמונה המקורית מטושטשות יותר כשמקרבים אותן.</p>
+    </aside>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const META = {"plan":{"w":2800,"h":660,"strip":[70,590]},"view":{"w":1500,"h":2000},"Hp":[[6.703394202724966,14.013624150743192,-5273.620486541825],[1.9233164782307344,0.6879669924680555,4361.4651230562],[0.005249335274911897,0.002085337954227834,1.0]],"yh":374.9522826303421,"soil":[[0,1080],[400,850],[700,720],[950,612],[1290,606],[1310,800],[1340,1100],[1500,1370],[1500,2000],[0,2000]],"stones":[{"id":1,"src":"img/s01.webp","w":205.0,"h":251.5,"ox":92.31567400558333,"oy":126.84953227927735,"x":991.3156740055833,"y":309.84953227927735,"tex":"p2"},{"id":2,"src":"img/s02.webp","w":182.0,"h":149.5,"ox":82.58557182736945,"oy":68.00901966053112,"x":645.5855718273694,"y":268.0090196605311,"tex":"p2"},{"id":3,"src":"img/s03.webp","w":123.5,"h":125.5,"ox":58.4586879795977,"oy":70.59272491290389,"x":1493.9586879795977,"y":240.5927249129039,"tex":"p1"},{"id":4,"src":"img/s04.webp","w":342.0,"h":281.5,"ox":170.58141475480096,"oy":138.01137824733166,"x":199.58141475480096,"y":357.51137824733166,"tex":"p2"},{"id":5,"src":"img/s05.webp","w":127.0,"h":75.5,"ox":60.55699905842266,"oy":34.80576604044299,"x":1182.0569990584227,"y":239.805766040443,"tex":"p2"},{"id":6,"src":"img/s06.webp","w":219.0,"h":180.0,"ox":122.07436540391188,"oy":93.06769706147423,"x":810.5743654039119,"y":316.06769706147423,"tex":"p2"},{"id":7,"src":"img/s07.webp","w":230.0,"h":209.0,"ox":114.00527466507998,"oy":110.89935754862654,"x":412.00527466508,"y":348.39935754862654,"tex":"p2"},{"id":8,"src":"img/s08.webp","w":159.5,"h":192.0,"ox":82.91387480828712,"oy":103.51434011801706,"x":1315.9138748082871,"y":326.01434011801706,"tex":"p2"},{"id":9,"src":"img/s09.webp","w":112.5,"h":207.5,"ox":53.53850452193342,"oy":98.63707766330765,"x":1602.5385045219334,"y":316.13707766330765,"tex":"p1"},{"id":10,"src":"img/s10.webp","w":86.5,"h":87.5,"ox":44.61213669259632,"oy":46.610159061883195,"x":1941.6121366925963,"y":252.1101590618832,"tex":"p1"},{"id":11,"src":"img/s11.webp","w":111.0,"h":112.0,"ox":53.7807878197018,"oy":53.3747467623611,"x":2548.280787819702,"y":255.3747467623611,"tex":"p1"},{"id":12,"src":"img/s12.webp","w":96.5,"h":180.5,"ox":49.204678325941586,"oy":90.4665088154477,"x":1823.2046783259416,"y":323.4665088154477,"tex":"p1"},{"id":13,"src":"img/s13.webp","w":102.0,"h":82.0,"ox":52.93785923387213,"oy":37.54591499767946,"x":2057.437859233872,"y":266.04591499767946,"tex":"p1"},{"id":14,"src":"img/s14.webp","w":129.0,"h":196.0,"ox":61.12393298567122,"oy":95.32054211452117,"x":2321.123932985671,"y":313.3205421145212,"tex":"p1"},{"id":15,"src":"img/s15.webp","w":85.5,"h":158.5,"ox":40.9601621643983,"oy":73.03157103655593,"x":1709.9601621643983,"y":327.03157103655593,"tex":"p1"},{"id":16,"src":"img/s16.webp","w":153.0,"h":144.5,"ox":77.98422818362656,"oy":71.73356136344734,"x":1143.9842281836266,"y":363.73356136344734,"tex":"p2"},{"id":17,"src":"img/s17.webp","w":118.0,"h":136.5,"ox":59.6934404204917,"oy":61.46124081254243,"x":2180.6934404204917,"y":301.9612408125424,"tex":"p1"},{"id":18,"src":"img/s18.webp","w":133.0,"h":135.5,"ox":65.64198636713718,"oy":67.56125796918525,"x":1454.1419863671372,"y":367.56125796918525,"tex":"p1"},{"id":19,"src":"img/s19.webp","w":200.0,"h":144.0,"ox":94.837210656573,"oy":66.62747610035422,"x":553.837210656573,"y":426.6274761003542,"tex":"p2"},{"id":20,"src":"img/s20.webp","w":139.0,"h":129.5,"ox":66.41018494150285,"oy":67.59179087813317,"x":2466.410184941503,"y":320.09179087813317,"tex":"p1"},{"id":21,"src":"img/s21.webp","w":80.5,"h":139.0,"ox":39.64187816983235,"oy":68.44102618403758,"x":1931.1418781698324,"y":373.4410261840376,"tex":"p1"},{"id":22,"src":"img/s22.webp","w":128.0,"h":128.0,"ox":50.45498289136003,"oy":63.760191670230995,"x":2059.45498289136,"y":367.260191670231,"tex":"p1"},{"id":23,"src":"img/s23.webp","w":113.0,"h":123.5,"ox":55.561954443034665,"oy":59.85277614728693,"x":2596.0619544430347,"y":376.35277614728693,"tex":"p1"}]};
+(function(){
+const P = META.plan, V = META.view, H = META.Hp, YH = META.yh;
+const KEY='stones-layout-v1', VKEY='stones-versions-v1';
+const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+// stones sorted along the path, numbered from the entrance
+const base = META.stones.slice().sort((a,b)=>a.x-b.x).map((s,i)=>({...s,n:i+1}));
+const orig = base.map(s=>({x:s.x,y:s.y,a:0}));
+let state = orig.map(o=>({...o}));
+const saved = store.get(KEY);
+if(Array.isArray(saved) && saved.length===state.length) state = saved;
+let order = base.map((_,i)=>i);      // z-order
+let sel = -1, history = [];
+
+const $ = id=>document.getElementById(id);
+const plan=$('plan'), stonesEl=$('stones'), ghosts=$('ghosts'), sizer=$('planSizer'), scroller=$('mapScroll');
+plan.style.width=P.w+'px'; plan.style.height=P.h+'px';
+
+// ----- homographies -> CSS matrix3d
+function mul(A,B){const C=[[0,0,0],[0,0,0],[0,0,0]];for(let i=0;i<3;i++)for(let j=0;j<3;j++)for(let k=0;k<3;k++)C[i][j]+=A[i][k]*B[k][j];return C}
+function m3d(M){return `matrix3d(${M[0][0]},${M[1][0]},0,${M[2][0]},${M[0][1]},${M[1][1]},0,${M[2][1]},0,0,1,0,${M[0][2]},${M[1][2]},0,${M[2][2]})`}
+// a plane slightly below the ground: stretch vertically away from the horizon (approximate stone thickness)
+const drop=k=>mul([[1,0,0],[0,1+k,-k*YH],[0,0,1]],H);
+
+// ----- build DOM
+function mkImg(s,cls){const im=new Image();im.src=s.src;im.alt='';im.draggable=false;if(cls)im.className=cls;
+  im.style.width=s.w+'px';im.style.height=s.h+'px';im.style.transformOrigin=`${s.ox}px ${s.oy}px`;return im}
+const planImgs = base.map((s,i)=>{const im=mkImg(s,'stone');im.tabIndex=0;im.dataset.i=i;
+  im.setAttribute('role','button');im.setAttribute('aria-label','אבן '+s.n);stonesEl.appendChild(im);return im});
+base.forEach((s,i)=>{const g=mkImg(s,'ghost');place(g,s,orig[i]);ghosts.appendChild(g)});
+
+const clip=$('clip');
+clip.style.clipPath='polygon('+META.soil.map(p=>p[0]+'px '+p[1]+'px').join(',')+')';
+const layerDefs=[['l-shadow',drop(0.022)]].concat([0.016,0.0128,0.0096,0.0064,0.0032].map(k=>['l-side',drop(k)]),[['l-top',H]]);
+const layers = layerDefs.map(([cls,M])=>{const d=document.createElement('div');d.className='layer '+cls;
+  d.style.width=P.w+'px';d.style.height=P.h+'px';d.style.transform=m3d(M);clip.appendChild(d);
+  return base.map(s=>{const im=mkImg(s);d.appendChild(im);return im})});
+
+function place(el,s,st){el.style.left=(st.x-s.ox)+'px';el.style.top=(st.y-s.oy)+'px';el.style.transform=`rotate(${st.a}deg)`}
+function render(i){const s=base[i],st=state[i];place(planImgs[i],s,st);layers.forEach(L=>place(L[i],s,st))}
+function renderOrder(){order.forEach((i,z)=>{planImgs[i].style.zIndex=z+1;layers.forEach(L=>L[i].style.zIndex=z+1)})}
+base.forEach((_,i)=>render(i)); renderOrder();
+
+// ----- zoom
+let zoom=1;
+function fitZoom(){return scroller.clientWidth/P.w}
+function setZoom(z,keepCenter){
+  const fz=fitZoom(); z=Math.max(fz,Math.min(1.2,z));
+  const cx=(scroller.scrollLeft+scroller.clientWidth/2)/zoom;
+  zoom=z; plan.style.transform=`scale(${z})`; sizer.style.width=P.w*z+'px'; sizer.style.height=P.h*z+'px';
+  if(keepCenter) scroller.scrollLeft=cx*z-scroller.clientWidth/2;
+  updateHandle();
+}
+function initZoom(){const fz=fitZoom(); setZoom(P.h*fz<210?210/P.h:fz,false)}
+$('zoomIn').onclick=()=>setZoom(zoom*1.35,true);
+$('zoomOut').onclick=()=>setZoom(zoom/1.35,true);
+
+// ----- view scaling
+const view=$('view'), vbox=$('viewBox');
+function fitView(){view.style.transform=`scale(${vbox.clientWidth/V.w})`;view.style.transformOrigin='0 0'}
+new ResizeObserver(()=>{fitView();const fz=fitZoom();if(zoom<fz||Math.abs(zoom-fz)<0.002)setZoom(fz,false);else updateHandle()}).observe(document.body);
+
+// ----- selection + handle
+const handle=$('rotHandle'), rline=$('rotLine');
+function select(i){
+  if(sel>=0){planImgs[sel].classList.remove('sel');layers[layers.length-1][sel].classList.remove('sel')}
+  sel=i;
+  if(i>=0){planImgs[i].classList.add('sel');layers[layers.length-1][i].classList.add('sel');
+    order=order.filter(k=>k!==i).concat(i);renderOrder()}
+  $('rotL').disabled=$('rotR').disabled=i<0; updateHandle();
+}
+function handleR(i){const s=base[i];return Math.max(s.w,s.h)*0.55+34/zoom}
+function updateHandle(){
+  if(sel<0){handle.hidden=rline.hidden=true;return}
+  const s=base[sel],st=state[sel],r=handleR(sel),a=st.a*Math.PI/180, sz=30/zoom;
+  const hx=st.x+Math.sin(a)*r, hy=st.y-Math.cos(a)*r;
+  Object.assign(handle.style,{width:sz+'px',height:sz+'px',left:(hx-sz/2)+'px',top:(hy-sz/2)+'px',zIndex:999});
+  Object.assign(rline.style,{width:2/zoom+'px',height:r+'px',left:(st.x-1/zoom)+'px',top:(st.y-r)+'px',transform:`rotate(${st.a}deg)`,zIndex:998});
+  handle.hidden=rline.hidden=false;
+}
+
+// ----- history / persistence
+function snapshot(){history.push(state.map(o=>({...o})));if(history.length>80)history.shift();$('undo').disabled=false}
+function commit(){store.set(KEY,state)}
+function undo(){if(!history.length)return;state=history.pop();base.forEach((_,i)=>render(i));updateHandle();commit();$('undo').disabled=!history.length}
+$('undo').onclick=undo;
+
+// ----- pointer: drag stones
+function toPlan(e){const r=plan.getBoundingClientRect();return{x:(e.clientX-r.left)/zoom,y:(e.clientY-r.top)/zoom}}
+let drag=null, raf=0;
+stonesEl.addEventListener('pointerdown',e=>{
+  const el=e.target.closest('.stone'); if(!el)return;
+  const i=+el.dataset.i; e.preventDefault(); select(i); snapshot();
+  const p=toPlan(e); drag={i,dx:state[i].x-p.x,dy:state[i].y-p.y,moved:false};
+  el.setPointerCapture(e.pointerId); el.classList.add('dragging');
+});
+stonesEl.addEventListener('pointermove',e=>{
+  if(!drag)return; const p=toPlan(e), st=state[drag.i];
+  st.x=Math.max(0,Math.min(P.w,p.x+drag.dx)); st.y=Math.max(0,Math.min(P.h,p.y+drag.dy)); drag.moved=true;
+  if(!raf)raf=requestAnimationFrame(()=>{raf=0;if(drag){render(drag.i);updateHandle()}});
+});
+function endDrag(){if(!drag)return;planImgs[drag.i].classList.remove('dragging');
+  if(!drag.moved){history.pop();$('undo').disabled=!history.length}else commit(); drag=null}
+stonesEl.addEventListener('pointerup',endDrag); stonesEl.addEventListener('pointercancel',endDrag);
+
+// rotate handle
+let rot=null;
+handle.addEventListener('pointerdown',e=>{if(sel<0)return;e.preventDefault();e.stopPropagation();snapshot();
+  rot={i:sel};handle.setPointerCapture(e.pointerId)});
+handle.addEventListener('pointermove',e=>{if(!rot)return;const p=toPlan(e),st=state[rot.i];
+  let a=Math.atan2(p.x-st.x,-(p.y-st.y))*180/Math.PI; if(e.shiftKey)a=Math.round(a/15)*15; st.a=a;
+  if(!raf)raf=requestAnimationFrame(()=>{raf=0;if(rot){render(rot.i);updateHandle()}})});
+function endRot(){if(rot){rot=null;commit()}}
+handle.addEventListener('pointerup',endRot); handle.addEventListener('pointercancel',endRot);
+
+function rotateBy(d){if(sel<0)return;snapshot();state[sel].a+=d;render(sel);updateHandle();commit()}
+$('rotL').onclick=()=>rotateBy(-15); $('rotR').onclick=()=>rotateBy(15);
+let wheelT=0;
+stonesEl.addEventListener('wheel',e=>{const el=e.target.closest('.stone');if(!el)return;e.preventDefault();
+  const i=+el.dataset.i; if(sel!==i)select(i);
+  if(Date.now()-wheelT>600)snapshot(); wheelT=Date.now();
+  state[i].a+=Math.sign(e.deltaY||e.deltaX)*4; render(i); updateHandle(); commit()},{passive:false});
+
+// click on soil clears selection
+plan.addEventListener('pointerdown',e=>{if(e.target===plan||e.target.classList.contains('bg'))select(-1)});
+
+// keyboard
+stonesEl.addEventListener('focusin',e=>{const el=e.target.closest('.stone');if(el&&sel!==+el.dataset.i)select(+el.dataset.i)});
+document.addEventListener('keydown',e=>{
+  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='z'){e.preventDefault();undo();return}
+  if(sel<0||e.target.tagName==='BUTTON')return;
+  const st=state[sel], step=e.shiftKey?20:5; let used=true;
+  if(e.key==='ArrowLeft'){snapshot();st.x-=step}else if(e.key==='ArrowRight'){snapshot();st.x+=step}
+  else if(e.key==='ArrowUp'){snapshot();st.y-=step}else if(e.key==='ArrowDown'){snapshot();st.y+=step}
+  else if(e.key==='['){snapshot();st.a-=5}else if(e.key===']'){snapshot();st.a+=5}
+  else if(e.key==='Escape'){select(-1)} else used=false;
+  if(used){e.preventDefault();if(sel>=0){render(sel);updateHandle();commit()}}
+});
+
+// ----- toolbar
+const ghostBtn=$('ghostBtn');
+ghostBtn.onclick=()=>{const on=ghostBtn.getAttribute('aria-pressed')!=='true';ghostBtn.setAttribute('aria-pressed',on);ghosts.hidden=!on};
+$('reset').onclick=()=>{snapshot();state=orig.map(o=>({...o}));base.forEach((_,i)=>render(i));updateHandle();commit();toast('חזרנו לסידור הקיים. אפשר לבטל עם “ביטול”.')};
+function setMode(after){$('showAfter').setAttribute('aria-pressed',after);$('showBefore').setAttribute('aria-pressed',!after);
+  $('viewOrig').hidden=after;clip.hidden=!after}
+$('showAfter').onclick=()=>setMode(true); $('showBefore').onclick=()=>setMode(false);
+
+// ----- versions
+const verEl=$('versions');
+let versions=store.get(VKEY)||[];
+function drawVersions(){
+  verEl.innerHTML='';
+  if(!versions.length){verEl.innerHTML='<span class="empty">עוד אין גרסאות שמורות.</span>';return}
+  versions.forEach((v,k)=>{const c=document.createElement('span');c.className='chip';
+    const b=document.createElement('button');b.textContent=v.name;b.title='טעינת '+v.name;
+    b.onclick=()=>{snapshot();state=v.state.map(o=>({...o}));base.forEach((_,i)=>render(i));updateHandle();commit();toast(v.name+' נטענה')};
+    const x=document.createElement('button');x.className='x';x.textContent='✕';x.setAttribute('aria-label','מחיקת '+v.name);
+    x.onclick=()=>{versions.splice(k,1);store.set(VKEY,versions);drawVersions()};
+    c.append(b,x);verEl.appendChild(c)});
+}
+$('saveVer').onclick=()=>{const used=new Set(versions.map(v=>v.name));let n=1;while(used.has('גרסה '+n))n++;
+  versions.push({name:'גרסה '+n,state:state.map(o=>({...o}))});store.set(VKEY,versions);drawVersions();toast('נשמרה גרסה '+n)};
+drawVersions();
+
+let tt;function toast(t){const el=$('toast');el.textContent=t;el.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('on'),2200)}
+
+fitView(); initZoom();
+})();
+</script>
+
+</body>
+</html>
