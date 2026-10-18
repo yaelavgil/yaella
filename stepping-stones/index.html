@@ -23,16 +23,16 @@
 /* Layout: the top-down map runs full width (like the photo from above); below it the walk-in view and a side panel. */
 :root{
   --bg:#eceee9; --surface:#f8f9f6; --ink:#1c231e; --muted:#5c665f; --line:#d3d8d0;
-  --accent:#2f5c3c; --accent-ink:#ffffff; --soil:#a8502b; --sel:#f2d36b;
+  --accent:#2f5c3c; --accent-ink:#ffffff; --soil:#a8502b; --sel:#ffd23f;
   --f-display:"Secular One","Assistant",system-ui,sans-serif;
   --f-body:"Assistant",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#131915; --surface:#1b231d; --ink:#e3e9e3; --muted:#9aa69d; --line:#2e3a31;
-  --accent:#8cc59a; --accent-ink:#0f1a12; --soil:#d87a52; --sel:#f2d36b; color-scheme:dark}}
+  --accent:#8cc59a; --accent-ink:#0f1a12; --soil:#d87a52; --sel:#ffd23f; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#131915; --surface:#1b231d; --ink:#e3e9e3; --muted:#9aa69d; --line:#2e3a31;
-  --accent:#8cc59a; --accent-ink:#0f1a12; --soil:#d87a52; --sel:#f2d36b; color-scheme:dark}
+  --accent:#8cc59a; --accent-ink:#0f1a12; --soil:#d87a52; --sel:#ffd23f; color-scheme:dark}
 html,body{background:var(--bg);color:var(--ink)}
 body{font-family:var(--f-body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:20px 40px}
 .wrap{max-width:1320px;margin-inline:auto;display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
@@ -61,7 +61,11 @@ button:disabled{opacity:.4;cursor:default}
 .stone{position:absolute;user-select:none;-webkit-user-drag:none;touch-action:none;cursor:grab;
   filter:drop-shadow(0 3px 3px rgba(0,0,0,.45))}
 .stone.dragging{cursor:grabbing;filter:drop-shadow(0 12px 10px rgba(0,0,0,.45))}
-.stone.sel{filter:drop-shadow(0 0 0 var(--sel)) drop-shadow(0 0 5px var(--sel)) drop-shadow(0 4px 4px rgba(0,0,0,.5))}
+.stone.sel{filter:drop-shadow(var(--ow) 0 0 var(--sel)) drop-shadow(calc(var(--ow)*-1) 0 0 var(--sel)) drop-shadow(0 var(--ow) 0 var(--sel)) drop-shadow(0 calc(var(--ow)*-1) 0 var(--sel))
+  drop-shadow(var(--ol) 0 0 #1b1b14) drop-shadow(calc(var(--ol)*-1) 0 0 #1b1b14) drop-shadow(0 var(--ol) 0 #1b1b14) drop-shadow(0 calc(var(--ol)*-1) 0 #1b1b14);
+  animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.82}}
+@media (prefers-reduced-motion:reduce){.stone.sel{animation:none}}
 .ghost{position:absolute;pointer-events:none;opacity:.33;filter:grayscale(1) brightness(1.6) contrast(.6)}
 #ghosts[hidden]{display:none}
 #rotHandle{position:absolute;border-radius:50%;background:var(--sel);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.5);
@@ -69,19 +73,26 @@ button:disabled{opacity:.4;cursor:default}
 #rotHandle svg{width:62%;height:62%}
 #rotLine{position:absolute;background:var(--sel);pointer-events:none;transform-origin:50% 100%}
 .hint{color:var(--muted);font-size:14px;margin:8px 2px 0}
+.callout{display:flex;align-items:center;gap:10px;margin-top:10px;padding:10px 14px;border-radius:10px;background:var(--sel);color:#2b2300;font-weight:700;font-size:17px}
+.callout svg{flex:none;width:26px;height:26px}
+.mapwrap{position:relative}
+.onmap{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(20,20,14,.82);color:#fff;font-weight:700;font-size:17px;padding:10px 18px;border-radius:999px;pointer-events:none;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.35);direction:rtl}
+.onmap.gone{opacity:0;transition:opacity .4s}
 
 /* lower row */
 .lower{display:grid;grid-template-columns:minmax(0,520px) minmax(0,1fr);gap:18px;align-items:start}
 @media (max-width:860px){.lower{grid-template-columns:minmax(0,1fr)}}
-.viewbox{position:relative;width:100%;aspect-ratio:3/4;max-width:100%;overflow:hidden;border-radius:10px;margin-top:10px;background:#222;direction:ltr}
-#view{position:absolute;left:0;top:0;width:1500px;height:2000px}
+.viewbox{position:relative;width:100%;aspect-ratio:1780/2420;max-width:100%;overflow:hidden;border-radius:10px;margin-top:10px;background:#222;direction:ltr}
+#view{position:absolute;left:0;top:0}
+#frame{position:absolute;pointer-events:none;outline:3px dashed rgba(255,255,255,.75);box-shadow:0 0 0 3000px rgba(16,16,10,.32)}
+.vnote{color:var(--muted);font-size:14px;margin:8px 2px 0}
 #view>img{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .clip{position:absolute;inset:0}
 .layer{position:absolute;left:0;top:0;transform-origin:0 0;pointer-events:none}
 .layer img{position:absolute;max-width:none}
 .l-shadow{filter:brightness(0) blur(4px);opacity:.42}
 .l-side{filter:brightness(.6) saturate(.65)}
-.l-top img.sel{filter:brightness(1.08) drop-shadow(0 0 8px rgba(255,236,150,.95))}
+.l-top img.sel{filter:drop-shadow(6px 0 0 #ffd23f) drop-shadow(-6px 0 0 #ffd23f) drop-shadow(0 6px 0 #ffd23f) drop-shadow(0 -6px 0 #ffd23f) drop-shadow(2px 0 0 #1b1b14) drop-shadow(-2px 0 0 #1b1b14) drop-shadow(0 2px 0 #1b1b14) drop-shadow(0 -2px 0 #1b1b14)}
 .side h2{font-family:var(--f-display);font-weight:400;font-size:22px;margin:0 0 6px}
 .side{display:grid;gap:14px;align-content:start}
 .side p,.side li{margin:0;color:var(--muted)}
@@ -103,7 +114,7 @@ kbd{font-family:ui-monospace,Menlo,monospace;font-size:13px;border:1px solid var
 <div class="wrap" dir="rtl">
   <header>
     <h1>שביל אבני המדרך</h1>
-    <p>גררי אבנים במפה כמו בפאזל וסובבי אותן. ההדמיה למטה מתעדכנת מיד ומראה את השביל מהכניסה, עם פינת הישיבה בקצה.</p>
+    <p>גוררים אבנים במפה כמו בפאזל ומסובבים אותן. ההדמיה למטה מתעדכנת מיד ומראה את השביל מהכניסה, עם פינת הישיבה בקצה.</p>
   </header>
 
   <section class="card" aria-label="מפה מלמעלה">
@@ -118,6 +129,8 @@ kbd{font-family:ui-monospace,Menlo,monospace;font-size:13px;border:1px solid var
       <button class="icon" id="zoomOut" aria-label="הקטנה">−</button>
       <button class="icon" id="zoomIn" aria-label="הגדלה">+</button>
     </div>
+    <div class="callout" role="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11V5a2 2 0 0 1 4 0v5"/><path d="M13 10V8.5a2 2 0 0 1 4 0V11"/><path d="M17 11a2 2 0 0 1 4 0v3a7 7 0 0 1-7 7h-1.5a6 6 0 0 1-4.7-2.3L4 14.5a1.8 1.8 0 0 1 2.7-2.4L9 14"/></svg>לחצו על אבן וגררו אותה כדי להזיז. הידית הצהובה מסובבת אותה.</div>
+    <div class="mapwrap">
     <div class="map-scroll" id="mapScroll">
       <div class="sizer" id="planSizer">
         <div class="stage" id="plan">
@@ -128,6 +141,8 @@ kbd{font-family:ui-monospace,Menlo,monospace;font-size:13px;border:1px solid var
           <div id="rotHandle" hidden title="גררי כדי לסובב"><svg viewBox="0 0 24 24" fill="none" stroke="#3b2f00" stroke-width="2.6" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v5h-5"/></svg></div>
         </div>
       </div>
+    </div>
+    <div class="onmap" id="onmap">לחצו על אבן וגררו אותה</div>
     </div>
     <p class="hint">משיח (גדר חיה) למעלה, קיר הבית למטה. הכניסה לשביל משמאל ופינת הישיבה מימין.</p>
   </section>
@@ -143,10 +158,12 @@ kbd{font-family:ui-monospace,Menlo,monospace;font-size:13px;border:1px solid var
       <div class="viewbox" id="viewBox">
         <div id="view">
           <img id="viewBg" src="img/view_bg.webp" alt="השביל מהכניסה, עם האבנים בסידור החדש">
+          <div id="frame"></div>
           <div class="clip" id="clip"></div>
           <img id="viewOrig" src="img/view_orig.webp" alt="התמונה המקורית של השביל" hidden>
         </div>
       </div>
+      <p class="vnote">האזור הכהה מסביב הוא השלמה מעבר לשולי התמונה המקורית, כדי שאפשר יהיה לראות את האבן הראשונה במלואה.</p>
     </section>
 
     <aside class="card side">
@@ -161,7 +178,7 @@ kbd{font-family:ui-monospace,Menlo,monospace;font-size:13px;border:1px solid var
       </div>
       <div>
         <h2>גרסאות</h2>
-        <p style="margin-bottom:10px">שמרי כמה סידורים והשווי ביניהם. הסידור הנוכחי נשמר אוטומטית בדפדפן הזה.</p>
+        <p style="margin-bottom:10px">אפשר לשמור כמה סידורים ולהשוות ביניהם. הסידור הנוכחי נשמר אוטומטית בדפדפן הזה.</p>
         <div class="bar" style="margin-bottom:10px"><button class="primary" id="saveVer">שמירת הסידור כגרסה</button></div>
         <div class="versions" id="versions"></div>
       </div>
@@ -172,7 +189,7 @@ kbd{font-family:ui-monospace,Menlo,monospace;font-size:13px;border:1px solid var
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
-const META = {"plan":{"w":2800,"h":660,"strip":[70,590]},"view":{"w":1500,"h":2000},"Hp":[[6.703394202724966,14.013624150743192,-5273.620486541825],[1.9233164782307344,0.6879669924680555,4361.4651230562],[0.005249335274911897,0.002085337954227834,1.0]],"yh":374.9522826303421,"soil":[[0,1080],[400,850],[700,720],[950,612],[1290,606],[1310,800],[1340,1100],[1500,1370],[1500,2000],[0,2000]],"stones":[{"id":1,"src":"img/s01.webp","w":205.0,"h":251.5,"ox":92.31567400558333,"oy":126.84953227927735,"x":991.3156740055833,"y":309.84953227927735,"tex":"p2"},{"id":2,"src":"img/s02.webp","w":182.0,"h":149.5,"ox":82.58557182736945,"oy":68.00901966053112,"x":645.5855718273694,"y":268.0090196605311,"tex":"p2"},{"id":3,"src":"img/s03.webp","w":123.5,"h":125.5,"ox":58.4586879795977,"oy":70.59272491290389,"x":1493.9586879795977,"y":240.5927249129039,"tex":"p1"},{"id":4,"src":"img/s04.webp","w":342.0,"h":281.5,"ox":170.58141475480096,"oy":138.01137824733166,"x":199.58141475480096,"y":357.51137824733166,"tex":"p2"},{"id":5,"src":"img/s05.webp","w":127.0,"h":75.5,"ox":60.55699905842266,"oy":34.80576604044299,"x":1182.0569990584227,"y":239.805766040443,"tex":"p2"},{"id":6,"src":"img/s06.webp","w":219.0,"h":180.0,"ox":122.07436540391188,"oy":93.06769706147423,"x":810.5743654039119,"y":316.06769706147423,"tex":"p2"},{"id":7,"src":"img/s07.webp","w":230.0,"h":209.0,"ox":114.00527466507998,"oy":110.89935754862654,"x":412.00527466508,"y":348.39935754862654,"tex":"p2"},{"id":8,"src":"img/s08.webp","w":159.5,"h":192.0,"ox":82.91387480828712,"oy":103.51434011801706,"x":1315.9138748082871,"y":326.01434011801706,"tex":"p2"},{"id":9,"src":"img/s09.webp","w":112.5,"h":207.5,"ox":53.53850452193342,"oy":98.63707766330765,"x":1602.5385045219334,"y":316.13707766330765,"tex":"p1"},{"id":10,"src":"img/s10.webp","w":86.5,"h":87.5,"ox":44.61213669259632,"oy":46.610159061883195,"x":1941.6121366925963,"y":252.1101590618832,"tex":"p1"},{"id":11,"src":"img/s11.webp","w":111.0,"h":112.0,"ox":53.7807878197018,"oy":53.3747467623611,"x":2548.280787819702,"y":255.3747467623611,"tex":"p1"},{"id":12,"src":"img/s12.webp","w":96.5,"h":180.5,"ox":49.204678325941586,"oy":90.4665088154477,"x":1823.2046783259416,"y":323.4665088154477,"tex":"p1"},{"id":13,"src":"img/s13.webp","w":102.0,"h":82.0,"ox":52.93785923387213,"oy":37.54591499767946,"x":2057.437859233872,"y":266.04591499767946,"tex":"p1"},{"id":14,"src":"img/s14.webp","w":129.0,"h":196.0,"ox":61.12393298567122,"oy":95.32054211452117,"x":2321.123932985671,"y":313.3205421145212,"tex":"p1"},{"id":15,"src":"img/s15.webp","w":85.5,"h":158.5,"ox":40.9601621643983,"oy":73.03157103655593,"x":1709.9601621643983,"y":327.03157103655593,"tex":"p1"},{"id":16,"src":"img/s16.webp","w":153.0,"h":144.5,"ox":77.98422818362656,"oy":71.73356136344734,"x":1143.9842281836266,"y":363.73356136344734,"tex":"p2"},{"id":17,"src":"img/s17.webp","w":118.0,"h":136.5,"ox":59.6934404204917,"oy":61.46124081254243,"x":2180.6934404204917,"y":301.9612408125424,"tex":"p1"},{"id":18,"src":"img/s18.webp","w":133.0,"h":135.5,"ox":65.64198636713718,"oy":67.56125796918525,"x":1454.1419863671372,"y":367.56125796918525,"tex":"p1"},{"id":19,"src":"img/s19.webp","w":200.0,"h":144.0,"ox":94.837210656573,"oy":66.62747610035422,"x":553.837210656573,"y":426.6274761003542,"tex":"p2"},{"id":20,"src":"img/s20.webp","w":139.0,"h":129.5,"ox":66.41018494150285,"oy":67.59179087813317,"x":2466.410184941503,"y":320.09179087813317,"tex":"p1"},{"id":21,"src":"img/s21.webp","w":80.5,"h":139.0,"ox":39.64187816983235,"oy":68.44102618403758,"x":1931.1418781698324,"y":373.4410261840376,"tex":"p1"},{"id":22,"src":"img/s22.webp","w":128.0,"h":128.0,"ox":50.45498289136003,"oy":63.760191670230995,"x":2059.45498289136,"y":367.260191670231,"tex":"p1"},{"id":23,"src":"img/s23.webp","w":113.0,"h":123.5,"ox":55.561954443034665,"oy":59.85277614728693,"x":2596.0619544430347,"y":376.35277614728693,"tex":"p1"}]};
+const META = {"plan":{"w":2800,"h":660,"strip":[70,590]},"view":{"w":1780,"h":2420,"frame":[280,0,1500,2000]},"Hp":[[8.173208079700297,14.597518777926986,-4993.620486541825],[1.9233164782307344,0.6879669924680555,4361.4651230562],[0.005249335274911897,0.002085337954227834,1.0]],"yh":374.9522826303421,"soil":[[0,1241],[280,1080],[680,850],[980,720],[1230,612],[1570,606],[1590,800],[1620,1100],[1780,1370],[1780,2420],[0,2420]],"stones":[{"id":1,"src":"img/s01.webp","w":205.0,"h":251.5,"ox":92.31567400558333,"oy":126.84953227927735,"x":991.3156740055833,"y":309.84953227927735,"tex":"p2"},{"id":2,"src":"img/s02.webp","w":182.0,"h":149.5,"ox":82.58557182736945,"oy":68.00901966053112,"x":645.5855718273694,"y":268.0090196605311,"tex":"p2"},{"id":3,"src":"img/s03.webp","w":123.5,"h":125.5,"ox":58.4586879795977,"oy":70.59272491290389,"x":1493.9586879795977,"y":240.5927249129039,"tex":"p1"},{"id":4,"src":"img/s04.webp","w":386.0,"h":296.0,"ox":197.15391998035716,"oy":146.55121942317436,"x":185.65391998035716,"y":366.05121942317436,"tex":"p2"},{"id":5,"src":"img/s05.webp","w":127.0,"h":75.5,"ox":60.55699905842266,"oy":34.80576604044299,"x":1182.0569990584227,"y":239.805766040443,"tex":"p2"},{"id":6,"src":"img/s06.webp","w":219.0,"h":180.0,"ox":122.07436540391188,"oy":93.06769706147423,"x":810.5743654039119,"y":316.06769706147423,"tex":"p2"},{"id":7,"src":"img/s07.webp","w":230.0,"h":209.0,"ox":114.00527466507998,"oy":110.89935754862654,"x":412.00527466508,"y":348.39935754862654,"tex":"p2"},{"id":8,"src":"img/s08.webp","w":159.5,"h":192.0,"ox":82.91387480828712,"oy":103.51434011801706,"x":1315.9138748082871,"y":326.01434011801706,"tex":"p2"},{"id":9,"src":"img/s09.webp","w":112.5,"h":207.5,"ox":53.53850452193342,"oy":98.63707766330765,"x":1602.5385045219334,"y":316.13707766330765,"tex":"p1"},{"id":10,"src":"img/s10.webp","w":86.5,"h":87.5,"ox":44.61213669259632,"oy":46.610159061883195,"x":1941.6121366925963,"y":252.1101590618832,"tex":"p1"},{"id":11,"src":"img/s11.webp","w":111.0,"h":112.0,"ox":53.7807878197018,"oy":53.3747467623611,"x":2548.280787819702,"y":255.3747467623611,"tex":"p1"},{"id":12,"src":"img/s12.webp","w":96.5,"h":180.5,"ox":49.204678325941586,"oy":90.4665088154477,"x":1823.2046783259416,"y":323.4665088154477,"tex":"p1"},{"id":13,"src":"img/s13.webp","w":102.0,"h":82.0,"ox":52.93785923387213,"oy":37.54591499767946,"x":2057.437859233872,"y":266.04591499767946,"tex":"p1"},{"id":14,"src":"img/s14.webp","w":129.0,"h":196.0,"ox":61.12393298567122,"oy":95.32054211452117,"x":2321.123932985671,"y":313.3205421145212,"tex":"p1"},{"id":15,"src":"img/s15.webp","w":85.5,"h":158.5,"ox":40.9601621643983,"oy":73.03157103655593,"x":1709.9601621643983,"y":327.03157103655593,"tex":"p1"},{"id":16,"src":"img/s16.webp","w":153.0,"h":144.5,"ox":77.98422818362656,"oy":71.73356136344734,"x":1143.9842281836266,"y":363.73356136344734,"tex":"p2"},{"id":17,"src":"img/s17.webp","w":118.0,"h":136.5,"ox":59.6934404204917,"oy":61.46124081254243,"x":2180.6934404204917,"y":301.9612408125424,"tex":"p1"},{"id":18,"src":"img/s18.webp","w":133.0,"h":135.5,"ox":65.64198636713718,"oy":67.56125796918525,"x":1454.1419863671372,"y":367.56125796918525,"tex":"p1"},{"id":19,"src":"img/s19.webp","w":200.0,"h":144.0,"ox":94.837210656573,"oy":66.62747610035422,"x":553.837210656573,"y":426.6274761003542,"tex":"p2"},{"id":20,"src":"img/s20.webp","w":139.0,"h":129.5,"ox":66.41018494150285,"oy":67.59179087813317,"x":2466.410184941503,"y":320.09179087813317,"tex":"p1"},{"id":21,"src":"img/s21.webp","w":80.5,"h":139.0,"ox":39.64187816983235,"oy":68.44102618403758,"x":1931.1418781698324,"y":373.4410261840376,"tex":"p1"},{"id":22,"src":"img/s22.webp","w":128.0,"h":128.0,"ox":50.45498289136003,"oy":63.760191670230995,"x":2059.45498289136,"y":367.260191670231,"tex":"p1"},{"id":23,"src":"img/s23.webp","w":113.0,"h":123.5,"ox":55.561954443034665,"oy":59.85277614728693,"x":2596.0619544430347,"y":376.35277614728693,"tex":"p1"}]};
 (function(){
 const P = META.plan, V = META.view, H = META.Hp, YH = META.yh;
 const KEY='stones-layout-v1', VKEY='stones-versions-v1';
@@ -222,7 +239,7 @@ function fitZoom(){return scroller.clientWidth/P.w}
 function setZoom(z,keepCenter){
   const fz=fitZoom(); z=Math.max(fz,Math.min(1.2,z));
   const cx=(scroller.scrollLeft+scroller.clientWidth/2)/zoom;
-  zoom=z; plan.style.transform=`scale(${z})`; sizer.style.width=P.w*z+'px'; sizer.style.height=P.h*z+'px';
+  zoom=z; plan.style.transform=`scale(${z})`; plan.style.setProperty('--ow',(3.5/z)+'px'); plan.style.setProperty('--ol',(1.5/z)+'px'); sizer.style.width=P.w*z+'px'; sizer.style.height=P.h*z+'px';
   if(keepCenter) scroller.scrollLeft=cx*z-scroller.clientWidth/2;
   updateHandle();
 }
@@ -232,6 +249,8 @@ $('zoomOut').onclick=()=>setZoom(zoom/1.35,true);
 
 // ----- view scaling
 const view=$('view'), vbox=$('viewBox');
+view.style.width=V.w+'px'; view.style.height=V.h+'px'; vbox.style.aspectRatio=V.w+'/'+V.h;
+if(V.frame){const f=$('frame');Object.assign(f.style,{left:V.frame[0]+'px',top:V.frame[1]+'px',width:V.frame[2]+'px',height:V.frame[3]+'px'})}
 function fitView(){view.style.transform=`scale(${vbox.clientWidth/V.w})`;view.style.transformOrigin='0 0'}
 new ResizeObserver(()=>{fitView();const fz=fitZoom();if(zoom<fz||Math.abs(zoom-fz)<0.002)setZoom(fz,false);else updateHandle()}).observe(document.body);
 
@@ -265,7 +284,7 @@ function toPlan(e){const r=plan.getBoundingClientRect();return{x:(e.clientX-r.le
 let drag=null, raf=0;
 stonesEl.addEventListener('pointerdown',e=>{
   const el=e.target.closest('.stone'); if(!el)return;
-  const i=+el.dataset.i; e.preventDefault(); select(i); snapshot();
+  const i=+el.dataset.i; e.preventDefault(); select(i); snapshot(); $('onmap').classList.add('gone');
   const p=toPlan(e); drag={i,dx:state[i].x-p.x,dy:state[i].y-p.y,moved:false};
   el.setPointerCapture(e.pointerId); el.classList.add('dragging');
 });
