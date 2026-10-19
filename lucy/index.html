@@ -180,6 +180,12 @@ body.sel main{padding-bottom:240px}
 .sb-act{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap}
 .btn.big{padding:12px 20px;font-size:16px;flex:1}
 .btn[disabled]{opacity:.45}
+.ostabs{display:flex;gap:6px;margin-top:4px}
+.ostabs button{flex:1;border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:9px;font-weight:800;font-size:15px}
+.ostabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.osteps{margin:0;padding:12px 18px 12px 12px;background:var(--bg);border-radius:12px;display:none;gap:8px;font-size:16px;line-height:1.4}
+.osteps.on{display:grid}
+.osteps li::marker{font-weight:800;color:var(--blush)}
 .dllist{display:grid;gap:8px;max-height:45vh;overflow:auto}
 .dli{border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:grid;gap:4px}
 .dli .h{display:flex;justify-content:space-between;gap:8px;font-weight:800}
@@ -304,10 +310,22 @@ body.sel .uppill{bottom:250px}
 <dialog id="dlDlg"><div class="dl">
   <h3>📦 הורדות</h3>
   <ul class="tips" style="margin-bottom:4px">
-    <li><span class="ti">☑️</span><span><b>בוחרים תמונות וסרטונים</b><small>„בחירה להורדה” למעלה</small></span></li>
-    <li><span class="ti">📋</span><span><b>עוברים על הבחירה</b><small>✓ להשאיר · ❓ מתלבטים · ✕ להסיר</small></span></li>
-    <li><span class="ti">📂</span><span><b>מקבלים תיקייה ב־Google Drive במייל</b><small>באיכות מקורית, אחרי אישור של יעל. ההורדה מ־Drive ממשיכה גם ברקע</small></span></li>
+    <li><span class="ti">☑️</span><span><b>בוחרים באתר</b><small>„☑️ בחירה” ← „בחירת הכל” ← „איכות מקורית”</small></span></li>
+    <li><span class="ti">📂</span><span><b>מקבלים במייל תיקייה ב־Google Drive</b><small>כל הקבצים באיכות מלאה, ממוספרים לפי סדר הסרטון</small></span></li>
   </ul>
+  <div class="ostabs" role="tablist"><button role="tab" data-os="android">🤖 אנדרואיד</button><button role="tab" data-os="ios">🍎 אייפון</button></div>
+  <ol class="osteps" data-for="android">
+    <li>פותחים את המייל מ־Google Drive ולוחצים <b>„פתיחה”</b></li>
+    <li>לחיצה ארוכה על הקובץ הראשון ← <b>⋮</b> ← <b>„בחירת הכל”</b></li>
+    <li><b>⋮</b> ← <b>„הורדה”</b>. הכל נשמר בטלפון, בתיקייה Download</li>
+    <li>ב־InShot: <b>„סרטון”</b> ← התיקייה <b>Download</b> ← בוחרים לפי המספרים 001, 002…</li>
+  </ol>
+  <ol class="osteps" data-for="ios">
+    <li>פותחים את המייל מ־Google Drive ולוחצים <b>„פתיחה”</b> (באפליקציית Google Drive)</li>
+    <li>לחיצה ארוכה על הקובץ הראשון ← <b>„בחירת הכל”</b></li>
+    <li><b>⋯</b> ← <b>„שליחת עותק”</b> ← <b>„שמירת תמונות/סרטונים”</b>. אם יש הרבה, עושים בכמה פעמים</li>
+    <li>ב־InShot: <b>„סרטון”</b> ← <b>„אחרונים”</b> ← בוחרים לפי הסדר</li>
+  </ol>
   <div id="dlList" class="dllist"></div>
   <div class="row"><button class="btn" type="button" id="dlClose">סגירה</button></div>
 </div></dialog>
@@ -739,12 +757,15 @@ function paintDl(){
   const pend=L.filter(([,d])=>!['shared','error'].includes(d.status)).length;
   $('#dlBtn').textContent='📦 הורדות'+(pend?` (⏳${pend})`:L.length?` (${L.length})`:'');
   $('#dlList').innerHTML=L.length?L.map(([k,d])=>`<div class="dli"><div class="h"><span>${esc(d.by)} · ${d.count} פריטים</span><span>${new Date(d.at).toLocaleDateString('he-IL')}</span></div>
-    ${d.status==='shared'?`<a class="btn pri" href="${esc(d.folderUrl)}" target="_blank" rel="noopener">📂 פתיחת התיקייה ב־Google Drive</a><small>שותפה עם ${esc(d.email)} · ${d.missing?`⚠️ ${d.missing} פריטים עוד לא היו זמינים`:'✓ כל הפריטים בפנים'} · ב־Drive: לחיצה ימנית על התיקייה ← „הורדה”</small>`
+    ${d.status==='shared'?`<a class="btn pri" href="${esc(d.folderUrl)}" target="_blank" rel="noopener">📂 פתיחת התיקייה ב־Google Drive</a><small>שותפה עם ${esc(d.email)} · ${d.missing?`⚠️ ${d.missing} פריטים עוד לא היו זמינים`:'✓ כל הפריטים בפנים'} · ההוראות למעלה</small>`
       :d.status==='built'?`<small>✓ התיקייה מוכנה (${mb(d.size||d.est)}). ⏳ מחכה לאישור של יעל כדי לשתף אותה עם ${esc(d.email)}</small>`
       :d.status==='error'?`<small>✕ ההכנה נכשלה: ${esc(d.error||'')}. בקשו מיעל</small>`
       :`<small>⏳ מכינים תיקייה באיכות מקורית (בערך ${mb(d.est||0)}) בשביל ${esc(d.email||'')}. אפשר לסגור את הדף בינתיים</small>`}</div>`).join(''):'<p class="hint">עוד אין הורדות. לוחצים על „☑️ בחירה להורדה”, בוחרים, ו„הכינו לי הורדה”.</p>';
   clearTimeout(dlTimer); if(pend) dlTimer=setTimeout(loadDl,30000);
 }
+function setOS(o){document.querySelectorAll('.ostabs [data-os]').forEach(b=>b.setAttribute('aria-selected',b.dataset.os===o));document.querySelectorAll('.osteps').forEach(x=>x.classList.toggle('on',x.dataset.for===o))}
+document.querySelector('.ostabs').addEventListener('click',e=>{const b=e.target.closest('[data-os]');if(b)setOS(b.dataset.os)});
+setOS(/iPhone|iPad|Macintosh/.test(navigator.userAgent)&&!/Android/.test(navigator.userAgent)?'ios':'android');
 function openDl(){$('#dlDlg').showModal();loadDl()}
 $('#dlBtn').onclick=openDl; $('#dlClose').onclick=()=>$('#dlDlg').close();
 setTimeout(loadDl,1500);
