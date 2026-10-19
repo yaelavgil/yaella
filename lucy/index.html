@@ -216,6 +216,17 @@ body.sel main{padding-bottom:240px}
   h2 small{display:block;margin:2px 0 0;font-size:12px}
   .t .tag{font-size:10px;padding:1px 6px}
 }
+.uppill{position:fixed;bottom:16px;inset-inline-start:16px;z-index:25;border:0;border-radius:16px;background:var(--ink);color:var(--bg);padding:10px 14px;font:inherit;font-weight:800;font-size:14px;display:grid;gap:6px;min-width:200px;box-shadow:0 8px 24px rgba(0,0,0,.25);text-align:start}
+.uppill i{display:block;height:6px;border-radius:9px;background:rgba(255,255,255,.25);overflow:hidden}
+.uppill b{display:block;height:100%;width:0;background:var(--blush);transition:width .3s}
+.uppill.ok{background:var(--mint)}
+body.sel .uppill{bottom:250px}
+.q .urow{display:grid;gap:4px;padding:6px 0;border-bottom:1px solid var(--line)}
+.q .urow .n{display:flex;justify-content:space-between;gap:8px;font-weight:700}
+.q .urow .n span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.q .urow .pb{height:8px;border-radius:9px;background:var(--line);overflow:hidden}
+.q .urow .pb i{display:block;height:100%;width:2%;background:var(--blush);transition:width .3s}
+.q .urow.done .pb i{background:var(--mint)}
 .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:7px 8px 7px 16px;border-radius:999px;font-weight:700;font-size:14px;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none;display:flex;align-items:center;gap:10px;white-space:nowrap}
 .toast.show{opacity:1;pointer-events:auto}
 .toast button{border:0;background:var(--blush);color:#fff;border-radius:999px;padding:4px 12px;font-weight:800}
@@ -323,6 +334,7 @@ body.sel main{padding-bottom:240px}
   <ul class="tips" id="svTips"></ul>
   <div class="row"><button class="btn pri big" id="svGo" disabled>שמירה</button><button class="btn" id="svClose">סגירה</button></div>
 </div></dialog>
+<button class="uppill" id="upPill" type="button" hidden><span id="upTxt"></span><i><b id="upBar"></b></i></button>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -784,13 +796,31 @@ $('#camBtns').onclick=async e=>{const b=e.target.closest('[data-cam]');if(!b)ret
   if(a==='send'){stopCam();$('#camDlg').close();handle([lastRec]);return}
 };
 $('#camDlg').addEventListener('close',stopCam);
-async function handle(files){for(const f of files){const row=document.createElement('div');row.innerHTML=`<span>${esc(f.name)}</span><span>מעלה…</span>`;$('#queue').prepend(row);const st=row.lastChild;
-  try{const r=await upload(f,p=>st.textContent=Math.round(p*100)+'%');st.textContent='✓ עלה';
+const UP={files:0,done:0,frac:{}};
+function paintUp(){const pill=$('#upPill'),left=UP.files-UP.done;
+  if(!UP.files){pill.hidden=true;return}
+  const pct=Math.round(Object.values(UP.frac).reduce((a,b)=>a+b,0)/UP.files*100);
+  pill.hidden=false;pill.classList.toggle('ok',!left);
+  $('#upTxt').textContent=left?`⬆ מעלה ${left===1?'קובץ אחד':left+' קבצים'} · ${pct}%`:`✓ ${UP.files===1?'הקובץ הועלה':'כל '+UP.files+' הקבצים הועלו'}`;
+  $('#upBar').style.width=pct+'%';
+  if(!left){clearTimeout(paintUp.t);paintUp.t=setTimeout(()=>{if(UP.done===UP.files){UP.files=UP.done=0;UP.frac={};paintUp()}},6000)}}
+$('#upPill').onclick=()=>$('#addDlg').showModal();
+addEventListener('beforeunload',e=>{if(UP.files>UP.done){e.preventDefault();e.returnValue=''}});
+async function handle(files){
+  const jobs=files.map(f=>{const key=Math.random().toString(36).slice(2);UP.files++;UP.frac[key]=0;
+    const row=document.createElement('div');row.className='urow';row.innerHTML=`<div class="n"><span>${kindOf(f)==='video'?'🎬':'🖼️'} ${esc(f.name)}</span><span class="s">ממתין…</span></div><div class="pb"><i></i></div>`;
+    $('#queue').prepend(row);return {f,key,row,st:row.querySelector('.s'),bar:row.querySelector('.pb i')}});
+  paintUp();
+  for(const {f,key,row,st,bar} of jobs){
+  const prog=(p,label)=>{UP.frac[key]=Math.min(1,p);bar.style.width=Math.max(2,Math.round(p*100))+'%';st.textContent=label||Math.round(p*100)+'%';paintUp()};
+  prog(.01,'מתחיל…');
+  try{const r=await upload(f,prog);prog(1,'✓ עלה');row.classList.add('done');
     if(r&&!r.year){const Y=new Date().getFullYear();const w=document.createElement('div');w.className='nodate';
       w.innerHTML=`⚠️ אין בקובץ תאריך צילום. מאיזו שנה? <select><option value="">לא יודעת</option>${Array.from({length:Y-2013},(_,i)=>Y-i).map(y=>`<option>${y}</option>`).join('')}</select>`;
       w.querySelector('select').onchange=async e=>{const y=+e.target.value;if(!y)return;try{await patch('items/'+r.id,{year:y,yearUnknown:null});w.innerHTML='📅 נשמר: '+y}catch(x){toast('השמירה נכשלה')}};
       row.after(w)}
-  }catch(e){showFail(row,st,f,e)}}}
+  }catch(e){UP.frac[key]=1;showFail(row,st,f,e)}
+  finally{UP.done++;paintUp()}}}
 function showFail(row,st,f,e){
   if(!e.code&&(e.name==='NotReadableError'||e.name==='NotFoundError'))e=new UpErr('READ','הטלפון לא הצליח לקרוא את הקובץ','אם התמונות שמורות ב־iCloud: פותחים את התמונה בגלריה, מחכים שתיטען במלואה, ואז „נסו שוב”',e.name+': '+e.message);
   const code='L-'+(e.code||'X')+'-'+Date.now().toString(36).slice(-4).toUpperCase();
@@ -834,21 +864,25 @@ async function upload(f,prog){
   try{
     if(kindOf(f)==='photo'){
       if(f.size>PHOTO_MAX)throw new UpErr('BIG','התמונה גדולה מדי ('+Math.round(f.size/1048576)+'MB, המקסימום 60MB)','מעלים את התמונה מהטלפון במקום קובץ RAW, או שולחים ליעל');
+      prog(.03,'מכין את התמונה…');
       let i=null;try{i=await img(u)}catch(e){}
       if(i){await put('thumbs/'+id,sq(i));await put('full/'+id,jpg(i,1800))}
       else{const c=document.createElement('canvas');c.width=c.height=400;const x=c.getContext('2d');x.fillStyle='#f3e3da';x.fillRect(0,0,400,400);x.fillStyle='#7d6f74';x.font='bold 30px sans-serif';x.textAlign='center';x.fillText('⏳ בעיבוד',200,210);await put('thumbs/'+id,c.toDataURL('image/jpeg',.8))}
       prog(.25);
       const W=i?i.naturalWidth:0,H=i?i.naturalHeight:0, buf=await f.arrayBuffer(), n=Math.ceil(buf.byteLength/CHUNK);
-      for(let k=0;k<n;k++){await put(`orig/${id}/${k}`,b64(buf.slice(k*CHUNK,(k+1)*CHUNK)));prog(.25+(k+1)/n*.7)}
+      for(let k=0;k<n;k++){await put(`orig/${id}/${k}`,b64(buf.slice(k*CHUNK,(k+1)*CHUNK)));prog(.25+(k+1)/n*.7,`שומר באיכות מלאה ${Math.round((k+1)/n*100)}%`)}
       await put('items/'+id,Object.assign(meta,{kind:'photo',srcW:W,srcH:H,orig:{chunks:n,name:f.name,type:f.type||'image/jpeg',size:f.size},needsConvert:i?null:true,qauto:i&&Math.max(W,H)<1200?'res':null}));
     }else if(kindOf(f)==='video'){
-      if(f.size>VIDEO_MAX)throw new UpErr('BIG','הסרטון גדול מדי ('+Math.round(f.size/1048576)+'MB, המקסימום 45MB)','מצלמום שוב קצר יותר (עד דקה) ולא ב־4K, או שולחים את הסרטון ישירות ליעל');
+      if(f.size>VIDEO_MAX)throw new UpErr('BIG','הסרטון גדול מדי ('+Math.round(f.size/1048576)+'MB, המקסימום 45MB)','מצלמים שוב קצר יותר (עד דקה) ולא ב־4K, או שולחים את הסרטון ישירות ליעל');
+      prog(.02,'מכין את הסרטון…');
       const v=document.createElement('video');v.muted=true;v.playsInline=true;v.preload='auto';v.src=u;
       const vok=await new Promise(ok=>{v.onloadeddata=()=>ok(true);v.onerror=()=>ok(false);setTimeout(()=>ok(false),15000)});
       if(vok){v.currentTime=Math.min(1,(v.duration||2)/3);await new Promise(ok=>{v.onseeked=ok;setTimeout(ok,1500)});await put('thumbs/'+id,sq(v))}
       else{const c=document.createElement('canvas');c.width=c.height=400;const x=c.getContext('2d');x.fillStyle='#f3e3da';x.fillRect(0,0,400,400);x.fillStyle='#7d6f74';x.font='bold 30px sans-serif';x.textAlign='center';x.fillText('🎬 ⏳ בעיבוד',200,210);await put('thumbs/'+id,c.toDataURL('image/jpeg',.8))}
-      const buf=await f.arrayBuffer(),n=Math.ceil(buf.byteLength/CHUNK);
-      for(let i=0;i<n;i++){await put(`vid/${id}/${i}`,b64(buf.slice(i*CHUNK,(i+1)*CHUNK)));prog((i+1)/n*.95)}
+      prog(.04,'קורא את הקובץ…');
+      const buf=await f.arrayBuffer(),n=Math.ceil(buf.byteLength/CHUNK);let sent=0,nx=0;
+      await Promise.all(Array.from({length:Math.min(3,n)},async()=>{while(nx<n){const i=nx++;await put(`vid/${id}/${i}`,b64(buf.slice(i*CHUNK,(i+1)*CHUNK)));sent++;
+        prog(.05+.93*sent/n,`מעלה ${Math.round(sent/n*100)}% · ${(Math.min(sent*CHUNK,f.size)/1048576).toFixed(1)} מתוך ${(f.size/1048576).toFixed(1)}MB`)}}));
       await put('items/'+id,Object.assign(meta,{kind:'video',dur:Math.round(isFinite(v.duration)&&v.duration?v.duration:(f._dur||0)),chunks:n,mime:f.type||'video/mp4',srcW:v.videoWidth,srcH:v.videoHeight,origInVid:{name:f.name,size:f.size},needsConvert:vok?null:true,qauto:Math.min(v.videoWidth,v.videoHeight)&&Math.min(v.videoWidth,v.videoHeight)<480?'res':null}));
     }else{const ext=(f.name.match(/\.([^.]+)$/)||[])[1];
       throw new UpErr('TYPE',`סוג הקובץ ${ext?'.'+ext.toLowerCase():f.type||'הזה'} לא נתמך, ולכן הוא לא עלה`,'אפשר להעלות תמונות (JPG, PNG, HEIC, WebP, GIF, TIFF, RAW) וסרטונים (MP4, MOV, WebM, AVI, MKV, 3GP). בוחרים קובץ מגלריית התמונות')}
