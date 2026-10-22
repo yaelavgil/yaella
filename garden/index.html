@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="משחקון קטן: חמישה עצים מהגינה של יעל ורועי. מנחשים, מקבלים רמז, ומגלים.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="איזה עץ זה? · משחקון הגינה">
+<meta property="og:description" content="5 עצים מהגינה בהקמה. אביבה, בואי נראה אותך 🌿">
+<meta property="og:image" content="https://yaelavgil.github.io/yaella/garden/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://yaelavgil.github.io/yaella/garden/">
+<link rel="icon" href="/yaella/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/yaella/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/yaella/apple-touch-icon.png">
+<title>איזה עץ זה?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Secular+One&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+:root{
+  --ink:#1f2a1f; --muted:#5d6b5a; --card:rgba(252,250,244,.88); --line:#dcd8c8;
+  --leaf:#4f9a45; --leaf-d:#3a7a34; --sun:#f4c032; --terra:#d9784f; --bad:#c4553a;
+  color-scheme:light;
+}
+html,body{margin:0;height:100%}
+body{font-family:'Varela Round',system-ui,sans-serif;color:var(--ink);background:#2e4a2b;overflow-x:hidden;
+  min-height:100dvh;display:flex;justify-content:center}
+#bg{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+.shade{position:fixed;inset:0;z-index:1;background:linear-gradient(180deg,rgba(20,40,20,.35),rgba(20,40,20,.55))}
+main{position:relative;z-index:2;width:100%;max-width:520px;padding:calc(env(safe-area-inset-top,0px) + 18px) 16px calc(env(safe-area-inset-bottom,0px) + 24px);
+  display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border-radius:26px;padding:20px;box-shadow:0 18px 50px rgba(0,0,0,.28);backdrop-filter:blur(6px)}
+h1,h2,.big{font-family:'Secular One','Varela Round',sans-serif;font-weight:400;margin:0}
+h1{font-size:clamp(34px,10vw,46px);line-height:1.05}
+p{margin:0;line-height:1.55}
+.muted{color:var(--muted)}
+button{font:inherit;cursor:pointer;border:0;border-radius:999px;padding:13px 20px;font-size:17px;transition:transform .12s}
+button:active{transform:scale(.96)}
+.primary{background:var(--leaf);color:#fff;box-shadow:0 4px 0 var(--leaf-d)}
+.ghost{background:#efeadb;color:var(--ink)}
+.sunny{background:var(--sun);color:#3b2d00}
+
+/* start */
+#start{margin-top:auto;margin-bottom:auto;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px}
+#start img.mascot{width:130px;animation:sway 2.6s ease-in-out infinite;transform-origin:50% 90%}
+@keyframes sway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+#start .go{font-size:20px;padding:15px 34px;margin-top:6px}
+
+/* game */
+.top{display:flex;align-items:center;justify-content:space-between;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.4)}
+.dots{display:flex;gap:6px}
+.dots i{width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,.4);display:block}
+.dots i.now{background:#fff}
+.dots i.ok{background:var(--sun)}
+.dots i.miss{background:#e9a48f}
+.score{font-family:'Secular One';font-size:18px}
+.photo{position:relative;border-radius:18px;overflow:hidden;background:#cfd8c6;aspect-ratio:3/4;height:min(46dvh,calc((100vw - 72px)*4/3));max-width:100%;margin:0 auto;cursor:zoom-in}
+.photo img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s}
+.photo .num{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.55);color:#fff;border-radius:999px;padding:4px 12px;font-size:14px}
+.photo .zoom{position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,.55);color:#fff;border-radius:999px;padding:6px 12px;font-size:14px}
+form{display:flex;gap:8px;margin-top:14px}
+input{flex:1;min-width:0;font:inherit;font-size:18px;padding:13px 16px;border-radius:999px;border:2px solid var(--line);background:#fff;color:var(--ink)}
+input:focus{outline:none;border-color:var(--leaf)}
+.fb{margin-top:12px;min-height:0}
+.msg{font-size:18px;text-align:center;padding:4px 0 10px}
+.msg.bad{color:var(--bad)}
+.msg.warm{color:#b07a00}
+.acts{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.hint{background:#fff6d8;border:1px dashed #e0bf52;border-radius:16px;padding:10px 14px;margin-top:10px;font-size:16px}
+.reveal{text-align:center;padding-top:4px}
+.reveal .big{font-size:40px;color:var(--leaf-d)}
+.reveal .sci{font-size:14px;color:var(--muted);direction:ltr;font-style:italic}
+.reveal p{margin:8px 0 14px}
+.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+
+/* end */
+#end{text-align:center}
+#end .big{font-size:56px;color:var(--leaf-d);line-height:1}
+.list{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:16px 0}
+.list figure{margin:0}
+.list img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px;display:block}
+.list figcaption{font-size:12px;margin-top:3px}
+
+#snd{position:fixed;z-index:5;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);left:14px;width:44px;height:44px;padding:0;border-radius:50%;
+  background:rgba(0,0,0,.45);color:#fff;font-size:20px}
+#lb{position:fixed;inset:0;z-index:9;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center}
+#lb img{max-width:100%;max-height:100%}
+.leaf{position:fixed;z-index:8;top:-40px;font-size:28px;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+</style>
+</head>
+<body>
+<video id="bg" src="media/garden.mp4" poster="media/poster.jpg" muted loop playsinline autoplay preload="auto"></video>
+<div class="shade"></div>
+<audio id="amb" src="media/nature.m4a" loop preload="auto"></audio>
+<button id="snd" type="button" aria-label="צליל" hidden>🔊</button>
+
+<main>
+  <section id="start" class="card">
+    <img class="mascot" src="img/sprout.png" alt="">
+    <h1>איזה עץ זה?</h1>
+    <p>הגינה שלנו בהקמה, והעצים כבר כאן.<br>חמישה עצים, חמש תמונות. מנחשים, ואם נתקעים יש רמזים.</p>
+    <p class="muted">במיוחד לאביבה, הבוטנאית של המשפחה 🌿</p>
+    <button class="primary go" type="button" id="goBtn">יאללה, מתחילים</button>
+  </section>
+
+  <div id="game" hidden>
+    <div class="top"><div class="dots" id="dots"></div><div class="score" id="score">0 נק׳</div></div>
+    <section class="card" id="play">
+      <div class="photo" id="photo"><img id="pic" alt="עץ מהגינה"><span class="num" id="num"></span><span class="zoom">🔍 הגדלה</span></div>
+      <div id="ask">
+        <form id="f" autocomplete="off">
+          <input id="guess" placeholder="מה העץ הזה?" aria-label="הניחוש שלך" enterkeyhint="done">
+          <button class="primary" type="submit">בדיקה</button>
+        </form>
+        <div class="fb" id="fb"></div>
+      </div>
+      <div class="reveal" id="rev" hidden></div>
+    </section>
+  </div>
+
+  <section id="end" class="card" hidden></section>
+</main>
+
+<div id="lb" hidden><img alt=""></div>
+
+<script>
+// ---- the trees: edit names / hints here ----
+var TREES = [
+  {img:'img/tree1.jpg', name:"ליצ'י", sci:'Litchi chinensis',
+   ok:["ליצי","ליצ'י","ליצ׳י","litchi","lychee","lichi"],
+   warm:{words:["לונגן","רמבוטן"], say:'ממש קרוב! אותה משפחה בדיוק, אבל לא.'},
+   hints:['עץ טרופי. הפרי שלו מבשיל אצלנו בתחילת הקיץ, ביוני־יולי.','פרי אדום עם קליפה מחוספסת, ובפנים ציפה לבנה ושקופה.'],
+   fact:'מקורו בדרום סין, ושם הוא מגודל כבר אלפי שנים. עוד כמה שנים: ליצ\'י מהגינה!'},
+  {img:'img/tree2.jpg', name:'אפרסק', sci:'Prunus persica',
+   ok:["אפרסק","נקטרינה","peach","nectarine"],
+   warm:{words:["שקד","שזיף","משמש","דובדבן"], say:'חם חם! זה מאותה משפחה, אבל לא הוא.'},
+   hints:['עץ נשיר. בחורף הוא יעמוד בלי עלה אחד.','פרי קיץ קטיפתי ועסיסי, שהמיץ שלו נוזל על המרפק.'],
+   fact:'באביב הוא פורח בוורוד. ונקטרינה? היא בעצם אפרסק בלי הפלומה.'},
+  {img:'img/tree3.jpg', name:'מנגו', sci:'Mangifera indica',
+   ok:["מנגו","mango"],
+   warm:{words:["ליצי","אבוקדו"], say:'כמעט! גם הוא טרופי, אבל לא.'},
+   hints:['העלים הצעירים שלו יוצאים בצבע אדמדם־ברונזה ורק אחר כך מוריקים.','הפרי כתום, מתוק ומלכלך את הסנטר.'],
+   fact:'קרוב משפחה של הפיסטוק ושל הקשיו. בעוד כמה שנים: מנגו מהעץ, ישר לקינוח.'},
+  {img:'img/tree4.jpg', name:'תפוז', sci:'Citrus sinensis',
+   ok:["תפוז","orange"],
+   warm:{words:["הדר","קלמנטינה","מנדרינה","לימון","אשכולית","פומלה","פומלית","ליים","קומקוואט","תפוזינה"], say:'חם! זה הדר, אבל לא הזה.'},
+   hints:['הדר, כן. עכשיו רק צריך לדעת איזה.','השם שלו בעברית הוא קיצור של "תפוח זהב".'],
+   fact:'תפוז = תפוח זהב. ובאביב, כשהוא פורח, כל החצר תריח.'},
+  {img:'img/tree5.jpg', name:'אשכולית', sci:'Citrus × paradisi',
+   ok:["אשכולית","אשכוליות","grapefruit"],
+   warm:{words:["הדר","תפוז","קלמנטינה","מנדרינה","לימון","פומלה","פומלית","ליים","קומקוואט","תפוזינה"], say:'חם! זה הדר, אבל לא הזה.'},
+   hints:['הדר עם עלים גדולים ורחבים במיוחד.','הפרי גדל באשכולות. משם השם, גם בעברית וגם באנגלית.'],
+   fact:'באנגלית grapefruit, כי הפרי גדל באשכולות כמו ענבים.'}
+];
+
+var lastMsg='';
+var NOPE = ['לא... 🙂','ממש לא, אבל ניסיון יפה','אוי, לא','לא זה. העץ קצת נעלב 🌳','לא, אבל אהבנו את האומץ'];
+var $ = function(id){return document.getElementById(id)};
+var i = 0, tries = 0, hintsUsed = 0, total = 0, results = [];
+
+// ---- sound / video ----
+var amb = $('amb'), snd = $('snd'), bg = $('bg'), soundOn = true;
+function startMedia(){
+  bg.play().catch(function(){});
+  amb.volume = 0.7;
+  amb.play().then(function(){snd.hidden=false}).catch(function(){snd.hidden=false;soundOn=false;snd.textContent='🔇'});
+}
+snd.addEventListener('click',function(){
+  soundOn=!soundOn; snd.textContent=soundOn?'🔊':'🔇';
+  if(soundOn){amb.play().catch(function(){})}else{amb.pause()}
+});
+
+// ---- matching ----
+function norm(s){
+  return s.toLowerCase().replace(/[\s'"`׳״\-.,!?]/g,'')
+    .replace(/ך/g,'כ').replace(/ם/g,'מ').replace(/ן/g,'נ').replace(/ף/g,'פ').replace(/ץ/g,'צ')
+    .replace(/^עצ(ה)?/,'').replace(/^ה(?=.{3,})/,'');
+}
+function lev(a,b){
+  var m=[],x,y;for(x=0;x<=a.length;x++){m[x]=[x]}for(y=0;y<=b.length;y++){m[0][y]=y}
+  for(x=1;x<=a.length;x++)for(y=1;y<=b.length;y++)m[x][y]=Math.min(m[x-1][y]+1,m[x][y-1]+1,m[x-1][y-1]+(a[x-1]===b[y-1]?0:1));
+  return m[a.length][b.length];
+}
+function hits(g,list){
+  var n=norm(g);
+  return list.some(function(w){var k=norm(w);return n===k||(k.length>=4&&lev(n,k)<=1)||(n.length>=4&&n.indexOf(k)>=0&&k.length>=3)});
+}
+
+// ---- flow ----
+function dots(){
+  $('dots').innerHTML=TREES.map(function(_,k){
+    var c=results[k]?(results[k].pts>0?'ok':'miss'):(k===i?'now':'');return '<i class="'+c+'"></i>'}).join('');
+  $('score').textContent=total+' נק׳';
+}
+function show(){
+  var t=TREES[i]; tries=0; hintsUsed=0;
+  $('pic').src=t.img; $('num').textContent='עץ '+(i+1)+' מתוך '+TREES.length;
+  $('ask').hidden=false; $('rev').hidden=true; $('fb').innerHTML=''; $('guess').value='';
+  dots();
+  if(i+1<TREES.length){var pre=new Image();pre.src=TREES[i+1].img}
+}
+function feedback(html){$('fb').innerHTML=html}
+function actions(){
+  var t=TREES[i], more=hintsUsed<t.hints.length;
+  return '<div class="acts">'+
+    '<button type="button" class="ghost" data-a="retry">לנסות שוב</button>'+
+    (more?'<button type="button" class="sunny" data-a="hint">רמז 💡</button>':'')+
+    '<button type="button" class="ghost" data-a="show">תראו לי</button></div>'+hintsHtml();
+}
+function hintsHtml(){
+  return TREES[i].hints.slice(0,hintsUsed).map(function(x,k){return '<div class="hint">💡 רמז '+(k+1)+': '+x+'</div>'}).join('');
+}
+$('f').addEventListener('submit',function(e){
+  e.preventDefault();
+  var g=$('guess').value.trim(); if(!g){$('guess').focus();return}
+  var t=TREES[i]; tries++;
+  if(hits(g,t.ok)){ return win(); }
+  var warm=t.warm&&hits(g,t.warm.words);
+  var m=warm?t.warm.say:NOPE[(tries-1)%NOPE.length];
+  lastMsg='<div class="msg '+(warm?'warm':'bad')+'">'+m+'</div>';
+  feedback(lastMsg+actions());
+  $('play').classList.remove('shake'); void $('play').offsetWidth; $('play').classList.add('shake');
+  $('guess').blur();
+});
+$('fb').addEventListener('click',function(e){
+  var a=e.target.getAttribute('data-a'); if(!a)return;
+  if(a==='retry'){feedback(hintsHtml());$('guess').value='';$('guess').focus()}
+  if(a==='hint'){hintsUsed++;feedback(lastMsg+actions())}
+  if(a==='show'){reveal(0,false)}
+});
+function win(){
+  var pts=Math.max(1,3-hintsUsed-(tries>1?1:0));
+  confetti(); reveal(pts,true);
+}
+function reveal(pts,won){
+  var t=TREES[i]; total+=pts; results[i]={pts:pts,won:won};
+  $('ask').hidden=true; var r=$('rev'); r.hidden=false;
+  var head=won?(tries===1&&!hintsUsed?'בול! על הפעם הראשונה 🎉':'נכון! 🎉'):'זה היה...';
+  r.innerHTML='<p class="muted" style="margin:0 0 4px">'+head+'</p><div class="big">'+t.name+'</div>'+
+    '<div class="sci">'+t.sci+'</div><p>'+t.fact+'</p>'+
+    (won?'<p class="muted" style="margin-top:-6px">+'+pts+' נק׳</p>':'')+
+    '<button class="primary" type="button" id="next">'+(i+1<TREES.length?'לעץ הבא ←':'לתוצאות 🌳')+'</button>';
+  $('next').addEventListener('click',function(){i++; if(i<TREES.length){show()}else{end()} window.scrollTo({top:0,behavior:'smooth'})});
+  dots();
+}
+function end(){
+  $('game').hidden=true; var e=$('end'); e.hidden=false;
+  var max=TREES.length*3, n=results.filter(function(r){return r.won}).length;
+  var title = total>=13?'אביבה, את רשמית האגרונומית של המשפחה 👩‍🌾':
+              total>=9 ?'יש לך עין ירוקה! כמעט מושלם 🌿':
+              total>=5 ?'לא רע בכלל. עוד שנה, כשיהיו פירות, יהיה קל יותר 🍊':
+                        'מבטיחים שכשיהיו פירות, זה יהיה קל יותר 😄';
+  e.innerHTML='<img src="img/sprout.png" alt="" style="width:90px">'+
+    '<div class="big"><bdi dir="ltr">'+total+'<span style="font-size:24px"> / '+max+'</span></bdi></div>'+
+    '<p style="font-size:19px;margin:6px 0 2px">'+title+'</p><p class="muted">'+n+' מתוך '+TREES.length+' עצים בלי לראות את התשובה</p>'+
+    '<div class="list">'+TREES.map(function(t,k){return '<figure><img src="'+t.img+'" alt=""><figcaption>'+(results[k].won?'✅ ':'')+t.name+'</figcaption></figure>'}).join('')+'</div>'+
+    '<p class="muted" style="margin-bottom:14px">ניפגש בגינה כשהכל יהיה שתול 💚<br>יעל ורועי</p>'+
+    '<button class="ghost" type="button" id="again">עוד סיבוב</button>';
+  $('again').addEventListener('click',function(){i=0;total=0;results=[];e.hidden=true;$('game').hidden=false;show()});
+}
+function confetti(){
+  var L=['🍃','🌿','🍀','🌱','🍊'];
+  for(var k=0;k<22;k++){var s=document.createElement('span');s.className='leaf';s.textContent=L[k%L.length];
+    s.style.left=Math.random()*100+'vw';s.style.animationDuration=(1.8+Math.random()*1.6)+'s';s.style.animationDelay=(Math.random()*.4)+'s';
+    document.body.appendChild(s);setTimeout(function(x){return function(){x.remove()}}(s),4000)}
+}
+// lightbox
+$('photo').addEventListener('click',function(){var lb=$('lb');lb.querySelector('img').src=TREES[i].img;lb.hidden=false});
+$('lb').addEventListener('click',function(){this.hidden=true});
+
+$('goBtn').addEventListener('click',function(){
+  startMedia(); $('start').hidden=true; $('game').hidden=false; show();
+});
+</script>
+</body>
+</html>

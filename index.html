@@ -67,6 +67,7 @@ h1{font-family:var(--display);font-weight:700;font-size:clamp(52px,10vw,80px);li
     <button type="button" data-f="חברים" aria-pressed="false">חברים</button>
     <button type="button" data-f="רועי" aria-pressed="false">רועי</button>
     <button type="button" data-f="מעצבת" aria-pressed="false">מעצבת</button>
+    <button type="button" data-f="משפחה" aria-pressed="false">משפחה</button>
   </div>
 
   <div id="out"></div>
@@ -82,6 +83,8 @@ h1{font-family:var(--display);font-weight:700;font-size:clamp(52px,10vw,80px);li
 // path: a page inside this collection. url: an older page that lives in its own artifact.
 var BASE = 'https://yaelavgil.github.io/yaella/';
 var PAGES = [
+  {slug:'garden', group:'הבית · החצר', title:'איזה עץ זה? · משחקון הגינה', who:'משפחה', date:'2026-10-22',
+   desc:'חמישה עצים מהגינה בהקמה: מנחשים, מקבלים רמז ומגלים. במיוחד לאביבה.', path:'garden/', thumb:'garden/og.jpg'},
   {slug:'stepping-stones', group:'הבית · החצר', title:'שביל אבני המדרך', who:'מעצבת', date:'2026-10-18',
    desc:'מפה אינטראקטיבית: גוררים ומסובבים את אבני המדרך ורואים מיד איך השביל ייראה מהכניסה.', path:'stepping-stones/', thumb:'stepping-stones/og.jpg'},
   {slug:'lucy', group:'בת המצווה של לוסי · 2026', title:'לוסי בת 12 · יעל וענת ממיינות תמונות', who:'חברים', date:'2026-10-13',
