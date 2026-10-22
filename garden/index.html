@@ -124,7 +124,8 @@ input:focus{outline:none;border-color:var(--leaf)}
 <div id="dock" hidden><button type="button" id="dAgain">🔁 סיבוב נוסף</button><button type="button" id="dBoard">🏆 טבלת הניקוד</button></div>
 
 <main>
-  <section id="start" class="card">
+  <section id="start" class="card" style="position:relative">
+    <button class="x" type="button" id="startX" aria-label="סגירה">✕</button>
     <img class="mascot" src="img/sprout.png" alt="">
     <h1>איזה עץ זה?</h1>
     <p>הגינה שלנו בהקמה, והעצים כבר כאן.<br>חמישה עצים, חמש תמונות. מנחשים, ואם נתקעים יש רמזים.</p>
@@ -367,6 +368,7 @@ function exitGame(){
 }
 $('mExit').addEventListener('click',exitGame);
 $('exitBtn').addEventListener('click',exitGame);
+$('startX').addEventListener('click',function(){startMedia();exitGame()});
 $('mClose').addEventListener('click',function(){$('mBoard').hidden=true});
 $('mBoard').addEventListener('click',function(e){if(e.target===this)this.hidden=true});
 $('dBoard').addEventListener('click',openBoard);
