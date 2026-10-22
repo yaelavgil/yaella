@@ -287,7 +287,9 @@ try{player=localStorage.getItem('gardenName')||''}catch(e){}
 if(player)$('pname').value=player;
 function setPlayer(v){player=v.slice(0,24);try{localStorage.setItem('gardenName',player)}catch(e){}}
 function keyOf(n){return n.trim().toLowerCase().replace(/[.#$\[\]\/\s]+/g,'_').slice(0,40)||'_'}
+function isTest(n){return /^\s*(test|טסט|טעסט|בדיקה)/i.test(n||'')}
 function saveScore(sc,max){
+  if(!player||isTest(player)){return loadBoard()}
   var k=keyOf(player), url=DB+'/'+encodeURIComponent(k)+'.json';
   fetch(url).then(function(r){return r.json()}).then(function(old){
     var rec={name:player,score:sc,max:max,plays:((old&&old.plays)||0)+1,ts:Date.now()};
@@ -298,7 +300,7 @@ function saveScore(sc,max){
 function loadBoard(meKey){
   meKey=meKey||(player?keyOf(player):'');
   fetch(DB+'.json').then(function(r){return r.json()}).then(function(d){
-    var rows=Object.keys(d||{}).map(function(k){var x=d[k]||{};return {k:k,name:String(x.name||'?'),score:+x.score||0,ts:+x.ts||0}})
+    var rows=Object.keys(d||{}).filter(function(k){return !isTest((d[k]||{}).name)}).map(function(k){var x=d[k]||{};return {k:k,name:String(x.name||'?'),score:+x.score||0,ts:+x.ts||0}})
       .sort(function(a,b){return b.score-a.score||a.ts-b.ts});
     var box=$('boardList'); if(!box)return;
     if(!rows.length){box.textContent='עדיין אין אף אחד בטבלה. את/ה הראשון/ה!';return}
