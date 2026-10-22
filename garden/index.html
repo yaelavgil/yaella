@@ -85,6 +85,15 @@ input:focus{outline:none;border-color:var(--leaf)}
 .list img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px;display:block}
 .list figcaption{font-size:12px;margin-top:3px}
 
+.board{margin:6px 0 18px;text-align:right}
+.board h2{font-size:24px;text-align:center;margin-bottom:8px}
+.board ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.board li{display:flex;align-items:center;gap:10px;background:#fff;border-radius:14px;padding:9px 14px;border:1px solid var(--line)}
+.board li.me{background:#fff6d8;border-color:#e0bf52}
+.board .pos{width:28px;text-align:center;font-family:'Secular One'}
+.board .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.board .pt{font-family:'Secular One';direction:ltr}
+.join{display:flex;gap:8px;margin-top:10px}
 #snd{position:fixed;z-index:5;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);left:14px;width:44px;height:44px;padding:0;border-radius:50%;
   background:rgba(0,0,0,.45);color:#fff;font-size:20px}
 #lb{position:fixed;inset:0;z-index:9;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center}
@@ -105,6 +114,7 @@ input:focus{outline:none;border-color:var(--leaf)}
     <h1>איזה עץ זה?</h1>
     <p>הגינה שלנו בהקמה, והעצים כבר כאן.<br>חמישה עצים, חמש תמונות. מנחשים, ואם נתקעים יש רמזים.</p>
     <p class="muted">במיוחד לאביבה, הבוטנאית של המשפחה 🌿</p>
+    <input id="pname" maxlength="24" placeholder="איך קוראים לך? (לטבלת הניקוד)" aria-label="השם שלך לטבלת הניקוד" autocomplete="given-name" style="width:100%;max-width:300px;text-align:center">
     <button class="primary go" type="button" id="goBtn">יאללה, מתחילים</button>
   </section>
 
@@ -251,7 +261,8 @@ function reveal(pts,won){
 function end(){
   $('game').hidden=true; var e=$('end'); e.hidden=false;
   var max=TREES.length*3, n=results.filter(function(r){return r.won}).length;
-  var title = total>=13?'אביבה, את רשמית האגרונומית של המשפחה 👩‍🌾':
+  var aviva=/אביב/.test(player);
+  var title = total>=13?(aviva?'אביבה, את רשמית האגרונומית של המשפחה 👩‍🌾':(player?player+', ':'')+'ציון של אגרונומים מוסמכים 🧑‍🌾'):
               total>=9 ?'יש לך עין ירוקה! כמעט מושלם 🌿':
               total>=5 ?'לא רע בכלל. עוד שנה, כשיהיו פירות, יהיה קל יותר 🍊':
                         'מבטיחים שכשיהיו פירות, זה יהיה קל יותר 😄';
@@ -259,9 +270,49 @@ function end(){
     '<div class="big"><bdi dir="ltr">'+total+'<span style="font-size:24px"> / '+max+'</span></bdi></div>'+
     '<p style="font-size:19px;margin:6px 0 2px">'+title+'</p><p class="muted">'+n+' מתוך '+TREES.length+' עצים בלי לראות את התשובה</p>'+
     '<div class="list">'+TREES.map(function(t,k){return '<figure><img src="'+t.img+'" alt=""><figcaption>'+(results[k].won?'✅ ':'')+t.name+'</figcaption></figure>'}).join('')+'</div>'+
+    '<div class="board" id="board"><h2>🏆 טבלת הניקוד</h2><div id="boardList" class="muted" style="text-align:center">טוען...</div>'+
+      (player?'':'<form class="join" id="joinF"><input id="joinName" maxlength="24" placeholder="השם שלך" aria-label="השם שלך"><button class="primary" type="submit">להיכנס לטבלה</button></form>')+'</div>'+
     '<p class="muted" style="margin-bottom:14px">ניפגש בגינה כשהכל יהיה שתול 💚<br>יעל ורועי</p>'+
     '<button class="ghost" type="button" id="again">עוד סיבוב</button>';
   $('again').addEventListener('click',function(){i=0;total=0;results=[];e.hidden=true;$('game').hidden=false;show()});
+  var jf=$('joinF');
+  if(jf)jf.addEventListener('submit',function(ev){ev.preventDefault();var v=$('joinName').value.trim();if(!v)return;setPlayer(v);jf.remove();saveScore(total,max)});
+  if(player){saveScore(total,max)}else{loadBoard()}
+}
+
+// ---- leaderboard (shared Firebase RTDB, best score per name) ----
+var DB='https://home-picks-47450-default-rtdb.europe-west1.firebasedatabase.app/garden_scores';
+var player='';
+try{player=localStorage.getItem('gardenName')||''}catch(e){}
+if(player)$('pname').value=player;
+function setPlayer(v){player=v.slice(0,24);try{localStorage.setItem('gardenName',player)}catch(e){}}
+function keyOf(n){return n.trim().toLowerCase().replace(/[.#$\[\]\/\s]+/g,'_').slice(0,40)||'_'}
+function saveScore(sc,max){
+  var k=keyOf(player), url=DB+'/'+encodeURIComponent(k)+'.json';
+  fetch(url).then(function(r){return r.json()}).then(function(old){
+    var rec={name:player,score:sc,max:max,plays:((old&&old.plays)||0)+1,ts:Date.now()};
+    if(old&&old.score>sc){rec.score=old.score;rec.ts=old.ts;rec.last=sc}
+    return fetch(url,{method:'PUT',body:JSON.stringify(rec)});
+  }).catch(function(){}).then(function(){loadBoard(k)});
+}
+function loadBoard(meKey){
+  meKey=meKey||(player?keyOf(player):'');
+  fetch(DB+'.json').then(function(r){return r.json()}).then(function(d){
+    var rows=Object.keys(d||{}).map(function(k){var x=d[k]||{};return {k:k,name:String(x.name||'?'),score:+x.score||0,ts:+x.ts||0}})
+      .sort(function(a,b){return b.score-a.score||a.ts-b.ts});
+    var box=$('boardList'); if(!box)return;
+    if(!rows.length){box.textContent='עדיין אין אף אחד בטבלה. את/ה הראשון/ה!';return}
+    var ol=document.createElement('ol'), medal=['🥇','🥈','🥉'];
+    rows.slice(0,30).forEach(function(r,idx){
+      var li=document.createElement('li'); if(r.k===meKey)li.className='me';
+      li.innerHTML='<span class="pos"></span><span class="nm"></span><span class="pt"></span>';
+      li.querySelector('.pos').textContent=medal[idx]||(idx+1);
+      li.querySelector('.nm').textContent=r.name;
+      li.querySelector('.pt').textContent=r.score+' / 15';
+      ol.appendChild(li);
+    });
+    box.className='';box.innerHTML='';box.appendChild(ol);
+  }).catch(function(){var b=$('boardList');if(b)b.textContent='לא הצלחנו לטעון את הטבלה כרגע'});
 }
 function confetti(){
   var L=['🍃','🌿','🍀','🌱','🍊'];
@@ -274,6 +325,7 @@ $('photo').addEventListener('click',function(){var lb=$('lb');lb.querySelector('
 $('lb').addEventListener('click',function(){this.hidden=true});
 
 $('goBtn').addEventListener('click',function(){
+  var v=$('pname').value.trim(); if(v)setPlayer(v);
   startMedia(); $('start').hidden=true; $('game').hidden=false; show();
 });
 </script>
