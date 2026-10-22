@@ -31,12 +31,12 @@ body{font-family:'Varela Round',system-ui,sans-serif;color:var(--ink);background
 #bg{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
 .shade{position:fixed;inset:0;z-index:1;background:linear-gradient(180deg,rgba(20,40,20,.35),rgba(20,40,20,.55));transition:opacity 1.2s}
 body.watch .shade{opacity:0}
-body.watch #snd{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 14px)}
 #end{transition:opacity .9s,transform .9s}
 #end.out{opacity:0;transform:translateY(24px);pointer-events:none}
 #dock{position:fixed;z-index:6;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 14px);display:flex;gap:8px;
   animation:dockIn .6s ease-out}
 #dock button{background:rgba(20,35,20,.6);color:#fff;font-size:15px;padding:10px 16px;backdrop-filter:blur(6px);white-space:nowrap}
+@media (max-width:600px){#dock{left:auto;right:14px;transform:none;animation:none}}
 @keyframes dockIn{from{opacity:0;transform:translate(-50%,16px)}to{opacity:1;transform:translate(-50%,0)}}
 .watchbtn{display:block;margin:10px auto 0;background:none;color:var(--muted);font-size:15px;padding:6px 10px;text-decoration:underline}
 main{position:relative;z-index:2;width:100%;max-width:520px;padding:calc(env(safe-area-inset-top,0px) + 18px) 16px calc(env(safe-area-inset-bottom,0px) + 76px);
@@ -135,7 +135,7 @@ input:focus{outline:none;border-color:var(--leaf)}
   </section>
 
   <div id="game" hidden>
-    <div class="top"><div class="dots" id="dots"></div><div style="display:flex;align-items:center;gap:10px"><div class="score" id="score">0 נק׳</div><button class="trophy" type="button" data-board aria-label="טבלת הניקוד">🏆 טבלה</button></div></div>
+    <div class="top"><div class="dots" id="dots"></div><div style="display:flex;align-items:center;gap:10px"><div class="score" id="score">0 נק׳</div><button class="trophy" type="button" data-board aria-label="טבלת הניקוד">🏆 טבלה</button><button class="trophy" type="button" id="exitBtn" aria-label="יציאה מהמשחק">✕ יציאה</button></div></div>
     <section class="card" id="play">
       <div class="photo" id="photo"><img id="pic" alt="עץ מהגינה"><span class="num" id="num"></span><span class="zoom">🔍 הגדלה</span></div>
       <div id="ask">
@@ -351,7 +351,7 @@ function watch(){
   bg.play().catch(function(){});
 }
 function unwatch(){document.body.classList.remove('watch');$('dock').hidden=true;var e=$('end');e.classList.remove('out')}
-function restart(){clearTimeout(watchT);unwatch();i=0;total=0;results=[];$('end').hidden=true;$('game').hidden=false;show();window.scrollTo(0,0)}
+function restart(){clearTimeout(watchT);unwatch();bg.play().catch(function(){});i=0;total=0;results=[];$('end').hidden=true;$('game').hidden=false;show();window.scrollTo(0,0)}
 $('dAgain').addEventListener('click',restart);
 function openBoard(){
   $('mBoard').hidden=false; $('mList').className='muted'; $('mList').textContent='טוען...';
@@ -361,10 +361,12 @@ function openBoard(){
   loadBoard(null,'mList');
 }
 document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('[data-board]'))openBoard()});
-$('mExit').addEventListener('click',function(){
-  $('mBoard').hidden=true; $('game').hidden=true; $('start').hidden=true;
+function exitGame(){
+  $('mBoard').hidden=true; $('lb').hidden=true; $('game').hidden=true; $('start').hidden=true;
   document.body.classList.add('watch'); $('dock').hidden=false; bg.play().catch(function(){});
-});
+}
+$('mExit').addEventListener('click',exitGame);
+$('exitBtn').addEventListener('click',exitGame);
 $('mClose').addEventListener('click',function(){$('mBoard').hidden=true});
 $('mBoard').addEventListener('click',function(e){if(e.target===this)this.hidden=true});
 $('dBoard').addEventListener('click',openBoard);
