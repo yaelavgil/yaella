@@ -29,7 +29,16 @@ html,body{margin:0;height:100%}
 body{font-family:'Varela Round',system-ui,sans-serif;color:var(--ink);background:#2e4a2b;overflow-x:hidden;
   min-height:100dvh;display:flex;justify-content:center}
 #bg{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
-.shade{position:fixed;inset:0;z-index:1;background:linear-gradient(180deg,rgba(20,40,20,.35),rgba(20,40,20,.55))}
+.shade{position:fixed;inset:0;z-index:1;background:linear-gradient(180deg,rgba(20,40,20,.35),rgba(20,40,20,.55));transition:opacity 1.2s}
+body.watch .shade{opacity:0}
+body.watch #snd{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 14px)}
+#end{transition:opacity .9s,transform .9s}
+#end.out{opacity:0;transform:translateY(24px);pointer-events:none}
+#dock{position:fixed;z-index:6;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 14px);display:flex;gap:8px;
+  animation:dockIn .6s ease-out}
+#dock button{background:rgba(20,35,20,.6);color:#fff;font-size:15px;padding:10px 16px;backdrop-filter:blur(6px);white-space:nowrap}
+@keyframes dockIn{from{opacity:0;transform:translate(-50%,16px)}to{opacity:1;transform:translate(-50%,0)}}
+.watchbtn{display:block;margin:10px auto 0;background:none;color:var(--muted);font-size:15px;padding:6px 10px;text-decoration:underline}
 main{position:relative;z-index:2;width:100%;max-width:520px;padding:calc(env(safe-area-inset-top,0px) + 18px) 16px calc(env(safe-area-inset-bottom,0px) + 24px);
   display:flex;flex-direction:column;gap:14px}
 .card{background:var(--card);border-radius:26px;padding:20px;box-shadow:0 18px 50px rgba(0,0,0,.28);backdrop-filter:blur(6px)}
@@ -107,6 +116,7 @@ input:focus{outline:none;border-color:var(--leaf)}
 <div class="shade"></div>
 <audio id="amb" src="media/nature.m4a" loop preload="auto"></audio>
 <button id="snd" type="button" aria-label="צליל" hidden>🔊</button>
+<div id="dock" hidden><button type="button" id="dAgain">🔁 סיבוב נוסף</button><button type="button" id="dBoard">🏆 טבלת הניקוד</button></div>
 
 <main>
   <section id="start" class="card">
@@ -273,10 +283,14 @@ function end(){
     '<div class="board" id="board"><h2>🏆 טבלת הניקוד</h2><div id="boardList" class="muted" style="text-align:center">טוען...</div>'+
       (player?'':'<form class="join" id="joinF"><input id="joinName" maxlength="24" placeholder="השם שלך" aria-label="השם שלך"><button class="primary" type="submit">להיכנס לטבלה</button></form>')+'</div>'+
     '<p class="muted" style="margin-bottom:14px">ניפגש בגינה כשהכל יהיה שתול 💚<br>יעל ורועי</p>'+
-    '<button class="ghost" type="button" id="again">עוד סיבוב</button>';
-  $('again').addEventListener('click',function(){i=0;total=0;results=[];e.hidden=true;$('game').hidden=false;show()});
+    '<button class="ghost" type="button" id="again">עוד סיבוב</button>'+
+    '<button class="watchbtn" type="button" id="watchBtn">לצפות בגינה ▶</button>';
+  $('again').addEventListener('click',restart);
+  $('watchBtn').addEventListener('click',watch);
+  scheduleWatch(10000);
+  var jn=$('joinName'); if(jn)jn.addEventListener('focus',function(){clearTimeout(watchT)});
   var jf=$('joinF');
-  if(jf)jf.addEventListener('submit',function(ev){ev.preventDefault();var v=$('joinName').value.trim();if(!v)return;setPlayer(v);jf.remove();saveScore(total,max)});
+  if(jf)jf.addEventListener('submit',function(ev){ev.preventDefault();var v=$('joinName').value.trim();if(!v)return;setPlayer(v);jf.remove();saveScore(total,max);scheduleWatch(7000)});
   if(player){saveScore(total,max)}else{loadBoard()}
 }
 
@@ -316,6 +330,19 @@ function loadBoard(meKey){
     box.className='';box.innerHTML='';box.appendChild(ol);
   }).catch(function(){var b=$('boardList');if(b)b.textContent='לא הצלחנו לטעון את הטבלה כרגע'});
 }
+// ---- after the game: fade the card away and leave the garden video looping ----
+var watchT=0;
+function scheduleWatch(ms){clearTimeout(watchT);watchT=setTimeout(watch,ms)}
+function watch(){
+  clearTimeout(watchT); var e=$('end'); e.classList.add('out'); document.body.classList.add('watch');
+  setTimeout(function(){if(e.classList.contains('out')){e.hidden=true;$('dock').hidden=false}},900);
+  bg.play().catch(function(){});
+}
+function unwatch(){document.body.classList.remove('watch');$('dock').hidden=true;var e=$('end');e.classList.remove('out')}
+function restart(){clearTimeout(watchT);unwatch();i=0;total=0;results=[];$('end').hidden=true;$('game').hidden=false;show();window.scrollTo(0,0)}
+$('dAgain').addEventListener('click',restart);
+$('dBoard').addEventListener('click',function(){unwatch();var e=$('end');e.hidden=false;loadBoard();window.scrollTo(0,0)});
+
 function confetti(){
   var L=['🍃','🌿','🍀','🌱','🍊'];
   for(var k=0;k<22;k++){var s=document.createElement('span');s.className='leaf';s.textContent=L[k%L.length];
