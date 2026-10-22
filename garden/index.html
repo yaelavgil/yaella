@@ -352,7 +352,9 @@ function watch(){
   bg.play().catch(function(){});
 }
 function unwatch(){document.body.classList.remove('watch');$('dock').hidden=true;var e=$('end');e.classList.remove('out')}
-function restart(){clearTimeout(watchT);unwatch();bg.play().catch(function(){});i=0;total=0;results=[];$('end').hidden=true;$('game').hidden=false;show();window.scrollTo(0,0)}
+// a new round goes back to the start screen and asks for a name again (maybe someone else is playing)
+function restart(){clearTimeout(watchT);unwatch();bg.play().catch(function(){});i=0;total=0;results=[];
+  $('end').hidden=true;$('game').hidden=true;$('start').hidden=false;$('pname').value='';player='';window.scrollTo(0,0);$('pname').focus()}
 $('dAgain').addEventListener('click',restart);
 function openBoard(){
   $('mBoard').hidden=false; $('mList').className='muted'; $('mList').textContent='טוען...';
@@ -384,7 +386,8 @@ $('photo').addEventListener('click',function(){var lb=$('lb');lb.querySelector('
 $('lb').addEventListener('click',function(){this.hidden=true});
 
 $('goBtn').addEventListener('click',function(){
-  var v=$('pname').value.trim(); if(v)setPlayer(v);
+  i=0;total=0;results=[];
+  var v=$('pname').value.trim(); if(v)setPlayer(v); else player='';
   startMedia(); $('start').hidden=true; $('game').hidden=false; show();
 });
 </script>
