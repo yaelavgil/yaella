@@ -198,7 +198,7 @@ var i = 0, tries = 0, hintsUsed = 0, total = 0, results = [];
 var amb = $('amb'), snd = $('snd'), bg = $('bg'), soundOn = true;
 function startMedia(){
   bg.play().catch(function(){});
-  amb.volume = 0.7;
+  amb.volume = 0.35;
   amb.play().then(function(){snd.hidden=false}).catch(function(){snd.hidden=false;soundOn=false;snd.textContent='🔇'});
 }
 snd.addEventListener('click',function(){
