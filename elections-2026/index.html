@@ -16,7 +16,7 @@
 <link rel="icon" href="/yaella/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/yaella/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="/yaella/apple-touch-icon.png">
-<meta name="theme-color" content="#16306e">
+<meta name="theme-color" content="#253371">
 <style>html,body{margin:0}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}img{max-width:100%}[hidden]{display:none!important}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -101,6 +101,20 @@ th{color:var(--muted);font-weight:600;font-size:.8rem}
 .hero{margin-inline:-16px;background:#7cc8f5;line-height:0}
 .hero img{display:block;width:100%;height:auto}
 @media (min-width:760px){.hero{margin-inline:0;border-radius:0 0 16px 16px;overflow:hidden}}
+/* Page ground continues the navy band at the bottom of the campaign banner */
+:root{--page:#253371;--on-page:#ffffff;--on-page-muted:#c9d7f1;--sky:#7cc8f5}
+body{background:var(--page)}
+header{background:var(--page)}
+.hero{background:var(--page)}
+h1{color:var(--on-page)}
+.ballot,.hot,.lead,.foot,.empty{color:var(--on-page-muted)}
+.hot b,.subhead{color:var(--on-page)}
+.hot .copy{border-color:var(--sky);color:var(--sky)}
+.foot a{color:var(--sky)}
+nav button{background:transparent;border-color:rgba(255,255,255,.35);color:var(--on-page)}
+nav button[aria-selected="true"]{background:var(--sky);border-color:var(--sky);color:#14244f}
+.search input{border-color:transparent}
+
 header{border-bottom:3px solid #7cc8f5!important}
 .empty{color:var(--muted);text-align:center;padding:30px 0}
 .foot{color:var(--muted);font-size:.8rem;margin-top:22px;text-align:center}
