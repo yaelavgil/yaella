@@ -98,6 +98,10 @@ th{color:var(--muted);font-weight:600;font-size:.8rem}
 .ptable .who img{width:36px;height:36px;border-radius:50%;object-fit:cover;flex:0 0 auto}
 .ptable .who small{display:block;font-weight:400;color:var(--muted);font-size:.75rem}
 .subhead{font-family:var(--display);font-weight:400;color:var(--navy);font-size:1.15rem;margin:18px 2px 0}
+.hero{margin-inline:-16px;background:#7cc8f5;line-height:0}
+.hero img{display:block;width:100%;height:auto;max-height:340px;object-fit:cover;object-position:center top}
+@media (min-width:760px){.hero{margin-inline:0;border-radius:0 0 16px 16px;overflow:hidden}}
+header{border-bottom:3px solid #7cc8f5!important}
 .empty{color:var(--muted);text-align:center;padding:30px 0}
 .foot{color:var(--muted);font-size:.8rem;margin-top:22px;text-align:center}
 @media (prefers-reduced-motion:no-preference){.card{transition:border-color .15s}.card[open]{border-color:var(--accent)}}
@@ -107,6 +111,7 @@ th{color:var(--muted);font-weight:600;font-size:.8rem}
 
 
 <div class="wrap" id="app" dir="rtl" lang="he">
+  <div class="hero"><img id="heroimg" src="img/hero.jpg" alt="יאיר גולן ומועמדי הדמוקרטים: על הדמוקרטים אפשר לסמוך"></div>
   <header>
     <div class="top">
       <h1>שליף אמת</h1>
