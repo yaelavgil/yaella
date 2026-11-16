@@ -330,6 +330,11 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .qtop .ttl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mtag{font-size:12px;padding:2px 9px}
 @media (max-width:420px){.qtop .ttl{font-size:18px}.qnum{font-size:14px}}
+.optwrap{position:relative;display:grid}
+.optsay{position:absolute;top:8px;inset-inline-start:8px;width:40px;height:40px;border-radius:50%;border:2px solid var(--line);background:var(--surface);display:grid;place-items:center;padding:0;font-size:18px;box-shadow:0 2px 0 var(--shadow);z-index:1;transition:transform .15s var(--ease)}
+.optsay:hover{transform:scale(1.08)}
+.optsay:active{transform:scale(.92)}
+.optsay .ji{height:22px}
 /* story */
 .story{padding:16px;margin-bottom:14px}
 .sthead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
@@ -1365,7 +1370,7 @@ function qPic() {
   for (const x of shuffle(pics)) { if (chosen.length >= 3) break; if (!chosen.some(c => c.L === x.L) && !clash(x, l)) chosen.push(x); }
   return { key: 'p:' + wd.w, hue: wd.hue, sayAfter: wd.w,
     prompt: `<div class="bigletter en">${wd.L}${l}</div><p class="ask">איזו תמונה מתחילה באות <span class="en">${wd.L}</span>?</p>`,
-    layout: 'emoji', options: shuffle(chosen).map(x => ({ v: x.w, html: x.e, label: x.w })),
+    layout: 'emoji', options: shuffle(chosen).map(x => ({ v: x.w, html: x.e, label: x.w, say: x.w })),
     answer: wd.w, rv: `${wd.L} → ${wd.e} ${wd.w}`,
     hint: { he: `האות <span class="en">${wd.L}</span> נשמעת בערך כמו <b>${heSound(wd.L)}</b>. הקשב לשמות של התמונות`, say: chosen.map(x => x.w).join('|') } };
 }
@@ -1561,8 +1566,10 @@ function runQuiz(mod, title, qs, again) {
       <div class="bar" aria-hidden="true"><i style="width:${(i / qs.length) * 100}%"></i></div>
       ${q.story ? storyHTML(q.story) : ''}
       <section class="qcard stk h${q.hue || 2}">${q.prompt}${sayBtns}<div id="hintbox" class="hintbox" hidden></div></section>
-      <div class="opts ${q.layout}">${q.options.map((o, k) =>
-        `<button class="opt h${q.hue || 2}" data-k="${k}">${o.html}${o.label ? `<span class="lab" hidden>${o.label}</span>` : ''}</button>`).join('')}</div>
+      <div class="opts ${q.layout}">${q.options.map((o, k) => {
+        const b = `<button class="opt h${q.hue || 2}" data-k="${k}">${o.html}${o.label ? `<span class="lab" hidden>${o.label}</span>` : ''}</button>`;
+        return o.say ? `<div class="optwrap">${b}<button class="optsay" data-say="${esc(o.say)}" aria-label="השמע את המילה בלי לבחור">🔊</button></div>` : b;
+      }).join('')}</div>
       <div id="fb" aria-live="polite"></div>`;
     $$('.opt', app).forEach(b => b.onclick = () => answer(+b.dataset.k));
     if (q.speak) setTimeout(() => say(q.speak), 350);
