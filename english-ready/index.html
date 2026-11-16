@@ -129,6 +129,73 @@ h2{font:600 24px/1.2 var(--f-display);margin:0;text-wrap:balance}
 .rv{font-family:var(--f-en);font-size:20px}
 .rv b{color:var(--c)}
 
+.hintbox{background:var(--surface);border:2px dashed var(--line);border-radius:12px;padding:8px 12px;font-size:17px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center}
+.fbbtns{display:flex;flex-wrap:wrap;gap:8px;flex:1 1 260px}
+.fbbtns .btn{flex:1 1 100px}
+.ss.hl{background:var(--t3);outline:2px solid var(--c3)}
+.sectable{width:100%;display:grid;gap:8px;text-align:start}
+.secrow{display:grid;grid-template-columns:8.5em minmax(0,1fr) 3em auto;align-items:center;gap:10px;min-height:44px}
+.sname{font-weight:600}
+.smeter{height:12px;border-radius:99px;background:var(--bg);border:2px solid var(--line);overflow:hidden}
+.smeter i{display:block;height:100%;background:var(--good)}
+.secrow.mid .smeter i{background:var(--c3)} .secrow.weak .smeter i{background:var(--bad)}
+.sval{font-variant-numeric:tabular-nums;direction:ltr;text-align:center}
+.sok{color:var(--good);font-weight:700;text-align:center}
+@media (max-width:420px){.secrow{grid-template-columns:7em minmax(0,1fr) 2.6em auto;gap:6px}}
+
+/* goal + zones */
+.goal{padding:18px;display:grid;gap:10px;margin-bottom:20px;background:var(--t)}
+.goalhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.glabel{font:600 20px var(--f-display)}
+.gbig{font:700 clamp(30px,8vw,40px)/1 var(--f-display);color:var(--c)}
+.gmeter{height:22px;border-radius:99px;background:var(--surface);border:2.5px solid var(--line);overflow:hidden}
+.gmeter i{display:block;height:100%;background:var(--c4);transition:width .4s}
+.gleft{margin:0;font-size:20px}
+.gleft b{font:700 clamp(24px,6vw,30px) var(--f-display);color:var(--c)}
+.gnow{margin:0;color:var(--muted);font-size:15px}
+.spinbtn{background:var(--c6);color:var(--on);font:700 20px var(--f-display);min-height:58px;animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.03)}}
+.zone{display:grid;gap:10px;margin-bottom:22px;padding:16px;border-radius:22px;border:2.5px dashed var(--line)}
+.zone.test{background:var(--badbg);border-style:solid;border-color:var(--bad)}
+.zhead{display:flex;align-items:center;gap:10px}
+.ztag,.mtag{font:700 14px var(--f-body);padding:2px 12px;border-radius:999px;color:var(--on);background:var(--c4);flex:none}
+.zone.test .ztag,.mtag.test{background:var(--bad)}
+.zdesc,.last{margin:0;max-width:62ch}
+.last{font-size:15px;color:var(--muted)}
+.testbtn{background:var(--bad);color:var(--on);font-size:18px;min-height:54px}
+.parentlink{display:block;margin:14px 0 0}
+/* wheel */
+.wheelbox{padding:18px;display:grid;justify-items:center;gap:14px;text-align:center}
+.whead{font:700 26px var(--f-en);margin:0}
+.wheelwrap{position:relative;max-width:100%}
+.wheelwrap canvas{display:block;max-width:100%}
+.pointer{position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-top:28px solid var(--ink);z-index:1;filter:drop-shadow(0 2px 0 var(--surface))}
+.bigspin{font:700 22px var(--f-en);min-height:60px;min-width:200px}
+.bigspin:disabled{opacity:.5}
+.prize{padding:16px 20px;background:var(--t3);display:grid;gap:4px;animation:pop .5s both}
+.prize p{margin:0}
+.pwin{font-size:18px;color:var(--muted)}
+.ptext{font:700 clamp(22px,6vw,28px)/1.25 var(--f-en)}
+/* parents */
+.pbox{padding:18px;display:grid;gap:10px}
+.pbox h2{margin-top:8px}
+.pbox p{margin:0}
+.pq{font:700 26px var(--f-display);align-self:center}
+.pin{font:600 20px var(--f-body);width:6em;min-height:48px;padding:6px 10px;border:2.5px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink)}
+.pfield{display:flex;align-items:center;gap:8px;font-weight:600}
+.ptext-in{width:100%;font-size:17px;line-height:1.6;padding:10px;border:2.5px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);direction:ltr;text-align:left}
+.wins{margin:0;padding-inline-start:20px;display:grid;gap:4px}
+
+.casebadge{display:inline-flex;align-items:center;gap:10px;font:700 clamp(26px,7vw,34px)/1 var(--f-display);padding:10px 20px;border-radius:16px;border:3px solid var(--line);box-shadow:3px 3px 0 var(--shadow);background:var(--c);color:var(--on)}
+.casebadge .en{font-size:.8em;background:var(--surface);color:var(--c);border-radius:10px;padding:4px 10px}
+.casebadge.up{background:var(--c2)} .casebadge.up .en{color:var(--c2)}
+.casebadge.low{background:var(--c6)} .casebadge.low .en{color:var(--c6)}
+.dict{flex-direction:column;align-items:flex-start}
+.dict p{flex:none}
+.lvlrow{display:flex;align-items:center;gap:10px;font-weight:600;flex-wrap:wrap}
+.lvlup{display:grid;gap:8px;justify-items:center;background:var(--t4);border-radius:14px;padding:12px 16px;width:100%}
+u.gap{text-decoration:none;display:inline-block;min-width:.7em;border-bottom:5px solid var(--c);color:transparent}
+.pbox h3{font:600 18px var(--f-display);margin:6px 0 0}
 /* story */
 .story{padding:16px;margin-bottom:14px}
 .sthead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
@@ -155,7 +222,9 @@ h2{font:600 24px/1.2 var(--f-display);margin:0;text-wrap:balance}
 .agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:10px;direction:ltr}
 .ab{aspect-ratio:1;font:700 28px var(--f-en);color:var(--c);background:var(--surface);border:2.5px solid var(--line);border-radius:14px;box-shadow:3px 3px 0 var(--shadow)}
 .acard{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:22px;align-items:center;padding:22px;border-radius:24px;background:var(--t);border:2.5px solid var(--line)}
-.flash{aspect-ratio:3/4;width:100%;display:grid;place-items:center;font:700 clamp(84px,17vw,128px)/1 var(--f-en);color:var(--c);transform:rotate(-3deg);text-shadow:3px 3px 0 var(--line)}
+.flash{position:relative;cursor:pointer;padding:0;aspect-ratio:3/4;width:100%;display:grid;place-items:center;font:700 clamp(84px,17vw,128px)/1 var(--f-en);color:var(--c);transform:rotate(-3deg);text-shadow:3px 3px 0 var(--line)}
+.flash .tap{position:absolute;bottom:10px;left:0;right:0;font:600 14px var(--f-body);color:var(--muted);text-shadow:none;direction:rtl}
+.flash:active{transform:rotate(-3deg) translate(2px,2px)}
 .aside{display:grid;gap:12px;min-width:0}
 .sndrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .he-snd{font:700 32px/1 var(--f-display);color:var(--c)}
@@ -177,7 +246,7 @@ h2{font:600 24px/1.2 var(--f-display);margin:0;text-wrap:balance}
 .strip button{flex:none;width:46px;height:46px;border-radius:11px;border:2px solid var(--line);background:var(--surface);color:var(--c);font:700 22px var(--f-en)}
 .strip button.on{background:var(--c);color:var(--on)}
 .dict{padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--t)}
-.dict p{margin:0;font-size:18px;flex:1 1 200px}
+.dict p{margin:0;font-size:18px}
 .cvwrap{position:relative;overflow:hidden;touch-action:none;height:260px}
 .cvwrap canvas{position:absolute;inset:0;touch-action:none}
 
@@ -238,6 +307,19 @@ const LETTERS = [
 ];
 const NAME = {A:'ay',B:'bee',C:'see',D:'dee',E:'ee',F:'ef',G:'gee',H:'aitch',I:'eye',J:'jay',K:'kay',L:'el',M:'em',N:'en',O:'oh',P:'pee',Q:'cue',R:'are',S:'ess',T:'tee',U:'you',V:'vee',W:'double you',X:'ex',Y:'why',Z:'zee'};
 const ALPHA = 'abcdefghijklmnopqrstuvwxyz'.split('');
+const LET = Object.fromEntries(LETTERS.map(L => [L[0], L]));
+const HE_NAME = {A:'אֵיי',B:'בִּי',C:'סִי',D:'דִּי',E:'אִי',F:'אֶף',G:'גִ׳י',H:'אֵייץ׳',I:'אַיי',J:'גֵ׳יי',K:'קֵיי',L:'אֶל',M:'אֶם',N:'אֶן',O:'אוֹ',P:'פִּי',Q:'קְיוּ',R:'אַר',S:'אֶס',T:'טִי',U:'יוּ',V:'וִי',W:'דַאבֶּל־יוּ',X:'אֶקְס',Y:'וַאי',Z:'זִי'};
+// which story sentence holds the answer, per question
+const STORY_HINT = {"What is the cat's name?":1,'What color is Mimi?':2,'What does Mimi like?':3,'Where does Mimi sleep?':4,
+ 'Where does Dan go?':0,'What color is the ball?':1,'Who is Rex?':2,'Is Dan happy?':4,
+ 'What time is it?':0,'What does Maya eat?':2,'What does Maya drink?':3,
+ 'Where do we go?':0,'What animal is big?':1,'What do the monkeys eat?':3,
+ 'What color is the room?':1,'Where is the bag?':3,'What is in the bag?':4,
+ 'What color is the umbrella?':1,'What does Tom see?':2,'What color is the frog?':3,
+ 'How old is Noa?':1,'Who is Ben?':2,'How old is Ben?':4,
+ 'What color is Max?':0,'Where does Sam look first?':3,'Where is Max?':4,'How does Sam feel at the end?':5,
+ 'How old is Lily?':1,'When do her friends come?':2,'What do they eat?':3,'What does Lily get?':4,
+ 'What is the weather like?':0,'Who goes with Noam?':1,'What does Noam see on the sand?':3,'What do they eat at the beach?':4};
 const WORDS = [];
 LETTERS.forEach((L, i) => L[3].forEach(([w, e, f]) => WORDS.push({ w, e, f: f || '', L: L[0], hue: hueOf(i) })));
 
@@ -310,47 +392,126 @@ const STORIES = [
   ['How old is Ben?','בן כמה בן?',['12','10','11']]]},
 ];
 
+STORIES.push(
+ {t:'The Lost Dog', hard:true, x:['Sam has a little brown dog.',"The dog's name is Max.",'One day, Max runs out of the house.','Sam looks in the park, but Max is not there.','Then Sam hears a bark under the big tree.','It is Max! Sam is very happy.'], q:[
+  ['What color is Max?','באיזה צבע מקס?',['brown','white','black']],
+  ['Where does Sam look first?','איפה סאם מחפש קודם?',['in the park','under the bed','at school']],
+  ['Where is Max?','איפה מקס?',['under the big tree','in the park','in the house']],
+  ['How does Sam feel at the end?','איך סאם מרגיש בסוף?',['happy','sad','angry']]]},
+ {t:'The Birthday Party', hard:true, x:["Today is Lily's birthday.",'She is eleven years old.',"Her friends come to her house at five o'clock.",'They eat a big chocolate cake.','Lily gets a blue bike from her mom and dad.','She says, "Thank you! This is the best day!"'], q:[
+  ['How old is Lily?','בת כמה לילי?',['11','10','5']],
+  ['When do her friends come?','מתי החברים מגיעים?',["at five o'clock","at eleven o'clock",'at night']],
+  ['What do they eat?','מה הם אוכלים?',['a chocolate cake','pizza','ice cream']],
+  ['What does Lily get?','מה לילי מקבלת?',['a blue bike','a red ball','a cat']]]},
+ {t:'At the Beach', hard:true, x:['It is a hot summer day.','Noam and his sister go to the beach.','They swim in the sea and play with a ball.','Noam sees a small crab on the sand.',"At four o'clock they eat watermelon.",'Then they go home.'], q:[
+  ['What is the weather like?','איך מזג האוויר?',['hot','cold','rainy']],
+  ['Who goes with Noam?','מי הולך עם נועם?',['his sister','his dad','his dog']],
+  ['What does Noam see on the sand?','מה נועם רואה על החול?',['a crab','a fish','a frog']],
+  ['What do they eat at the beach?','מה הם אוכלים בחוף?',['watermelon','pizza','bananas']]]},
+);
 const NW = ['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve'];
 const NCONF = {1:[7,11],2:[12,10],3:[8,2],4:[5,6],5:[4,9],6:[7,8],7:[11,6],8:[3,6],9:[5,1],10:[2,12],11:[7,12],12:[2,11]};
 const COUNT_ITEMS = ['🍎','⭐','🐟','🎈','🐞','🍌','⚽','🌸'];
 
-/* ---------- speech ---------- */
-const canSpeak = 'speechSynthesis' in window;
+/* ---------- speech: recorded clips first, browser voice as backup ---------- */
+const canTTS = 'speechSynthesis' in window;
 let voice = null;
 function pickVoice() {
-  if (!canSpeak) return;
+  if (!canTTS) return;
   const vs = speechSynthesis.getVoices();
   voice = vs.find(v => /^en[-_]US/i.test(v.lang) && /Samantha|Google US|Aria|Jenny|Allison|Ava/i.test(v.name))
        || vs.find(v => /^en[-_](US|GB)/i.test(v.lang))
        || vs.find(v => /^en/i.test(v.lang)) || null;
 }
-if (canSpeak) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
-function say(text, rate = 0.85) {
-  if (!canSpeak || !text) return;
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-US'; if (voice) u.voice = voice; u.rate = rate;
-  if (speechSynthesis.speaking || speechSynthesis.pending) { speechSynthesis.cancel(); setTimeout(() => speechSynthesis.speak(u), 60); }
-  else speechSynthesis.speak(u);
+if (canTTS) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+const slug = t => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const player = new Audio();
+player.preload = 'auto';
+let token = 0;
+function tts(text, rate) {
+  return new Promise(res => {
+    if (!canTTS) return res();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US'; if (voice) u.voice = voice; u.rate = rate;
+    u.onend = u.onerror = () => res();
+    speechSynthesis.speak(u);
+    setTimeout(res, 6000);
+  });
 }
+function clip(text, slow) {
+  return new Promise(res => {
+    let done = false;
+    const fin = ok => { if (done) return; done = true; player.onended = player.onerror = null; res(ok); };
+    player.onended = () => fin(true);
+    player.onerror = () => fin(false);
+    player.src = 'audio/' + slug(text) + '.m4a';
+    player.playbackRate = slow ? 0.7 : 1;
+    try { player.preservesPitch = true; } catch (e) {}
+    const p = player.play();
+    if (p && p.catch) p.catch(() => fin(false));
+    setTimeout(() => fin(true), 8000);
+  });
+}
+// text can be one string, or several joined with "|" (played one after another)
+async function say(text, slow = false) {
+  if (!text) return;
+  const my = ++token;
+  try { player.pause(); } catch (e) {}
+  if (canTTS) speechSynthesis.cancel();
+  const parts = String(text).split('|').filter(Boolean);
+  for (let i = 0; i < parts.length; i++) {
+    if (my !== token) return;
+    const ok = await clip(parts[i], slow);
+    if (my !== token) return;
+    if (!ok) await tts(parts[i], slow ? 0.5 : 0.85);
+    if (i < parts.length - 1) await new Promise(r => setTimeout(r, 250));
+  }
+}
+function hush() { token++; try { player.pause(); } catch (e) {} if (canTTS) speechSynthesis.cancel(); }
 let primed = false;
 document.addEventListener('pointerdown', () => {
-  if (primed || !canSpeak) return; primed = true;
-  try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } catch (e) {}
+  if (primed) return; primed = true;
+  try { player.src = 'audio/silence.m4a'; const p = player.play(); if (p && p.catch) p.catch(() => {}); } catch (e) {}
+  if (canTTS) { try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } catch (e) {} }
 }, { capture: true });
 
 /* ---------- progress (this device only) ---------- */
 const KEY = 'english-ready-v1';
-const fresh = () => ({ stars: 0, days: [], done: {}, best: {} });
+const DEFAULT_PRIZES = [
+  'Watch "The Next Star" 🌟',
+  'Watch "The Masked Singer" 🎭',
+  'A card game with Mom and Dad 🃏',
+  'A candy of your choice 🍬',
+  'Ping-pong with Mom or Dad 🏓',
+  'A snack 🍿',
+  '30 more minutes of screen time 📱',
+];
+const fresh = () => ({ stars: 0, days: [], done: {}, best: {}, td: null, goal: { type: 'stars', n: 25 }, prizes: DEFAULT_PRIZES.slice(), wins: [], wheel: true, level: 'medium' });
 function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s) return Object.assign(fresh(), s); } catch (e) {} return fresh(); }
 function save(s) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} }
 function today() { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; }
+function day(s) { const t = today(); if (!s.td || s.td.date !== t) s.td = { date: t, stars: 0, ms: 0, spins: 0 }; return s.td; }
 function markDone(mod, pct) {
   const s = load(); s.done[mod] = today();
   if (pct != null) s.best[mod] = Math.max(s.best[mod] || 0, pct);
   if (!s.days.includes(today())) s.days.push(today());
   save(s);
 }
-function addStar() { const s = load(); s.stars++; save(s); }
+function addStar() { const s = load(); s.stars++; day(s).stars++; save(s); }
+// practice time: time between taps while inside a practice screen (gaps over 90s don't count)
+let practicing = false, lastAct = 0;
+document.addEventListener('pointerdown', () => {
+  const now = Date.now();
+  if (practicing && lastAct && now - lastAct < 90000) { const s = load(); day(s).ms += now - lastAct; save(s); }
+  lastAct = practicing ? now : 0;
+}, { capture: true });
+function goalState(s) {
+  const d = day(s), g = s.goal, mins = Math.floor(d.ms / 60000);
+  const value = g.type === 'mins' ? mins : d.stars;
+  const earned = Math.floor(value / g.n), avail = Math.max(0, earned - d.spins);
+  const left = g.n * (earned + 1) - value;
+  return { d, g, mins, value, earned, avail, left, unit: g.type === 'mins' ? 'דקות' : 'כוכבים', pct: Math.min(100, ((value % g.n) / g.n) * 100) };
+}
 
 function countdown() {
   const ex = new Date(2026, 10, 23); const t = new Date(); t.setHours(0, 0, 0, 0);
@@ -365,7 +526,8 @@ function countdown() {
 let cleanup = null;
 function go(fn, ...a) {
   if (cleanup) { cleanup(); cleanup = null; }
-  if (canSpeak) speechSynthesis.cancel();
+  practicing = ![home, wheelView, parentView].includes(fn); lastAct = 0;
+  hush();
   fn(...a);
   window.scrollTo(0, 0);
 }
@@ -374,7 +536,7 @@ const top = (title, back = 'home', extra = '') =>
 
 app.addEventListener('click', e => {
   const s = e.target.closest('[data-say]');
-  if (s) { say(s.dataset.say, s.dataset.slow ? 0.5 : 0.85); }
+  if (s) { say(s.dataset.say, !!s.dataset.slow); }
   const h = e.target.closest('[data-he]');
   if (h) { const n = h.nextElementSibling; n.hidden = !n.hidden; }
   const b = e.target.closest('[data-back]');
@@ -390,26 +552,176 @@ const MODS = [
   { id:'sentences', t:'קריאת משפטים', sub:'Read a sentence', g:'I see', h:5, run:() => go(quizSentences) },
   { id:'stories', t:'הבנת הנקרא', sub:'Read & answer', g:'?', h:6, run:() => go(quizStories) },
   { id:'numbers', t:'מספרים עד 12', sub:'Numbers 1–12', g:'12', h:2, run:() => go(quizNumbers) },
-  { id:'mock', t:'מבחן ניסיון', sub:'Practice test · a bit of everything', g:'✓', h:1, wide:true, fill:true, run:() => go(quizMock) },
 ];
 function home() {
-  const st = load(), td = today();
+  const st = load(), td = today(), G = goalState(st);
+  const m = st.mock;
+  const weak = m ? Object.keys(SECS).filter(k => m.secs[k] && m.secs[k][0] < m.secs[k][1]) : [];
+  const mockLine = m
+    ? `<p class="last">המבחן האחרון (${m.date.split('-').slice(1).reverse().join('.')}): <b>${m.score}/${m.n}</b>${weak.length ? ` · כדאי לחזק: ${weak.map(k => SECS[k]).join(', ')}` : ' · הכול נכון!'}</p>`
+    : '<p class="last">עוד לא עשית מבחן ניסיון. כדאי להתחיל בו: הוא יראה מה כבר יודעים ומה צריך לחזק.</p>';
   app.innerHTML = `
   <header class="hero">
     <div class="blocks" aria-hidden="true"><span class="blk h1">A</span><span class="blk h2">B</span><span class="blk h4">C</span></div>
     <h1>מוכן לאנגלית</h1>
-    <p class="sub">מתכוננים למבחן המיפוי. כמה דקות בכל יום.</p>
-    <div class="pills"><span class="pill due">${countdown()}</span><span class="pill">⭐ ${st.stars} כוכבים</span><span class="pill">${st.days.length} ימי תרגול</span></div>
+    <div class="pills"><span class="pill due">${countdown()}</span><span class="pill">⭐ ${st.stars} כוכבים בסך הכול</span></div>
   </header>
-  ${canSpeak ? '' : '<p class="warn">בדפדפן הזה אין הקראה באנגלית. כדאי לפתוח בכרום או בספארי.</p>'}
-  <nav class="tiles">${MODS.map((m, i) => {
-    const done = st.done[m.id] === td, best = st.best[m.id];
-    const chip = done ? '<span class="chip">✓ תרגלת היום</span>' : (best != null ? `<span class="chip">שיא: ${best}%</span>` : '');
-    return `<button class="tile h${m.h}${m.wide ? ' wide' : ''}${m.fill ? ' fill' : ''}" data-m="${i}">
-      <span class="gl${m.g.length > 2 ? ' long' : ''}">${m.g}</span><span class="tx"><b>${m.t}</b><small>${m.sub}</small>${chip}</span></button>`;
-  }).join('')}</nav>
-  <p class="tip">מה המורה ביקשה: קריאה בקול, חזרה על הצלילים והאותיות, קצת בכל יום. כל תשובה נכונה שווה כוכב.</p>`;
+
+  <section class="goal stk h3">
+    <div class="goalhead"><span class="glabel">🎯 היעד היומי</span><span class="gbig">${G.g.n} ${G.unit}</span></div>
+    <div class="gmeter" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${G.avail ? 100 : Math.round(G.pct)}"><i style="width:${G.avail ? 100 : G.pct}%"></i></div>
+    ${st.wheel
+      ? (G.avail
+        ? `<button class="btn spinbtn" id="spin">🎡 הגעת ליעד! סובב את גלגל ההפתעות${G.avail > 1 ? ` (${G.avail})` : ''}</button>`
+        : `<p class="gleft">נשארו עוד <b>${G.left} ${G.unit}</b> לגלגל ההפתעות 🎡</p>`)
+      : (G.earned
+        ? `<p class="gleft">🏆 <b>הגעת ליעד היומי!</b> כל הכבוד!${G.earned > 1 ? ` (${G.earned} פעמים)` : ''}</p>`
+        : `<p class="gleft">נשארו עוד <b>${G.left} ${G.unit}</b> ליעד</p>`)}
+    <p class="gnow">היום תרגלת: <b>⭐ ${G.d.stars} כוכבים</b> · <b>⏱ ${G.mins} דקות</b>${G.d.spins ? ` · 🎡 ${G.d.spins} סיבובים` : ''}</p>
+  </section>
+
+  <section class="zone test">
+    <div class="zhead"><span class="ztag">מבחן</span><h2>מבחן ניסיון</h2></div>
+    <p class="zdesc">כמו במבחן האמיתי: ${'19'} שאלות מכל החומר, <b>בלי רמזים ובלי ניסיון נוסף</b>. בסוף רואים כמה הצלחת בכל נושא.</p>
+    ${mockLine}
+    <button class="btn testbtn" id="mock">להתחיל מבחן ניסיון ←</button>
+  </section>
+
+  <section class="zone practice">
+    <div class="zhead"><span class="ztag">תרגול</span><h2>תרגול לפי נושא</h2></div>
+    <p class="zdesc">כאן לומדים: אפשר לנסות שוב, לבקש רמז ולראות את התשובה. כל תשובה נכונה בניסיון הראשון שווה כוכב.</p>
+    <div class="lvlrow"><span>רמה:</span><div class="seg" role="group" aria-label="רמה">${Object.keys(LEVELS).map(k => `<button data-lvl="${k}" class="${(st.level || 'medium') === k ? 'on' : ''}">${LEVELS[k]}</button>`).join('')}</div></div>
+    <nav class="tiles">${MODS.map((m, i) => {
+      const done = st.done[m.id] === td, best = st.best[m.id];
+      const chip = done ? '<span class="chip">✓ תרגלת היום</span>' : (best != null ? `<span class="chip">שיא: ${best}%</span>` : '');
+      return `<button class="tile h${m.h}${m.wide ? ' wide' : ''}" data-m="${i}">
+        <span class="gl${m.g.length > 2 ? ' long' : ''}">${m.g}</span><span class="tx"><b>${m.t}</b><small>${m.sub}</small>${chip}</span></button>`;
+    }).join('')}</nav>
+  </section>
+  <p class="tip">המורה ביקשה: קריאה בקול, חזרה על הצלילים והאותיות, קצת בכל יום.</p>
+  <button class="link parentlink" id="parent">⚙️ להורים: יעד יומי והפתעות</button>`;
   $$('.tile', app).forEach(b => b.onclick = () => MODS[+b.dataset.m].run());
+  $('#mock').onclick = () => go(quizMock);
+  $('#parent').onclick = () => go(parentView);
+  $$('[data-lvl]', app).forEach(b => b.onclick = () => { const s = load(); s.level = b.dataset.lvl; save(s); home(); });
+  const sp = $('#spin'); if (sp) sp.onclick = () => go(wheelView);
+}
+
+/* ---------- surprise wheel ---------- */
+const WHEEL_COLORS = ['--c1', '--c2', '--c3', '--c4', '--c5', '--c6'];
+function wheelView() {
+  const st = load(), G = goalState(st), prizes = st.prizes.length ? st.prizes : DEFAULT_PRIZES;
+  app.innerHTML = `${top('גלגל ההפתעות')}
+    <section class="wheelbox stk">
+      <p class="whead en">${G.avail ? 'Spin the wheel!' : 'No spins right now'}</p>
+      <div class="wheelwrap"><div class="pointer" aria-hidden="true"></div><canvas id="wheel" width="340" height="340" aria-label="גלגל ההפתעות"></canvas></div>
+      <button class="btn primary bigspin" dir="ltr" id="go" ${G.avail ? '' : 'disabled'}>🎡 Spin!${G.avail > 1 ? ` (${G.avail})` : ''}</button>
+      ${G.avail ? '' : `<p class="gleft">נשארו עוד <b>${G.left} ${G.unit}</b> כדי לסובב.</p>`}
+      <div id="prize" aria-live="polite"></div>
+    </section>`;
+  const cv = $('#wheel'), ctx = cv.getContext('2d');
+  const size = Math.min(340, app.clientWidth - 40), dpr = Math.min(window.devicePixelRatio || 1, 3);
+  cv.style.width = cv.style.height = size + 'px'; cv.width = cv.height = size * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const R = size / 2, n = prizes.length, seg = Math.PI * 2 / n;
+  const cs = getComputedStyle(document.documentElement);
+  const emojiOf = t => (t.match(/\p{Extended_Pictographic}️?/gu) || ['🎁']).pop();
+  const textOf = t => t.replace(/\p{Extended_Pictographic}️?/gu, '').trim();
+  let rot = 0;
+  function draw() {
+    ctx.clearRect(0, 0, size, size);
+    for (let k = 0; k < n; k++) {
+      const a0 = rot + k * seg - Math.PI / 2;
+      ctx.beginPath(); ctx.moveTo(R, R); ctx.arc(R, R, R - 4, a0, a0 + seg); ctx.closePath();
+      ctx.fillStyle = cs.getPropertyValue(WHEEL_COLORS[k % 6]).trim(); ctx.fill();
+      ctx.lineWidth = 3; ctx.strokeStyle = cs.getPropertyValue('--line').trim(); ctx.stroke();
+      ctx.save(); ctx.translate(R, R); ctx.rotate(a0 + seg / 2);
+      ctx.fillStyle = cs.getPropertyValue('--on').trim(); ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+      ctx.font = `${Math.round(size / 13)}px system-ui`; ctx.fillText(emojiOf(prizes[k]), R - 12, 0);
+      let fs = Math.round(size / 26); const label = textOf(prizes[k]); const maxW = R - 34 - size / 11;
+      ctx.font = `700 ${fs}px Rubik, system-ui, sans-serif`;
+      while (ctx.measureText(label).width > maxW && fs > 8) { fs--; ctx.font = `700 ${fs}px Rubik, system-ui, sans-serif`; }
+      ctx.fillText(label, R - 16 - size / 11, 0);
+      ctx.restore();
+    }
+    ctx.beginPath(); ctx.arc(R, R, size / 14, 0, Math.PI * 2);
+    ctx.fillStyle = cs.getPropertyValue('--surface').trim(); ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = cs.getPropertyValue('--line').trim(); ctx.stroke();
+  }
+  draw();
+  if (document.fonts) document.fonts.ready.then(draw);
+  $('#go').onclick = () => {
+    const s = load(), g = goalState(s);
+    if (g.avail < 1) return;
+    $('#go').disabled = true; $('#prize').innerHTML = '';
+    const win = Math.floor(Math.random() * n);
+    const start = rot, reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // segment `win` centre must stop under the pointer at the top
+    const target = -(win * seg + seg / 2);
+    const total = reduce ? 1 : 4200, t0 = performance.now();
+    const final = start + ((((target - start) % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2)) + Math.PI * 2 * (reduce ? 0 : 6);
+    function frame(t) {
+      const k = Math.min(1, (t - t0) / total), e = 1 - Math.pow(1 - k, 4);
+      rot = start + (final - start) * e; draw();
+      if (k < 1) return requestAnimationFrame(frame);
+      const s2 = load(); day(s2).spins++; s2.wins.unshift({ date: today(), prize: prizes[win] }); s2.wins = s2.wins.slice(0, 60); save(s2);
+      const g2 = goalState(s2);
+      $('#prize').innerHTML = `<div class="prize stk"><p class="en pwin">You won:</p><p class="en ptext">${esc(prizes[win])}</p><p>כל הכבוד! 🎉 תראה את זה לאמא או לאבא.</p></div>`;
+      say(textOf(prizes[win]));
+      const b = $('#go'); b.disabled = g2.avail < 1; b.textContent = g2.avail ? `🎡 Spin again! (${g2.avail})` : '🎡 Spin!';
+    }
+    requestAnimationFrame(frame);
+  };
+}
+
+/* ---------- parents ---------- */
+function parentView() {
+  const a = rint(6, 9), b = rint(6, 9);
+  app.innerHTML = `${top('להורים')}
+    <section class="stk pbox">
+      <p>כדי להיכנס, פתרו את התרגיל:</p>
+      <form id="gate" class="row"><label for="pg" class="en pq">${a} × ${b} =</label><input id="pg" inputmode="numeric" autocomplete="off" class="pin"><button class="btn primary">כניסה</button></form>
+      <p id="pgerr" class="hint" hidden>לא נכון, נסו שוב.</p>
+    </section>`;
+  $('#gate').onsubmit = e => { e.preventDefault(); if (+$('#pg').value === a * b) parentSettings(); else $('#pgerr').hidden = false; };
+  $('#pg').focus();
+}
+function parentSettings() {
+  const st = load(), G = goalState(st);
+  app.innerHTML = `${top('להורים')}
+    <section class="stk pbox">
+      <h2>היעד היומי</h2>
+      <p class="hint">בכל פעם שהוא מגיע ליעד הוא מקבל סיבוב אחד בגלגל. אם היעד הוא 25 כוכבים, אז ב־25 כוכבים הוא מקבל סיבוב, ב־50 עוד סיבוב, וכן הלאה. הספירה מתאפסת כל בוקר.</p>
+      <div class="row">
+        <div class="seg" role="group" aria-label="סוג יעד"><button type="button" data-gt="stars" class="${st.goal.type === 'stars' ? 'on' : ''}">⭐ כוכבים</button><button type="button" data-gt="mins" class="${st.goal.type === 'mins' ? 'on' : ''}">⏱ דקות</button></div>
+        <label class="pfield">כמה? <input id="gn" type="number" min="1" max="500" value="${st.goal.n}" class="pin"></label>
+      </div>
+      <p class="hint">כוכב = תשובה נכונה בניסיון הראשון, או אות שנכתבה נכון. דקות = זמן פעיל במסכי התרגול.</p>
+      <h2>גלגל ההפתעות</h2>
+      <div class="seg" role="group" aria-label="גלגל ההפתעות"><button type="button" data-wh="1" class="${st.wheel ? 'on' : ''}">🎡 פעיל</button><button type="button" data-wh="0" class="${st.wheel ? '' : 'on'}">כבוי: רק כוכבים</button></div>
+      <h2>רמת התרגול</h2>
+      <div class="seg" role="group" aria-label="רמה">${Object.keys(LEVELS).map(k => `<button type="button" data-pl="${k}" class="${(st.level || 'medium') === k ? 'on' : ''}">${LEVELS[k]}</button>`).join('')}</div>
+      <p class="hint">קל: 3 תשובות לבחירה ותרגום לעברית בסיפורים. בינוני: כמו במבחן. קשה: איות מילים, אות חסרה במילה, "מה בא אחרי" וסיפורים ארוכים יותר. אחרי סבב של 90% ומעלה הוא יכול לעלות רמה בעצמו. מבחן הניסיון תמיד ברמה בינונית.</p>
+      <h3>ההפתעות בגלגל</h3>
+      <p class="hint">הפתעה אחת בכל שורה, באנגלית. אפשר להוסיף אימוג׳י בסוף.</p>
+      <textarea id="pz" rows="8" class="en ptext-in">${esc(st.prizes.join('\n'))}</textarea>
+      <div class="row"><button class="btn primary" id="psave">שמירה</button><span id="pok" class="chip" hidden>נשמר ✓</span></div>
+      <h2>היום</h2>
+      <p>⭐ ${G.d.stars} כוכבים · ⏱ ${G.mins} דקות · 🎡 ${G.d.spins} סיבובים נוצלו${G.avail ? ` · ${G.avail} מחכים` : ''}</p>
+      <h2>מה הוא זכה</h2>
+      ${st.wins.length ? `<ul class="wins">${st.wins.slice(0, 20).map(w => `<li><span class="en">${esc(w.prize)}</span> · ${w.date.split('-').slice(1).reverse().join('.')}</li>`).join('')}</ul>` : '<p class="hint">עוד אין זכיות.</p>'}
+      <p class="hint">הכול נשמר רק במכשיר הזה.</p>
+    </section>`;
+  let gt = st.goal.type, wh = st.wheel, pl = st.level || 'medium';
+  $$('[data-wh]', app).forEach(b => b.onclick = () => { wh = b.dataset.wh === '1'; $$('[data-wh]', app).forEach(x => x.classList.toggle('on', x === b)); });
+  $$('[data-pl]', app).forEach(b => b.onclick = () => { pl = b.dataset.pl; $$('[data-pl]', app).forEach(x => x.classList.toggle('on', x === b)); });
+  $$('[data-gt]', app).forEach(b => b.onclick = () => { gt = b.dataset.gt; $$('[data-gt]', app).forEach(x => x.classList.toggle('on', x === b)); });
+  $('#psave').onclick = () => {
+    const s = load();
+    s.wheel = wh; s.level = pl;
+    s.goal = { type: gt, n: Math.max(1, Math.min(500, parseInt($('#gn').value, 10) || 25)) };
+    const list = $('#pz').value.split('\n').map(x => x.trim()).filter(Boolean);
+    s.prizes = list.length >= 2 ? list.slice(0, 12) : DEFAULT_PRIZES.slice();
+    save(s); $('#pok').hidden = false;
+  };
 }
 
 /* ---------- ABC cards ---------- */
@@ -425,7 +737,7 @@ function abcCard(i) {
   const p = (i + 25) % 26, n = (i + 1) % 26;
   app.innerHTML = `${top('כרטיסיות ABC', 'abc')}
   <section class="acard h${hueOf(i)}">
-    <div class="flash stk en">${U}${U.toLowerCase()}</div>
+    <button class="flash stk en" data-say="${esc(NAME[U] + '|' + ws.map(w => w[0]).join('|'))}" aria-label="השמע את האות והמילים">${U}${U.toLowerCase()}<span class="tap">🔊 לחץ עליי</span></button>
     <div class="aside">
       <div class="sndrow"><span>הצליל בערך:</span><b class="he-snd">${snd}</b><button class="btn sm" data-say="${NAME[U]}">🔊 שם האות</button></div>
       ${note ? `<p class="note">${note}</p>` : ''}
@@ -434,7 +746,7 @@ function abcCard(i) {
   </section>
   <div class="row nav">
     <button class="btn" id="prev">→ <span class="en">${LETTERS[p][0]}</span></button>
-    <button class="btn" data-say="${esc(ws.map(w => w[0]).join('. ') + '.')}">🔊 כל המילים</button>
+    <button class="btn" data-say="${esc(ws.map(w => w[0]).join('|'))}">🔊 כל המילים</button>
     <button class="btn" id="next"><span class="en">${LETTERS[n][0]}</span> ←</button>
   </div>`;
   $('#prev').onclick = () => go(abcCard, p);
@@ -442,7 +754,10 @@ function abcCard(i) {
 }
 
 /* ---------- question generators ---------- */
-function fillOpts(ans, conf, ok, pool, n = 4) {
+let lvl = 'medium';
+const LEVELS = { easy: 'קל', medium: 'בינוני', hard: 'קשה' };
+const optN = () => lvl === 'easy' ? 3 : 4;
+function fillOpts(ans, conf, ok, pool, n = optN()) {
   const out = [ans];
   for (const c of shuffle([...(conf || '')].filter(Boolean))) if (out.length < n && !out.includes(c) && ok(c)) out.push(c);
   for (const c of shuffle(pool)) { if (out.length >= n) break; if (!out.includes(c) && ok(c)) out.push(c); }
@@ -457,7 +772,8 @@ function qSound() {
   return { key: 's:' + wd.w, hue: wd.hue, speak: wd.w,
     prompt: `<div class="pic">${wd.e}</div><p class="ask">שמע את המילה. באיזו אות היא מתחילה?</p>`,
     layout: 'letters', options: opts.map(l => ({ v: l, html: `<span class="en">${l.toUpperCase()}${l}</span>` })),
-    answer: ans, reveal: wordHTML(wd), rv: `${wd.e} ${wd.w} → ${ans.toUpperCase()}${ans}` };
+    answer: ans, reveal: wordHTML(wd), rv: `${wd.e} ${wd.w} → ${ans.toUpperCase()}${ans}`,
+    hint: { he: `הקשב לצליל הראשון. בעברית הוא נשמע בערך <b>${LET[wd.L][1]}</b>.`, say: wd.w, slow: true } };
 }
 function qPic() {
   const pics = WORDS.filter(x => !x.f);
@@ -467,26 +783,27 @@ function qPic() {
   return { key: 'p:' + wd.w, hue: wd.hue, sayAfter: wd.w,
     prompt: `<div class="bigletter en">${wd.L}${l}</div><p class="ask">איזו תמונה מתחילה באות <span class="en">${wd.L}</span>?</p>`,
     layout: 'emoji', options: shuffle(chosen).map(x => ({ v: x.w, html: x.e, label: x.w })),
-    answer: wd.w, rv: `${wd.L} → ${wd.e} ${wd.w}` };
+    answer: wd.w, rv: `${wd.L} → ${wd.e} ${wd.w}`,
+    hint: { he: `האות <span class="en">${wd.L}</span> נשמעת בערך <b>${LET[wd.L][1]}</b>. הקשב לשמות של התמונות:`, say: chosen.map(x => x.w).join('|') } };
 }
 function qCase() {
   const U = pick(ALPHA).toUpperCase(), l = U.toLowerCase(), h = hueOf(ALPHA.indexOf(l));
   if (Math.random() < 0.55) {
     return { key: 'c:' + U, hue: h, prompt: `<div class="bigletter en">${U}</div><p class="ask">מה האות הקטנה של <span class="en">${U}</span>?</p>`,
       layout: 'letters', options: fillOpts(l, LOWC[l], () => true, ALPHA).map(x => ({ v: x, html: `<span class="en">${x}</span>` })),
-      answer: l, rv: `${U} → ${l}` };
+      answer: l, rv: `${U} → ${l}`, hint: { he: `<span class="en">${U}</span> כמו במילה <b class="en">${LET[U][3][0][0]}</b>`, say: LET[U][3][0][0] } };
   }
   const UP = ALPHA.map(x => x.toUpperCase());
   return { key: 'C:' + l, hue: h, prompt: `<div class="bigletter en">${l}</div><p class="ask">מה האות הגדולה של <span class="en">${l}</span>?</p>`,
     layout: 'letters', options: fillOpts(U, UPC[U], () => true, UP).map(x => ({ v: x, html: `<span class="en">${x}</span>` })),
-    answer: U, rv: `${l} → ${U}` };
+    answer: U, rv: `${l} → ${U}`, hint: { he: `<span class="en">${l}</span> כמו במילה <b class="en">${LET[U][3][0][0][0].toUpperCase() + LET[U][3][0][0].slice(1)}</b>`, say: LET[U][3][0][0] } };
 }
 function qName() {
   const l = pick(ALPHA), U = l.toUpperCase();
   return { key: 'n:' + l, hue: hueOf(ALPHA.indexOf(l)), speak: NAME[U],
     prompt: `<div class="pic" aria-hidden="true">🔊</div><p class="ask">שמע את שם האות ובחר אותה</p>`,
     layout: 'letters', options: fillOpts(l, NAMECONF[l], () => true, ALPHA).map(x => ({ v: x, html: `<span class="en">${x.toUpperCase()}${x}</span>` })),
-    answer: l, rv: `🔊 ${U}${l}` };
+    answer: l, rv: `🔊 ${U}${l}`, hint: { he: `שם האות נשמע בעברית בערך <b>${HE_NAME[U]}</b>.`, say: NAME[U], slow: true } };
 }
 function qSeq() {
   const up = Math.random() < 0.5, s = rint(0, 22), hide = rint(1, 3);
@@ -497,48 +814,87 @@ function qSeq() {
   return { key: 'q:' + s + hide, hue: hueOf(s),
     prompt: `<p class="ask">איזו אות חסרה?</p><p class="seq en">${seq.map((x, i) => i === hide ? '<u>_</u>' : tc(x)).join(' ')}</p>`,
     layout: 'letters', options: opts.map(x => ({ v: x, html: `<span class="en">${tc(x)}</span>` })),
-    answer: ans, rv: seq.map(tc).join(' ') };
+    answer: ans, rv: seq.map(tc).join(' '), hint: { he: 'נסה לשיר בשקט את ה־ABC מההתחלה עד האותיות האלה.' } };
 }
 
 function numOpts(n) {
   const out = [n];
   for (const x of [...shuffle(NCONF[n]), n - 1, n + 1, ...shuffle([...Array(12)].map((_, i) => i + 1))])
-    if (x >= 1 && x <= 12 && !out.includes(x) && out.length < 4) out.push(x);
+    if (x >= 1 && x <= 12 && !out.includes(x) && out.length < optN()) out.push(x);
   return shuffle(out);
 }
 function qNumListen() {
   const n = rint(1, 12);
   return { key: 'nl' + n, hue: 2, speak: NW[n], prompt: `<div class="pic" aria-hidden="true">🔊</div><p class="ask">שמע את המספר ובחר אותו</p>`,
-    layout: 'digits', options: numOpts(n).map(x => ({ v: x, html: x })), answer: n, rv: `🔊 ${NW[n]} = ${n}` };
+    layout: 'digits', options: numOpts(n).map(x => ({ v: x, html: x })), answer: n, rv: `🔊 ${NW[n]} = ${n}`, hint: { he: 'הקשב שוב, לאט.', say: NW[n], slow: true } };
 }
 function qNumWord() {
   const n = rint(1, 12);
   return { key: 'nw' + n, hue: 4, sayAfter: NW[n], prompt: `<p class="word en">${NW[n]}</p><p class="ask">איזה מספר כתוב כאן?</p>`,
-    layout: 'digits', options: numOpts(n).map(x => ({ v: x, html: x })), answer: n, rv: `${NW[n]} = ${n}` };
+    layout: 'digits', options: numOpts(n).map(x => ({ v: x, html: x })), answer: n, rv: `${NW[n]} = ${n}`, hint: { he: 'הקשב איך קוראים את המילה.', say: NW[n] } };
 }
 function qNumDigit() {
   const n = rint(1, 12);
   return { key: 'nd' + n, hue: 5, sayAfter: NW[n], prompt: `<div class="digit">${n}</div><p class="ask">איך כותבים את המספר באנגלית?</p>`,
-    layout: 'words', options: numOpts(n).map(x => ({ v: x, html: `<span class="en">${NW[x]}</span>` })), answer: n, rv: `${n} = ${NW[n]}` };
+    layout: 'words', options: numOpts(n).map(x => ({ v: x, html: `<span class="en">${NW[x]}</span>` })), answer: n, rv: `${n} = ${NW[n]}`, hint: { he: 'הקשב לשם המספר, ואז חפש את המילה שמתחילה באותו צליל.', say: NW[n] } };
 }
 function qNumCount() {
   const n = rint(3, 12), it = pick(COUNT_ITEMS);
   return { key: 'nc' + n, hue: 3, sayAfter: NW[n], prompt: `<div class="count" aria-label="${n}">${it.repeat(n)}</div><p class="ask">כמה יש? בחר את המילה</p>`,
-    layout: 'words', options: numOpts(n).map(x => ({ v: x, html: `<span class="en">${NW[x]}</span>` })), answer: n, rv: `${it} × ${n} = ${NW[n]}` };
+    layout: 'words', options: numOpts(n).map(x => ({ v: x, html: `<span class="en">${NW[x]}</span>` })), answer: n, rv: `${it} × ${n} = ${NW[n]}`, hint: { he: 'ספור לאט עם האצבע, אחד אחד.' } };
 }
 
+const VOW = 'aeiou';
+const spellable = () => WORDS.filter(x => x.f !== 't' && /^[a-z]{3,8}$/.test(x.w));
+function misspell(w) {
+  const outs = new Set(), tries = [];
+  for (let t = 0; t < 40 && outs.size < 4; t++) {
+    let v = w; const r = Math.random();
+    if (r < 0.4) { const ix = [...w].map((c, i) => VOW.includes(c) ? i : -1).filter(i => i >= 0); if (!ix.length) continue; const i = pick(ix); v = w.slice(0, i) + pick(VOW.replace(w[i], '').split('')) + w.slice(i + 1); }
+    else if (r < 0.65) { const c = (SOUNDCONF[w[0]] || 'k')[0]; v = c + w.slice(1); }
+    else if (r < 0.85) { const i = rint(1, w.length - 1); v = w.slice(0, i) + w.slice(i + 1); }
+    else { const i = rint(1, w.length - 1); v = w.slice(0, i) + w[i] + w.slice(i); }
+    if (v !== w && v.length > 1) outs.add(v);
+  }
+  return [...outs];
+}
+function qSpell() {
+  const wd = pick(spellable());
+  const opts = shuffle([wd.w, ...shuffle(misspell(wd.w)).slice(0, optN() - 1)]);
+  return { key: 'sp:' + wd.w, hue: wd.hue, speak: wd.w,
+    prompt: `<div class="pic">${wd.e}</div><p class="ask">איך כותבים את המילה נכון?</p>`,
+    layout: 'words', options: opts.map(x => ({ v: x, html: `<span class="en">${x}</span>` })), answer: wd.w, rv: `${wd.e} ${wd.w}`,
+    hint: { he: 'הקשב לאט לכל הצלילים במילה.', say: wd.w, slow: true } };
+}
+function qMissing() {
+  const wd = pick(spellable()), w = wd.w, i = rint(1, w.length - 1), ans = w[i];
+  const pool = VOW.includes(ans) ? VOW.split('') : ALPHA.filter(c => !VOW.includes(c));
+  const opts = fillOpts(ans, SOUNDCONF[ans], c => c !== ans, pool);
+  return { key: 'ms:' + w + i, hue: wd.hue, speak: w,
+    prompt: `<div class="pic">${wd.e}</div><p class="word en">${w.slice(0, i)}<u class="gap">_</u>${w.slice(i + 1)}</p><p class="ask">איזו אות חסרה?</p>`,
+    layout: 'letters', options: opts.map(x => ({ v: x, html: `<span class="en">${x}</span>` })), answer: ans, reveal: wordHTML(wd), rv: `${wd.e} ${w}`,
+    hint: { he: 'הקשב לאט לאמצע המילה.', say: w, slow: true } };
+}
+function qNumNext() {
+  const n = rint(1, 11), up = Math.random() < 0.6, a = up ? n + 1 : n, base = up ? n : n + 1;
+  return { key: 'nn' + base + up, hue: 6, sayAfter: NW[a],
+    prompt: `<p class="qen en">What comes ${up ? 'after' : 'before'} <b>${NW[base]}</b>?</p><p class="ask">${up ? 'איזה מספר בא אחרי' : 'איזה מספר בא לפני'} <span class="en">${NW[base]}</span>?</p>`,
+    layout: 'words', options: shuffle([a, ...shuffle([...Array(12)].map((_, i) => i + 1).filter(x => x !== a && x !== base)).filter(x => Math.abs(x - a) <= 3).slice(0, optN() - 1)]).map(x => ({ v: x, html: `<span class="en">${NW[x]}</span>` })),
+    answer: a, rv: `${NW[base]} → ${NW[a]}`, hint: { he: 'ספור בקול באנגלית: one, two, three…' } };
+}
 function qSentence(it, reverse) {
   if (!reverse) return { key: 'sf' + it.s, hue: 5, sayAfter: it.s, help: it.s,
     prompt: `<p class="ask">קרא את המשפט ובחר את התמונה המתאימה</p><p class="sent en">${it.s}</p>`,
-    layout: 'emoji', options: shuffle([it.p, ...it.wp]).map(x => ({ v: x, html: x })), answer: it.p, rv: `${it.s} → ${it.p}` };
+    layout: 'emoji', options: shuffle([it.p, ...it.wp.slice(0, optN() - 1)]).map(x => ({ v: x, html: x })), answer: it.p, rv: `${it.s} → ${it.p}`, hint: { he: 'הקשב למשפט וחפש בתמונות את המילים שבו.', say: it.s } };
   return { key: 'sr' + it.s, hue: 5, sayAfter: it.s,
     prompt: `<div class="pic">${it.p}</div><p class="ask">איזה משפט מתאים לתמונה?</p>`,
-    layout: 'wide', options: shuffle([it.s, ...it.ws]).map(x => ({ v: x, html: `<span class="en">${x}</span>` })), answer: it.s, rv: `${it.p} → ${it.s}` };
+    layout: 'wide', options: shuffle([it.s, ...it.ws.slice(0, optN() - 1)]).map(x => ({ v: x, html: `<span class="en">${x}</span>` })), answer: it.s, rv: `${it.p} → ${it.s}`, hint: { he: 'קרא כל משפט לאט, מילה אחרי מילה. מה רואים בתמונה?' } };
 }
 function storyQs(st) {
   return st.q.map(([q, he, o]) => ({ key: 'st' + q, hue: 6, story: st,
-    prompt: `<p class="qen en">${q}</p><button class="link" data-he>תרגום לעברית</button><span class="he" hidden>${he}</span>`,
-    layout: 'wide', options: shuffle(o).map(x => ({ v: x, html: `<span class="en">${x}</span>` })), answer: o[0], rv: `${q} → ${o[0]}` }));
+    prompt: `<p class="qen en">${q}</p>${lvl === 'hard' ? '' : `<button class="link" data-he>תרגום לעברית</button><span class="he"${lvl === 'easy' ? '' : ' hidden'}>${he}</span>`}`,
+    layout: 'wide', options: shuffle([o[0], ...o.slice(1, optN())]).map(x => ({ v: x, html: `<span class="en">${x}</span>` })), answer: o[0], rv: `${q} → ${o[0]}`,
+    hint: { he: 'התשובה נמצאת במשפט המסומן בסיפור.', say: st.x[STORY_HINT[q]], mark: STORY_HINT[q] } }));
 }
 function build(gens, n) {
   const out = [], keys = new Set();
@@ -550,24 +906,36 @@ function build(gens, n) {
 }
 
 /* ---------- quiz sessions ---------- */
-const quizSounds = () => runQuiz('sounds', 'צלילים', build([qSound, qPic], 10), quizSounds);
-const quizLetters = () => runQuiz('letters', 'גדולות וקטנות', build([qCase, qName, qCase, qSeq], 10), quizLetters);
-const quizNumbers = () => runQuiz('numbers', 'מספרים עד 12', build([qNumListen, qNumWord, qNumDigit, qNumCount], 10), quizNumbers);
+const setLvl = () => { lvl = load().level || 'medium'; };
+const SETS = {
+  sounds:  { easy: [qSound, qPic], medium: [qSound, qPic], hard: [qMissing, qSpell, qSound, qMissing] },
+  letters: { easy: [qCase, qCase, qName], medium: [qCase, qName, qCase, qSeq], hard: [qCase, qName, qSeq, qSeq] },
+  numbers: { easy: [qNumListen, qNumCount, qNumWord], medium: [qNumListen, qNumWord, qNumDigit, qNumCount], hard: [qNumDigit, qNumNext, qNumWord, qNumNext] },
+};
+const quizSounds = () => { setLvl(); runQuiz('sounds', 'צלילים', build(SETS.sounds[lvl], 10), quizSounds); };
+const quizLetters = () => { setLvl(); runQuiz('letters', 'גדולות וקטנות', build(SETS.letters[lvl], 10), quizLetters); };
+const quizNumbers = () => { setLvl(); runQuiz('numbers', 'מספרים עד 12', build(SETS.numbers[lvl], 10), quizNumbers); };
 function quizSentences() {
-  const qs = shuffle(SENTENCES).slice(0, 8).map((it, i) => qSentence(it, i % 2 === 1));
+  setLvl();
+  const pool = lvl === 'easy' ? SENTENCES.filter(x => x.s.split(' ').length <= 5) : SENTENCES;
+  const qs = shuffle(pool).slice(0, 8).map((it, i) => qSentence(it, lvl === 'hard' ? true : lvl === 'easy' ? false : i % 2 === 1));
   runQuiz('sentences', 'קריאת משפטים', qs, quizSentences);
 }
 function quizStories() {
-  const qs = shuffle(STORIES).slice(0, 2).flatMap(storyQs);
+  setLvl();
+  const pool = STORIES.filter(st => lvl === 'hard' ? st.hard : !st.hard);
+  const qs = shuffle(pool).slice(0, lvl === 'easy' ? 1 : 2).flatMap(storyQs);
   runQuiz('stories', 'הבנת הנקרא', qs, quizStories);
 }
 function quizMock() {
+  lvl = 'medium';
+  const tag = (arr, sec) => arr.map(q => Object.assign(q, { sec }));
   const qs = [
-    ...build([qSound, qPic], 4),
-    ...build([qCase, qName, qSeq, qCase], 4),
-    ...shuffle(SENTENCES).slice(0, 3).map((it, i) => qSentence(it, i === 1)),
-    ...storyQs(pick(STORIES)),
-    ...build([qNumListen, qNumWord, qNumDigit, qNumCount], 4),
+    ...tag(build([qSound, qPic], 4), 'sounds'),
+    ...tag(build([qCase, qName, qSeq, qCase], 4), 'letters'),
+    ...tag(shuffle(SENTENCES).slice(0, 3).map((it, i) => qSentence(it, i === 1)), 'sentences'),
+    ...tag(storyQs(pick(STORIES.filter(st => !st.hard))), 'stories'),
+    ...tag(build([qNumListen, qNumWord, qNumDigit, qNumCount], 4), 'numbers'),
   ];
   runQuiz('mock', 'מבחן ניסיון', qs, quizMock);
 }
@@ -575,168 +943,452 @@ function quizMock() {
 const PRAISE = ['Great job!', 'Super!', 'Well done!', 'Excellent!', 'Yes!', 'You got it!'];
 function storyHTML(st) {
   return `<section class="story stk">
-    <div class="sthead"><b class="en">${st.t}</b><button class="btn sm" data-say="${esc(st.x.join(' '))}">🔊 הקרא לי</button></div>
+    <div class="sthead"><b class="en">${st.t}</b><button class="btn sm" data-say="${esc(st.x.join('|'))}">🔊 הקרא לי</button></div>
     <p class="stx">${st.x.map(s => `<span class="ss" data-say="${esc(s)}">${s}</span>`).join(' ')}</p>
     <p class="hint">קרא בעצמך קודם. אפשר ללחוץ על משפט כדי לשמוע אותו.</p>
   </section>`;
 }
 
+const SECS = { sounds:'צלילים', letters:'גדולות וקטנות', sentences:'קריאת משפטים', stories:'הבנת הנקרא', numbers:'מספרים עד 12' };
 function runQuiz(mod, title, qs, again) {
-  let i = 0, score = 0; const wrong = [];
+  let i = 0, score = 0; const wrong = [], secs = {};
+  let tries = 0, hintUsed = false, closed = false;
   function step() {
-    const q = qs[i];
+    const q = qs[i]; tries = 0; hintUsed = false; closed = false;
     const sayBtns = q.speak
       ? `<div class="sayrow"><button class="btn sm" data-say="${esc(q.speak)}">🔊 שמע שוב</button><button class="btn sm" data-say="${esc(q.speak)}" data-slow="1">🐢 לאט</button></div>`
       : q.help ? `<div class="sayrow"><button class="btn sm" data-say="${esc(q.help)}">🔊 עזרה: הקרא לי</button></div>` : '';
-    app.innerHTML = `${top(title, 'home', `<span class="qnum">${i + 1} / ${qs.length}</span>`)}
+    app.innerHTML = `${top(title, 'home', `<span class="mtag ${mod === 'mock' ? 'test' : 'practice'}">${mod === 'mock' ? 'מבחן' : 'תרגול · ' + LEVELS[lvl]}</span><span class="qnum">${i + 1} / ${qs.length}</span>`)}
       <div class="bar" aria-hidden="true"><i style="width:${(i / qs.length) * 100}%"></i></div>
       ${q.story ? storyHTML(q.story) : ''}
-      <section class="qcard stk h${q.hue || 2}">${q.prompt}${sayBtns}</section>
+      <section class="qcard stk h${q.hue || 2}">${q.prompt}${sayBtns}<div id="hintbox" class="hintbox" hidden></div></section>
       <div class="opts ${q.layout}">${q.options.map((o, k) =>
         `<button class="opt h${q.hue || 2}" data-k="${k}">${o.html}${o.label ? `<span class="lab" hidden>${o.label}</span>` : ''}</button>`).join('')}</div>
       <div id="fb" aria-live="polite"></div>`;
     $$('.opt', app).forEach(b => b.onclick = () => answer(+b.dataset.k));
     if (q.speak) setTimeout(() => say(q.speak), 350);
   }
-  function answer(k) {
-    const q = qs[i], o = q.options[k], ok = o.v === q.answer;
+  function tally(ok) {
+    const q = qs[i];
+    if (ok) { score++; addStar(); } else wrong.push(q.rv);
+    if (q.sec) { secs[q.sec] = secs[q.sec] || [0, 0]; secs[q.sec][1]++; if (ok) secs[q.sec][0]++; }
+  }
+  function close(msgHTML, good) {
+    const q = qs[i]; closed = true;
     $$('.opt', app).forEach((b, j) => {
       b.disabled = true;
       const lab = $('.lab', b); if (lab) lab.hidden = false;
-      if (q.options[j].v === q.answer) b.classList.add('ok');
-      else if (j === k) b.classList.add('no');
-      else b.classList.add('dim');
+      if (q.options[j].v === q.answer) { b.classList.add('ok'); b.classList.remove('dim'); }
+      else if (!b.classList.contains('no')) b.classList.add('dim');
     });
-    if (ok) { score++; addStar(); } else wrong.push(q.rv);
-    $('#fb').innerHTML = `<div class="fb ${ok ? 'good' : 'bad'} h${q.hue || 2}">
-      <div class="msg"><b>${ok ? `<span class="en">${pick(PRAISE)}</span> ⭐` : 'כמעט! התשובה הנכונה בירוק.'}</b>${q.reveal || ''}</div>
+    $('#fb').innerHTML = `<div class="fb ${good ? 'good' : 'bad'} h${q.hue || 2}">
+      <div class="msg"><b>${msgHTML}</b>${q.reveal || ''}</div>
       <button class="btn primary" id="next">${i + 1 < qs.length ? 'המשך ←' : 'לתוצאות ←'}</button></div>`;
     if (q.sayAfter) setTimeout(() => say(q.sayAfter), 250);
     const nx = $('#next'); nx.onclick = () => { i++; i < qs.length ? (window.scrollTo(0, 0), step()) : finish(); };
     nx.focus({ preventScroll: true });
     nx.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }
+  function answer(k) {
+    if (closed) return;
+    const q = qs[i], ok = q.options[k].v === q.answer;
+    if (mod === 'mock') {
+      tally(ok);
+      if (!ok) $(`.opt[data-k="${k}"]`, app).classList.add('no');
+      close(ok ? `<span class="en">${pick(PRAISE)}</span> ⭐` : 'לא נכון. התשובה הנכונה בירוק.', ok);
+      return;
+    }
+    if (ok) {
+      if (tries === 0) { tally(true); close(`<span class="en">${pick(PRAISE)}</span> ⭐`, true); }
+      else close('נכון! הפעם הצלחת 💪', true);
+      return;
+    }
+    if (tries === 0) tally(false);
+    tries++;
+    const b = $(`.opt[data-k="${k}"]`, app); b.classList.add('no'); b.disabled = true;
+    const left = $$('.opt:not(:disabled)', app).length;
+    if (left <= 1) { close('כמעט! הנה התשובה הנכונה.', false); return; }
+    $('#fb').innerHTML = `<div class="fb bad">
+      <div class="msg"><b>לא הפעם. מה עושים?</b></div>
+      <div class="fbbtns">
+        <button class="btn" id="retry">↻ נסה שוב</button>
+        ${hintUsed || !q.hint ? '' : '<button class="btn" id="hint">💡 רמז</button>'}
+        <button class="btn" id="show">👀 הראה תשובה</button>
+      </div></div>`;
+    $('#retry').onclick = () => { $('#fb').innerHTML = ''; const f = $('.opt:not(:disabled)', app); if (f) f.focus(); };
+    const hb = $('#hint'); if (hb) hb.onclick = () => { showHint(); $('#fb').innerHTML = ''; };
+    $('#show').onclick = () => close('הנה התשובה הנכונה, בירוק.', false);
+    $('#fb').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+  function showHint() {
+    const q = qs[i], h = q.hint; hintUsed = true;
+    const box = $('#hintbox');
+    box.innerHTML = `💡 ${h.he}${h.say ? ` <button class="btn sm" data-say="${esc(h.say)}"${h.slow ? ' data-slow="1"' : ''}>🔊</button>` : ''}`;
+    box.hidden = false;
+    if (h.say) say(h.say, !!h.slow);
+    if (h.mark != null) { const ss = $$('.ss', app)[h.mark]; if (ss) ss.classList.add('hl'); }
+    const wrongs = $$('.opt:not(:disabled)', app).filter(b => q.options[+b.dataset.k].v !== q.answer);
+    if (wrongs.length > 1) { const w = pick(wrongs); w.disabled = true; w.classList.add('dim'); }
+  }
   function finish() {
     const pct = Math.round((score / qs.length) * 100);
     markDone(mod, pct);
+    const isMock = mod === 'mock';
+    if (isMock) { const s = load(); s.mock = { date: today(), score, n: qs.length, secs }; save(s); }
     const stars = pct >= 90 ? 3 : pct >= 70 ? 2 : 1;
     const msg = pct >= 90 ? 'מעולה! אתה מוכן!' : pct >= 70 ? 'יפה מאוד! עוד קצת תרגול ואתה שם.' : 'כל סיבוב מקדם אותך. ננסה שוב?';
     app.innerHTML = `${top(title)}
       <section class="result stk">
         <div class="starrow" aria-label="${stars} כוכבים">${[0, 1, 2].map(j => `<span>${j < stars ? '⭐' : '☆'}</span>`).join('')}</div>
         <div class="score">${score}/${qs.length}</div>
+        <p class="hint">נספרות רק תשובות נכונות בניסיון הראשון.</p>
         <h2>${msg}</h2>
+        ${isMock ? secTable(secs) : ''}
         ${wrong.length ? `<div class="review"><b>כדאי לחזור על:</b><ul>${wrong.map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>` : ''}
-        <div class="row center"><button class="btn primary" id="again">עוד סיבוב</button><button class="btn" data-back="home">לדף הבית</button></div>
+        ${!isMock && pct >= 90 && lvl !== 'hard' ? `<div class="lvlup"><b>עברת את זה בקלות! 🚀</b><button class="btn primary" id="lvlup">⬆ לעלות לרמה ${LEVELS[lvl === 'easy' ? 'medium' : 'hard']}</button></div>` : ''}
+        <div class="row center"><button class="btn ${!isMock && pct >= 90 && lvl !== 'hard' ? '' : 'primary'}" id="again">${isMock ? 'מבחן חדש' : 'עוד סיבוב'}</button><button class="btn" data-back="home">לדף הבית</button></div>
       </section>`;
     $('#again').onclick = () => go(again);
+    const lu = $('#lvlup'); if (lu) lu.onclick = () => { const s = load(); s.level = lvl === 'easy' ? 'medium' : 'hard'; save(s); go(again); };
+    $$('[data-practice]', app).forEach(b => b.onclick = () => MODS.find(m => m.id === b.dataset.practice).run());
   }
   step();
 }
+function secTable(secs) {
+  const rows = Object.keys(SECS).filter(k => secs[k]).map(k => {
+    const [ok, n] = secs[k], pct = Math.round(ok / n * 100);
+    const state = pct === 100 ? 'good' : pct >= 60 ? 'mid' : 'weak';
+    return `<div class="secrow ${state}"><span class="sname">${SECS[k]}</span><span class="smeter"><i style="width:${pct}%"></i></span><span class="sval">${ok}/${n}</span>
+      ${pct < 100 ? `<button class="btn sm" data-practice="${k}">לתרגל</button>` : '<span class="sok">✓</span>'}</div>`;
+  }).join('');
+  return `<div class="sectable"><b>לפי נושא</b>${rows}<p class="hint">כתיבת אותיות לא נבדקת כאן. מתרגלים אותה ב"כתיבת אותיות".</p></div>`;
+}
 
 /* ---------- writing ---------- */
+// Letters as strokes on a 4-line notebook grid: y 0 = top line, 1 = dashed middle, 2 = base line, 3 = descender line.
+// A stroke is a list of segments; L = line, A = arc (centre, radii, start/end angle in degrees; 0 = right, 90 = down).
+const L_ = (x1, y1, x2, y2) => ['L', x1, y1, x2, y2];
+const A_ = (cx, cy, rx, ry, a0, a1) => ['A', cx, cy, rx, ry, a0, a1];
+const GLYPHS = {
+  A: [[L_(0.6,0,0,2)], [L_(0.6,0,1.2,2)], [L_(0.25,1.3,0.95,1.3)]],
+  B: [[L_(0,0,0,2)], [L_(0,0,0.5,0), A_(0.5,0.5,0.45,0.5,-90,90), L_(0.5,1,0,1)], [L_(0,1,0.55,1), A_(0.55,1.5,0.45,0.5,-90,90), L_(0.55,2,0,2)]],
+  C: [[A_(0.75,1,0.75,1,-45,-315)]],
+  D: [[L_(0,0,0,2)], [L_(0,0,0.3,0), A_(0.3,1,0.8,1,-90,90), L_(0.3,2,0,2)]],
+  E: [[L_(0,0,0,2)], [L_(0,0,1,0)], [L_(0,1,0.8,1)], [L_(0,2,1,2)]],
+  F: [[L_(0,0,0,2)], [L_(0,0,1,0)], [L_(0,1,0.8,1)]],
+  G: [[A_(0.75,1,0.75,1,-45,-360)], [L_(0.85,1,1.5,1)]],
+  H: [[L_(0,0,0,2)], [L_(1.1,0,1.1,2)], [L_(0,1,1.1,1)]],
+  I: [[L_(0,0,0,2)]],
+  J: [[L_(0.8,0,0.8,1.5), A_(0.4,1.5,0.4,0.5,0,180)]],
+  K: [[L_(0,0,0,2)], [L_(1,0,0,1.2)], [L_(0.32,0.85,1.05,2)]],
+  L: [[L_(0,0,0,2)], [L_(0,2,0.9,2)]],
+  M: [[L_(0,0,0,2)], [L_(0,0,0.7,1.4), L_(0.7,1.4,1.4,0)], [L_(1.4,0,1.4,2)]],
+  N: [[L_(0,0,0,2)], [L_(0,0,1.1,2)], [L_(1.1,2,1.1,0)]],
+  O: [[A_(0.8,1,0.8,1,-90,-450)]],
+  P: [[L_(0,0,0,2)], [L_(0,0,0.5,0), A_(0.5,0.5,0.45,0.5,-90,90), L_(0.5,1,0,1)]],
+  Q: [[A_(0.8,1,0.8,1,-90,-450)], [L_(0.9,1.45,1.55,2.15)]],
+  R: [[L_(0,0,0,2)], [L_(0,0,0.5,0), A_(0.5,0.5,0.45,0.5,-90,90), L_(0.5,1,0,1)], [L_(0.4,1,1,2)]],
+  S: [[A_(0.55,0.5,0.5,0.5,-20,-270), A_(0.55,1.5,0.55,0.5,-90,160)]],
+  T: [[L_(0.6,0,0.6,2)], [L_(0,0,1.2,0)]],
+  U: [[L_(0,0,0,1.4), A_(0.55,1.4,0.55,0.6,180,0), L_(1.1,1.4,1.1,0)]],
+  V: [[L_(0,0,0.65,2), L_(0.65,2,1.3,0)]],
+  W: [[L_(0,0,0.45,2), L_(0.45,2,0.9,0.6), L_(0.9,0.6,1.35,2), L_(1.35,2,1.8,0)]],
+  X: [[L_(0,0,1.1,2)], [L_(1.1,0,0,2)]],
+  Y: [[L_(0,0,0.6,1)], [L_(1.2,0,0.6,1)], [L_(0.6,1,0.6,2)]],
+  Z: [[L_(0,0,1.1,0), L_(1.1,0,0,2), L_(0,2,1.1,2)]],
+  a: [[A_(0.5,1.5,0.5,0.5,-30,-390)], [L_(1,1,1,2)]],
+  b: [[L_(0,0,0,2)], [A_(0.5,1.5,0.5,0.5,180,540)]],
+  c: [[A_(0.5,1.5,0.5,0.5,-40,-320)]],
+  d: [[A_(0.5,1.5,0.5,0.5,-30,-390)], [L_(1,0,1,2)]],
+  e: [[L_(0,1.5,1,1.5), A_(0.5,1.5,0.5,0.5,0,-310)]],
+  f: [[A_(0.75,0.35,0.35,0.35,-30,-180), L_(0.4,0.35,0.4,2)], [L_(0,1,0.8,1)]],
+  g: [[A_(0.5,1.5,0.5,0.5,-30,-390)], [L_(1,1,1,2.6), A_(0.55,2.6,0.45,0.4,0,150)]],
+  h: [[L_(0,0,0,2)], [A_(0.5,1.5,0.5,0.5,180,360), L_(1,1.5,1,2)]],
+  i: [[L_(0,1,0,2)], [L_(0,0.5,0,0.56)]],
+  j: [[L_(0.6,1,0.6,2.6), A_(0.25,2.6,0.35,0.4,0,160)], [L_(0.6,0.5,0.6,0.56)]],
+  k: [[L_(0,0,0,2)], [L_(0.8,1,0,1.6)], [L_(0.25,1.42,0.85,2)]],
+  l: [[L_(0,0,0,2)]],
+  m: [[L_(0,1,0,2)], [A_(0.37,1.42,0.37,0.42,180,360), L_(0.74,1.42,0.74,2)], [A_(1.11,1.42,0.37,0.42,180,360), L_(1.48,1.42,1.48,2)]],
+  n: [[L_(0,1,0,2)], [A_(0.5,1.45,0.5,0.45,180,360), L_(1,1.45,1,2)]],
+  o: [[A_(0.5,1.5,0.5,0.5,-90,-450)]],
+  p: [[L_(0,1,0,3)], [A_(0.5,1.5,0.5,0.5,180,540)]],
+  q: [[A_(0.5,1.5,0.5,0.5,-30,-390)], [L_(1,1,1,3)]],
+  r: [[L_(0,1,0,2)], [A_(0.5,1.5,0.5,0.45,180,300)]],
+  s: [[A_(0.45,1.25,0.4,0.25,-30,-270), A_(0.45,1.75,0.42,0.25,-90,160)]],
+  t: [[L_(0.35,0.3,0.35,2)], [L_(0,1,0.75,1)]],
+  u: [[L_(0,1,0,1.5), A_(0.5,1.5,0.5,0.5,180,0)], [L_(1,1,1,2)]],
+  v: [[L_(0,1,0.5,2), L_(0.5,2,1,1)]],
+  w: [[L_(0,1,0.3,2), L_(0.3,2,0.6,1.3), L_(0.6,1.3,0.9,2), L_(0.9,2,1.2,1)]],
+  x: [[L_(0,1,0.9,2)], [L_(0.9,1,0,2)]],
+  y: [[L_(0,1,0.5,2)], [L_(1,1,0.2,3)]],
+  z: [[L_(0,1,0.9,1), L_(0.9,1,0,2), L_(0,2,0.9,2)]],
+};
+function sampleStroke(stroke, step = 0.04) {
+  const pts = [];
+  for (const sg of stroke) {
+    if (sg[0] === 'L') {
+      const [, x1, y1, x2, y2] = sg, n = Math.max(2, Math.ceil(Math.hypot(x2 - x1, y2 - y1) / step));
+      for (let k = 0; k <= n; k++) pts.push([x1 + (x2 - x1) * k / n, y1 + (y2 - y1) * k / n]);
+    } else {
+      const [, cx, cy, rx, ry, a0, a1] = sg, r0 = a0 * Math.PI / 180, r1 = a1 * Math.PI / 180;
+      const n = Math.max(4, Math.ceil(Math.abs(r1 - r0) * Math.max(rx, ry) / step));
+      for (let k = 0; k <= n; k++) { const t = r0 + (r1 - r0) * k / n; pts.push([cx + rx * Math.cos(t), cy + ry * Math.sin(t)]); }
+    }
+  }
+  return pts;
+}
+// lay out one or two glyphs; returns strokes in unit space, grouped per glyph
+function layoutGlyphs(chars) {
+  let x = 0; const glyphs = [];
+  chars.forEach((ch, gi) => {
+    const strokes = GLYPHS[ch].map(st => sampleStroke(st));
+    const xs = strokes.flat().map(p => p[0]), minX = Math.min(...xs), maxX = Math.max(...xs);
+    if (gi) x += 0.9;
+    glyphs.push(strokes.map(st => st.map(([px, py]) => [px - minX + x, py])));
+    x += maxX - minX;
+  });
+  return { glyphs, width: x };
+}
+function nearest(p, pts) { let b = Infinity; for (const q of pts) { const d = (p[0] - q[0]) ** 2 + (p[1] - q[1]) ** 2; if (d < b) b = d; } return Math.sqrt(b); }
+// compare a drawing with the letter: share of the letter that was covered, and share of the drawing that is on the letter
+const plen = a => { let t = 0; for (let k = 1; k < a.length; k++) t += Math.hypot(a[k][0] - a[k - 1][0], a[k][1] - a[k - 1][1]); return t; };
+const centre = a => { const xs = a.map(p => p[0]), ys = a.map(p => p[1]); return { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) }; };
+// does the drawing match the letter? Tuned on simulated wobbly tracing: all 52 letters pass, unlike letters are rejected.
+function matches(inkStrokes, tplStrokes, U) {
+  const tpl = tplStrokes.flat(); let ink = inkStrokes.flat();
+  if (ink.length < 6) return false;
+  const tol = U * 0.2;
+  const cov = tpl.filter(p => nearest(p, ink) <= tol).length / tpl.length;
+  const prec = ink.filter(p => nearest(p, tpl) <= tol * 1.3).length / ink.length;
+  const per = Math.min(...tplStrokes.map(st => st.filter(p => nearest(p, ink) <= tol).length / st.length));
+  const lr = inkStrokes.reduce((t, st) => t + plen(st), 0) / tplStrokes.reduce((t, st) => t + plen(st), 0);
+  return cov >= 0.8 && prec >= 0.88 && per >= 0.65 && lr >= 0.7 && lr <= 1.45;
+}
+// shift a traced letter slightly so small offsets don't count against it
+function nudge(inkStrokes, tplStrokes, U) {
+  const d = centre(inkStrokes.flat()), t = centre(tplStrokes.flat());
+  const dx = (t.x0 + t.x1 - d.x0 - d.x1) / 2, dy = (t.y0 + t.y1 - d.y0 - d.y1) / 2;
+  return Math.hypot(dx, dy) < U * 0.4 ? inkStrokes.map(st => st.map(([x, y]) => [x + dx, y + dy])) : inkStrokes;
+}
+// move and scale a free drawing onto the letter's box (dictation, where there is no guide letter)
+function fitInto(inkStrokes, tplStrokes) {
+  const d = centre(inkStrokes.flat()), t = centre(tplStrokes.flat());
+  const dw = d.x1 - d.x0, dh = d.y1 - d.y0, tw = t.x1 - t.x0, th = t.y1 - t.y0;
+  let sy = dh > 4 ? th / dh : 1, sx = dw > 4 && tw > th * 0.25 ? tw / dw : sy;
+  sx = Math.min(Math.max(sx, sy * 0.6), sy * 1.7);
+  const dcx = (d.x0 + d.x1) / 2, dcy = (d.y0 + d.y1) / 2, tcx = (t.x0 + t.x1) / 2, tcy = (t.y0 + t.y1) / 2;
+  return inkStrokes.map(st => st.map(([x, y]) => [tcx + (x - dcx) * sx, tcy + (y - dcy) * sy]));
+}
+
 function writeView() {
-  let mode = 'trace', idx = 0, cs = 'both', ghost = true, dict = null, checked = false;
+  let mode = 'trace', idx = 0, cs = 'both', ghost = true, dict = null, state = 'draw', won = false;
   app.innerHTML = `${top('כתיבת אותיות')}
     <div class="wctl"><div class="seg" role="group" aria-label="סוג תרגול"><button data-mode="trace" class="on">העתקה</button><button data-mode="dict">הכתבה</button></div></div>
     <div id="wtop"></div>
     <div class="cvwrap stk" id="cvw"><canvas id="g"></canvas><canvas id="d" aria-label="משטח כתיבה"></canvas></div>
+    <div id="wfb" aria-live="polite"></div>
     <div class="row" id="wb"></div>`;
   const g = $('#g'), d = $('#d'), wrap = $('#cvw');
-  let W = 0, H = 0;
+  let W = 0, H = 0, U = 40, lay = null, tplPx = [], strokesPx = [], ink = [], anim = 0; // ink: list of strokes
   const dpr = Math.min(window.devicePixelRatio || 1, 3);
   const css = (el, v) => getComputedStyle(el).getPropertyValue(v).trim();
-
-  function curHue() { return hueOf(mode === 'trace' ? idx : dict.i); }
-  function curText() {
-    const U = LETTERS[mode === 'trace' ? idx : dict.i][0], l = U.toLowerCase();
-    const c = mode === 'trace' ? cs : dict.cs;
-    return c === 'up' ? U : c === 'low' ? l : U + ' ' + l;
+  const curI = () => mode === 'trace' ? idx : dict.i;
+  function chars() {
+    const U_ = LETTERS[curI()][0], l = U_.toLowerCase(), c = mode === 'trace' ? cs : dict.cs;
+    return c === 'up' ? [U_] : c === 'low' ? [l] : [U_, l];
   }
   function size() {
-    W = wrap.clientWidth; H = Math.round(Math.min(320, Math.max(220, W * 0.5)));
+    W = wrap.clientWidth; H = Math.round(Math.min(330, Math.max(230, W * 0.52)));
     wrap.style.height = H + 'px';
     for (const c of [g, d]) { c.width = W * dpr; c.height = H * dpr; c.style.width = W + 'px'; c.style.height = H + 'px'; c.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0); }
-    drawGuide();
+    ink = []; drawGuide();
   }
-  function drawGuide() {
+  function geometry() {
+    lay = layoutGlyphs(chars());
+    U = Math.min(H / 3.7, (W - 40) / (lay.width + 0.8));
+    const ox = (W - lay.width * U) / 2, oy = (H - 3 * U) / 2;
+    strokesPx = lay.glyphs.map(gl => gl.map(st => st.map(([x, y]) => [ox + x * U, oy + y * U])));
+    tplPx = strokesPx.flat(2);
+    window.__tpl = () => strokesPx; // used by automated checks
+    return oy;
+  }
+  function path(ctx, pts, upto = pts.length) {
+    ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]);
+    for (let k = 1; k < upto; k++) ctx.lineTo(pts[k][0], pts[k][1]);
+  }
+  let dots = [];
+  function arrowsFor(ctx, st, num, col) {
+    // direction chevrons along the stroke
+    const len = st.length; const marks = len > 60 ? [0.3, 0.7] : [0.55];
+    if (len > 8) for (const f of marks) {
+      const k = Math.min(len - 2, Math.max(1, Math.round(len * f))), p = st[k], q = st[Math.min(len - 1, k + 2)], o = st[Math.max(0, k - 2)];
+      const ang = Math.atan2(q[1] - o[1], q[0] - o[0]), s = Math.max(7, U * 0.17);
+      ctx.save(); ctx.translate(p[0], p[1]); ctx.rotate(ang);
+      ctx.beginPath(); ctx.moveTo(-s * 0.6, -s * 0.75); ctx.lineTo(s * 0.5, 0); ctx.lineTo(-s * 0.6, s * 0.75);
+      ctx.strokeStyle = col; ctx.lineWidth = Math.max(2.5, U * 0.07); ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.stroke(); ctx.restore();
+    }
+    // numbered start dot
+    const r = Math.max(9, U * 0.17);
+    // when two strokes start at the same spot, move the later number a little along its stroke
+    let k0 = 0;
+    while (k0 < st.length - 1 && dots.some(([x, y]) => Math.hypot(st[k0][0] - x, st[k0][1] - y) < r * 2.1)) k0++;
+    const [sx, sy] = st[k0]; dots.push([sx, sy]);
+    ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI * 2); ctx.fillStyle = col; ctx.fill();
+    ctx.fillStyle = css(document.body, '--on'); ctx.font = `700 ${Math.round(r * 1.25)}px Rubik, system-ui, sans-serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(num, sx, sy + 1);
+  }
+  function drawGuide(partial) {
     const ctx = g.getContext('2d'); ctx.clearRect(0, 0, W, H);
-    wrap.className = `cvwrap stk h${curHue()}`;
-    const txt = curText();
-    let F = H * 0.62; ctx.font = `400 ${F}px Andika, sans-serif`;
-    while (ctx.measureText(txt).width > W * 0.86 && F > 30) { F *= 0.92; ctx.font = `400 ${F}px Andika, sans-serif`; }
-    const cap = ctx.measureText('H').actualBoundingBoxAscent || F * 0.7;
-    const xh = ctx.measureText('x').actualBoundingBoxAscent || F * 0.48;
-    const ds = ctx.measureText('g').actualBoundingBoxDescent || F * 0.22;
-    const base = Math.round((H - (cap + ds)) / 2 + cap);
-    const muted = css(document.body, '--muted');
+    wrap.className = `cvwrap stk h${hueOf(curI())}`;
+    const oy = geometry(), muted = css(document.body, '--muted'), col = css(wrap, '--c');
     const line = (y, w, dash, a) => { ctx.save(); ctx.globalAlpha = a; ctx.strokeStyle = muted; ctx.lineWidth = w; ctx.setLineDash(dash); ctx.beginPath(); ctx.moveTo(10, y); ctx.lineTo(W - 10, y); ctx.stroke(); ctx.restore(); };
-    line(base - cap, 1.5, [], 0.45); line(base - xh, 1.5, [8, 8], 0.45); line(base, 2.5, [], 0.8); line(base + ds, 1.5, [], 0.35);
-    if (ghost) { ctx.save(); ctx.globalAlpha = 0.22; ctx.fillStyle = css(wrap, '--c'); ctx.textAlign = 'center'; ctx.fillText(txt, W / 2, base); ctx.restore(); }
+    line(oy, 1.5, [], 0.5); line(oy + U, 1.5, [8, 8], 0.5); line(oy + 2 * U, 2.5, [], 0.85); line(oy + 3 * U, 1.5, [], 0.35);
+    if (!ghost && !partial) return;
+    ctx.save(); ctx.globalAlpha = 0.25; ctx.strokeStyle = col; ctx.lineWidth = U * 0.26; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    strokesPx.flat().forEach(st => { path(ctx, st); ctx.stroke(); }); ctx.restore();
+    if (partial) { // demo: draw strokes progressively
+      ctx.save(); ctx.strokeStyle = css(document.body, '--ink'); ctx.lineWidth = Math.max(5, U * 0.09); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      let left = partial;
+      for (const st of strokesPx.flat()) { if (left <= 0) break; const n = Math.min(st.length, left); path(ctx, st, n); ctx.stroke(); left -= st.length; }
+      ctx.restore();
+    }
+    dots = [];
+    strokesPx.forEach(gl => gl.forEach((st, j) => arrowsFor(ctx, st, j + 1, col)));
   }
-  function clear() { d.getContext('2d').clearRect(0, 0, W, H); }
+  function demo() {
+    cancelAnimationFrame(anim); const total = strokesPx.flat().reduce((a, st) => a + st.length, 0); let n = 0;
+    const tick = () => { n += 2; drawGuide(n); if (n < total) anim = requestAnimationFrame(tick); else setTimeout(() => drawGuide(), 600); };
+    anim = requestAnimationFrame(tick);
+  }
+  function clear() { d.getContext('2d').clearRect(0, 0, W, H); ink = []; $('#wfb').innerHTML = ''; }
 
   // drawing
-  let drawing = false, last = null;
-  const pt = e => { const r = d.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+  let drawing = false, last = null, idle = 0;
+  const pt = e => { const r = d.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
   function seg(a, b) {
     const ctx = d.getContext('2d');
-    ctx.strokeStyle = css(document.body, '--ink'); ctx.lineWidth = Math.max(5, H * 0.03); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+    ctx.strokeStyle = css(document.body, '--ink'); ctx.lineWidth = Math.max(5, U * 0.09); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+    const n = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / 3));
+    const cur = ink[ink.length - 1];
+    for (let k = 1; k <= n; k++) cur.push([a[0] + (b[0] - a[0]) * k / n, a[1] + (b[1] - a[1]) * k / n]);
   }
-  d.addEventListener('pointerdown', e => { e.preventDefault(); drawing = true; try { d.setPointerCapture(e.pointerId); } catch (_) {} last = pt(e); seg(last, { x: last.x + 0.1, y: last.y }); });
+  d.addEventListener('pointerdown', e => {
+    e.preventDefault(); if (state !== 'draw') return; clearTimeout(idle);
+    drawing = true; try { d.setPointerCapture(e.pointerId); } catch (_) {} last = pt(e); ink.push([last]); seg(last, [last[0] + 0.1, last[1]]);
+  });
   d.addEventListener('pointermove', e => { if (!drawing) return; const p = pt(e); seg(last, p); last = p; });
-  ['pointerup', 'pointercancel'].forEach(t => d.addEventListener(t, () => { drawing = false; }));
+  ['pointerup', 'pointercancel'].forEach(t => d.addEventListener(t, () => {
+    if (!drawing) return; drawing = false;
+    if (mode === 'trace') { clearTimeout(idle); idle = setTimeout(() => check(true), 700); }
+  }));
 
+  function result(absolute) {
+    const tpl = strokesPx.flat();
+    if (ink.flat().length < 6) return false;
+    if (absolute) { // on the guide lines the letter must also start and end at the right height
+      const d = centre(ink.flat()), t = centre(tplPx);
+      if (Math.abs(d.y0 - t.y0) > U * 0.45 || Math.abs(d.y1 - t.y1) > U * 0.45) return false;
+      return matches(nudge(ink, tpl, U), tpl, U);
+    }
+    return matches(fitInto(ink, tpl), tpl, U);
+  }
+  function check(auto) {
+    if (mode === 'trace') {
+      if (won) return;
+      const ok = result(true);
+      if (ok) {
+        won = true; addStar(); markDone('write');
+        $('#wfb').innerHTML = `<div class="fb good"><div class="msg"><b><span class="en">${pick(PRAISE)}</span> ⭐ כתבת את האות נכון!</b></div><button class="btn primary" id="wnext">אות הבאה ←</button></div>`;
+        $('#wnext').onclick = nextTrace;
+        say(NAME[LETTERS[idx][0]]);
+      } else if (!auto) {
+        ghost = true; renderButtons(); drawGuide();
+        $('#wfb').innerHTML = `<div class="fb bad"><div class="msg"><b>עוד לא מדויק.</b> נסה לכתוב על האות האפורה ולעקוב אחרי המספרים והחצים.</div><button class="btn" id="wagain">↻ לנסות שוב</button></div>`;
+        $('#wagain').onclick = clear;
+      }
+      return;
+    }
+    // dictation
+    state = 'checked'; ghost = true; drawGuide();
+    const ok = result(false);
+    if (ok) { addStar(); markDone('write'); }
+    $('#wfb').innerHTML = ok
+      ? `<div class="fb good"><div class="msg"><b><span class="en">${pick(PRAISE)}</span> ⭐ נכון!</b> השווה לאות שעל המסך.</div></div>`
+      : `<div class="fb bad"><div class="msg"><b>עוד לא.</b> כך כותבים את האות. אפשר לנסות שוב.</div></div>`;
+    renderButtons(ok);
+  }
+  function nextTrace() { idx = (idx + 1) % 26; won = false; clear(); render(); }
   function newDict() {
     let i; do { i = rint(0, 25); } while (dict && i === dict.i);
-    dict = { i, cs: Math.random() < 0.5 ? 'up' : 'low' }; checked = false; ghost = false;
+    dict = { i, cs: Math.random() < 0.5 ? 'up' : 'low' }; ghost = false; state = 'draw';
+  }
+  function renderButtons(ok) {
+    const wb = $('#wb');
+    if (mode === 'trace') {
+      wb.innerHTML = `<button class="btn" id="clr">🧽 נקה</button>
+        <button class="btn" id="demo">▶ איך כותבים</button>
+        <button class="btn" id="gh">${ghost ? 'הסתר דוגמה' : 'הצג דוגמה'}</button>
+        <button class="btn" id="chk">✓ בדוק אותי</button>
+        <button class="btn primary" id="nxt">אות הבאה ←</button>`;
+      $('#gh').onclick = () => { ghost = !ghost; renderButtons(); drawGuide(); };
+      $('#demo').onclick = demo;
+      $('#chk').onclick = () => check(false);
+      $('#nxt').onclick = nextTrace;
+    } else if (state === 'draw') {
+      wb.innerHTML = `<button class="btn" id="clr">🧽 נקה</button><button class="btn primary" id="chk">✓ בדוק אותי</button>`;
+      $('#chk').onclick = () => check(false);
+    } else {
+      wb.innerHTML = `<button class="btn" id="retry">↻ לנסות שוב</button><button class="btn" id="demo">▶ איך כותבים</button><button class="btn primary" id="nx">אות הבאה ←</button>`;
+      $('#retry').onclick = () => { state = 'draw'; ghost = false; clear(); drawGuide(); renderButtons(); };
+      $('#demo').onclick = demo;
+      $('#nx').onclick = () => { newDict(); clear(); render(); say(NAME[LETTERS[dict.i][0]]); };
+    }
+    const c = $('#clr'); if (c) c.onclick = () => { clear(); won = false; };
   }
   function render() {
     $$('.seg [data-mode]', app).forEach(b => b.classList.toggle('on', b.dataset.mode === mode));
-    const wt = $('#wtop'), wb = $('#wb');
+    const wt = $('#wtop');
     if (mode === 'trace') {
       wt.innerHTML = `<div class="strip" id="strip">${LETTERS.map((L, i) => `<button class="h${hueOf(i)}${i === idx ? ' on' : ''}" data-i="${i}" aria-label="${L[0]}">${L[0]}</button>`).join('')}</div>
         <div class="wctl"><div class="seg" role="group" aria-label="גודל אות">
-          <button data-cs="up" class="${cs === 'up' ? 'on' : ''}">גדולה</button><button data-cs="low" class="${cs === 'low' ? 'on' : ''}">קטנה</button><button data-cs="both" class="${cs === 'both' ? 'on' : ''}">שתיהן</button></div></div>`;
-      wb.innerHTML = `<button class="btn" id="clr">🧽 נקה</button>
-        <button class="btn" id="gh">${ghost ? 'הסתר דוגמה' : 'הצג דוגמה'}</button>
-        <button class="btn" data-say="${NAME[LETTERS[idx][0]]}">🔊 שם האות</button>
-        <button class="btn primary" id="nxt">אות הבאה ←</button>`;
-      $$('#strip button').forEach(b => b.onclick = () => { idx = +b.dataset.i; clear(); render(); });
-      $$('[data-cs]', wt).forEach(b => b.onclick = () => { cs = b.dataset.cs; clear(); render(); });
-      $('#gh').onclick = () => { ghost = !ghost; render(); };
-      $('#nxt').onclick = () => { idx = (idx + 1) % 26; markDone('write'); clear(); render(); };
+          <button data-cs="up" class="${cs === 'up' ? 'on' : ''}">גדולה</button><button data-cs="low" class="${cs === 'low' ? 'on' : ''}">קטנה</button><button data-cs="both" class="${cs === 'both' ? 'on' : ''}">שתיהן</button></div>
+          <button class="btn sm" data-say="${NAME[LETTERS[idx][0]]}">🔊 שם האות</button></div>
+        <p class="hint">כותבים לפי המספרים והחצים: מתחילים בעיגול 1. כשהאות יוצאת נכון, מקבלים כוכב.</p>`;
+      $$('#strip button').forEach(b => b.onclick = () => { idx = +b.dataset.i; won = false; clear(); render(); });
+      $$('[data-cs]', wt).forEach(b => b.onclick = () => { cs = b.dataset.cs; won = false; clear(); render(); });
       const on = $('#strip .on'); if (on) on.scrollIntoView({ block: 'nearest', inline: 'center' });
     } else {
-      const U = LETTERS[dict.i][0];
-      wt.innerHTML = `<div class="dict stk h${curHue()}"><p>שמע את שם האות וכתוב אותה כאות <b>${dict.cs === 'up' ? 'גדולה' : 'קטנה'}</b>.</p>
-        <button class="btn sm" data-say="${NAME[U]}">🔊 שמע שוב</button><button class="btn sm" data-say="${NAME[U]}" data-slow="1">🐢 לאט</button></div>`;
-      wb.innerHTML = checked
-        ? `<button class="btn primary" id="yes">צדקתי ⭐</button><button class="btn" id="no">עוד לא, הבאה</button>`
-        : `<button class="btn" id="clr">🧽 נקה</button><button class="btn primary" id="chk">בדיקה 👀</button>`;
-      if (checked) {
-        $('#yes').onclick = () => { addStar(); markDone('write'); newDict(); clear(); render(); say(NAME[LETTERS[dict.i][0]]); };
-        $('#no').onclick = () => { markDone('write'); newDict(); clear(); render(); say(NAME[LETTERS[dict.i][0]]); };
-      } else $('#chk').onclick = () => { checked = true; ghost = true; render(); };
+      const U_ = LETTERS[dict.i][0], up = dict.cs === 'up';
+      wt.innerHTML = `<div class="dict stk h${hueOf(dict.i)}">
+          <p>שמע את שם האות וכתוב אותה בתור</p>
+          <span class="casebadge ${up ? 'up' : 'low'}">${up ? 'אות גדולה' : 'אות קטנה'} <span class="en">${up ? 'ABC' : 'abc'}</span></span>
+          <div class="sayrow"><button class="btn sm" data-say="${NAME[U_]}">🔊 שמע שוב</button><button class="btn sm" data-say="${NAME[U_]}" data-slow="1">🐢 לאט</button></div>
+        </div>`;
     }
-    const c = $('#clr'); if (c) c.onclick = clear;
+    renderButtons();
     drawGuide();
   }
   $$('.seg [data-mode]', app).forEach(b => b.onclick = () => {
     if (b.dataset.mode === mode) return;
-    mode = b.dataset.mode; clear();
+    mode = b.dataset.mode; won = false; clear();
     if (mode === 'dict') { newDict(); render(); say(NAME[LETTERS[dict.i][0]]); }
-    else { ghost = true; render(); }
+    else { ghost = true; state = 'draw'; render(); }
   });
   let lastW = -1;
   const ro = new ResizeObserver(() => { if (wrap.clientWidth !== lastW) { lastW = wrap.clientWidth; size(); } });
   ro.observe(wrap);
-  cleanup = () => ro.disconnect();
+  cleanup = () => { ro.disconnect(); cancelAnimationFrame(anim); clearTimeout(idle); };
   render(); size();
-  if (document.fonts && document.fonts.load) document.fonts.load('400 60px Andika').then(drawGuide, () => {});
+  if (document.fonts) document.fonts.ready.then(() => drawGuide());
 }
 
+// every English phrase the app speaks (used to make the audio clips)
+window.speechTexts = () => [...new Set([
+  ...Object.values(NAME), ...WORDS.map(w => w.w), ...SENTENCES.map(x => x.s),
+  ...STORIES.flatMap(st => st.x), ...NW.slice(1),
+  ...DEFAULT_PRIZES.map(t => t.replace(/\p{Extended_Pictographic}\uFE0F?/gu, '').trim()),
+])];
 home();
 })();
 </script>
