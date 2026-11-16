@@ -537,6 +537,10 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
   border:2.5px solid #fff;box-shadow:0 1px 4px rgba(90,50,0,.35);animation:mwturn 9s linear infinite}
 @media (prefers-reduced-motion:reduce){.wtmini{animation:none}}
 
+/* OpenMoji is CC BY-SA 4.0, which asks for the credit to be shown */
+.credit{margin:18px 0 6px;text-align:center;font-size:12px;color:#9AA0B4}
+.credit a{color:#8A91A6;text-decoration:underline}
+
 .optsay{border-width:1.5px;box-shadow:0 1px 4px rgba(31,42,68,.10)}
 .sfxbtn{border-width:1.5px;box-shadow:0 2px 8px rgba(31,42,68,.12)}
 .pill{border-width:1.5px}
@@ -804,11 +808,23 @@ document.addEventListener('pointerdown', () => {
 }, { capture: true });
 
 /* ---------- illustrations ---------- */
-// Microsoft Fluent Emoji 3D (MIT licence), served from jsDelivr at a pinned commit. Any emoji in the page is swapped
-// for its illustration; if an image can't load, the emoji itself stays.
-const ILL_BASE = 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@1ffb34c752ecf5d402f04cfb4b392c77f57c54bc/assets/';
-const EMAP = {"0️⃣":"Keycap 0/3D/keycap_0_3d.png","⌚":"Watch/3D/watch_3d.png","⏱":"Stopwatch/3D/stopwatch_3d.png","☂️":"Umbrella/3D/umbrella_3d.png","☆":"Star/3D/star_3d.png","⚙️":"Gear/3D/gear_3d.png","⚽":"Soccer ball/3D/soccer_ball_3d.png","✈️":"Airplane/3D/airplane_3d.png","✏️":"Pencil/3D/pencil_3d.png","✓":"Check mark/3D/check_mark_3d.png","🌈":"Rainbow/3D/rainbow_3d.png","🌋":"Volcano/3D/volcano_3d.png","🌙":"Crescent moon/3D/crescent_moon_3d.png","🌟":"Glowing star/3D/glowing_star_3d.png","🌳":"Deciduous tree/3D/deciduous_tree_3d.png","🌸":"Cherry blossom/3D/cherry_blossom_3d.png","🍃":"Leaf fluttering in wind/3D/leaf_fluttering_in_wind_3d.png","🍇":"Grapes/3D/grapes_3d.png","🍉":"Watermelon/3D/watermelon_3d.png","🍊":"Tangerine/3D/tangerine_3d.png","🍋":"Lemon/3D/lemon_3d.png","🍌":"Banana/3D/banana_3d.png","🍎":"Red apple/3D/red_apple_3d.png","🍦":"Soft ice cream/3D/soft_ice_cream_3d.png","🍬":"Candy/3D/candy_3d.png","🍿":"Popcorn/3D/popcorn_3d.png","🎂":"Birthday cake/3D/birthday_cake_3d.png","🎈":"Balloon/3D/balloon_3d.png","🎉":"Party popper/3D/party_popper_3d.png","🎡":"Ferris wheel/3D/ferris_wheel_3d.png","🎩":"Top hat/3D/top_hat_3d.png","🎭":"Performing arts/3D/performing_arts_3d.png","🎻":"Violin/3D/violin_3d.png","🏆":"Trophy/3D/trophy_3d.png","🏝️":"Desert island/3D/desert_island_3d.png","🐍":"Snake/3D/snake_3d.png","🐘":"Elephant/3D/elephant_3d.png","🐙":"Octopus/3D/octopus_3d.png","🐜":"Ant/3D/ant_3d.png","🐞":"Lady beetle/3D/lady_beetle_3d.png","🐟":"Fish/3D/fish_3d.png","🐢":"Turtle/3D/turtle_3d.png","🐧":"Penguin/3D/penguin_3d.png","🐯":"Tiger face/3D/tiger_face_3d.png","🐰":"Rabbit face/3D/rabbit_face_3d.png","🐱":"Cat face/3D/cat_face_3d.png","🐳":"Spouting whale/3D/spouting_whale_3d.png","🐴":"Horse face/3D/horse_face_3d.png","🐵":"Monkey face/3D/monkey_face_3d.png","🐶":"Dog face/3D/dog_face_3d.png","👀":"Eyes/3D/eyes_3d.png","👁️":"Eye/3D/eye_3d.png","👑":"Crown/3D/crown_3d.png","👸":"Princess/Default/3D/princess_3d_default.png","👖":"Jeans/3D/jeans_3d.png","📓":"Notebook/3D/notebook_3d.png","📱":"Mobile phone/3D/mobile_phone_3d.png","🔑":"Key/3D/key_3d.png","🔔":"Bell/3D/bell_3d.png","🚀":"Rocket/3D/rocket_3d.png","🚐":"Minibus/3D/minibus_3d.png","🚗":"Automobile/3D/automobile_3d.png","🚪":"Door/3D/door_3d.png","🤐":"Zipper-mouth face/3D/zipper-mouth_face_3d.png","🥚":"Egg/3D/egg_3d.png","🥛":"Glass of milk/3D/glass_of_milk_3d.png","🥜":"Peanuts/3D/peanuts_3d.png","🥣":"Bowl with spoon/3D/bowl_with_spoon_3d.png","🦆":"Duck/3D/duck_3d.png","🦉":"Owl/3D/owl_3d.png","🦘":"Kangaroo/3D/kangaroo_3d.png","🧃":"Beverage box/3D/beverage_box_3d.png","🧥":"Coat/3D/coat_3d.png","🧽":"Sponge/3D/sponge_3d.png","🩻":"X-ray/3D/x-ray_3d.png","🪀":"Yo-yo/3D/yo-yo_3d.png","🪁":"Kite/3D/kite_3d.png","☀️":"Sun/3D/sun_3d.png","❓":"Red question mark/3D/red_question_mark_3d.png","⬆️":"Up arrow/3D/up_arrow_3d.png","⬆":"Up arrow/3D/up_arrow_3d.png","⭐":"Star/3D/star_3d.png","🃏":"Joker/3D/joker_3d.png","🍕":"Pizza/3D/pizza_3d.png","🎁":"Wrapped gift/3D/wrapped_gift_3d.png","🎯":"Bullseye/3D/bullseye_3d.png","🎶":"Musical notes/3D/musical_notes_3d.png","🏓":"Ping pong/3D/ping_pong_3d.png","🏠":"House/3D/house_3d.png","🐸":"Frog/3D/frog_3d.png","🐻":"Bear/3D/bear_3d.png","💡":"Light bulb/3D/light_bulb_3d.png","📈":"Chart increasing/3D/chart_increasing_3d.png","🔊":"Speaker high volume/3D/speaker_high_volume_3d.png","🔕":"Bell with slash/3D/bell_with_slash_3d.png","🚂":"Locomotive/3D/locomotive_3d.png","🟡":"Yellow circle/3D/yellow_circle_3d.png","🤖":"Robot/3D/robot_3d.png","🤫":"Shushing face/3D/shushing_face_3d.png","🦁":"Lion/3D/lion_3d.png","🦄":"Unicorn/3D/unicorn_3d.png","🦒":"Giraffe/3D/giraffe_3d.png","🦓":"Zebra/3D/zebra_3d.png","👃":"Nose/Default/3D/nose_3d_default.png","👦":"Boy/Default/3D/boy_3d_default.png","👧":"Girl/Default/3D/girl_3d_default.png","💪":"Flexed biceps/Default/3D/flexed_biceps_3d_default.png","🔤":"Input latin letters/3D/input_latin_letters_3d.png","🔠":"Input latin uppercase/3D/input_latin_uppercase_3d.png","👂":"Ear/Default/3D/ear_3d_default.png","✍️":"Writing hand/Default/3D/writing_hand_3d_default.png","📖":"Open book/3D/open_book_3d.png","📚":"Books/3D/books_3d.png","🔢":"Input numbers/3D/input_numbers_3d.png","⏱️":"Stopwatch/3D/stopwatch_3d.png","✨":"Sparkles/3D/sparkles_3d.png","📅":"Calendar/3D/calendar_3d.png","🏅":"Sports medal/3D/sports_medal_3d.png","👋":"Waving hand/Default/3D/waving_hand_3d_default.png","✅":"Check mark button/3D/check_mark_button_3d.png","❌":"Cross mark/3D/cross_mark_3d.png","🎓":"Graduation cap/3D/graduation_cap_3d.png","🎒":"Backpack/3D/backpack_3d.png","🔗":"Link/3D/link_3d.png","🗑️":"Wastebasket/3D/wastebasket_3d.png"};
-const illUrl = g => { const k = EMAP[g] ? g : EMAP[g.replace(/\uFE0F/g, '')] ? g.replace(/\uFE0F/g, '') : EMAP[g + '\uFE0F'] ? g + '\uFE0F' : null; return k ? ILL_BASE + encodeURI(EMAP[k]) : null; };
+// OpenMoji (CC BY-SA 4.0, hfg-gmuend/openmoji), served from jsDelivr at a pinned version.
+// Hand-drawn with visible outlines — doodles rather than the glossy 3D set that was here
+// before. The file name is simply the character's own code points, so the hand-written map
+// of 120 emoji that used to live here is gone, and anything with an emoji gets a picture.
+// Variation selectors are dropped, except in keycaps, where OpenMoji keeps them.
+const ILL_BASE = 'https://cdn.jsdelivr.net/gh/hfg-gmuend/openmoji@15.0.0/color/svg/';
+const illName = g => {
+  const cps = [...g].map(c => c.codePointAt(0));
+  const keycap = cps.includes(0x20E3);
+  return cps.filter(c => keycap || c !== 0xFE0F)
+    .map(c => c.toString(16).toUpperCase().padStart(4, '0')).join('-');
+};
+const illUrl = g => {
+  if (!/\p{Extended_Pictographic}/u.test(g)) return null;
+  const n = illName(g);
+  return n ? ILL_BASE + n + '.svg' : null;
+};
 const graphemes = (() => { try { const sg = new Intl.Segmenter(undefined, { granularity: 'grapheme' }); return t => [...sg.segment(t)].map(x => x.segment); } catch (e) { return t => [...t]; } })();
 function illustrate(root) {
   if (!root || root.nodeType !== 1 || root.closest('textarea,script,style,.noill')) return;
@@ -829,14 +845,6 @@ function illustrate(root) {
 }
 new MutationObserver(ms => { for (const m of ms) for (const nd of m.addedNodes) { if (nd.nodeType === 1) illustrate(nd); else if (nd.nodeType === 3) illustrate(nd.parentElement); } })
   .observe(document.documentElement, { childList: true, subtree: true });
-// warm the cache: fetch every illustration quietly in the background, a few at a time, so pictures are ready before they're needed
-(function preloadAll() {
-  const urls = [...new Set(Object.keys(EMAP).map(illUrl).filter(Boolean))];
-  let i = 0;
-  const next = () => { if (i >= urls.length) return; const im = new Image(); im.decoding = 'async'; try { im.fetchPriority = 'low'; } catch (e) {} im.onload = im.onerror = next; im.src = urls[i++]; };
-  const start = () => { for (let k = 0; k < 6; k++) next(); };
-  if ('requestIdleCallback' in window) requestIdleCallback(start, { timeout: 1500 }); else setTimeout(start, 800);
-})();
 // preload for the wheel canvas
 const illImg = {};
 function illImage(g) { const u = illUrl(g); if (!u) return null; if (!illImg[u]) { const im = new Image(); im.crossOrigin = 'anonymous'; im.src = u; illImg[u] = im; } return illImg[u]; }
@@ -1041,7 +1049,8 @@ function home() {
   <p class="tip">המורה ביקשה: קריאה בקול, חזרה על הצלילים והאותיות, קצת בכל יום.</p>
   ${KID ? '' : `<div class="parentrow">
     ${CLOUD_OK ? '<button class="btn" id="gparent"><span class="gmark" aria-hidden="true">G</span> כניסת הורים עם Google</button>' : ''}
-    <button class="link parentlink" id="parent">⚙️ הגדרות במכשיר הזה</button></div>`}`;
+    <button class="link parentlink" id="parent">⚙️ הגדרות במכשיר הזה</button></div>`}
+  <p class="credit">האיורים: <a href="https://openmoji.org" target="_blank" rel="noopener">OpenMoji</a> · רישיון <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a></p>`;
   $$('.tile', app).forEach(b => b.onclick = () => MODS[+b.dataset.m].run());
   const mk = $('#mock'); if (mk) mk.onclick = () => go(quizMock);
   $('#myprog').onclick = () => go(progressView);
