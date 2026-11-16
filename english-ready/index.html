@@ -345,6 +345,7 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .lockmeter i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#FFE27A,#FFB020)}
 .locknote{margin:0;font-size:15px;color:#E6DEFF}
 .spinbig.gohome{font-size:clamp(20px,5.5vw,24px);letter-spacing:0;animation:none}
+.wlabel.hint{font-family:var(--f-body);font-weight:600;font-size:clamp(16px,4.5vw,19px);direction:rtl}
 /* story */
 .story{padding:16px;margin-bottom:14px}
 .sthead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
@@ -1165,7 +1166,10 @@ function wheelView(preview) {
   const R = C - size * 0.075;            // slices
   const RIM = C - size * 0.02;           // outer edge of the gold rim
   const label = $('#wlabel');
-  let rot = 0, spinning = false, lastIdx = -1, raf = 0, tilt = 0;
+  label.textContent = G.avail ? 'לחץ על SPIN וגלה מה תזכה! ✨' : '';
+  label.classList.toggle('hint', true);
+  if (!G.avail) label.hidden = true;
+  let rot = 0, spinning = false, lastIdx = -1, raf = 0, tilt = 0, live = false; // live: name the slice under the pointer only once a spin has started
   const under = () => { const a = ((-rot) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2); return Math.floor(a / seg) % n; };
 
   function draw(now) {
@@ -1228,7 +1232,8 @@ function wheelView(preview) {
     const i = under();
     if (i !== lastIdx) {
       if (lastIdx !== -1 && spinning) { tick(); tilt = -0.35; }
-      lastIdx = i; label.textContent = textOf(prizes[i]) + ' ' + emojiOf(prizes[i]);
+      lastIdx = i;
+      if (live) label.textContent = textOf(prizes[i]) + ' ' + emojiOf(prizes[i]);
     }
     tilt *= 0.82;
   }
@@ -1257,7 +1262,7 @@ function wheelView(preview) {
   $('#go').onclick = () => {
     if (spinning) return;
     if (!preview && goalState(load()).avail < 1) return;
-    spinning = true; $('#go').disabled = true; $('#prize').innerHTML = '';
+    spinning = true; live = true; lastIdx = -1; label.classList.remove('hint'); $('#go').disabled = true; $('#prize').innerHTML = '';
     const win = Math.floor(Math.random() * n);
     const start = rot, reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     // slice `win` must stop under the pointer, a little off-centre so it looks natural
