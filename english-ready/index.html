@@ -243,6 +243,9 @@ a.btn{text-decoration:none}
 .hebubble{margin:0;position:relative;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:8px 16px;font:500 19px/1.4 var(--f-body);color:var(--ink);animation:pop .25s both}
 .qtools{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 .heicon{font-size:15px}
+.sfxbtn{position:fixed;z-index:40;left:calc(12px + env(safe-area-inset-left, 0px));bottom:calc(12px + env(safe-area-inset-bottom, 0px));width:46px;height:46px;border-radius:50%;border:2.5px solid var(--line);background:var(--surface);box-shadow:2px 2px 0 var(--shadow);font-size:20px;display:grid;place-items:center;padding:0}
+.sfxbtn:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--shadow)}
+#root{padding-bottom:calc(72px + env(safe-area-inset-bottom, 0px))}
 /* story */
 .story{padding:16px;margin-bottom:14px}
 .sthead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
@@ -517,6 +520,36 @@ async function say(text, slow = false) {
   }
 }
 function hush() { token++; try { player.pause(); } catch (e) {} if (canTTS) speechSynthesis.cancel(); }
+// soft feedback sounds (made in the browser, no files); the 🔔 button mutes them on this device
+let sfxOn = true; try { sfxOn = localStorage.getItem('english-ready-sfx') !== 'off'; } catch (e) {}
+let actx = null;
+function sfx(kind) {
+  if (!sfxOn) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === 'suspended') actx.resume();
+    const notes = kind === 'ok' ? [[659, 0], [988, 0.09]]            // E5 → B5, a light "ding-ding"
+      : kind === 'win' ? [[523, 0], [659, 0.1], [784, 0.2], [1047, 0.3]] // little fanfare
+      : [[330, 0], [262, 0.12]];                                       // soft low "oh-oh"
+    const t0 = actx.currentTime + 0.01;
+    for (const [f, dt] of notes) {
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = kind === 'no' ? 'triangle' : 'sine'; o.frequency.value = f;
+      const vol = kind === 'no' ? 0.07 : 0.09, len = kind === 'no' ? 0.22 : 0.28;
+      g.gain.setValueAtTime(0.0001, t0 + dt);
+      g.gain.exponentialRampToValueAtTime(vol, t0 + dt + 0.015);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dt + len);
+      o.connect(g).connect(actx.destination); o.start(t0 + dt); o.stop(t0 + dt + len + 0.02);
+    }
+  } catch (e) {}
+}
+function sfxButton() {
+  const b = document.createElement('button');
+  b.className = 'sfxbtn'; b.type = 'button';
+  const paint = () => { b.textContent = sfxOn ? '🔔' : '🔕'; b.setAttribute('aria-label', sfxOn ? 'צלילי הצלחה וטעות: פועלים. לחיצה משתיקה' : 'צלילי הצלחה וטעות: מושתקים. לחיצה מפעילה'); b.title = sfxOn ? 'השתקת צלילים' : 'הפעלת צלילים'; };
+  b.onclick = () => { sfxOn = !sfxOn; try { localStorage.setItem('english-ready-sfx', sfxOn ? 'on' : 'off'); } catch (e) {} paint(); if (sfxOn) sfx('ok'); };
+  paint(); document.body.appendChild(b);
+}
 let primed = false;
 document.addEventListener('pointerdown', () => {
   if (primed) return; primed = true;
@@ -997,7 +1030,7 @@ function wheelView(preview) {
       let g2 = { avail: 1 };
       if (!preview) { const s2 = load(); day(s2).spins++; s2.wins.unshift({ date: today(), prize: prizes[win] }); s2.wins = s2.wins.slice(0, 60); save(s2); g2 = goalState(s2); }
       $('#prize').innerHTML = `<div class="prize stk"><p class="en pwin">You won:</p><p class="en ptext">${esc(prizes[win])}</p><p>כל הכבוד! 🎉 תראה את זה לאמא או לאבא.</p></div>`;
-      say(textOf(prizes[win]));
+      sfx('win'); setTimeout(() => say(textOf(prizes[win])), 600);
       const b = $('#go'); b.disabled = g2.avail < 1; b.textContent = preview ? '🎡 Spin again!' : g2.avail ? `🎡 Spin again! (${g2.avail})` : '🎡 Spin!';
     }
     requestAnimationFrame(frame);
@@ -1332,6 +1365,7 @@ function runQuiz(mod, title, qs, again) {
   function answer(k) {
     if (closed) return;
     const q = qs[i], ok = q.options[k].v === q.answer;
+    sfx(ok ? 'ok' : 'no');
     if (mod === 'mock') {
       tally(ok);
       if (!ok) $(`.opt[data-k="${k}"]`, app).classList.add('no');
@@ -1638,11 +1672,12 @@ function writeView() {
       if (won) return;
       const ok = result(true);
       if (ok) {
-        won = true; addStar(); markDone('write');
+        won = true; addStar(); markDone('write'); sfx('ok');
         $('#wfb').innerHTML = `<div class="fb good"><div class="msg"><b><span class="en">${pick(PRAISE)}</span> ⭐ כתבת את האות נכון!</b></div><button class="btn primary" id="wnext">אות הבאה ←</button></div>`;
         $('#wnext').onclick = nextTrace;
         say(NAME[LETTERS[idx][0]]);
       } else if (!auto) {
+        sfx('no');
         ghost = true; renderButtons(); drawGuide();
         $('#wfb').innerHTML = `<div class="fb bad"><div class="msg"><b>עוד לא מדויק.</b> נסה לכתוב על האות האפורה ולעקוב אחרי המספרים והחצים.</div><button class="btn" id="wagain">↻ לנסות שוב</button></div>`;
         $('#wagain').onclick = clear;
@@ -1653,6 +1688,7 @@ function writeView() {
     state = 'checked'; ghost = true; drawGuide();
     const ok = result(false);
     if (ok) { addStar(); markDone('write'); }
+    sfx(ok ? 'ok' : 'no');
     $('#wfb').innerHTML = ok
       ? `<div class="fb good"><div class="msg"><b><span class="en">${pick(PRAISE)}</span> ⭐ נכון!</b> השווה לאות שעל המסך.</div></div>`
       : `<div class="fb bad"><div class="msg"><b>עוד לא.</b> כך כותבים את האות. אפשר לנסות שוב.</div></div>`;
@@ -1729,6 +1765,7 @@ window.speechTexts = () => [...new Set([
   ...STORIES.flatMap(st => st.x), ...STORIES.flatMap(st => st.q.map(q => q[0])), ...NW.slice(1),
   ...DEFAULT_PRIZES.map(t => t.replace(/\p{Extended_Pictographic}\uFE0F?/gu, '').trim()),
 ])];
+sfxButton();
 const QS = new URLSearchParams(location.search);
 if (QS.get('k') && CLOUD_OK) bootKid(QS.get('k'), QS.get('m') || 'all');
 else home();
