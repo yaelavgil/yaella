@@ -360,6 +360,17 @@ const ALPHA = 'abcdefghijklmnopqrstuvwxyz'.split('');
 const LET = Object.fromEntries(LETTERS.map(L => [L[0], L]));
 // Hebrew sound for hints, without the English letter that some cards show in brackets
 const heSound = U => LET[U][1].replace(/\s*\(.*?\)/g, '');
+// a picture word for a letter, avoiding words whose first sound is misleading
+const hintWord = U => LET[U][3].find(w => w[2] !== 't') || LET[U][3][LET[U][3].length - 1];
+// shape tips: describe how the letter looks without naming it
+const SHAPE_LOW = {a:'עיגול קטן עם קו קצר צמוד אליו מימין',b:'קו גבוה, ולמטה בטן עגולה שפונה ימינה',c:'כמו הגדולה, רק קטנה: חצי עיגול פתוח',d:'קו גבוה, ולמטה בטן עגולה שפונה שמאלה',e:'עיגול קטן עם קו באמצע',f:'קו גבוה עם קרס למעלה וקו קטן לרוחב',g:'עיגול קטן עם זנב שיורד מתחת לשורה',h:'קו גבוה וגשר קטן בצד',i:'קו קצר עם נקודה למעלה',j:'קו שיורד מתחת לשורה, עם נקודה למעלה',k:'קו גבוה ושני קווים קטנים באלכסון',l:'קו אחד ישר וגבוה',m:'שני גשרים קטנים',n:'גשר אחד קטן',o:'כמו הגדולה, רק קטנה: עיגול',p:'קו שיורד מתחת לשורה, ולמעלה בטן שפונה ימינה',q:'קו שיורד מתחת לשורה, ולמעלה בטן שפונה שמאלה',r:'קו קצר, ובראשו התחלה של גשר',s:'כמו הגדולה, רק קטנה: נחש',t:'קו עם קו קטן לרוחב, קצת כמו צלב',u:'כמו הגדולה, רק קטנה: צורת כוס',v:'כמו הגדולה, רק קטנה: חץ למטה',w:'כמו הגדולה, רק קטנה: שני חצים',x:'כמו הגדולה, רק קטנה: שני קווים שנחתכים',y:'שני קווים באלכסון, ואחד מהם יורד מתחת לשורה',z:'כמו הגדולה, רק קטנה: זיגזג'};
+const SHAPE_UP = {A:'גג משולש עם קו באמצע',B:'קו ישר ושתי בטנים מימין',C:'חצי עיגול שפתוח מימין',D:'קו ישר ובטן אחת גדולה מימין',E:'קו ישר ושלושה קווים לרוחב',F:'קו ישר ושני קווים לרוחב, למעלה ובאמצע',G:'חצי עיגול עם קו קטן בפנים',H:'שני קווים עומדים וגשר באמצע',I:'קו אחד ישר',J:'קו שיורד ומתעקל למטה שמאלה, כמו ידית של מטרייה',K:'קו ישר ושני קווים באלכסון',L:'קו ישר וקו קצר למטה ימינה',M:'שני הרים',N:'קו, אלכסון, ועוד קו',O:'עיגול גדול',P:'קו ישר ובטן אחת למעלה',Q:'עיגול עם זנב קטן',R:'קו ישר, בטן למעלה ורגל באלכסון',S:'נחש',T:'קו ישר עם גג ישר למעלה',U:'צורת כוס',V:'חץ למטה',W:'שני חצים למטה',X:'שני קווים שנחתכים',Y:'כוס קטנה על מקל',Z:'זיגזג: למעלה, אלכסון, למטה'};
+// the word in a sentence that tells it apart from the look-alike sentences
+function keyWords(it) {
+  const tok = t => t.toLowerCase().replace(/[.!?,]/g, '').split(' ');
+  const others = it.ws.map(tok);
+  return tok(it.s).filter(w => others.some(o => !o.includes(w)));
+}
 const HE_NAME = {A:'אֵיי',B:'בִּי',C:'סִי',D:'דִּי',E:'אִי',F:'אֶף',G:'גִ׳י',H:'אֵייץ׳',I:'אַיי',J:'גֵ׳יי',K:'קֵיי',L:'אֶל',M:'אֶם',N:'אֶן',O:'אוֹ',P:'פִּי',Q:'קְיוּ',R:'אַר',S:'אֶס',T:'טִי',U:'יוּ',V:'וִי',W:'דַאבֶּל־יוּ',X:'אֶקְס',Y:'וַאי',Z:'זִי'};
 // which story sentence holds the answer, per question
 const STORY_HINT = {"What is the cat's name?":1,'What color is Mimi?':2,'What does Mimi like?':3,'Where does Mimi sleep?':4,
@@ -1164,19 +1175,19 @@ function qCase() {
   if (Math.random() < 0.55) {
     return { key: 'c:' + U, hue: h, prompt: `<div class="bigletter en">${U}</div><p class="ask">מה האות הקטנה של <span class="en">${U}</span>?</p>`,
       layout: 'letters', options: fillOpts(l, LOWC[l], () => true, ALPHA).map(x => ({ v: x, html: `<span class="en">${x}</span>` })),
-      answer: l, rv: `${U} → ${l}`, hint: { he: `<span class="en">${U}</span> כמו ב־${LET[U][3][0][1]} · הקשב למילה ונסה לדמיין איך היא כתובה`, say: LET[U][3][0][0] } };
+      answer: l, rv: `${U} → ${l}`, hint: { he: `איך נראית האות הקטנה? ${SHAPE_LOW[l]}` } };
   }
   const UP = ALPHA.map(x => x.toUpperCase());
   return { key: 'C:' + l, hue: h, prompt: `<div class="bigletter en">${l}</div><p class="ask">מה האות הגדולה של <span class="en">${l}</span>?</p>`,
     layout: 'letters', options: fillOpts(U, UPC[U], () => true, UP).map(x => ({ v: x, html: `<span class="en">${x}</span>` })),
-    answer: U, rv: `${l} → ${U}`, hint: { he: `<span class="en">${l}</span> כמו ב־${LET[U][3][0][1]} · הקשב למילה ונסה לדמיין איך היא כתובה`, say: LET[U][3][0][0] } };
+    answer: U, rv: `${l} → ${U}`, hint: { he: `איך נראית האות הגדולה? ${SHAPE_UP[U]}` } };
 }
 function qName() {
   const l = pick(ALPHA), U = l.toUpperCase();
   return { key: 'n:' + l, hue: hueOf(ALPHA.indexOf(l)), speak: NAME[U],
     prompt: `<div class="pic" aria-hidden="true">🔊</div><p class="ask">שמע את שם האות ובחר אותה</p>`,
     layout: 'letters', options: fillOpts(l, NAMECONF[l], () => true, ALPHA).map(x => ({ v: x, html: `<span class="en">${x.toUpperCase()}${x}</span>` })),
-    answer: l, rv: `🔊 ${U}${l}`, hint: { he: `שם האות נשמע בעברית בערך <b>${HE_NAME[U]}</b>.`, say: NAME[U], slow: true } };
+    answer: l, rv: `🔊 ${U}${l}`, hint: { he: `זו האות שבה מתחילה המילה ${hintWord(U)[1]} (הקשב לשתיהן)`, say: NAME[U] + '|' + hintWord(U)[0], slow: true } };
 }
 function qSeq() {
   const up = Math.random() < 0.5, s = rint(0, 22), hide = rint(1, 3);
@@ -1204,12 +1215,12 @@ function qNumListen() {
 function qNumWord() {
   const n = rint(1, 12);
   return { key: 'nw' + n, hue: 4, sayAfter: NW[n], prompt: `<p class="word en">${NW[n]}</p><p class="ask">איזה מספר כתוב כאן?</p>`,
-    layout: 'digits', options: numOpts(n).map(x => ({ v: x, html: x })), answer: n, rv: `${NW[n]} = ${n}`, hint: { he: 'הקשב איך קוראים את המילה.', say: NW[n] } };
+    layout: 'digits', options: numOpts(n).map(x => ({ v: x, html: x })), answer: n, rv: `${NW[n]} = ${n}`, hint: { he: `המילה מתחילה בצליל <b>${heSound(NW[n][0].toUpperCase())}</b>. אילו מספרים באנגלית מתחילים כך?` } };
 }
 function qNumDigit() {
   const n = rint(1, 12);
   return { key: 'nd' + n, hue: 5, sayAfter: NW[n], prompt: `<div class="digit">${n}</div><p class="ask">איך כותבים את המספר באנגלית?</p>`,
-    layout: 'words', options: numOpts(n).map(x => ({ v: x, html: `<span class="en">${NW[x]}</span>` })), answer: n, rv: `${n} = ${NW[n]}`, hint: { he: 'הקשב לשם המספר, ואז חפש את המילה שמתחילה באותו צליל.', say: NW[n] } };
+    layout: 'words', options: numOpts(n).map(x => ({ v: x, html: `<span class="en">${NW[x]}</span>` })), answer: n, rv: `${n} = ${NW[n]}`, hint: { he: `המילה מתחילה בצליל <b>${heSound(NW[n][0].toUpperCase())}</b>. איזו מהמילים מתחילה כך?` } };
 }
 function qNumCount() {
   const n = rint(3, 12), it = pick(COUNT_ITEMS);
@@ -1253,21 +1264,21 @@ function qNumNext() {
   return { key: 'nn' + base + up, hue: 6, sayAfter: NW[a],
     prompt: `<p class="qen en">What comes ${up ? 'after' : 'before'} <b>${NW[base]}</b>?</p><p class="ask">${up ? 'איזה מספר בא אחרי' : 'איזה מספר בא לפני'} <span class="en">${NW[base]}</span>?</p>`,
     layout: 'words', options: shuffle([a, ...shuffle([...Array(12)].map((_, i) => i + 1).filter(x => x !== a && x !== base)).filter(x => Math.abs(x - a) <= 3).slice(0, optN() - 1)]).map(x => ({ v: x, html: `<span class="en">${NW[x]}</span>` })),
-    answer: a, rv: `${NW[base]} → ${NW[a]}`, hint: { he: 'ספור בקול באנגלית: one, two, three…' } };
+    answer: a, rv: `${NW[base]} → ${NW[a]}`, hint: { he: 'ספור בקול באנגלית מההתחלה, לאט, עד שתגיע למספר הזה.' } };
 }
 function qSentence(it, reverse) {
   if (!reverse) return { key: 'sf' + it.s, hue: 5, sayAfter: it.s, help: it.s,
     prompt: `<p class="ask">קרא את המשפט ובחר את התמונה המתאימה</p><p class="sent en">${it.s}</p>`,
-    layout: 'emoji', options: shuffle([it.p, ...it.wp.slice(0, optN() - 1)]).map(x => ({ v: x, html: x })), answer: it.p, rv: `${it.s} → ${it.p}`, hint: { he: 'הקשב למשפט וחפש בתמונות את המילים שבו.', say: it.s } };
+    layout: 'emoji', options: shuffle([it.p, ...it.wp.slice(0, optN() - 1)]).map(x => ({ v: x, html: x })), answer: it.p, rv: `${it.s} → ${it.p}`, hint: { he: `קרא לאט את המילה החשובה: <b class="en">${keyWords(it).join(' ')}</b>. מה היא אומרת?` } };
   return { key: 'sr' + it.s, hue: 5, sayAfter: it.s,
     prompt: `<div class="pic">${it.p}</div><p class="ask">איזה משפט מתאים לתמונה?</p>`,
-    layout: 'wide', options: shuffle([it.s, ...it.ws.slice(0, optN() - 1)]).map(x => ({ v: x, html: `<span class="en">${x}</span>` })), answer: it.s, rv: `${it.p} → ${it.s}`, hint: { he: 'קרא כל משפט לאט, מילה אחרי מילה. מה רואים בתמונה?' } };
+    layout: 'wide', options: shuffle([it.s, ...it.ws.slice(0, optN() - 1)]).map(x => ({ v: x, html: `<span class="en">${x}</span>` })), answer: it.s, rv: `${it.p} → ${it.s}`, hint: { he: 'המשפטים כמעט זהים. חפש את המילה ששונה בכל משפט וקרא אותה לאט.' } };
 }
 function storyQs(st) {
   return st.q.map(([q, he, o]) => ({ key: 'st' + q, hue: 6, story: st,
     prompt: `<p class="qen en">${q}</p><div class="qtools"><button class="hebtn" data-say="${esc(q)}"><span class="heicon" aria-hidden="true">🔊</span><span>השמע את השאלה</span></button>${lvl === 'hard' ? '' : `<button class="hebtn" data-he aria-expanded="false"><span class="heicon" aria-hidden="true">א</span><span class="helab">תרגום לעברית</span></button>`}</div>${lvl === 'hard' ? '' : `<p class="hebubble" hidden>${he}</p>`}`,
     layout: 'wide', options: shuffle([o[0], ...o.slice(1, optN())]).map(x => ({ v: x, html: `<span class="en">${x}</span>` })), answer: o[0], rv: `${q} → ${o[0]}`,
-    hint: { he: 'התשובה נמצאת במשפט המסומן בסיפור.', say: st.x[STORY_HINT[q]], mark: STORY_HINT[q] } }));
+    hint: { he: 'התשובה נמצאת במשפט המסומן בסיפור. קרא אותו שוב לאט.', mark: STORY_HINT[q] } }));
 }
 function build(gens, n) {
   const out = [], keys = new Set();
