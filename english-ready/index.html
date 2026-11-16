@@ -196,6 +196,53 @@ h2{font:600 24px/1.2 var(--f-display);margin:0;text-wrap:balance}
 .lvlup{display:grid;gap:8px;justify-items:center;background:var(--t4);border-radius:14px;padding:12px 16px;width:100%}
 u.gap{text-decoration:none;display:inline-block;min-width:.7em;border-bottom:5px solid var(--c);color:transparent}
 .pbox h3{font:600 18px var(--f-display);margin:6px 0 0}
+.parentrow{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-top:16px}
+.gmark{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#fff;color:#4285F4;font:700 16px Arial,sans-serif;border:1px solid #dadce0}
+.gbtn{font-size:18px;min-height:54px}
+.loading{padding:30px;text-align:center;color:var(--muted)}
+.plist{margin:0;padding-inline-start:20px;display:grid;gap:4px}
+.pdash{display:grid;gap:16px}
+.who{margin:0;color:var(--muted)}
+.kidcard{padding:16px;display:grid;gap:10px}
+.kchead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.kstats{margin:0}
+.links{display:grid;gap:8px}
+.linkrow{display:grid;grid-template-columns:7.5em minmax(0,1fr) auto auto;gap:8px;align-items:center}
+.lmode{font-weight:700;font-size:14px;padding:2px 10px;border-radius:999px;text-align:center;color:var(--on);background:var(--c4)}
+.lmode.test{background:var(--bad)} .lmode.all{background:var(--c2)}
+.lurl{min-width:0;width:100%;font:13px var(--f-body);direction:ltr;padding:8px;border:2px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+a.btn{text-decoration:none}
+@media (max-width:520px){.linkrow{grid-template-columns:1fr 1fr}.lmode,.lurl{grid-column:1/-1}}
+.pin.wide{width:100%;max-width:20em}
+.packs{display:grid;gap:8px}
+.pack{display:grid;grid-template-columns:auto 1fr;column-gap:10px;align-items:center;padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer}
+.pack small{grid-column:2;color:var(--muted)}
+.pack.soon{opacity:.55;cursor:default}
+.check{display:flex;align-items:center;gap:8px;font-weight:500}
+.check input{width:22px;height:22px}
+.danger{border-color:var(--bad)}
+.previewnote{background:var(--t3);border:2px dashed var(--line);border-radius:12px;padding:8px 12px;margin:0 0 12px;font-weight:600}
+.myprog{width:100%;margin-top:4px;font-size:17px}
+.bignum{font:700 30px var(--f-display);margin:0}
+.bignum small{font-size:16px;color:var(--muted)}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;max-width:420px}
+.wday{aspect-ratio:1;border-radius:12px;border:2px solid var(--line);display:grid;place-items:center;align-content:center;font:700 20px var(--f-display);background:var(--surface)}
+.wday small{font:500 12px var(--f-body);color:var(--muted)}
+.wday.on{background:var(--goodbg);color:var(--good)}
+.mocklist{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.mocklist li{display:grid;grid-template-columns:4em 3.5em minmax(0,1fr);gap:10px;align-items:center}
+.bests{margin:0;padding-inline-start:20px;display:grid;gap:4px}
+.modal{position:fixed;inset:0;z-index:50;background:rgba(10,14,28,.55);display:grid;place-items:center;padding:16px;overflow-y:auto}
+.mbox{background:var(--bg);border:2.5px solid var(--line);border-radius:22px;box-shadow:5px 5px 0 var(--shadow);padding:12px;width:min(420px,100%);display:grid;gap:10px}
+.mhead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.mbox .previewnote{margin:0}
+.hebtn{display:inline-flex;align-items:center;gap:8px;background:var(--surface);color:var(--ink);border:2px solid var(--line);border-radius:999px;padding:4px 14px 4px 6px;font:600 15px var(--f-body);box-shadow:2px 2px 0 var(--shadow);min-height:40px}
+.hebtn:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--shadow)}
+.heicon{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--c);color:var(--on);font:700 16px var(--f-display)}
+.hebtn[aria-expanded="true"]{background:var(--t)}
+.hebubble{margin:0;position:relative;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:8px 16px;font:500 19px/1.4 var(--f-body);color:var(--ink);animation:pop .25s both}
+.qtools{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.heicon{font-size:15px}
 /* story */
 .story{padding:16px;margin-bottom:14px}
 .sthead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
@@ -486,9 +533,34 @@ const DEFAULT_PRIZES = [
   'A snack 🍿',
   '30 more minutes of screen time 📱',
 ];
-const fresh = () => ({ stars: 0, days: [], done: {}, best: {}, td: null, goal: { type: 'stars', n: 25 }, prizes: DEFAULT_PRIZES.slice(), wins: [], wheel: true, level: 'medium' });
-function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s) return Object.assign(fresh(), s); } catch (e) {} return fresh(); }
-function save(s) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} }
+const fresh = () => ({ stars: 0, days: [], done: {}, best: {}, td: null, goal: { type: 'stars', n: 25 }, prizes: DEFAULT_PRIZES.slice(), wins: [], wheel: true, level: 'medium', testLevel: 'medium', allowLevelUp: true, pack: 'g4-mapping' });
+const PROGRESS_KEYS = ['stars', 'days', 'done', 'best', 'td', 'mock', 'mocks', 'wins', 'level', 'updatedAt'];
+const SETTING_KEYS = ['goal', 'prizes', 'wheel', 'level', 'testLevel', 'allowLevelUp', 'pack'];
+const defaultSettings = () => { const f = fresh(); return Object.fromEntries(SETTING_KEYS.map(k => [k, f[k]])); };
+// KID is set when the app is opened from a parent's link: settings come from the parent, progress is saved to the cloud
+let KID = null;
+function load() {
+  if (KID) {
+    const st = Object.assign(fresh(), KID.settings);
+    Object.assign(st, Object.fromEntries(PROGRESS_KEYS.filter(k => KID.progress[k] !== undefined && k !== 'level').map(k => [k, KID.progress[k]])));
+    if (KID.settings.allowLevelUp && KID.progress.level) st.level = KID.progress.level;
+    return JSON.parse(JSON.stringify(st));
+  }
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s) return Object.assign(fresh(), s); } catch (e) {} return fresh();
+}
+function save(s) {
+  if (KID) {
+    const pr = Object.fromEntries(PROGRESS_KEYS.filter(k => k !== 'level' && k !== 'updatedAt' && s[k] !== undefined).map(k => [k, s[k]]));
+    if (KID.settings.allowLevelUp && s.level && s.level !== (KID.progress.level || KID.settings.level)) pr.level = s.level;
+    else if (KID.progress.level) pr.level = KID.progress.level;
+    pr.updatedAt = Date.now();
+    KID.progress = pr;
+    try { localStorage.setItem(KEY + ':' + KID.id, JSON.stringify(pr)); } catch (e) {}
+    cloudSoon();
+    return;
+  }
+  try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {}
+}
 function today() { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; }
 function day(s) { const t = today(); if (!s.td || s.td.date !== t) s.td = { date: t, stars: 0, ms: 0, spins: 0 }; return s.td; }
 function markDone(mod, pct) {
@@ -526,7 +598,7 @@ function countdown() {
 let cleanup = null;
 function go(fn, ...a) {
   if (cleanup) { cleanup(); cleanup = null; }
-  practicing = ![home, wheelView, parentView].includes(fn); lastAct = 0;
+  practicing = ![home, wheelView, parentView, parentCloud].includes(fn); lastAct = 0;
   hush();
   fn(...a);
   window.scrollTo(0, 0);
@@ -538,9 +610,9 @@ app.addEventListener('click', e => {
   const s = e.target.closest('[data-say]');
   if (s) { say(s.dataset.say, !!s.dataset.slow); }
   const h = e.target.closest('[data-he]');
-  if (h) { const n = h.nextElementSibling; n.hidden = !n.hidden; }
+  if (h) { const n = h.closest('.qtools') ? h.closest('.qtools').nextElementSibling : h.nextElementSibling; n.hidden = !n.hidden; h.setAttribute('aria-expanded', String(!n.hidden)); const lb = h.querySelector('.helab'); if (lb) lb.textContent = n.hidden ? 'תרגום לעברית' : 'הסתרת התרגום'; }
   const b = e.target.closest('[data-back]');
-  if (b) { const t = b.dataset.back; go(t === 'abc' ? abcGrid : home); }
+  if (b) { const t = b.dataset.back; if (t === 'preview' && backTo) { const f = backTo; backTo = null; go(f); return; } go(t === 'abc' ? abcGrid : t === 'pdash' ? parentCloud : home); }
 });
 
 /* ---------- home ---------- */
@@ -563,11 +635,12 @@ function home() {
   app.innerHTML = `
   <header class="hero">
     <div class="blocks" aria-hidden="true"><span class="blk h1">A</span><span class="blk h2">B</span><span class="blk h4">C</span></div>
-    <h1>מוכן לאנגלית</h1>
+    <h1>${KID ? `שלום ${esc(KID.name)}!` : 'מוכן לאנגלית'}</h1>
+    ${KID ? `<p class="sub">${KID.mode === 'test' ? 'כאן עושים מבחן ניסיון.' : KID.mode === 'learn' ? 'כאן מתרגלים אנגלית. בהצלחה!' : 'מתכוננים למבחן באנגלית.'}</p>` : ''}
     <div class="pills"><span class="pill due">${countdown()}</span><span class="pill">⭐ ${st.stars} כוכבים בסך הכול</span></div>
   </header>
 
-  <section class="goal stk h3">
+  ${KID && KID.mode === 'test' ? '' : `<section class="goal stk h3">
     <div class="goalhead"><span class="glabel">🎯 היעד היומי</span><span class="gbig">${G.g.n} ${G.unit}</span></div>
     <div class="gmeter" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${G.avail ? 100 : Math.round(G.pct)}"><i style="width:${G.avail ? 100 : G.pct}%"></i></div>
     ${st.wheel
@@ -578,49 +651,301 @@ function home() {
         ? `<p class="gleft">🏆 <b>הגעת ליעד היומי!</b> כל הכבוד!${G.earned > 1 ? ` (${G.earned} פעמים)` : ''}</p>`
         : `<p class="gleft">נשארו עוד <b>${G.left} ${G.unit}</b> ליעד</p>`)}
     <p class="gnow">היום תרגלת: <b>⭐ ${G.d.stars} כוכבים</b> · <b>⏱ ${G.mins} דקות</b>${G.d.spins ? ` · 🎡 ${G.d.spins} סיבובים` : ''}</p>
-  </section>
+  </section>`}
 
-  <section class="zone test">
+  ${KID && KID.mode === 'learn' ? '' : `<section class="zone test">
     <div class="zhead"><span class="ztag">מבחן</span><h2>מבחן ניסיון</h2></div>
-    <p class="zdesc">כמו במבחן האמיתי: ${'19'} שאלות מכל החומר, <b>בלי רמזים ובלי ניסיון נוסף</b>. בסוף רואים כמה הצלחת בכל נושא.</p>
+    <p class="zdesc">כמו במבחן האמיתי: כ־20 שאלות מכל החומר, <b>בלי רמזים ובלי ניסיון נוסף</b>. בסוף רואים כמה הצלחת בכל נושא.</p>
     ${mockLine}
     <button class="btn testbtn" id="mock">להתחיל מבחן ניסיון ←</button>
-  </section>
+  </section>`}
 
-  <section class="zone practice">
+  ${KID && KID.mode === 'test' ? '' : `<section class="zone practice">
     <div class="zhead"><span class="ztag">תרגול</span><h2>תרגול לפי נושא</h2></div>
     <p class="zdesc">כאן לומדים: אפשר לנסות שוב, לבקש רמז ולראות את התשובה. כל תשובה נכונה בניסיון הראשון שווה כוכב.</p>
-    <div class="lvlrow"><span>רמה:</span><div class="seg" role="group" aria-label="רמה">${Object.keys(LEVELS).map(k => `<button data-lvl="${k}" class="${(st.level || 'medium') === k ? 'on' : ''}">${LEVELS[k]}</button>`).join('')}</div></div>
+    ${KID && !KID.settings.allowLevelUp
+      ? `<div class="lvlrow"><span>רמה: <b>${LEVELS[st.level] || 'בינוני'}</b></span></div>`
+      : `<div class="lvlrow"><span>רמה:</span><div class="seg" role="group" aria-label="רמה">${Object.keys(LEVELS).map(k => `<button data-lvl="${k}" class="${(st.level || 'medium') === k ? 'on' : ''}">${LEVELS[k]}</button>`).join('')}</div></div>`}
     <nav class="tiles">${MODS.map((m, i) => {
       const done = st.done[m.id] === td, best = st.best[m.id];
       const chip = done ? '<span class="chip">✓ תרגלת היום</span>' : (best != null ? `<span class="chip">שיא: ${best}%</span>` : '');
       return `<button class="tile h${m.h}${m.wide ? ' wide' : ''}" data-m="${i}">
         <span class="gl${m.g.length > 2 ? ' long' : ''}">${m.g}</span><span class="tx"><b>${m.t}</b><small>${m.sub}</small>${chip}</span></button>`;
     }).join('')}</nav>
-  </section>
+  </section>`}
+  <button class="btn myprog" id="myprog">📈 ההתקדמות שלי</button>
   <p class="tip">המורה ביקשה: קריאה בקול, חזרה על הצלילים והאותיות, קצת בכל יום.</p>
-  <button class="link parentlink" id="parent">⚙️ להורים: יעד יומי והפתעות</button>`;
+  ${KID ? '' : `<div class="parentrow">
+    ${CLOUD_OK ? '<button class="btn" id="gparent"><span class="gmark" aria-hidden="true">G</span> כניסת הורים עם Google</button>' : ''}
+    <button class="link parentlink" id="parent">⚙️ הגדרות במכשיר הזה</button></div>`}`;
   $$('.tile', app).forEach(b => b.onclick = () => MODS[+b.dataset.m].run());
-  $('#mock').onclick = () => go(quizMock);
-  $('#parent').onclick = () => go(parentView);
+  const mk = $('#mock'); if (mk) mk.onclick = () => go(quizMock);
+  $('#myprog').onclick = () => go(progressView);
+  const pa = $('#parent'); if (pa) pa.onclick = () => go(parentView);
+  const gp = $('#gparent'); if (gp) gp.onclick = () => go(parentCloud);
   $$('[data-lvl]', app).forEach(b => b.onclick = () => { const s = load(); s.level = b.dataset.lvl; save(s); home(); });
   const sp = $('#spin'); if (sp) sp.onclick = () => go(wheelView);
 }
 
+/* ---------- cloud: parent accounts (Google) and kid links ---------- */
+// Firebase web config. Empty until the project is created; then parents can sign in on the yaella site.
+const FIREBASE = null;
+const DEMO = /[?&]demo\b/.test(location.search) && /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+const CLOUD_OK = DEMO || (!!FIREBASE && /(^|\.)github\.io$|^localhost$|^127\.0\.0\.1$/.test(location.hostname));
+const PACKS = [
+  { id: 'g4-mapping', title: 'כיתה ד׳ · מבחן מיפוי', desc: 'צלילים, אותיות גדולות וקטנות, כתיבה, משפטים קצרים, הבנת הנקרא ומספרים עד 12', ready: true },
+  { id: 'g5', title: 'כיתה ה׳', desc: 'בקרוב', ready: false },
+  { id: 'g6', title: 'כיתה ו׳', desc: 'בקרוב', ready: false },
+];
+const MODES = { learn: 'לימוד ותרגול', test: 'מבחן ניסיון', all: 'הכול' };
+const newId = () => { const a = new Uint8Array(18); crypto.getRandomValues(a); return [...a].map(b => 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'[b % 56]).join(''); };
+function loadScript(src) { return new Promise((res, rej) => { const t = document.createElement('script'); t.src = src; t.onload = res; t.onerror = rej; document.head.appendChild(t); }); }
+
+// The app talks to the cloud only through this small API, so a demo store can stand in for Firebase when testing.
+let API = null;
+async function api() {
+  if (API) return API;
+  if (DEMO) { API = demoApi(); return API; }
+  const V = 'https://www.gstatic.com/firebasejs/10.12.2/';
+  await loadScript(V + 'firebase-app-compat.js');
+  await Promise.all([loadScript(V + 'firebase-auth-compat.js'), loadScript(V + 'firebase-firestore-compat.js')]);
+  firebase.initializeApp(FIREBASE);
+  const auth = firebase.auth(), db = firebase.firestore(), kids = db.collection('kids');
+  API = {
+    onUser: cb => auth.onAuthStateChanged(u => cb(u ? { uid: u.uid, name: u.displayName, email: u.email } : null)),
+    signIn: async () => { const pr = new firebase.auth.GoogleAuthProvider(); try { await auth.signInWithPopup(pr); } catch (e) { if (/popup/.test(e.code || '')) await auth.signInWithRedirect(pr); else throw e; } },
+    signOut: () => auth.signOut(),
+    getKid: async id => { const d = await kids.doc(id).get(); return d.exists ? { id, ...d.data() } : null; },
+    listKids: async uid => (await kids.where('owner', '==', uid).get()).docs.map(d => ({ id: d.id, ...d.data() })),
+    createKid: async (uid, name) => { const id = newId(); await kids.doc(id).set({ owner: uid, name, settings: defaultSettings(), progress: {}, createdAt: Date.now(), updatedAt: Date.now() }); return id; },
+    saveSettings: (id, settings, name) => kids.doc(id).update({ settings, name, updatedAt: Date.now() }),
+    saveProgress: (id, progress) => kids.doc(id).update({ progress, updatedAt: Date.now() }),
+    deleteKid: id => kids.doc(id).delete(),
+  };
+  return API;
+}
+function demoApi() { // local stand-in for Firebase (only with ?demo on this computer)
+  const K = 'english-ready-demo-db', db = () => { try { return JSON.parse(localStorage.getItem(K)) || {}; } catch (e) { return {}; } };
+  const put = o => localStorage.setItem(K, JSON.stringify(o));
+  let user = null; try { user = JSON.parse(sessionStorage.getItem(K + ':u')); } catch (e) {}
+  const subs = [];
+  return {
+    onUser: cb => { subs.push(cb); cb(user); },
+    signIn: async () => { user = { uid: 'demo-parent', name: 'הורה לדוגמה', email: 'parent@example.com' }; sessionStorage.setItem(K + ':u', JSON.stringify(user)); subs.forEach(f => f(user)); },
+    signOut: async () => { user = null; sessionStorage.removeItem(K + ':u'); subs.forEach(f => f(null)); },
+    getKid: async id => db()[id] ? { id, ...db()[id] } : null,
+    listKids: async uid => Object.entries(db()).filter(([, v]) => v.owner === uid).map(([id, v]) => ({ id, ...v })),
+    createKid: async (uid, name) => { const o = db(), id = newId(); o[id] = { owner: uid, name, settings: defaultSettings(), progress: {}, createdAt: Date.now() }; put(o); return id; },
+    saveSettings: async (id, settings, name) => { const o = db(); Object.assign(o[id], { settings, name }); put(o); },
+    saveProgress: async (id, progress) => { const o = db(); if (o[id]) { o[id].progress = progress; put(o); } },
+    deleteKid: async id => { const o = db(); delete o[id]; put(o); },
+  };
+}
+
+// --- kid side: progress is written to the cloud a moment after each change
+let cloudTimer = 0;
+function cloudSoon() { clearTimeout(cloudTimer); cloudTimer = setTimeout(cloudFlush, 1500); }
+async function cloudFlush() {
+  clearTimeout(cloudTimer);
+  if (!KID) return;
+  try { (await api()).saveProgress(KID.id, KID.progress); } catch (e) {}
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && KID) cloudFlush(); });
+async function bootKid(id, mode) {
+  app.innerHTML = '<p class="loading">טוען…</p>';
+  try {
+    const k = await (await api()).getKid(id);
+    if (!k) { app.innerHTML = '<section class="stk pbox"><h2>הקישור לא נמצא</h2><p>אולי ההורה מחק אותו. בקשו מההורה קישור חדש.</p></section>'; return; }
+    let local = null; try { local = JSON.parse(localStorage.getItem(KEY + ':' + id)); } catch (e) {}
+    const progress = local && (local.updatedAt || 0) > ((k.progress || {}).updatedAt || 0) ? local : (k.progress || {});
+    KID = { id, mode: MODES[mode] ? mode : 'all', name: k.name || '', settings: Object.assign(defaultSettings(), k.settings || {}), progress };
+    if (local === progress) cloudSoon();
+    home();
+  } catch (e) {
+    app.innerHTML = '<section class="stk pbox"><h2>אין חיבור</h2><p>לא הצלחנו לטעון את ההגדרות. בדקו את האינטרנט ונסו שוב.</p><button class="btn primary" onclick="location.reload()">לנסות שוב</button></section>';
+  }
+}
+
+// --- parent side
+const kidLink = (id, mode) => `${location.origin}${location.pathname}?k=${id}&m=${mode}${DEMO ? '&demo' : ''}`;
+async function parentCloud() {
+  app.innerHTML = `${top('אזור ההורים')}<p class="loading">טוען…</p>`;
+  let A;
+  try { A = await api(); } catch (e) { app.innerHTML = `${top('אזור ההורים')}<section class="stk pbox"><p>לא הצלחנו להתחבר לשרת. נסו שוב מאוחר יותר.</p></section>`; return; }
+  let first = true;
+  A.onUser(u => { if (!first && !$('.pdash, .plogin', app)) return; first = false; u ? parentDash(A, u) : parentLogin(A); });
+}
+function parentLogin(A) {
+  app.innerHTML = `${top('אזור ההורים')}
+    <section class="stk pbox plogin">
+      <h2>כניסה להורים</h2>
+      <p>אחרי הכניסה אפשר:</p>
+      <ul class="plist"><li>להגדיר לכל ילד יעד יומי, גלגל הפתעות ורמה</li><li>לשלוח לו קישור ללימוד בלבד או למבחן בלבד</li><li>לראות כמה תרגל ומה הצליח במבחן</li></ul>
+      <button class="btn gbtn" id="gin"><span class="gmark" aria-hidden="true">G</span> התחברות עם Google</button>
+      <p class="hint">הילד לא צריך חשבון: הקישור שתשלחו פתוח לכל מי שמקבל אותו.</p>
+      <p id="gerr" class="hint" hidden></p>
+    </section>`;
+  $('#gin').onclick = async () => { try { await A.signIn(); } catch (e) { const g = $('#gerr'); g.hidden = false; g.textContent = 'הכניסה לא הצליחה. נסו שוב.'; } };
+}
+async function parentDash(A, u) {
+  app.innerHTML = `${top('אזור ההורים')}<p class="loading">טוען…</p>`;
+  let kids = [];
+  try { kids = await A.listKids(u.uid); } catch (e) {}
+  kids.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+  const card = k => {
+    const p = k.progress || {}, today = p.td && p.td.date === today_() ? p.td : { stars: 0, ms: 0 };
+    const pk = PACKS.find(x => x.id === (k.settings || {}).pack) || PACKS[0];
+    return `<article class="kidcard stk" data-id="${k.id}">
+      <div class="kchead"><h2>${esc(k.name)}</h2><span class="chip">${pk.title}</span></div>
+      <p class="kstats">היום: <b>⭐ ${today.stars || 0}</b> · <b>⏱ ${Math.floor((today.ms || 0) / 60000)} דק׳</b> · סך הכול ⭐ ${p.stars || 0}${p.mock ? ` · מבחן אחרון: <b>${p.mock.score}/${p.mock.n}</b>` : ''}</p>
+      <div class="links">${Object.keys(MODES).map(m => `<div class="linkrow"><span class="lmode ${m}">${MODES[m]}</span><input class="lurl" readonly value="${kidLink(k.id, m)}" aria-label="קישור ${MODES[m]}"><button class="btn sm" data-copy="${kidLink(k.id, m)}">העתקה</button><a class="btn sm" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(`${esc(k.name)}, הנה הקישור ל${MODES[m]} באנגלית: ${kidLink(k.id, m)}`)}">וואטסאפ</a></div>`).join('')}</div>
+      <div class="row"><button class="btn primary" data-edit="${k.id}">⚙️ הגדרות והתקדמות</button></div>
+    </article>`;
+  };
+  app.innerHTML = `${top('אזור ההורים')}
+    <section class="pdash">
+      <p class="who">מחובר/ת בתור <b>${esc(u.name || u.email || '')}</b> · <button class="link" id="gout">יציאה</button></p>
+      ${kids.length ? kids.map(card).join('') : '<p class="hint">עוד אין ילדים. הוסיפו ילד כדי לקבל קישורים.</p>'}
+      <form class="stk pbox" id="addkid">
+        <h2>הוספת ילד</h2>
+        <label class="pfield" for="kname">שם פרטי <input id="kname" class="pin wide" maxlength="20" required autocomplete="off"></label>
+        <p class="hint">השם יופיע לילד ("שלום גור!"). מי שיש לו את הקישור יכול לראות אותו, אז שם פרטי בלבד.</p>
+        <button class="btn primary">הוספה</button>
+      </form>
+    </section>`;
+  $('#gout').onclick = () => A.signOut();
+  $$('[data-copy]', app).forEach(b => b.onclick = async () => {
+    try { await navigator.clipboard.writeText(b.dataset.copy); b.textContent = 'הועתק ✓'; }
+    catch (e) { const i = b.previousElementSibling; i.focus(); i.select(); b.textContent = 'סמנו והעתיקו'; }
+  });
+  $$('[data-edit]', app).forEach(b => b.onclick = () => kidSettings(A, u, kids.find(k => k.id === b.dataset.edit)));
+  $('#addkid').onsubmit = async e => {
+    e.preventDefault(); const n = $('#kname').value.trim(); if (!n) return;
+    e.submitter && (e.submitter.disabled = true);
+    try { await A.createKid(u.uid, n); } catch (er) {}
+    parentDash(A, u);
+  };
+}
+const today_ = () => today();
+function kidSettings(A, u, k) {
+  const st = Object.assign(defaultSettings(), k.settings || {}), p = k.progress || {};
+  const segs = (attr, cur) => Object.keys(LEVELS).map(x => `<button type="button" data-${attr}="${x}" class="${cur === x ? 'on' : ''}">${LEVELS[x]}</button>`).join('');
+  const m = p.mock;
+  app.innerHTML = `${top('הגדרות · ' + esc(k.name), 'pdash')}
+    <section class="stk pbox">
+      <h2>החומר</h2>
+      <div class="packs">${PACKS.map(x => `<label class="pack ${x.ready ? '' : 'soon'}"><input type="radio" name="pack" value="${x.id}" ${st.pack === x.id ? 'checked' : ''} ${x.ready ? '' : 'disabled'}><b>${x.title}</b><small>${x.desc}</small></label>`).join('')}</div>
+      <p class="hint">בהמשך יתווספו כאן כיתות ורמות נוספות לפי החומר והגיל.</p>
+      <h2>רמת הלימוד</h2>
+      <div class="seg" role="group" aria-label="רמת לימוד">${segs('ll', st.level)}</div>
+      <label class="check"><input type="checkbox" id="alu" ${st.allowLevelUp ? 'checked' : ''}> הילד יכול לשנות רמה בעצמו (ולעלות רמה אחרי 90%)</label>
+      <h2>רמת מבחן הניסיון</h2>
+      <div class="seg" role="group" aria-label="רמת מבחן">${segs('tl', st.testLevel)}</div>
+      <h2>היעד היומי</h2>
+      <div class="row">
+        <div class="seg" role="group" aria-label="סוג יעד"><button type="button" data-gt="stars" class="${st.goal.type === 'stars' ? 'on' : ''}">⭐ כוכבים</button><button type="button" data-gt="mins" class="${st.goal.type === 'mins' ? 'on' : ''}">⏱ דקות</button></div>
+        <label class="pfield">כמה? <input id="gn" type="number" min="1" max="500" value="${st.goal.n}" class="pin"></label>
+      </div>
+      <h2>גלגל ההפתעות</h2>
+      <div class="seg" role="group" aria-label="גלגל ההפתעות"><button type="button" data-wh="1" class="${st.wheel ? 'on' : ''}">🎡 פעיל</button><button type="button" data-wh="0" class="${st.wheel ? '' : 'on'}">כבוי: רק כוכבים</button></div>
+      <p class="hint">הפתעה אחת בכל שורה, באנגלית. בכל הגעה ליעד הוא מקבל סיבוב.</p>
+      <textarea id="pz" rows="7" class="en ptext-in">${esc(st.prizes.join('\n'))}</textarea>
+      <button type="button" class="btn" id="wtry">🎡 נסו את הגלגל</button>
+      <h2>שם</h2>
+      <input id="kn" class="pin wide" maxlength="20" value="${esc(k.name)}" aria-label="שם הילד">
+      <div class="row"><button class="btn primary" id="ksave">שמירה</button><span id="kok" class="chip" hidden>נשמר ✓ הילד יראה את השינוי בפעם הבאה שיפתח את הקישור</span></div>
+    </section>
+    <section class="stk pbox">
+      <h2>התקדמות</h2>
+      <p>היום: ⭐ ${p.td && p.td.date === today() ? p.td.stars : 0} · ⏱ ${p.td && p.td.date === today() ? Math.floor(p.td.ms / 60000) : 0} דקות · ימי תרגול: ${(p.days || []).length} · סך הכול ⭐ ${p.stars || 0}</p>
+      ${m ? `<p>מבחן ניסיון אחרון (${m.date.split('-').slice(1).reverse().join('.')}): <b>${m.score}/${m.n}</b></p>${secTable(m.secs).replace(/<button[^>]*>לתרגל<\/button>/g, '')}` : '<p class="hint">עוד לא עשה מבחן ניסיון.</p>'}
+      <h3>זכיות בגלגל</h3>
+      ${(p.wins || []).length ? `<ul class="wins">${p.wins.slice(0, 15).map(w => `<li><span class="en">${esc(w.prize)}</span> · ${w.date.split('-').slice(1).reverse().join('.')}</li>`).join('')}</ul>` : '<p class="hint">עוד אין.</p>'}
+    </section>
+    <section class="stk pbox danger">
+      <h3>מחיקת הילד</h3>
+      <p class="hint">הקישורים שלו יפסיקו לעבוד וההתקדמות תימחק.</p>
+      <div class="row" id="delrow"><button class="btn" id="kdel">מחיקה</button></div>
+    </section>`;
+  const pick1 = (attr, set) => $$(`[data-${attr}]`, app).forEach(b => b.onclick = () => { set(b.dataset[attr]); $$(`[data-${attr}]`, app).forEach(x => x.classList.toggle('on', x === b)); });
+  pick1('ll', v => st.level = v); pick1('tl', v => st.testLevel = v); pick1('gt', v => st.goal.type = v); pick1('wh', v => st.wheel = v === '1');
+  $('#ksave').onclick = async () => {
+    const pk = $('input[name="pack"]:checked', app); if (pk) st.pack = pk.value;
+    st.allowLevelUp = $('#alu').checked;
+    st.goal = { type: st.goal.type, n: Math.max(1, Math.min(500, parseInt($('#gn').value, 10) || 25)) };
+    const list = $('#pz').value.split('\n').map(x => x.trim()).filter(Boolean);
+    st.prizes = list.length >= 2 ? list.slice(0, 12) : DEFAULT_PRIZES.slice();
+    const name = $('#kn').value.trim() || k.name;
+    try { await A.saveSettings(k.id, st, name); k.settings = st; k.name = name; $('#kok').hidden = false; }
+    catch (e) { const ok = $('#kok'); ok.hidden = false; ok.textContent = 'השמירה נכשלה. נסו שוב.'; }
+  };
+  $('#wtry').onclick = () => {
+    const list = $('#pz').value.split('\n').map(x => x.trim()).filter(Boolean);
+    wheelView({ prizes: list.length >= 2 ? list.slice(0, 12) : DEFAULT_PRIZES });
+  };
+  $('#kdel').onclick = () => {
+    $('#delrow').innerHTML = `<b>למחוק את ${esc(k.name)}?</b><button class="btn" id="kdel2">כן, למחוק</button><button class="btn" id="kdel0">ביטול</button>`;
+    $('#kdel0').onclick = () => kidSettings(A, u, k);
+    $('#kdel2').onclick = async () => { try { await A.deleteKid(k.id); } catch (e) {} parentDash(A, u); };
+  };
+}
+
+/* ---------- my progress (kid) ---------- */
+function progressView() {
+  const st = load(), G = goalState(st), fmt = d => d.split('-').slice(1).reverse().join('.');
+  const last7 = [...Array(7)].map((_, i) => { const d = new Date(); d.setDate(d.getDate() - 6 + i); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; });
+  const DAYS = ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'ש׳'];
+  const mocks = st.mocks || (st.mock ? [st.mock] : []);
+  app.innerHTML = `${top('ההתקדמות שלי')}
+    <section class="stk pbox">
+      <h2>היום</h2>
+      <p class="bignum">⭐ ${G.d.stars} <small>כוכבים</small> · ⏱ ${G.mins} <small>דקות</small></p>
+      <p class="gleft">${G.earned ? '🏆 הגעת ליעד היומי!' : `נשארו עוד <b>${G.left} ${G.unit}</b> ליעד`}</p>
+      <h2>השבוע</h2>
+      <div class="week">${last7.map(d => { const on = (st.days || []).includes(d); const wd = DAYS[new Date(d.split('-')[0], d.split('-')[1] - 1, d.split('-')[2]).getDay()]; return `<span class="wday ${on ? 'on' : ''}" title="${fmt(d)}">${on ? '✓' : ''}<small>${wd}</small></span>`; }).join('')}</div>
+      <p>סך הכול: <b>⭐ ${st.stars}</b> כוכבים · <b>${(st.days || []).length}</b> ימי תרגול</p>
+    </section>
+    <section class="stk pbox">
+      <h2>מבחני ניסיון</h2>
+      ${mocks.length ? `<ul class="mocklist">${mocks.slice(0, 8).map(m => `<li><span>${fmt(m.date)}</span><b dir="ltr">${m.score}/${m.n}</b><span class="smeter"><i style="width:${Math.round(m.score / m.n * 100)}%"></i></span></li>`).join('')}</ul>${secTable(mocks[0].secs)}` : '<p class="hint">עוד לא עשית מבחן ניסיון.</p>'}
+    </section>
+    <section class="stk pbox">
+      <h2>השיאים שלי בתרגול</h2>
+      <ul class="bests">${MODS.filter(m => st.best[m.id] != null).map(m => `<li>${m.t}: <b>${st.best[m.id]}%</b></li>`).join('') || '<li class="hint">עוד אין.</li>'}</ul>
+      ${(st.wins || []).length ? `<h3>מה זכיתי בגלגל</h3><ul class="wins">${st.wins.slice(0, 10).map(w => `<li><span class="en">${esc(w.prize)}</span> · ${fmt(w.date)}</li>`).join('')}</ul>` : ''}
+    </section>`;
+  $$('[data-practice]', app).forEach(b => b.onclick = () => MODS.find(m => m.id === b.dataset.practice).run());
+}
+
 /* ---------- surprise wheel ---------- */
 const WHEEL_COLORS = ['--c1', '--c2', '--c3', '--c4', '--c5', '--c6'];
-function wheelView() {
-  const st = load(), G = goalState(st), prizes = st.prizes.length ? st.prizes : DEFAULT_PRIZES;
-  app.innerHTML = `${top('גלגל ההפתעות')}
-    <section class="wheelbox stk">
+let backTo = null; // where the back button goes from a preview
+function wheelView(preview) {
+  const st = load(), prizes = preview ? preview.prizes : (st.prizes.length ? st.prizes : DEFAULT_PRIZES);
+  const G = preview ? { avail: 99 } : goalState(st);
+  const box = `<section class="wheelbox stk">
       <p class="whead en">${G.avail ? 'Spin the wheel!' : 'No spins right now'}</p>
       <div class="wheelwrap"><div class="pointer" aria-hidden="true"></div><canvas id="wheel" width="340" height="340" aria-label="גלגל ההפתעות"></canvas></div>
-      <button class="btn primary bigspin" dir="ltr" id="go" ${G.avail ? '' : 'disabled'}>🎡 Spin!${G.avail > 1 ? ` (${G.avail})` : ''}</button>
+      <button class="btn primary bigspin" dir="ltr" id="go" ${G.avail ? '' : 'disabled'}>🎡 Spin!${!preview && G.avail > 1 ? ` (${G.avail})` : ''}</button>
       ${G.avail ? '' : `<p class="gleft">נשארו עוד <b>${G.left} ${G.unit}</b> כדי לסובב.</p>`}
       <div id="prize" aria-live="polite"></div>
     </section>`;
+  let wrapW = app.clientWidth;
+  if (preview) { // parents: a popup over the settings, closed by ✕, a tap outside or Esc
+    const m = document.createElement('div');
+    m.className = 'modal'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-modal', 'true'); m.setAttribute('aria-label', 'גלגל ההפתעות');
+    m.innerHTML = `<div class="mbox"><div class="mhead"><b>כך הילד רואה את הגלגל</b><button class="btn icon" id="mclose" aria-label="סגירה">✕</button></div><p class="previewnote">הסיבובים כאן לניסיון בלבד ולא נספרים.</p>${box}</div>`;
+    document.body.appendChild(m);
+    const close = () => { m.remove(); document.removeEventListener('keydown', esc_); };
+    const esc_ = e => { if (e.key === 'Escape') close(); };
+    m.addEventListener('click', e => { if (e.target === m) close(); });
+    m.querySelector('#mclose').onclick = close;
+    document.addEventListener('keydown', esc_);
+    m.querySelector('#mclose').focus();
+    wrapW = Math.min(420, window.innerWidth - 32) - 24;
+  } else app.innerHTML = `${top('גלגל ההפתעות')}${box}`;
   const cv = $('#wheel'), ctx = cv.getContext('2d');
-  const size = Math.min(340, app.clientWidth - 40), dpr = Math.min(window.devicePixelRatio || 1, 3);
+  const size = Math.min(340, wrapW - 40), dpr = Math.min(window.devicePixelRatio || 1, 3);
   cv.style.width = cv.style.height = size + 'px'; cv.width = cv.height = size * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const R = size / 2, n = prizes.length, seg = Math.PI * 2 / n;
   const cs = getComputedStyle(document.documentElement);
@@ -649,8 +974,7 @@ function wheelView() {
   draw();
   if (document.fonts) document.fonts.ready.then(draw);
   $('#go').onclick = () => {
-    const s = load(), g = goalState(s);
-    if (g.avail < 1) return;
+    if (!preview && goalState(load()).avail < 1) return;
     $('#go').disabled = true; $('#prize').innerHTML = '';
     const win = Math.floor(Math.random() * n);
     const start = rot, reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -662,11 +986,11 @@ function wheelView() {
       const k = Math.min(1, (t - t0) / total), e = 1 - Math.pow(1 - k, 4);
       rot = start + (final - start) * e; draw();
       if (k < 1) return requestAnimationFrame(frame);
-      const s2 = load(); day(s2).spins++; s2.wins.unshift({ date: today(), prize: prizes[win] }); s2.wins = s2.wins.slice(0, 60); save(s2);
-      const g2 = goalState(s2);
+      let g2 = { avail: 1 };
+      if (!preview) { const s2 = load(); day(s2).spins++; s2.wins.unshift({ date: today(), prize: prizes[win] }); s2.wins = s2.wins.slice(0, 60); save(s2); g2 = goalState(s2); }
       $('#prize').innerHTML = `<div class="prize stk"><p class="en pwin">You won:</p><p class="en ptext">${esc(prizes[win])}</p><p>כל הכבוד! 🎉 תראה את זה לאמא או לאבא.</p></div>`;
       say(textOf(prizes[win]));
-      const b = $('#go'); b.disabled = g2.avail < 1; b.textContent = g2.avail ? `🎡 Spin again! (${g2.avail})` : '🎡 Spin!';
+      const b = $('#go'); b.disabled = g2.avail < 1; b.textContent = preview ? '🎡 Spin again!' : g2.avail ? `🎡 Spin again! (${g2.avail})` : '🎡 Spin!';
     }
     requestAnimationFrame(frame);
   };
@@ -699,10 +1023,13 @@ function parentSettings() {
       <div class="seg" role="group" aria-label="גלגל ההפתעות"><button type="button" data-wh="1" class="${st.wheel ? 'on' : ''}">🎡 פעיל</button><button type="button" data-wh="0" class="${st.wheel ? '' : 'on'}">כבוי: רק כוכבים</button></div>
       <h2>רמת התרגול</h2>
       <div class="seg" role="group" aria-label="רמה">${Object.keys(LEVELS).map(k => `<button type="button" data-pl="${k}" class="${(st.level || 'medium') === k ? 'on' : ''}">${LEVELS[k]}</button>`).join('')}</div>
-      <p class="hint">קל: 3 תשובות לבחירה ותרגום לעברית בסיפורים. בינוני: כמו במבחן. קשה: איות מילים, אות חסרה במילה, "מה בא אחרי" וסיפורים ארוכים יותר. אחרי סבב של 90% ומעלה הוא יכול לעלות רמה בעצמו. מבחן הניסיון תמיד ברמה בינונית.</p>
+      <h3>רמת מבחן הניסיון</h3>
+      <div class="seg" role="group" aria-label="רמת מבחן">${Object.keys(LEVELS).map(k => `<button type="button" data-tl="${k}" class="${(st.testLevel || 'medium') === k ? 'on' : ''}">${LEVELS[k]}</button>`).join('')}</div>
+      <p class="hint">קל: 3 תשובות לבחירה ותרגום לעברית בסיפורים. בינוני: כמו במבחן. קשה: איות מילים, אות חסרה במילה, "מה בא אחרי" וסיפורים ארוכים יותר. אחרי סבב של 90% ומעלה הוא יכול לעלות רמה בעצמו.</p>
       <h3>ההפתעות בגלגל</h3>
       <p class="hint">הפתעה אחת בכל שורה, באנגלית. אפשר להוסיף אימוג׳י בסוף.</p>
       <textarea id="pz" rows="8" class="en ptext-in">${esc(st.prizes.join('\n'))}</textarea>
+      <button type="button" class="btn" id="wtry">🎡 נסו את הגלגל</button>
       <div class="row"><button class="btn primary" id="psave">שמירה</button><span id="pok" class="chip" hidden>נשמר ✓</span></div>
       <h2>היום</h2>
       <p>⭐ ${G.d.stars} כוכבים · ⏱ ${G.mins} דקות · 🎡 ${G.d.spins} סיבובים נוצלו${G.avail ? ` · ${G.avail} מחכים` : ''}</p>
@@ -710,13 +1037,18 @@ function parentSettings() {
       ${st.wins.length ? `<ul class="wins">${st.wins.slice(0, 20).map(w => `<li><span class="en">${esc(w.prize)}</span> · ${w.date.split('-').slice(1).reverse().join('.')}</li>`).join('')}</ul>` : '<p class="hint">עוד אין זכיות.</p>'}
       <p class="hint">הכול נשמר רק במכשיר הזה.</p>
     </section>`;
-  let gt = st.goal.type, wh = st.wheel, pl = st.level || 'medium';
+  let gt = st.goal.type, wh = st.wheel, pl = st.level || 'medium', tl = st.testLevel || 'medium';
+  $$('[data-tl]', app).forEach(b => b.onclick = () => { tl = b.dataset.tl; $$('[data-tl]', app).forEach(x => x.classList.toggle('on', x === b)); });
   $$('[data-wh]', app).forEach(b => b.onclick = () => { wh = b.dataset.wh === '1'; $$('[data-wh]', app).forEach(x => x.classList.toggle('on', x === b)); });
   $$('[data-pl]', app).forEach(b => b.onclick = () => { pl = b.dataset.pl; $$('[data-pl]', app).forEach(x => x.classList.toggle('on', x === b)); });
   $$('[data-gt]', app).forEach(b => b.onclick = () => { gt = b.dataset.gt; $$('[data-gt]', app).forEach(x => x.classList.toggle('on', x === b)); });
+  $('#wtry').onclick = () => {
+    const list = $('#pz').value.split('\n').map(x => x.trim()).filter(Boolean);
+    wheelView({ prizes: list.length >= 2 ? list.slice(0, 12) : DEFAULT_PRIZES });
+  };
   $('#psave').onclick = () => {
     const s = load();
-    s.wheel = wh; s.level = pl;
+    s.wheel = wh; s.level = pl; s.testLevel = tl;
     s.goal = { type: gt, n: Math.max(1, Math.min(500, parseInt($('#gn').value, 10) || 25)) };
     const list = $('#pz').value.split('\n').map(x => x.trim()).filter(Boolean);
     s.prizes = list.length >= 2 ? list.slice(0, 12) : DEFAULT_PRIZES.slice();
@@ -892,7 +1224,7 @@ function qSentence(it, reverse) {
 }
 function storyQs(st) {
   return st.q.map(([q, he, o]) => ({ key: 'st' + q, hue: 6, story: st,
-    prompt: `<p class="qen en">${q}</p>${lvl === 'hard' ? '' : `<button class="link" data-he>תרגום לעברית</button><span class="he"${lvl === 'easy' ? '' : ' hidden'}>${he}</span>`}`,
+    prompt: `<p class="qen en">${q}</p><div class="qtools"><button class="hebtn" data-say="${esc(q)}"><span class="heicon" aria-hidden="true">🔊</span><span>השמע את השאלה</span></button>${lvl === 'hard' ? '' : `<button class="hebtn" data-he aria-expanded="false"><span class="heicon" aria-hidden="true">א</span><span class="helab">תרגום לעברית</span></button>`}</div>${lvl === 'hard' ? '' : `<p class="hebubble" hidden>${he}</p>`}`,
     layout: 'wide', options: shuffle([o[0], ...o.slice(1, optN())]).map(x => ({ v: x, html: `<span class="en">${x}</span>` })), answer: o[0], rv: `${q} → ${o[0]}`,
     hint: { he: 'התשובה נמצאת במשפט המסומן בסיפור.', say: st.x[STORY_HINT[q]], mark: STORY_HINT[q] } }));
 }
@@ -928,7 +1260,7 @@ function quizStories() {
   runQuiz('stories', 'הבנת הנקרא', qs, quizStories);
 }
 function quizMock() {
-  lvl = 'medium';
+  lvl = load().testLevel || 'medium';
   const tag = (arr, sec) => arr.map(q => Object.assign(q, { sec }));
   const qs = [
     ...tag(build([qSound, qPic], 4), 'sounds'),
@@ -1034,7 +1366,7 @@ function runQuiz(mod, title, qs, again) {
     const pct = Math.round((score / qs.length) * 100);
     markDone(mod, pct);
     const isMock = mod === 'mock';
-    if (isMock) { const s = load(); s.mock = { date: today(), score, n: qs.length, secs }; save(s); }
+    if (isMock) { const s = load(); s.mock = { date: today(), score, n: qs.length, secs, level: lvl }; s.mocks = [s.mock, ...(s.mocks || [])].slice(0, 20); save(s); }
     const stars = pct >= 90 ? 3 : pct >= 70 ? 2 : 1;
     const msg = pct >= 90 ? 'מעולה! אתה מוכן!' : pct >= 70 ? 'יפה מאוד! עוד קצת תרגול ואתה שם.' : 'כל סיבוב מקדם אותך. ננסה שוב?';
     app.innerHTML = `${top(title)}
@@ -1045,8 +1377,8 @@ function runQuiz(mod, title, qs, again) {
         <h2>${msg}</h2>
         ${isMock ? secTable(secs) : ''}
         ${wrong.length ? `<div class="review"><b>כדאי לחזור על:</b><ul>${wrong.map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>` : ''}
-        ${!isMock && pct >= 90 && lvl !== 'hard' ? `<div class="lvlup"><b>עברת את זה בקלות! 🚀</b><button class="btn primary" id="lvlup">⬆ לעלות לרמה ${LEVELS[lvl === 'easy' ? 'medium' : 'hard']}</button></div>` : ''}
-        <div class="row center"><button class="btn ${!isMock && pct >= 90 && lvl !== 'hard' ? '' : 'primary'}" id="again">${isMock ? 'מבחן חדש' : 'עוד סיבוב'}</button><button class="btn" data-back="home">לדף הבית</button></div>
+        ${!isMock && pct >= 90 && lvl !== 'hard' && load().allowLevelUp !== false ? `<div class="lvlup"><b>עברת את זה בקלות! 🚀</b><button class="btn primary" id="lvlup">⬆ לעלות לרמה ${LEVELS[lvl === 'easy' ? 'medium' : 'hard']}</button></div>` : ''}
+        <div class="row center"><button class="btn ${!isMock && pct >= 90 && lvl !== 'hard' && load().allowLevelUp !== false ? '' : 'primary'}" id="again">${isMock ? 'מבחן חדש' : 'עוד סיבוב'}</button><button class="btn" data-back="home">לדף הבית</button></div>
       </section>`;
     $('#again').onclick = () => go(again);
     const lu = $('#lvlup'); if (lu) lu.onclick = () => { const s = load(); s.level = lvl === 'easy' ? 'medium' : 'hard'; save(s); go(again); };
@@ -1386,10 +1718,12 @@ function writeView() {
 // every English phrase the app speaks (used to make the audio clips)
 window.speechTexts = () => [...new Set([
   ...Object.values(NAME), ...WORDS.map(w => w.w), ...SENTENCES.map(x => x.s),
-  ...STORIES.flatMap(st => st.x), ...NW.slice(1),
+  ...STORIES.flatMap(st => st.x), ...STORIES.flatMap(st => st.q.map(q => q[0])), ...NW.slice(1),
   ...DEFAULT_PRIZES.map(t => t.replace(/\p{Extended_Pictographic}\uFE0F?/gu, '').trim()),
 ])];
-home();
+const QS = new URLSearchParams(location.search);
+if (QS.get('k') && CLOUD_OK) bootKid(QS.get('k'), QS.get('m') || 'all');
+else home();
 })();
 </script>
 </body>
