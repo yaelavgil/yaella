@@ -2437,8 +2437,16 @@ window.speechTexts = () => [...new Set([
 ])];
 sfxButton();
 const QS = new URLSearchParams(location.search);
-if (QS.get('k') && CLOUD_OK) bootKid(QS.get('k'), QS.get('m') || 'all');
-else home();
+// ?trywheel — opens the wheel straight away in try-it mode, for checking the win card
+// and the sharing without having to earn a spin first. Spins here are not counted and
+// nothing is saved, exactly like the preview a parent gets from the settings.
+function tryWheel() {
+  if (!QS.has('trywheel')) return;
+  const s = load(), prizes = (s.prizes && s.prizes.length) ? s.prizes : DEFAULT_PRIZES;
+  wheelView({ prizes });
+}
+if (QS.get('k') && CLOUD_OK) bootKid(QS.get('k'), QS.get('m') || 'all').then(tryWheel, tryWheel);
+else { home(); tryWheel(); }
 })();
 </script>
 </body>
