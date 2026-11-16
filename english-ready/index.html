@@ -355,6 +355,8 @@ const LETTERS = [
 const NAME = {A:'ay',B:'bee',C:'see',D:'dee',E:'ee',F:'ef',G:'gee',H:'aitch',I:'eye',J:'jay',K:'kay',L:'el',M:'em',N:'en',O:'oh',P:'pee',Q:'cue',R:'are',S:'ess',T:'tee',U:'you',V:'vee',W:'double you',X:'ex',Y:'why',Z:'zee'};
 const ALPHA = 'abcdefghijklmnopqrstuvwxyz'.split('');
 const LET = Object.fromEntries(LETTERS.map(L => [L[0], L]));
+// Hebrew sound for hints, without the English letter that some cards show in brackets
+const heSound = U => LET[U][1].replace(/\s*\(.*?\)/g, '');
 const HE_NAME = {A:'אֵיי',B:'בִּי',C:'סִי',D:'דִּי',E:'אִי',F:'אֶף',G:'גִ׳י',H:'אֵייץ׳',I:'אַיי',J:'גֵ׳יי',K:'קֵיי',L:'אֶל',M:'אֶם',N:'אֶן',O:'אוֹ',P:'פִּי',Q:'קְיוּ',R:'אַר',S:'אֶס',T:'טִי',U:'יוּ',V:'וִי',W:'דַאבֶּל־יוּ',X:'אֶקְס',Y:'וַאי',Z:'זִי'};
 // which story sentence holds the answer, per question
 const STORY_HINT = {"What is the cat's name?":1,'What color is Mimi?':2,'What does Mimi like?':3,'Where does Mimi sleep?':4,
@@ -1111,7 +1113,7 @@ function qSound() {
     prompt: `<div class="pic">${wd.e}</div><p class="ask">שמע את המילה. באיזו אות היא מתחילה?</p>`,
     layout: 'letters', options: opts.map(l => ({ v: l, html: `<span class="en">${l.toUpperCase()}${l}</span>` })),
     answer: ans, reveal: wordHTML(wd), rv: `${wd.e} ${wd.w} → ${ans.toUpperCase()}${ans}`,
-    hint: { he: `הקשב לצליל הראשון. בעברית הוא נשמע בערך <b>${LET[wd.L][1]}</b>.`, say: wd.w, slow: true } };
+    hint: { he: `הקשב לצליל הראשון. בעברית הוא נשמע בערך כמו <b>${heSound(wd.L)}</b>`, say: wd.w, slow: true } };
 }
 function qPic() {
   const pics = WORDS.filter(x => !x.f);
@@ -1122,19 +1124,19 @@ function qPic() {
     prompt: `<div class="bigletter en">${wd.L}${l}</div><p class="ask">איזו תמונה מתחילה באות <span class="en">${wd.L}</span>?</p>`,
     layout: 'emoji', options: shuffle(chosen).map(x => ({ v: x.w, html: x.e, label: x.w })),
     answer: wd.w, rv: `${wd.L} → ${wd.e} ${wd.w}`,
-    hint: { he: `האות <span class="en">${wd.L}</span> נשמעת בערך <b>${LET[wd.L][1]}</b>. הקשב לשמות של התמונות:`, say: chosen.map(x => x.w).join('|') } };
+    hint: { he: `האות <span class="en">${wd.L}</span> נשמעת בערך כמו <b>${heSound(wd.L)}</b>. הקשב לשמות של התמונות`, say: chosen.map(x => x.w).join('|') } };
 }
 function qCase() {
   const U = pick(ALPHA).toUpperCase(), l = U.toLowerCase(), h = hueOf(ALPHA.indexOf(l));
   if (Math.random() < 0.55) {
     return { key: 'c:' + U, hue: h, prompt: `<div class="bigletter en">${U}</div><p class="ask">מה האות הקטנה של <span class="en">${U}</span>?</p>`,
       layout: 'letters', options: fillOpts(l, LOWC[l], () => true, ALPHA).map(x => ({ v: x, html: `<span class="en">${x}</span>` })),
-      answer: l, rv: `${U} → ${l}`, hint: { he: `<span class="en">${U}</span> כמו במילה <b class="en">${LET[U][3][0][0]}</b>`, say: LET[U][3][0][0] } };
+      answer: l, rv: `${U} → ${l}`, hint: { he: `<span class="en">${U}</span> כמו ב־${LET[U][3][0][1]} · הקשב למילה ונסה לדמיין איך היא כתובה`, say: LET[U][3][0][0] } };
   }
   const UP = ALPHA.map(x => x.toUpperCase());
   return { key: 'C:' + l, hue: h, prompt: `<div class="bigletter en">${l}</div><p class="ask">מה האות הגדולה של <span class="en">${l}</span>?</p>`,
     layout: 'letters', options: fillOpts(U, UPC[U], () => true, UP).map(x => ({ v: x, html: `<span class="en">${x}</span>` })),
-    answer: U, rv: `${l} → ${U}`, hint: { he: `<span class="en">${l}</span> כמו במילה <b class="en">${LET[U][3][0][0][0].toUpperCase() + LET[U][3][0][0].slice(1)}</b>`, say: LET[U][3][0][0] } };
+    answer: U, rv: `${l} → ${U}`, hint: { he: `<span class="en">${l}</span> כמו ב־${LET[U][3][0][1]} · הקשב למילה ונסה לדמיין איך היא כתובה`, say: LET[U][3][0][0] } };
 }
 function qName() {
   const l = pick(ALPHA), U = l.toUpperCase();
