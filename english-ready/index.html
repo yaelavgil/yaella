@@ -537,6 +537,42 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
   border:2.5px solid #fff;box-shadow:0 1px 4px rgba(90,50,0,.35);animation:mwturn 9s linear infinite}
 @media (prefers-reduced-motion:reduce){.wtmini{animation:none}}
 
+/* ---- the parent's strip, above everything a child sees ---- */
+.pbar{margin:0 0 14px}
+.pin-btn{width:100%;min-height:46px;font-size:15px;background:var(--surface);color:var(--ink)}
+.pbrow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:9px 12px}
+.pbwho{font-weight:600;color:var(--muted);font-size:14px}
+.pbhint{margin:8px 2px 0}
+.kstrip{display:grid;gap:8px;margin-top:8px}
+.kst{background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:8px 10px;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.kstmain{flex:1 1 180px;display:grid;gap:3px;text-align:start;background:none;border:0;padding:4px 2px;cursor:pointer;color:inherit}
+.kstname{font:700 17px var(--f-display)}
+.kstbits{display:flex;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.kstlink{flex:none}
+.kstmore{flex:1 1 100%;border-top:1px solid var(--line);margin-top:6px;padding-top:8px;display:grid;gap:7px}
+.kstline{margin:0;font-size:14px;color:var(--muted)}
+
+/* ---- the slide-in menu ---- */
+.pdrawer{position:fixed;inset:0;z-index:60;background:rgba(26,20,40,.42);display:flex;justify-content:flex-start;
+  animation:fade .2s both}
+@keyframes fade{from{opacity:0}}
+.pdbox{width:min(330px,88vw);height:100%;overflow:auto;background:var(--bg);padding:14px;
+  display:flex;flex-direction:column;gap:10px;box-shadow:-10px 0 40px rgba(20,10,40,.28);
+  animation:slidein .26s var(--ease) both}
+@keyframes slidein{from{transform:translateX(100%)}}
+.pdhead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.pdhead b{font:700 18px var(--f-display)}
+.pdwho{margin:0;font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.pdnav{display:grid;gap:8px;margin-top:4px}
+.pditem{display:grid;gap:2px;text-align:start;background:var(--surface);border:1.5px solid var(--line);
+  border-radius:14px;padding:11px 13px;cursor:pointer;color:inherit}
+.pditem b{font:700 16px var(--f-body)}
+.pditem small{color:var(--muted);font-size:13px}
+.pditem:active{transform:translateY(1px)}
+.pdout{margin-top:auto;align-self:flex-start}
+
 /* OpenMoji is CC BY-SA 4.0, which asks for the credit to be shown */
 .credit{margin:18px 0 6px;text-align:center;font-size:12px;color:#9AA0B4}
 .credit a{color:#8A91A6;text-decoration:underline}
@@ -999,6 +1035,7 @@ function home() {
     ? `<p class="last">המבחן האחרון (${m.date.split('-').slice(1).reverse().join('.')}): <b>${m.score}/${m.n}</b>${weak.length ? ` · כדאי לחזק: ${weak.map(k => SECS[k]).join(', ')}` : ' · הכול נכון!'}</p>`
     : '<p class="last">עוד לא עשית מבחן ניסיון. כדאי להתחיל בו: הוא יראה מה כבר יודעים ומה צריך לחזק.</p>';
   app.innerHTML = `
+  ${KID ? '' : '<div id="pbar" class="pbar"></div>'}
   <header class="hero">
     <div class="heroart" aria-hidden="true"><span class="ha a1">📚</span><span class="ha a2">🚀</span><span class="ha a3">✨</span><span class="ha a4">⭐</span></div>
     <div class="blocks" aria-hidden="true"><span class="blk h1">A</span><span class="blk h2">B</span><span class="blk h4">C</span></div>
@@ -1047,15 +1084,13 @@ function home() {
   </section>`}
   <button class="btn myprog" id="myprog">📈 ההתקדמות שלי</button>
   <p class="tip">המורה ביקשה: קריאה בקול, חזרה על הצלילים והאותיות, קצת בכל יום.</p>
-  ${KID ? '' : `<div class="parentrow">
-    ${CLOUD_OK ? '<button class="btn" id="gparent"><span class="gmark" aria-hidden="true">G</span> כניסת הורים עם Google</button>' : ''}
-    <button class="link parentlink" id="parent">⚙️ הגדרות במכשיר הזה</button></div>`}
+  ${KID ? '' : '<div class="parentrow"><button class="link parentlink" id="parent">הגדרות במכשיר הזה</button></div>'}
   <p class="credit">האיורים: <a href="https://openmoji.org" target="_blank" rel="noopener">OpenMoji</a> · רישיון <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a></p>`;
   $$('.tile', app).forEach(b => b.onclick = () => MODS[+b.dataset.m].run());
   const mk = $('#mock'); if (mk) mk.onclick = () => go(quizMock);
   $('#myprog').onclick = () => go(progressView);
   const pa = $('#parent'); if (pa) pa.onclick = () => go(parentView);
-  const gp = $('#gparent'); if (gp) gp.onclick = () => go(parentCloud);
+  if (!KID && CLOUD_OK) parentBar();
   $$('[data-lvl]', app).forEach(b => b.onclick = () => { const s = load(); s.level = b.dataset.lvl; save(s); home(); });
   const sp = $('#spin'); if (sp) sp.onclick = () => go(wheelView);
   const pk = $('#peek'); if (pk) pk.onclick = () => go(wheelView);
@@ -1148,6 +1183,122 @@ async function bootKid(id, mode) {
 
 // --- parent side
 const kidLink = (id, mode) => `${location.origin}${location.pathname}?k=${id}&m=${mode}${DEMO ? '&demo' : ''}`;
+/* ---------- the parent's strip at the top of the home screen ----------
+   Getting in used to mean scrolling past everything a child sees to a link at the very
+   bottom. The way in now sits above the page, and once a parent is in, each child's day
+   and a one-tap link are there with it. */
+let PAPI = null, PUSER = null, PKIDS = [];
+const kidDay = k => { const p = k.progress || {}; return (p.td && p.td.date === today()) ? p.td : { stars: 0, ms: 0, letters: 0, spins: 0 }; };
+const kidMode = k => ((k.settings || {}).linkMode) || 'learn';
+
+async function parentBar() {
+  const bar = $('#pbar'); if (!bar) return;
+  bar.innerHTML = `<button class="btn pin-btn" id="pgo"><span class="gmark" aria-hidden="true">G</span> כניסת הורים</button>`;
+  $('#pgo').onclick = () => go(parentCloud);
+  let A; try { A = PAPI || (PAPI = await api()); } catch (e) { return; }
+  A.onUser(async u => {
+    if (!$('#pbar')) return;
+    PUSER = u;
+    if (!u) { // signed out: just the way in
+      $('#pbar').innerHTML = `<button class="btn pin-btn" id="pgo"><span class="gmark" aria-hidden="true">G</span> כניסת הורים</button>`;
+      const b = $('#pgo'); if (b) b.onclick = () => go(parentCloud);
+      return;
+    }
+    try { PKIDS = await A.listKids(u.uid); } catch (e) { PKIDS = []; }
+    PKIDS.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+    renderParentBar();
+  });
+}
+
+function renderParentBar() {
+  const bar = $('#pbar'); if (!bar || !PUSER) return;
+  const who = esc((PUSER.name || PUSER.email || '').split(' ')[0] || 'הורה');
+  bar.innerHTML = `
+    <div class="pbrow">
+      <span class="pbwho">שלום ${who}</span>
+      <button class="btn sm" id="popen" aria-haspopup="dialog">תפריט ההורים</button>
+    </div>
+    ${PKIDS.length ? `<div class="kstrip">${PKIDS.map(k => {
+      const d = kidDay(k), mins = Math.floor((d.ms || 0) / 60000);
+      const abc = ((k.settings || {}).goal || {}).type !== 'mins' && ((k.settings || {}).goal || {}).type !== 'stars';
+      const prog = abc ? `${d.letters || 0}/26 אותיות` : `${d.stars || 0} כוכבים`;
+      return `<article class="kst" data-k="${k.id}">
+        <button class="kstmain" data-open="${k.id}" aria-expanded="false">
+          <span class="kstname">${esc(k.name)}</span>
+          <span class="kstbits"><span>${prog}</span><span>${mins} דק׳</span>${d.spins ? '<span>סובב היום</span>' : ''}</span>
+        </button>
+        <button class="btn sm kstlink" data-link="${k.id}">שליחת קישור</button>
+      </article>`;
+    }).join('')}</div>` : '<p class="hint pbhint">עוד אין ילדים. פתחו את תפריט ההורים כדי להוסיף.</p>'}`;
+  $('#popen').onclick = () => parentPanel();
+  $$('[data-link]', bar).forEach(b => b.onclick = () => sendKidLink(b, PKIDS.find(k => k.id === b.dataset.link)));
+  $$('[data-open]', bar).forEach(b => b.onclick = () => {
+    const k = PKIDS.find(x => x.id === b.dataset.open);
+    const art = b.closest('.kst'), open = art.querySelector('.kstmore');
+    if (open) { open.remove(); b.setAttribute('aria-expanded', 'false'); return; }
+    b.setAttribute('aria-expanded', 'true');
+    const p = k.progress || {}, d = kidDay(k);
+    const div = document.createElement('div');
+    div.className = 'kstmore';
+    div.innerHTML = `
+      <p class="kstline">סך הכול <b>${p.stars || 0}</b> כוכבים · ימי תרגול <b>${(p.days || []).length}</b>${p.mock ? ` · מבחן אחרון <b>${p.mock.score}/${p.mock.n}</b>` : ''}</p>
+      <p class="kstline">היום: <b>${d.letters || 0}/26</b> אותיות · <b>${Math.floor((d.ms || 0) / 60000)}</b> דקות · <b>${d.spins || 0}</b> סיבובים</p>
+      <div class="row">
+        <button class="btn sm" data-copy="${kidLink(k.id, kidMode(k))}">העתקת הקישור</button>
+        <button class="btn sm" data-set="${k.id}">הגדרות הילד</button>
+      </div>`;
+    art.appendChild(div);
+    div.querySelector('[data-set]').onclick = () => kidSettings(PAPI, PUSER, k);
+    div.querySelector('[data-copy]').onclick = async e => {
+      const t = e.currentTarget;
+      try { await navigator.clipboard.writeText(t.dataset.copy); t.textContent = 'הועתק'; }
+      catch (er) { t.textContent = 'לא הצלחנו להעתיק'; }
+    };
+  });
+}
+
+// one tap: the child's own link, in their own mode, ready to send
+function sendKidLink(btn, k) {
+  if (!k) return;
+  const url = kidLink(k.id, kidMode(k));
+  const txt = `${k.name}, הנה הקישור שלך לתרגול באנגלית:\n${url}`;
+  try { navigator.clipboard.writeText(url); } catch (e) {}
+  if (navigator.canShare && matchMedia('(pointer: coarse)').matches) {
+    navigator.share({ text: txt }).catch(() => {});
+  } else {
+    window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank', 'noopener');
+  }
+  const was = btn.textContent; btn.textContent = 'הקישור הועתק';
+  setTimeout(() => { btn.textContent = was; }, 2200);
+}
+
+function parentPanel() {
+  const ov = document.createElement('div');
+  ov.className = 'pdrawer';
+  ov.innerHTML = `<div class="pdbox" role="dialog" aria-modal="true" aria-label="תפריט ההורים">
+    <div class="pdhead"><b>תפריט ההורים</b><button class="btn icon" id="pdx" aria-label="סגירה">✕</button></div>
+    <p class="pdwho">${esc(PUSER && (PUSER.name || PUSER.email) || '')}</p>
+    <nav class="pdnav">
+      ${PKIDS.map(k => `<button class="pditem" data-s="${k.id}"><b>${esc(k.name)}</b><small>הגדרות והתקדמות</small></button>`).join('')}
+      <button class="pditem" id="pdadd"><b>הוספת ילד</b><small>שם פרטי בלבד</small></button>
+      <button class="pditem" id="pdall"><b>כל הילדים והקישורים</b><small>המסך המלא</small></button>
+      <button class="pditem" id="pddev"><b>הגדרות במכשיר הזה</b><small>בלי חשבון</small></button>
+    </nav>
+    <button class="link pdout" id="pdout">יציאה מהחשבון</button>
+  </div>`;
+  document.body.appendChild(ov);
+  const close = () => { ov.remove(); document.removeEventListener('keydown', esc_); };
+  const esc_ = e => { if (e.key === 'Escape') close(); };
+  document.addEventListener('keydown', esc_);
+  ov.addEventListener('click', e => { if (e.target === ov) close(); });
+  ov.querySelector('#pdx').onclick = close;
+  ov.querySelector('#pdall').onclick = () => { close(); go(parentCloud); };
+  ov.querySelector('#pddev').onclick = () => { close(); go(parentView); };
+  ov.querySelector('#pdadd').onclick = () => { close(); go(parentCloud); };
+  ov.querySelector('#pdout').onclick = async () => { close(); try { await PAPI.signOut(); } catch (e) {} };
+  ov.querySelectorAll('[data-s]').forEach(b => b.onclick = () => { close(); kidSettings(PAPI, PUSER, PKIDS.find(k => k.id === b.dataset.s)); });
+}
+
 async function parentCloud() {
   app.innerHTML = `${top('אזור ההורים')}<p class="loading">טוען…</p>`;
   let A;
