@@ -683,6 +683,14 @@ function illustrate(root) {
 }
 new MutationObserver(ms => { for (const m of ms) for (const nd of m.addedNodes) { if (nd.nodeType === 1) illustrate(nd); else if (nd.nodeType === 3) illustrate(nd.parentElement); } })
   .observe(document.documentElement, { childList: true, subtree: true });
+// warm the cache: fetch every illustration quietly in the background, a few at a time, so pictures are ready before they're needed
+(function preloadAll() {
+  const urls = [...new Set(Object.keys(EMAP).map(illUrl).filter(Boolean))];
+  let i = 0;
+  const next = () => { if (i >= urls.length) return; const im = new Image(); im.decoding = 'async'; try { im.fetchPriority = 'low'; } catch (e) {} im.onload = im.onerror = next; im.src = urls[i++]; };
+  const start = () => { for (let k = 0; k < 6; k++) next(); };
+  if ('requestIdleCallback' in window) requestIdleCallback(start, { timeout: 1500 }); else setTimeout(start, 800);
+})();
 // preload for the wheel canvas
 const illImg = {};
 function illImage(g) { const u = illUrl(g); if (!u) return null; if (!illImg[u]) { const im = new Image(); im.crossOrigin = 'anonymous'; im.src = u; illImg[u] = im; } return illImg[u]; }
