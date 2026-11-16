@@ -165,17 +165,29 @@ h2{font:600 24px/1.2 var(--f-display);margin:0;text-wrap:balance}
 .testbtn{background:var(--bad);color:var(--on);font-size:18px;min-height:54px}
 .parentlink{display:block;margin:14px 0 0}
 /* wheel */
-.wheelbox{padding:18px;display:grid;justify-items:center;gap:14px;text-align:center}
-.whead{font:700 26px var(--f-en);margin:0}
+.wstage{position:relative;overflow:hidden;display:grid;justify-items:center;gap:12px;text-align:center;padding:20px 14px 22px;border-radius:26px;border:2.5px solid var(--line);box-shadow:4px 4px 0 var(--shadow);color:#fff;
+  background:radial-gradient(120% 80% at 50% 0%,#7B4DFF 0%,#4B21C9 45%,#2A0F86 100%)}
+.wstage::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.55;
+  background-image:radial-gradient(2px 2px at 12% 18%,#fff 50%,transparent 51%),radial-gradient(1.5px 1.5px at 82% 12%,#fff 50%,transparent 51%),radial-gradient(2px 2px at 90% 60%,#FFE08A 50%,transparent 51%),radial-gradient(1.5px 1.5px at 8% 70%,#fff 50%,transparent 51%),radial-gradient(2px 2px at 30% 92%,#FFE08A 50%,transparent 51%),radial-gradient(1.5px 1.5px at 70% 88%,#fff 50%,transparent 51%)}
+.whead{font:700 clamp(26px,7vw,34px)/1 var(--f-display);margin:0;letter-spacing:.01em;text-shadow:0 3px 0 rgba(0,0,0,.25)}
 .wheelwrap{position:relative;max-width:100%}
 .wheelwrap canvas{display:block;max-width:100%}
-.pointer{position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-top:28px solid var(--ink);z-index:1;filter:drop-shadow(0 2px 0 var(--surface))}
-.bigspin{font:700 22px var(--f-en);min-height:60px;min-width:200px}
-.bigspin:disabled{opacity:.5}
-.prize{padding:16px 20px;background:var(--t3);display:grid;gap:4px;animation:pop .5s both}
+#confetti{position:absolute;inset:0;pointer-events:none}
+.wlabel{min-height:1.6em;font:700 clamp(18px,5vw,22px)/1.3 var(--f-en);background:rgba(255,255,255,.14);border:2px solid rgba(255,255,255,.35);border-radius:999px;padding:6px 18px;max-width:100%}
+.spinbig{font:700 clamp(26px,7vw,32px)/1 var(--f-display);letter-spacing:.06em;color:#3A1A00;min-width:220px;min-height:64px;padding:10px 28px;border-radius:999px;border:3px solid #fff;
+  background:linear-gradient(180deg,#FFE27A 0%,#FFB020 100%);box-shadow:0 6px 0 #C77700,0 10px 22px rgba(0,0,0,.35);cursor:pointer;transition:transform .08s,box-shadow .08s}
+.spinbig small{font-size:.6em;opacity:.8}
+.spinbig:active:not(:disabled){transform:translateY(4px);box-shadow:0 2px 0 #C77700,0 4px 10px rgba(0,0,0,.3)}
+.spinbig:disabled{filter:grayscale(.6);opacity:.6;cursor:default}
+.spinbig:not(:disabled){animation:pulse 1.6s ease-in-out infinite}
+.wleft{margin:0;font-size:17px}
+.wleft b{color:#FFE27A}
+.prize{display:grid;gap:2px;justify-items:center;background:#fff;color:#2A0F86;border-radius:22px;padding:14px 22px;box-shadow:0 8px 24px rgba(0,0,0,.3);animation:pop .5s both}
 .prize p{margin:0}
-.pwin{font-size:18px;color:var(--muted)}
-.ptext{font:700 clamp(22px,6vw,28px)/1.25 var(--f-en)}
+.pwin{font:700 18px var(--f-display);color:#FF3B6B}
+.pemoji{font-size:44px;line-height:1.1}
+.ptext{font:700 clamp(20px,5.5vw,26px)/1.25 var(--f-en)}
+.pnote{font-size:15px;color:#5B4A99}
 /* parents */
 .pbox{padding:18px;display:grid;gap:10px}
 .pbox h2{margin-top:8px}
@@ -970,79 +982,161 @@ function progressView() {
 }
 
 /* ---------- surprise wheel ---------- */
-const WHEEL_COLORS = ['--c1', '--c2', '--c3', '--c4', '--c5', '--c6'];
+// A game-show wheel: candy-coloured slices with one big upright emoji each, a gold rim with blinking bulbs,
+// and a live label under the pointer. The stage keeps its own fixed colours in both themes on purpose.
+const WHEEL_SLICES = ['#FF5D8F', '#FFB020', '#22C3A6', '#4D8DFF', '#A66BFF', '#FF7A3D', '#16B8D9', '#F25CC0', '#7ED957', '#FFD23F', '#5C6BFF', '#FF4D6D'];
 let backTo = null; // where the back button goes from a preview
+const emojiOf = t => (t.match(/\p{Extended_Pictographic}️?/gu) || ['🎁']).pop();
+const textOf = t => t.replace(/\p{Extended_Pictographic}️?/gu, '').trim();
+function tick() { // tiny click as a slice passes the pointer
+  if (!sfxOn) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = actx.createOscillator(), g = actx.createGain(), t = actx.currentTime;
+    o.type = 'square'; o.frequency.value = 1400;
+    g.gain.setValueAtTime(0.025, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.03);
+    o.connect(g).connect(actx.destination); o.start(t); o.stop(t + 0.04);
+  } catch (e) {}
+}
 function wheelView(preview) {
   const st = load(), prizes = preview ? preview.prizes : (st.prizes.length ? st.prizes : DEFAULT_PRIZES);
   const G = preview ? { avail: 99 } : goalState(st);
-  const box = `<section class="wheelbox stk">
+  const box = `<section class="wstage">
       <p class="whead en">${G.avail ? 'Spin the wheel!' : 'No spins right now'}</p>
-      <div class="wheelwrap"><div class="pointer" aria-hidden="true"></div><canvas id="wheel" width="340" height="340" aria-label="גלגל ההפתעות"></canvas></div>
-      <button class="btn primary bigspin" dir="ltr" id="go" ${G.avail ? '' : 'disabled'}>🎡 Spin!${!preview && G.avail > 1 ? ` (${G.avail})` : ''}</button>
-      ${G.avail ? '' : `<p class="gleft">נשארו עוד <b>${G.left} ${G.unit}</b> כדי לסובב.</p>`}
+      <div class="wheelwrap"><canvas id="wheel" aria-label="גלגל ההפתעות"></canvas><canvas id="confetti" aria-hidden="true"></canvas></div>
+      <div class="wlabel en" id="wlabel" aria-live="off"></div>
+      <button class="spinbig" dir="ltr" id="go" ${G.avail ? '' : 'disabled'}>SPIN!${!preview && G.avail > 1 ? ` <small>×${G.avail}</small>` : ''}</button>
+      ${G.avail ? '' : `<p class="wleft">נשארו עוד <b>${G.left} ${G.unit}</b> כדי לסובב</p>`}
       <div id="prize" aria-live="polite"></div>
     </section>`;
   let wrapW = app.clientWidth;
+  let close = null;
   if (preview) { // parents: a popup over the settings, closed by ✕, a tap outside or Esc
     const m = document.createElement('div');
     m.className = 'modal'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-modal', 'true'); m.setAttribute('aria-label', 'גלגל ההפתעות');
     m.innerHTML = `<div class="mbox"><div class="mhead"><b>כך הילד רואה את הגלגל</b><button class="btn icon" id="mclose" aria-label="סגירה">✕</button></div><p class="previewnote">הסיבובים כאן לניסיון בלבד ולא נספרים.</p>${box}</div>`;
     document.body.appendChild(m);
-    const close = () => { m.remove(); document.removeEventListener('keydown', esc_); };
     const esc_ = e => { if (e.key === 'Escape') close(); };
+    close = () => { cancelAnimationFrame(raf); m.remove(); document.removeEventListener('keydown', esc_); };
     m.addEventListener('click', e => { if (e.target === m) close(); });
-    m.querySelector('#mclose').onclick = close;
+    m.querySelector('#mclose').onclick = () => close();
     document.addEventListener('keydown', esc_);
     m.querySelector('#mclose').focus();
-    wrapW = Math.min(420, window.innerWidth - 32) - 24;
+    wrapW = Math.min(440, window.innerWidth - 32) - 24;
   } else app.innerHTML = `${top('גלגל ההפתעות')}${box}`;
-  const cv = $('#wheel'), ctx = cv.getContext('2d');
-  const size = Math.min(340, wrapW - 40), dpr = Math.min(window.devicePixelRatio || 1, 3);
-  cv.style.width = cv.style.height = size + 'px'; cv.width = cv.height = size * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  const R = size / 2, n = prizes.length, seg = Math.PI * 2 / n;
-  const cs = getComputedStyle(document.documentElement);
-  const emojiOf = t => (t.match(/\p{Extended_Pictographic}️?/gu) || ['🎁']).pop();
-  const textOf = t => t.replace(/\p{Extended_Pictographic}️?/gu, '').trim();
-  let rot = 0;
-  function draw() {
+
+  const cv = $('#wheel'), ctx = cv.getContext('2d'), cf = $('#confetti'), cfx = cf.getContext('2d');
+  const size = Math.round(Math.min(380, wrapW - 32)), dpr = Math.min(window.devicePixelRatio || 1, 3);
+  for (const c of [cv, cf]) { c.style.width = c.style.height = size + 'px'; c.width = c.height = size * dpr; c.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0); }
+  const C = size / 2, n = prizes.length, seg = Math.PI * 2 / n;
+  const R = C - size * 0.075;            // slices
+  const RIM = C - size * 0.02;           // outer edge of the gold rim
+  const label = $('#wlabel');
+  let rot = 0, spinning = false, lastIdx = -1, raf = 0, tilt = 0;
+  const under = () => { const a = ((-rot) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2); return Math.floor(a / seg) % n; };
+
+  function draw(now) {
     ctx.clearRect(0, 0, size, size);
+    // gold rim
+    const rim = ctx.createLinearGradient(0, 0, size, size);
+    rim.addColorStop(0, '#FFE08A'); rim.addColorStop(0.5, '#F5B60A'); rim.addColorStop(1, '#FFD45C');
+    ctx.beginPath(); ctx.arc(C, C, RIM, 0, Math.PI * 2); ctx.fillStyle = rim; ctx.fill();
+    ctx.beginPath(); ctx.arc(C, C, RIM, 0, Math.PI * 2); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(120,70,0,.35)'; ctx.stroke();
+    // slices
     for (let k = 0; k < n; k++) {
       const a0 = rot + k * seg - Math.PI / 2;
-      ctx.beginPath(); ctx.moveTo(R, R); ctx.arc(R, R, R - 4, a0, a0 + seg); ctx.closePath();
-      ctx.fillStyle = cs.getPropertyValue(WHEEL_COLORS[k % 6]).trim(); ctx.fill();
-      ctx.lineWidth = 3; ctx.strokeStyle = cs.getPropertyValue('--line').trim(); ctx.stroke();
-      ctx.save(); ctx.translate(R, R); ctx.rotate(a0 + seg / 2);
-      ctx.fillStyle = cs.getPropertyValue('--on').trim(); ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-      ctx.font = `${Math.round(size / 13)}px system-ui`; ctx.fillText(emojiOf(prizes[k]), R - 12, 0);
-      let fs = Math.round(size / 26); const label = textOf(prizes[k]); const maxW = R - 34 - size / 11;
-      ctx.font = `700 ${fs}px Rubik, system-ui, sans-serif`;
-      while (ctx.measureText(label).width > maxW && fs > 8) { fs--; ctx.font = `700 ${fs}px Rubik, system-ui, sans-serif`; }
-      ctx.fillText(label, R - 16 - size / 11, 0);
-      ctx.restore();
+      const base = WHEEL_SLICES[k % WHEEL_SLICES.length];
+      const gr = ctx.createRadialGradient(C, C, R * 0.15, C, C, R);
+      gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.18, base); gr.addColorStop(1, base);
+      ctx.beginPath(); ctx.moveTo(C, C); ctx.arc(C, C, R, a0, a0 + seg); ctx.closePath();
+      ctx.fillStyle = gr; ctx.fill();
+      ctx.lineWidth = Math.max(2, size * 0.008); ctx.strokeStyle = '#fff'; ctx.stroke();
+      // upright emoji, placed along the slice's middle
+      const mid = a0 + seg / 2, er = R * 0.66;
+      const fs = Math.min(R * 0.3, (2 * Math.PI * er / n) * 0.55);
+      ctx.font = `${Math.round(fs)}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'rgba(0,0,0,.18)'; ctx.shadowBlur = 4; ctx.shadowOffsetY = 2;
+      ctx.fillText(emojiOf(prizes[k]), C + Math.cos(mid) * er, C + Math.sin(mid) * er);
+      ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
     }
-    ctx.beginPath(); ctx.arc(R, R, size / 14, 0, Math.PI * 2);
-    ctx.fillStyle = cs.getPropertyValue('--surface').trim(); ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = cs.getPropertyValue('--line').trim(); ctx.stroke();
+    // inner shine
+    const sh = ctx.createRadialGradient(C, C - R * 0.5, R * 0.1, C, C, R);
+    sh.addColorStop(0, 'rgba(255,255,255,.22)'); sh.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.beginPath(); ctx.arc(C, C, R, 0, Math.PI * 2); ctx.fillStyle = sh; ctx.fill();
+    // bulbs on the rim, blinking in turns
+    const nb = 20, br = Math.max(3, size * 0.014), blink = Math.floor((now || 0) / (spinning ? 90 : 450)) % 2;
+    for (let b = 0; b < nb; b++) {
+      const a = b / nb * Math.PI * 2, x = C + Math.cos(a) * (R + (RIM - R) / 2), y = C + Math.sin(a) * (R + (RIM - R) / 2);
+      const on = (b % 2) === blink;
+      ctx.beginPath(); ctx.arc(x, y, br, 0, Math.PI * 2);
+      ctx.fillStyle = on ? '#FFFFFF' : '#FFF3C4'; ctx.fill();
+      if (on) { ctx.beginPath(); ctx.arc(x, y, br * 2.2, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,.25)'; ctx.fill(); }
+    }
+    // hub
+    const hr = size * 0.085;
+    const hub = ctx.createRadialGradient(C - hr * 0.3, C - hr * 0.3, hr * 0.2, C, C, hr);
+    hub.addColorStop(0, '#FFF6D6'); hub.addColorStop(1, '#F5B60A');
+    ctx.beginPath(); ctx.arc(C, C, hr, 0, Math.PI * 2); ctx.fillStyle = hub; ctx.fill();
+    ctx.lineWidth = 3; ctx.strokeStyle = '#fff'; ctx.stroke();
+    ctx.font = `${Math.round(hr * 1.05)}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+    ctx.fillText('⭐', C, C + 1);
+    // pointer at the top (wobbles as slices pass)
+    ctx.save(); ctx.translate(C, size * 0.035); ctx.rotate(tilt);
+    const pw = size * 0.065, ph = size * 0.11;
+    ctx.beginPath(); ctx.moveTo(-pw, 0); ctx.quadraticCurveTo(0, -pw * 0.5, pw, 0); ctx.lineTo(0, ph); ctx.closePath();
+    ctx.shadowColor = 'rgba(0,0,0,.3)'; ctx.shadowBlur = 6; ctx.shadowOffsetY = 3;
+    ctx.fillStyle = '#FF3B6B'; ctx.fill();
+    ctx.shadowColor = 'transparent'; ctx.lineWidth = 3; ctx.strokeStyle = '#fff'; ctx.stroke();
+    ctx.restore();
+    // live label
+    const i = under();
+    if (i !== lastIdx) {
+      if (lastIdx !== -1 && spinning) { tick(); tilt = -0.35; }
+      lastIdx = i; label.textContent = textOf(prizes[i]) + ' ' + emojiOf(prizes[i]);
+    }
+    tilt *= 0.82;
   }
-  draw();
-  if (document.fonts) document.fonts.ready.then(draw);
+  // idle loop keeps the bulbs blinking
+  const idle = t => { if (!document.body.contains(cv)) return; if (!spinning) draw(t); raf = requestAnimationFrame(idle); };
+  raf = requestAnimationFrame(idle);
+  if (!preview) cleanup = () => cancelAnimationFrame(raf);
+  if (document.fonts) document.fonts.ready.then(() => draw(performance.now()));
+
+  function confetti() {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const cols = ['#FF5D8F', '#FFB020', '#22C3A6', '#4D8DFF', '#A66BFF', '#FFD23F', '#fff'];
+    const bits = [...Array(90)].map(() => ({ x: C, y: C, vx: (Math.random() - 0.5) * 9, vy: -Math.random() * 9 - 2, r: Math.random() * Math.PI, vr: (Math.random() - 0.5) * 0.4, w: 5 + Math.random() * 5, h: 8 + Math.random() * 6, c: pick(cols) }));
+    const t0 = performance.now();
+    const step = t => {
+      cfx.clearRect(0, 0, size, size);
+      for (const b of bits) { b.x += b.vx; b.y += b.vy; b.vy += 0.28; b.vx *= 0.99; b.r += b.vr;
+        cfx.save(); cfx.translate(b.x, b.y); cfx.rotate(b.r); cfx.fillStyle = b.c; cfx.fillRect(-b.w / 2, -b.h / 2, b.w, b.h); cfx.restore(); }
+      if (t - t0 < 2200) requestAnimationFrame(step); else cfx.clearRect(0, 0, size, size);
+    };
+    requestAnimationFrame(step);
+  }
+
   $('#go').onclick = () => {
+    if (spinning) return;
     if (!preview && goalState(load()).avail < 1) return;
-    $('#go').disabled = true; $('#prize').innerHTML = '';
+    spinning = true; $('#go').disabled = true; $('#prize').innerHTML = '';
     const win = Math.floor(Math.random() * n);
     const start = rot, reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    // segment `win` centre must stop under the pointer at the top
-    const target = -(win * seg + seg / 2);
-    const total = reduce ? 1 : 4200, t0 = performance.now();
-    const final = start + ((((target - start) % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2)) + Math.PI * 2 * (reduce ? 0 : 6);
+    // slice `win` must stop under the pointer, a little off-centre so it looks natural
+    const target = -(win * seg + seg / 2 + (Math.random() - 0.5) * seg * 0.6);
+    const total = reduce ? 1 : 5200, t0 = performance.now();
+    const final = start + ((((target - start) % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2)) + Math.PI * 2 * (reduce ? 0 : 7);
     function frame(t) {
       const k = Math.min(1, (t - t0) / total), e = 1 - Math.pow(1 - k, 4);
-      rot = start + (final - start) * e; draw();
-      if (k < 1) return requestAnimationFrame(frame);
+      rot = start + (final - start) * e; draw(t);
+      if (k < 1) { requestAnimationFrame(frame); return; }
+      spinning = false;
       let g2 = { avail: 1 };
       if (!preview) { const s2 = load(); day(s2).spins++; s2.wins.unshift({ date: today(), prize: prizes[win] }); s2.wins = s2.wins.slice(0, 60); save(s2); g2 = goalState(s2); }
-      $('#prize').innerHTML = `<div class="prize stk"><p class="en pwin">You won:</p><p class="en ptext">${esc(prizes[win])}</p><p>כל הכבוד! 🎉 תראה את זה לאמא או לאבא.</p></div>`;
-      sfx('win'); setTimeout(() => say(textOf(prizes[win])), 600);
-      const b = $('#go'); b.disabled = g2.avail < 1; b.textContent = preview ? '🎡 Spin again!' : g2.avail ? `🎡 Spin again! (${g2.avail})` : '🎡 Spin!';
+      $('#prize').innerHTML = `<div class="prize"><p class="en pwin">You won!</p><p class="pemoji">${emojiOf(prizes[win])}</p><p class="en ptext">${esc(textOf(prizes[win]))}</p><p class="pnote">כל הכבוד! 🎉 תראה את זה לאמא או לאבא</p></div>`;
+      confetti(); sfx('win'); setTimeout(() => say(textOf(prizes[win])), 600);
+      const b = $('#go'); b.disabled = g2.avail < 1; b.innerHTML = preview ? 'AGAIN!' : g2.avail ? `AGAIN! <small>×${g2.avail}</small>` : 'SPIN!';
     }
     requestAnimationFrame(frame);
   };
