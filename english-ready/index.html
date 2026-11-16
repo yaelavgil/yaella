@@ -1301,12 +1301,15 @@ async function winCardBlob(pz, at) {
   for (const ln of wrapLines(x, textOf(pz), W - 240)) { x.fillText(ln, W / 2, y); y += 74; }
 
   x.direction = 'rtl'; const he = heOf(pz);
-  if (he) { x.fillStyle = '#5E6680'; x.font = f(BOD, 42, 500); for (const ln of wrapLines(x, he, W - 240)) { x.fillText(ln, W / 2, y + 10); y += 56; } }
+  if (he) { x.fillStyle = '#5E6680'; x.font = f(BOD, 42, 500); y += 14; for (const ln of wrapLines(x, he, W - 240)) { x.fillText(ln, W / 2, y); y += 56; } }
 
-  // the witty bit, in a pill
+  // The witty bit, in a pill. It used to sit a fixed distance off the bottom, so a prize
+  // whose name wrapped to two lines grew down into it; now it keeps clear of whatever
+  // the text above actually used.
   const wit = pick(WIT);
   x.font = f(BOD, 34, 500);
-  const wl = wrapLines(x, wit, W - 300), ph = wl.length * 48 + 44, pt = H - 196 - ph;
+  const wl = wrapLines(x, wit, W - 320), ph = wl.length * 48 + 44;
+  const pt = Math.max(y + 26, H - 196 - ph);
   x.fillStyle = '#E6DCFF'; roundRect(x, 120, pt, W - 240, ph, 30); x.fill();
   x.fillStyle = '#6A3FD0';
   wl.forEach((ln, i) => x.fillText(ln, W / 2, pt + 52 + i * 48));
@@ -1359,9 +1362,14 @@ document.addEventListener('click', e => {
     try { navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]); copied = true; } catch (err) {}
     const u = URL.createObjectURL(blob), a = document.createElement('a');
     a.href = u; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(u), 4000);
-    shareNote(b, copied ? 'התמונה הועתקה וגם נשמרה. בוואטסאפ שנפתח — הדביקו אותה (⌘V).' : 'התמונה נשמרה אצלכם. גררו אותה לוואטסאפ שנפתח.');
+    shareNote(b, copied
+      ? '📋 התמונה הועתקה (וגם נשמרה אצלכם). בוואטסאפ שנפתח: בחרו צ׳אט והדביקו ⌘V — ורק אז שלחו.'
+      : '💾 התמונה נשמרה אצלכם. גררו אותה לתוך הצ׳אט בוואטסאפ שנפתח.');
   }
-  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+  // WhatsApp on a Mac mangles emoji that arrive through a wa.me link — they land as ◆ —
+  // so the words go over plain and the picture carries the emoji.
+  const plain = msg.replace(/\p{Extended_Pictographic}️?/gu, '').replace(/[ \t]{2,}/g, ' ').split('\n').map(l => l.trim()).join('\n');
+  window.open('https://wa.me/?text=' + encodeURIComponent(plain), '_blank', 'noopener');
 });
 function tick() { // tiny click as a slice passes the pointer
   if (!sfxOn) return;
