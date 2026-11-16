@@ -688,8 +688,14 @@ function home() {
 }
 
 /* ---------- cloud: parent accounts (Google) and kid links ---------- */
-// Firebase web config. Empty until the project is created; then parents can sign in on the yaella site.
-const FIREBASE = null;
+const FIREBASE = { // public web config of the "english-ready" Firebase project (safe to publish; access is guarded by firestore.rules)
+  apiKey: 'AIzaSyAcTQbubrzwcSn8H8GZ9n7p3VyqaEisuNk',
+  authDomain: 'english-ready-dca3c.firebaseapp.com',
+  projectId: 'english-ready-dca3c',
+  storageBucket: 'english-ready-dca3c.firebasestorage.app',
+  messagingSenderId: '688090057705',
+  appId: '1:688090057705:web:e5fd50983913f355f49978',
+};
 const DEMO = /[?&]demo\b/.test(location.search) && /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 const CLOUD_OK = DEMO || (!!FIREBASE && /(^|\.)github\.io$|^localhost$|^127\.0\.0\.1$/.test(location.hostname));
 const PACKS = [
