@@ -346,6 +346,25 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .locknote{margin:0;font-size:15px;color:#E6DEFF}
 .spinbig.gohome{font-size:clamp(20px,5.5vw,24px);letter-spacing:0;animation:none}
 .wlabel.hint{font-family:var(--f-body);font-weight:600;font-size:clamp(16px,4.5vw,19px);direction:rtl}
+.sharebtn{background:#25D366;color:#fff;border-color:transparent;box-shadow:0 4px 0 #128C4B!important;font-size:17px;margin-top:6px;text-decoration:none}
+.sharenote{margin:0;font-size:13px;color:#5B4A99}
+.prize .hebtn{margin-top:4px}
+.prize .hebubble{background:#F3EEFF;border-color:#D9CCFF;color:#2A0F86}
+.winov{position:fixed;inset:0;z-index:70;display:grid;place-items:center;padding:16px;background:rgba(20,8,60,.55);backdrop-filter:blur(3px);animation:fadein .3s ease both}
+.winov.out{animation:fadeout .25s ease both}
+@keyframes fadein{from{opacity:0}to{opacity:1}} @keyframes fadeout{to{opacity:0}}
+.winconf{position:fixed;inset:0;pointer-events:none}
+.wincard{position:relative;width:min(420px,100%);display:grid;justify-items:center;gap:6px;text-align:center;background:#fff;color:#2A0F86;border-radius:28px;padding:22px 20px 18px;box-shadow:0 0 0 6px #FFD23F,0 20px 60px rgba(0,0,0,.4)}
+.wtitle{margin:0;font:700 clamp(28px,8vw,40px)/1 var(--f-display);color:#FF3B6B}
+.wemoji{font-size:96px;line-height:1}
+.wemoji .ji{height:110px;filter:drop-shadow(0 10px 14px rgba(40,30,80,.25))}
+.wincard.ready .wemoji .ji,.winov.ready .wemoji .ji{animation:floaty 3s ease-in-out infinite}
+.wtext{margin:0;font:700 clamp(24px,7vw,32px)/1.2 var(--f-en);text-wrap:balance}
+.wdetails{display:grid;gap:8px;justify-items:center;width:100%;opacity:0;transform:translateY(10px);transition:opacity .4s ease,transform .4s var(--ease);pointer-events:none}
+.winov.ready .wdetails{opacity:1;transform:none;pointer-events:auto}
+.wclose{min-height:44px;font-size:15px}
+.wincard .hebubble{background:#F3EEFF;border-color:#D9CCFF;color:#2A0F86}
+@media (prefers-reduced-motion:reduce){.winov,.winov.out{animation:none}}
 /* story */
 .story{padding:16px;margin-bottom:14px}
 .sthead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
@@ -708,6 +727,15 @@ function illImage(g) { const u = illUrl(g); if (!u) return null; if (!illImg[u])
 
 /* ---------- progress (this device only) ---------- */
 const KEY = 'english-ready-v1';
+const PRIZE_HE = {
+  'Watch "The Next Star"': 'לראות את "הכוכב הבא"',
+  'Watch "The Masked Singer"': 'לראות את "הזמר במסכה"',
+  'A card game with Mom and Dad': 'משחק קלפים עם אמא ואבא',
+  'A candy of your choice': 'ממתק לבחירתך',
+  'Ping-pong with Mom or Dad': 'פינג פונג עם אמא או אבא',
+  'A snack': 'חטיף',
+  '30 more minutes of screen time': 'עוד 30 דקות מסך',
+};
 const DEFAULT_PRIZES = [
   'Watch "The Next Star" 🌟',
   'Watch "The Masked Singer" 🎭',
@@ -790,11 +818,11 @@ function go(fn, ...a) {
 const top = (title, back = 'home', extra = '') =>
   `<div class="qtop"><button class="btn icon" data-back="${back}" aria-label="חזרה">→</button><div class="ttl">${title}</div>${extra}</div>`;
 
-app.addEventListener('click', e => {
+document.addEventListener('click', e => {
   const s = e.target.closest('[data-say]');
   if (s) { say(s.dataset.say, !!s.dataset.slow); }
   const h = e.target.closest('[data-he]');
-  if (h) { const n = h.closest('.qtools') ? h.closest('.qtools').nextElementSibling : h.nextElementSibling; n.hidden = !n.hidden; h.setAttribute('aria-expanded', String(!n.hidden)); const lb = h.querySelector('.helab'); if (lb) lb.textContent = n.hidden ? 'תרגום לעברית' : 'הסתרת התרגום'; }
+  if (h) { const n = h.closest('.qtools') ? h.closest('.qtools').nextElementSibling : h.nextElementSibling; n.hidden = !n.hidden; h.setAttribute('aria-expanded', String(!n.hidden)); const lb = h.querySelector('.helab'); if (lb) lb.textContent = n.hidden ? (h.closest('.prize') ? 'מה זה בעברית?' : 'תרגום לעברית') : 'הסתרת התרגום'; }
   const b = e.target.closest('[data-back]');
   if (b) { const t = b.dataset.back; if (t === 'preview' && backTo) { const f = backTo; backTo = null; go(f); return; } go(t === 'abc' ? abcGrid : t === 'pdash' ? parentCloud : home); }
 });
@@ -1040,7 +1068,7 @@ function kidSettings(A, u, k) {
       </div>
       <h2>גלגל ההפתעות</h2>
       <div class="seg" role="group" aria-label="גלגל ההפתעות"><button type="button" data-wh="1" class="${st.wheel ? 'on' : ''}">🎡 פעיל</button><button type="button" data-wh="0" class="${st.wheel ? '' : 'on'}">כבוי: רק כוכבים</button></div>
-      <p class="hint">הפתעה אחת בכל שורה, באנגלית. בכל הגעה ליעד הוא מקבל סיבוב.</p>
+      <p class="hint">הפתעה אחת בכל שורה, באנגלית. בכל הגעה ליעד הוא מקבל סיבוב. אפשר להוסיף תרגום לעברית אחרי קו: <span class="en" dir="ltr">A pizza night 🍕 | ערב פיצה</span></p>
       <textarea id="pz" rows="7" class="en ptext-in">${esc(st.prizes.join('\n'))}</textarea>
       <button type="button" class="btn" id="wtry">🎡 נסו את הגלגל</button>
       <h2>שם</h2>
@@ -1052,7 +1080,7 @@ function kidSettings(A, u, k) {
       <p>היום: ⭐ ${p.td && p.td.date === today() ? p.td.stars : 0} · ⏱ ${p.td && p.td.date === today() ? Math.floor(p.td.ms / 60000) : 0} דקות · ימי תרגול: ${(p.days || []).length} · סך הכול ⭐ ${p.stars || 0}</p>
       ${m ? `<p>מבחן ניסיון אחרון (${m.date.split('-').slice(1).reverse().join('.')}): <b>${m.score}/${m.n}</b></p>${secTable(m.secs).replace(/<button[^>]*>לתרגל<\/button>/g, '')}` : '<p class="hint">עוד לא עשה מבחן ניסיון.</p>'}
       <h3>זכיות בגלגל</h3>
-      ${(p.wins || []).length ? `<ul class="wins">${p.wins.slice(0, 15).map(w => `<li><span class="en">${esc(w.prize)}</span> · ${w.date.split('-').slice(1).reverse().join('.')}</li>`).join('')}</ul>` : '<p class="hint">עוד אין.</p>'}
+      ${(p.wins || []).length ? `<ul class="wins">${p.wins.slice(0, 15).map(w => `<li><span class="en">${esc(enPart(w.prize))}</span> · ${w.date.split('-').slice(1).reverse().join('.')}</li>`).join('')}</ul>` : '<p class="hint">עוד אין.</p>'}
     </section>
     <section class="stk pbox danger">
       <h3>מחיקת הילד</h3>
@@ -1104,7 +1132,7 @@ function progressView() {
     <section class="stk pbox">
       <h2>השיאים שלי בתרגול</h2>
       <ul class="bests">${MODS.filter(m => st.best[m.id] != null).map(m => `<li>${m.t}: <b>${st.best[m.id]}%</b></li>`).join('') || '<li class="hint">עוד אין.</li>'}</ul>
-      ${(st.wins || []).length ? `<h3>מה זכיתי בגלגל</h3><ul class="wins">${st.wins.slice(0, 10).map(w => `<li><span class="en">${esc(w.prize)}</span> · ${fmt(w.date)}</li>`).join('')}</ul>` : ''}
+      ${(st.wins || []).length ? `<h3>מה זכיתי בגלגל</h3><ul class="wins">${st.wins.slice(0, 10).map(w => `<li><span class="en">${esc(enPart(w.prize))}</span> · ${fmt(w.date)}</li>`).join('')}</ul>` : ''}
     </section>`;
   $$('[data-practice]', app).forEach(b => b.onclick = () => MODS.find(m => m.id === b.dataset.practice).run());
 }
@@ -1114,8 +1142,10 @@ function progressView() {
 // and a live label under the pointer. The stage keeps its own fixed colours in both themes on purpose.
 const WHEEL_SLICES = ['#FF5D8F', '#FFB020', '#22C3A6', '#4D8DFF', '#A66BFF', '#FF7A3D', '#16B8D9', '#F25CC0', '#7ED957', '#FFD23F', '#5C6BFF', '#FF4D6D'];
 let backTo = null; // where the back button goes from a preview
-const emojiOf = t => (t.match(/\p{Extended_Pictographic}️?/gu) || ['🎁']).pop();
-const textOf = t => t.replace(/\p{Extended_Pictographic}️?/gu, '').trim();
+const enPart = t => String(t).split('|')[0];
+const emojiOf = t => (enPart(t).match(/\p{Extended_Pictographic}\uFE0F?/gu) || ['🎁']).pop();
+const textOf = t => enPart(t).replace(/\p{Extended_Pictographic}\uFE0F?/gu, '').trim();
+const heOf = t => (String(t).split('|')[1] || '').trim() || PRIZE_HE[textOf(t)] || '';
 function tick() { // tiny click as a slice passes the pointer
   if (!sfxOn) return;
   try {
@@ -1257,6 +1287,46 @@ function wheelView(preview) {
     requestAnimationFrame(step);
   }
 
+  // the win flies out of the winning slice, spins and grows into the middle of the screen, with confetti
+  function showWin(pz, details) {
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const ov = document.createElement('div');
+    ov.className = 'winov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-label', 'זכית!');
+    ov.innerHTML = `<canvas class="winconf" aria-hidden="true"></canvas>
+      <div class="wincard">
+        <p class="en wtitle">You won!</p>
+        <div class="wemoji">${emojiOf(pz)}</div>
+        <p class="en wtext">${esc(textOf(pz))}</p>
+        <div class="wdetails">${details}<button class="btn wclose" id="wclose">סגירה</button></div>
+      </div>`;
+    document.body.appendChild(ov);
+    const card = ov.querySelector('.wincard'), r = cv.getBoundingClientRect();
+    const sx = r.left + r.width / 2, sy = r.top + r.height * 0.18; // the slice under the pointer
+    const cr = card.getBoundingClientRect(), dx = sx - (cr.left + cr.width / 2), dy = sy - (cr.top + cr.height / 2);
+    const close = () => { ov.classList.add('out'); setTimeout(() => ov.remove(), 250); document.removeEventListener('keydown', esc_); };
+    const esc_ = e => { if (e.key === 'Escape') close(); };
+    ov.querySelector('#wclose').onclick = close;
+    ov.addEventListener('click', e => { if (e.target === ov) close(); });
+    document.addEventListener('keydown', esc_);
+    if (reduce || !card.animate) { ov.classList.add('ready'); return; }
+    card.animate([
+      { transform: `translate(${dx}px,${dy}px) scale(.12) rotate(-540deg)`, opacity: 0 },
+      { transform: `translate(${dx * 0.3}px,${dy * 0.3}px) scale(.8) rotate(-120deg)`, opacity: 1, offset: .6 },
+      { transform: 'translate(0,0) scale(1.08) rotate(6deg)', offset: .85 },
+      { transform: 'translate(0,0) scale(1) rotate(0)' },
+    ], { duration: 1100, easing: 'cubic-bezier(.2,.8,.2,1)' }).onfinish = () => { ov.classList.add('ready'); };
+    // full-screen confetti
+    const c = ov.querySelector('.winconf'), x = c.getContext('2d'), dpr_ = Math.min(window.devicePixelRatio || 1, 2);
+    const W_ = window.innerWidth, H_ = window.innerHeight; c.width = W_ * dpr_; c.height = H_ * dpr_; c.style.width = W_ + 'px'; c.style.height = H_ + 'px'; x.setTransform(dpr_, 0, 0, dpr_, 0, 0);
+    const cols = ['#FF5D8F', '#FFB020', '#22C3A6', '#4D8DFF', '#A66BFF', '#FFD23F', '#ffffff'];
+    const bits = [...Array(160)].map((_, i) => ({ x: W_ / 2 + (Math.random() - .5) * 80, y: H_ / 2, vx: (Math.random() - .5) * 16, vy: -Math.random() * 16 - 4, r: Math.random() * 6, vr: (Math.random() - .5) * .4, w: 6 + Math.random() * 6, h: 9 + Math.random() * 8, c: cols[i % cols.length], d: 700 + Math.random() * 300 }));
+    const t0 = performance.now();
+    setTimeout(() => {
+      const st_ = t => { x.clearRect(0, 0, W_, H_); for (const b of bits) { b.x += b.vx; b.y += b.vy; b.vy += .32; b.vx *= .99; b.r += b.vr; x.save(); x.translate(b.x, b.y); x.rotate(b.r); x.fillStyle = b.c; x.fillRect(-b.w / 2, -b.h / 2, b.w, b.h); x.restore(); }
+        if (t - t0 < 3600 && document.body.contains(c)) requestAnimationFrame(st_); else x.clearRect(0, 0, W_, H_); };
+      requestAnimationFrame(st_);
+    }, 650);
+  }
   const gh = $('#gohome'); if (gh) gh.onclick = () => go(home);
   if (!$('#go')) return;
   $('#go').onclick = () => {
@@ -1276,8 +1346,16 @@ function wheelView(preview) {
       spinning = false;
       let g2 = { avail: 1 };
       if (!preview) { const s2 = load(); day(s2).spins++; s2.wins.unshift({ date: today(), prize: prizes[win] }); s2.wins = s2.wins.slice(0, 60); save(s2); g2 = goalState(s2); }
-      $('#prize').innerHTML = `<div class="prize"><p class="en pwin">You won!</p><p class="pemoji">${emojiOf(prizes[win])}</p><p class="en ptext">${esc(textOf(prizes[win]))}</p><p class="pnote">כל הכבוד! 🎉 תראה את זה לאמא או לאבא</p></div>`;
-      confetti(); sfx('win'); setTimeout(() => say(textOf(prizes[win])), 600);
+      const pz = prizes[win], he = heOf(pz), who = KID && KID.name ? KID.name : '';
+      const msg = `אמא ואבא! ${who ? who + ' כאן. ' : ''}זכיתי בגלגל ההפתעות 🎉\n${emojiOf(pz)} ${textOf(pz)}${he ? `\n(${he})` : ''}\nאתם חייבים לי 😄`;
+      const details = `
+        ${he ? `<button class="hebtn" data-he aria-expanded="false"><span class="heicon" aria-hidden="true">א</span><span class="helab">מה זה בעברית?</span></button><p class="hebubble" hidden>${esc(he)}</p>` : ''}
+        <a class="btn sharebtn" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(msg)}">📤 שלח לאמא ולאבא</a>
+        <p class="sharenote">נפתח וואטסאפ עם ההודעה. בחר את קבוצת המשפחה ולחץ שליחה.</p>`;
+      // small summary that stays under the wheel
+      $('#prize').innerHTML = `<div class="prize"><p class="en pwin">You won!</p><p class="pemoji">${emojiOf(pz)}</p><p class="en ptext">${esc(textOf(pz))}</p>${details}</div>`;
+      showWin(pz, details);
+      sfx('win'); setTimeout(() => say(textOf(prizes[win])), 600);
       const b = $('#go'); b.disabled = g2.avail < 1; b.innerHTML = preview ? 'AGAIN!' : g2.avail ? `AGAIN! <small>×${g2.avail}</small>` : 'SPIN!';
     }
     requestAnimationFrame(frame);
@@ -1315,14 +1393,14 @@ function parentSettings() {
       <div class="seg" role="group" aria-label="רמת מבחן">${Object.keys(LEVELS).map(k => `<button type="button" data-tl="${k}" class="${(st.testLevel || 'medium') === k ? 'on' : ''}">${LEVELS[k]}</button>`).join('')}</div>
       <p class="hint">קל: 3 תשובות לבחירה ותרגום לעברית בסיפורים. בינוני: כמו במבחן. קשה: איות מילים, אות חסרה במילה, "מה בא אחרי" וסיפורים ארוכים יותר. אחרי סבב של 90% ומעלה הוא יכול לעלות רמה בעצמו.</p>
       <h3>ההפתעות בגלגל</h3>
-      <p class="hint">הפתעה אחת בכל שורה, באנגלית. אפשר להוסיף אימוג׳י בסוף.</p>
+      <p class="hint">הפתעה אחת בכל שורה, באנגלית. אפשר להוסיף אימוג׳י, ותרגום לעברית אחרי קו: <span class="en" dir="ltr">A pizza night 🍕 | ערב פיצה</span></p>
       <textarea id="pz" rows="8" class="en ptext-in">${esc(st.prizes.join('\n'))}</textarea>
       <button type="button" class="btn" id="wtry">🎡 נסו את הגלגל</button>
       <div class="row"><button class="btn primary" id="psave">שמירה</button><span id="pok" class="chip" hidden>נשמר ✓</span></div>
       <h2>היום</h2>
       <p>⭐ ${G.d.stars} כוכבים · ⏱ ${G.mins} דקות · 🎡 ${G.d.spins} סיבובים נוצלו${G.avail ? ` · ${G.avail} מחכים` : ''}</p>
       <h2>מה הוא זכה</h2>
-      ${st.wins.length ? `<ul class="wins">${st.wins.slice(0, 20).map(w => `<li><span class="en">${esc(w.prize)}</span> · ${w.date.split('-').slice(1).reverse().join('.')}</li>`).join('')}</ul>` : '<p class="hint">עוד אין זכיות.</p>'}
+      ${st.wins.length ? `<ul class="wins">${st.wins.slice(0, 20).map(w => `<li><span class="en">${esc(enPart(w.prize))}</span> · ${w.date.split('-').slice(1).reverse().join('.')}</li>`).join('')}</ul>` : '<p class="hint">עוד אין זכיות.</p>'}
       <p class="hint">הכול נשמר רק במכשיר הזה.</p>
     </section>`;
   let gt = st.goal.type, wh = st.wheel, pl = st.level || 'medium', tl = st.testLevel || 'medium';
@@ -2119,7 +2197,7 @@ function writeView() {
 window.speechTexts = () => [...new Set([
   ...Object.values(NAME), ...WORDS.map(w => w.w), ...SENTENCES.map(x => x.s),
   ...STORIES.flatMap(st => st.x), ...STORIES.flatMap(st => st.q.map(q => q[0])), ...NW.slice(1),
-  ...DEFAULT_PRIZES.map(t => t.replace(/\p{Extended_Pictographic}\uFE0F?/gu, '').trim()),
+  ...DEFAULT_PRIZES.map(textOf),
 ])];
 sfxButton();
 const QS = new URLSearchParams(location.search);
