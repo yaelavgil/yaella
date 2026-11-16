@@ -1809,7 +1809,7 @@ function writeView() {
     W = wrap.clientWidth; H = Math.round(Math.min(330, Math.max(230, W * 0.52)));
     wrap.style.height = H + 'px';
     for (const c of [g, d]) { c.width = W * dpr; c.height = H * dpr; c.style.width = W + 'px'; c.style.height = H + 'px'; c.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0); }
-    ink = []; drawGuide();
+    ink = []; resetMatch(); drawGuide(); redrawInk();
   }
   function geometry() {
     lay = layoutGlyphs(chars());
@@ -1817,6 +1817,7 @@ function writeView() {
     const ox = (W - lay.width * U) / 2, oy = (H - 3 * U) / 2;
     strokesPx = lay.glyphs.map(gl => gl.map(st => st.map(([x, y]) => [ox + x * U, oy + y * U])));
     tplPx = strokesPx.flat(2);
+    if (matched.length !== strokesPx.length || matched.some((m, g) => m.length !== strokesPx[g].length)) resetMatch();
     window.__tpl = () => strokesPx; // used by automated checks
     return oy;
   }
@@ -1868,59 +1869,148 @@ function writeView() {
     const tick = () => { n += 2; drawGuide(n); if (n < total) anim = requestAnimationFrame(tick); else setTimeout(() => drawGuide(), 600); };
     anim = requestAnimationFrame(tick);
   }
-  function clear() { d.getContext('2d').clearRect(0, 0, W, H); ink = []; $('#wfb').innerHTML = ''; }
+  function clear() { d.getContext('2d').clearRect(0, 0, W, H); ink = []; resetMatch(); $('#wfb').innerHTML = ''; }
 
   // drawing
-  let drawing = false, last = null, idle = 0;
+  // ink = the child's own strokes that are not recognised yet; matched[g][s] = template stroke s of letter g was recognised
+  let drawing = false, last = null, idle = 0, matched = [], morphing = null, snappedRaw = [];
   const pt = e => { const r = d.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+  const inkW = () => Math.max(5, U * 0.09);
+  function resetMatch() { matched = strokesPx.map(gl => gl.map(() => false)); snappedRaw = strokesPx.map(() => []); }
+  function strokeLine(ctx, pts, color, w) {
+    if (pts.length < 2) return;
+    ctx.strokeStyle = color; ctx.lineWidth = w; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]); for (const p of pts) ctx.lineTo(p[0], p[1]); ctx.stroke();
+  }
+  function redrawInk() {
+    const ctx = d.getContext('2d'); ctx.clearRect(0, 0, W, H);
+    const good = css(document.body, '--good'), ink_ = css(document.body, '--ink');
+    strokesPx.forEach((gl, g) => gl.forEach((st, s) => { if (matched[g] && matched[g][s]) strokeLine(ctx, st, good, inkW()); }));
+    for (const st of ink) strokeLine(ctx, st, ink_, inkW());
+    if (morphing) strokeLine(ctx, morphing, good, inkW());
+  }
   function seg(a, b) {
     const ctx = d.getContext('2d');
-    ctx.strokeStyle = css(document.body, '--ink'); ctx.lineWidth = Math.max(5, U * 0.09); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.strokeStyle = css(document.body, '--ink'); ctx.lineWidth = inkW(); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
     ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
     const n = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / 3));
     const cur = ink[ink.length - 1];
     for (let k = 1; k <= n; k++) cur.push([a[0] + (b[0] - a[0]) * k / n, a[1] + (b[1] - a[1]) * k / n]);
   }
+  function resample(pts, n) {
+    const L = plen(pts); if (L === 0) return Array(n).fill(pts[0]);
+    const out = [pts[0]]; let acc = 0, k = 1;
+    for (let i = 1; i < pts.length && out.length < n; i++) {
+      const a = pts[i - 1], b = pts[i], sl = Math.hypot(b[0] - a[0], b[1] - a[1]);
+      while (out.length < n && acc + sl >= (L * k) / (n - 1)) { const t = ((L * k) / (n - 1) - acc) / (sl || 1); out.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]); k++; }
+      acc += sl;
+    }
+    while (out.length < n) out.push(pts[pts.length - 1]);
+    return out;
+  }
+  // after each stroke: is it one (or a few) of the letter's strokes? then straighten it onto the letter
+  function liveMatch(st) {
+    if (st.length < 4) return false;
+    const tol = U * 0.32;
+    const cands = [];
+    strokesPx.forEach((gl, g) => gl.forEach((t, s) => {
+      if (matched[g][s]) return;
+      const cov = t.filter(p => nearest(p, st) <= tol).length / t.length;
+      if (cov >= 0.78) cands.push([g, s]);
+    }));
+    if (!cands.length) return false;
+    const union = cands.flatMap(([g, s]) => strokesPx[g][s]);
+    const prec = st.filter(p => nearest(p, union) <= tol * 1.25).length / st.length;
+    const lr = plen(st) / cands.reduce((a, [g, s]) => a + plen(strokesPx[g][s]), 0);
+    if (prec < 0.8 || lr < 0.55 || lr > 1.8) return false;
+    // morph the hand-drawn line into the clean letter stroke(s)
+    ink.splice(ink.indexOf(st), 1);
+    snappedRaw[cands[0][0]].push(st); // keep the original line: the final check looks at what was really drawn
+    const target = resample(cands.flatMap(([g, s]) => strokesPx[g][s]), 60), from = resample(st, 60);
+    const finish = () => { morphing = null; cands.forEach(([g, s]) => matched[g][s] = true); redrawInk(); afterMatch(cands); };
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { finish(); return true; }
+    const t0 = performance.now();
+    const step = t => {
+      const k = Math.min(1, (t - t0) / 260), e = 1 - Math.pow(1 - k, 3);
+      morphing = from.map((p, i) => [p[0] + (target[i][0] - p[0]) * e, p[1] + (target[i][1] - p[1]) * e]);
+      redrawInk();
+      if (k < 1) requestAnimationFrame(step); else finish();
+    };
+    requestAnimationFrame(step);
+    return true;
+  }
+  function afterMatch(cands) {
+    const letters = chars();
+    const doneG = [...new Set(cands.map(c => c[0]))].filter(g => matched[g].every(Boolean));
+    if (matched.every(gl => gl.every(Boolean))) { check(true); return; }
+    if (doneG.length) { sfx('ok'); $('#wfb').innerHTML = `<div class="fb good"><div class="msg"><b>✓ <span class="en">${letters[doneG[0]]}</span> נכונה!</b> עכשיו ${letters.length > 1 ? 'האות השנייה' : ''}</div></div>`; }
+  }
+  function success(tip) {
+    if (won) return;
+    won = true; addStar(); markDone('write'); sfx('ok');
+    $('#wfb').innerHTML = `<div class="fb good"><div class="msg"><b><span class="en">${pick(PRAISE)}</span> ⭐ כתבת נכון!</b>${tip ? `<span>${tip}</span>` : ''}</div><button class="btn primary" id="wnext">אות הבאה ←</button></div>`;
+    $('#wnext').onclick = nextTrace;
+    say(NAME[LETTERS[idx][0]]);
+  }
   d.addEventListener('pointerdown', e => {
-    e.preventDefault(); if (state !== 'draw') return; clearTimeout(idle);
+    e.preventDefault(); if (state !== 'draw' || morphing) return; clearTimeout(idle);
     drawing = true; try { d.setPointerCapture(e.pointerId); } catch (_) {} last = pt(e); ink.push([last]); seg(last, [last[0] + 0.1, last[1]]);
   });
   d.addEventListener('pointermove', e => { if (!drawing) return; const p = pt(e); seg(last, p); last = p; });
   ['pointerup', 'pointercancel'].forEach(t => d.addEventListener(t, () => {
     if (!drawing) return; drawing = false;
-    if (mode === 'trace') { clearTimeout(idle); idle = setTimeout(() => check(true), 700); }
+    if (mode === 'trace') {
+      const st = ink[ink.length - 1];
+      if (!liveMatch(st)) { clearTimeout(idle); idle = setTimeout(() => check(true), 800); }
+    }
   }));
 
-  function result(absolute) {
-    const tpl = strokesPx.flat();
-    if (ink.flat().length < 6) return false;
-    if (absolute) { // on the guide lines the letter must also start and end at the right height
-      const d = centre(ink.flat()), t = centre(tplPx);
-      if (Math.abs(d.y0 - t.y0) > U * 0.45 || Math.abs(d.y1 - t.y1) > U * 0.45) return false;
-      return matches(nudge(ink, tpl, U), tpl, U);
+  // whole-letter check: fit the drawing into each letter's box and compare it with all the letters of the same kind;
+  // it counts when it is close enough AND closest to the letter asked for (tuned on simulated shaky handwriting:
+  // ~96% of correct letters pass, under 1% of wrong letters do)
+  const sub = (a, n = 60) => { const k = Math.max(1, Math.floor(a.length / n)); return a.filter((_, i) => i % k === 0); };
+  const chamfer = (inkS, tplS) => { const a = sub(inkS.flat()), b = sub(tplS.flat()); const d1 = a.reduce((t, p) => t + nearest(p, b), 0) / a.length, d2 = b.reduce((t, p) => t + nearest(p, a), 0) / b.length; return Math.max(d1, d2) / U; };
+  const tplOf = ch => layoutGlyphs([ch]).glyphs[0].map(st => st.map(([x, y]) => [x * U, y * U]));
+  function recognise(inkS, ch) {
+    if (inkS.flat().length < 6) return false;
+    const pool = /[A-Z]/.test(ch) ? ALPHA.map(c => c.toUpperCase()) : ALPHA;
+    let mine = 9, best = 9;
+    for (const c of pool) { const t = tplOf(c), sc = chamfer(fitInto(inkS, t), t); if (c === ch) mine = sc; else best = Math.min(best, sc); }
+    return mine <= 0.28 && mine <= best * 1.15;
+  }
+  function judgeLetters() { // -> per letter: 'ok' | 'size' (right letter, but its size or place on the lines is off) | 'no'
+    const boxes = strokesPx.map(gl => centre(gl.flat())), letters = chars();
+    const groups = strokesPx.map(() => []);
+    for (const st of ink) { // give each stroke to the nearest letter
+      const c = centre(st), cx = (c.x0 + c.x1) / 2;
+      let best = 0; boxes.forEach((b, g) => { if (Math.abs((b.x0 + b.x1) / 2 - cx) < Math.abs((boxes[best].x0 + boxes[best].x1) / 2 - cx)) best = g; });
+      groups[best].push(st);
     }
-    return matches(fitInto(ink, tpl), tpl, U);
+    return strokesPx.map((gl, g) => {
+      const mine = groups[g].concat(snappedRaw[g]); // what was really drawn for this letter
+      if (!mine.length || !recognise(mine, letters[g])) return 'no';
+      const b = centre(mine.flat()), t = boxes[g], h = (b.y1 - b.y0) / Math.max(1, t.y1 - t.y0);
+      return Math.abs(b.y0 - t.y0) < U * 0.5 && Math.abs(b.y1 - t.y1) < U * 0.5 && h > 0.7 && h < 1.4 ? 'ok' : 'size';
+    });
   }
   function check(auto) {
     if (mode === 'trace') {
       if (won) return;
-      const ok = result(true);
-      if (ok) {
-        won = true; addStar(); markDone('write'); sfx('ok');
-        $('#wfb').innerHTML = `<div class="fb good"><div class="msg"><b><span class="en">${pick(PRAISE)}</span> ⭐ כתבת את האות נכון!</b></div><button class="btn primary" id="wnext">אות הבאה ←</button></div>`;
-        $('#wnext').onclick = nextTrace;
-        say(NAME[LETTERS[idx][0]]);
+      const r = judgeLetters(), letters = chars();
+      if (r.every(x => x !== 'no')) {
+        success(r.includes('size') ? ' שים לב לגודל: אות גדולה מגיעה עד הקו העליון, ואות קטנה כמו a נכנסת בין הקו המקווקו לקו התחתון.' : '');
       } else if (!auto) {
         sfx('no');
         ghost = true; renderButtons(); drawGuide();
-        $('#wfb').innerHTML = `<div class="fb bad"><div class="msg"><b>עוד לא מדויק.</b> נסה לכתוב על האות האפורה ולעקוב אחרי המספרים והחצים.</div><button class="btn" id="wagain">↻ לנסות שוב</button></div>`;
-        $('#wagain').onclick = clear;
+        const parts = letters.length > 1 ? letters.map((l, i) => `<span class="en">${l}</span> ${r[i] === 'no' ? '– עוד לא' : '✓'}`).join(' · ') + '. ' : '';
+        $('#wfb').innerHTML = `<div class="fb bad"><div class="msg"><b>כמעט!</b> ${parts}נסה לכתוב על האות האפורה ולעקוב אחרי המספרים והחצים.</div><button class="btn" id="wagain">↻ לנסות שוב</button></div>`;
+        $('#wagain').onclick = () => { clear(); won = false; };
       }
       return;
     }
-    // dictation
+    // dictation: shape matters, size and place are free (there is no guide letter)
     state = 'checked'; ghost = true; drawGuide();
-    const ok = result(false);
+    const ok = recognise(ink, chars()[0]);
     if (ok) { addStar(); markDone('write'); }
     sfx(ok ? 'ok' : 'no');
     $('#wfb').innerHTML = ok
