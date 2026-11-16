@@ -335,7 +335,15 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .optsay:hover{transform:scale(1.08)}
 .optsay:active{transform:scale(.92)}
 .optsay .ji{height:22px}
-.peekbtn{justify-self:start;font-size:15px;min-height:42px}
+.peekwheel{justify-self:center;display:grid;gap:8px;justify-items:center;background:none;border:0;padding:4px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .18s var(--ease)}
+.peekwheel:hover{transform:scale(1.05)}
+.peekwheel:active{transform:scale(.95)}
+.peekwheel .mw{width:clamp(132px,38vw,168px);height:auto;filter:drop-shadow(0 8px 14px rgba(40,20,80,.3))}
+.peekwheel .mwspin{transform-origin:50px 50px;animation:mwturn 26s linear infinite}
+@keyframes mwturn{to{transform:rotate(360deg)}}
+.peekwheel:hover .mwspin{animation-duration:6s}
+.pwcap{font:700 15px var(--f-display);color:var(--c3);background:#fff;border:2px solid var(--line);border-radius:99px;padding:5px 14px;box-shadow:0 2px 0 var(--shadow)}
+@media (prefers-reduced-motion:reduce){.peekwheel .mwspin{animation:none}}
 .locked{display:grid;gap:8px;justify-items:center;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.3);border-radius:22px;padding:14px 18px;width:100%;max-width:340px}
 .lockrow{display:flex;align-items:center;gap:8px;font:600 17px var(--f-display);color:#FFE9A8}
 .lockico .ji{height:26px}
@@ -429,6 +437,52 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
 }
+
+/* ---------------------------------------------------------------
+   Quieter chrome. Everything used to shout in the same voice — the
+   answer, the "read it to me" helper and the translation all had the
+   same thick border and hard drop shadow, so nothing led the eye.
+   Helpers are now flat tinted chips; the things you act on keep the
+   weight. Softer, shallower shadows throughout.
+   --------------------------------------------------------------- */
+.btn{border-width:1.5px;border-radius:13px;box-shadow:0 1px 1px rgba(31,42,68,.05),0 3px 8px rgba(31,42,68,.07)}
+.btn:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 2px rgba(31,42,68,.08)}
+.btn.primary{box-shadow:0 2px 4px rgba(28,100,200,.22),0 8px 18px rgba(28,100,200,.20)}
+.btn.primary:hover:not(:disabled){box-shadow:0 3px 6px rgba(28,100,200,.24),0 12px 24px rgba(28,100,200,.22)}
+.btn:disabled{opacity:.55}
+
+/* helper chips: present, but clearly secondary */
+.hebtn,.sthead .btn.sm,.sayrow .btn.sm,.qtools .btn.sm{
+  background:var(--t,#F1EEE6);color:var(--c,var(--ink));border:1px solid rgba(31,42,68,.10);
+  box-shadow:none;border-radius:999px;min-height:36px;font:600 14.5px var(--f-body)}
+.hebtn{padding:3px 14px 3px 5px;gap:7px}
+.sthead .btn.sm,.sayrow .btn.sm,.qtools .btn.sm{padding:4px 14px}
+.hebtn:hover,.sthead .btn.sm:hover,.sayrow .btn.sm:hover,.qtools .btn.sm:hover{filter:brightness(.96)}
+.hebtn:active,.sthead .btn.sm:active,.sayrow .btn.sm:active,.qtools .btn.sm:active{transform:translateY(1px);box-shadow:none}
+.heicon{width:24px;height:24px;background:rgba(255,255,255,.85);color:var(--c);font-size:13px}
+.hebtn[aria-expanded="true"]{background:var(--c);color:#fff;border-color:transparent}
+.hebtn[aria-expanded="true"] .heicon{background:rgba(255,255,255,.22);color:#fff}
+.hebubble{border-width:1.5px;box-shadow:0 2px 10px rgba(31,42,68,.06)}
+
+/* the same softening for the cards, so chips and cards belong to one set */
+.stk,.tile,.opt,.ab,.wrow{border-width:1.5px;box-shadow:0 1px 2px rgba(31,42,68,.05),0 4px 12px rgba(31,42,68,.07)}
+.opt{border-radius:15px}
+.opt.ok{box-shadow:0 1px 2px rgba(30,122,71,.15),0 4px 12px rgba(30,122,71,.18)}
+.btn:hover:not(:disabled),.tile:hover,.ab:hover,.wrow:hover,.opt:hover:not(:disabled){
+  transform:translateY(-2px);box-shadow:0 2px 4px rgba(31,42,68,.07),0 10px 22px rgba(31,42,68,.11)}
+.tile:active,.ab:active,.wrow:active,.opt:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 2px rgba(31,42,68,.08)}
+.hebtn:hover{transform:none}
+.blk{box-shadow:0 3px 10px rgba(0,0,0,.14)}
+.mbox{border-width:1.5px;box-shadow:0 10px 40px rgba(31,42,68,.18)}
+.wstage{border-width:1.5px;box-shadow:0 6px 24px rgba(40,20,80,.22)}
+.optsay{border-width:1.5px;box-shadow:0 1px 4px rgba(31,42,68,.10)}
+.sfxbtn{border-width:1.5px;box-shadow:0 2px 8px rgba(31,42,68,.12)}
+.pill{border-width:1.5px}
+
+/* the word the voice is on, while a sentence is read aloud */
+.en .wd{border-radius:5px;padding:0 1px;transition:background-color .12s linear,color .12s linear}
+.en .wd.on{background:#FFD23F;color:#1F2A44;box-shadow:0 0 0 2px #FFD23F}
+.sent.saying,.stx.saying{background:rgba(255,210,63,.13);border-radius:8px}
 </style>
 
 <div id="root" dir="rtl" lang="he"><main id="app"></main></div>
@@ -859,7 +913,8 @@ function home() {
     ${st.wheel
       ? (G.avail
         ? `<button class="btn spinbtn" id="spin">🎡 הגעת ליעד! סובב את גלגל ההפתעות${G.avail > 1 ? ` (${G.avail})` : ''}</button>`
-        : `<p class="gleft">נשארו עוד <b>${G.left} ${G.unit}</b> לגלגל ההפתעות 🎡</p><button class="btn peekbtn" id="peek">🎡 הצצה לגלגל</button>`)
+        : `<p class="gleft">נשארו עוד <b>${G.left} ${G.unit}</b> לגלגל ההפתעות</p>
+           <button type="button" class="peekwheel" id="peek" aria-label="הצצה לגלגל ההפתעות">${miniWheel((st.prizes || []).length)}<span class="pwcap">הצצה לגלגל</span></button>`)
       : (G.earned
         ? `<p class="gleft">🏆 <b>הגעת ליעד היומי!</b> כל הכבוד!${G.earned > 1 ? ` (${G.earned} פעמים)` : ''}</p>`
         : `<p class="gleft">נשארו עוד <b>${G.left} ${G.unit}</b> ליעד</p>`)}
@@ -1141,6 +1196,23 @@ function progressView() {
 // A game-show wheel: candy-coloured slices with one big upright emoji each, a gold rim with blinking bulbs,
 // and a live label under the pointer. The stage keeps its own fixed colours in both themes on purpose.
 const WHEEL_SLICES = ['#FF5D8F', '#FFB020', '#22C3A6', '#4D8DFF', '#A66BFF', '#FF7A3D', '#16B8D9', '#F25CC0', '#7ED957', '#FFD23F', '#5C6BFF', '#FF4D6D'];
+// a small drawing of the real wheel: same number of slices, same colours. Tapping it is the peek.
+function miniWheel(n) {
+  n = Math.max(2, n || 8);
+  const seg = 360 / n, pol = (a, r) => [50 + r * Math.cos((a - 90) * Math.PI / 180), 50 + r * Math.sin((a - 90) * Math.PI / 180)];
+  let slices = '';
+  for (let i = 0; i < n; i++) {
+    const a0 = i * seg, a1 = a0 + seg, [x0, y0] = pol(a0, 40), [x1, y1] = pol(a1, 40);
+    slices += `<path d="M50 50 L${x0.toFixed(2)} ${y0.toFixed(2)} A40 40 0 ${seg > 180 ? 1 : 0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)} Z" fill="${WHEEL_SLICES[i % WHEEL_SLICES.length]}"/>`;
+  }
+  return `<svg class="mw" viewBox="0 0 100 100" aria-hidden="true">
+    <circle cx="50" cy="50" r="47" fill="#2B1B63"/><circle cx="50" cy="50" r="44" fill="#FFD23F"/>
+    <g class="mwspin">${slices}</g>
+    ${[...Array(n)].map((_, i) => { const [bx, by] = pol(i * seg, 42); return `<circle cx="${bx.toFixed(2)}" cy="${by.toFixed(2)}" r="1.6" fill="#FFF3C4"/>`; }).join('')}
+    <circle cx="50" cy="50" r="10" fill="#fff"/><text x="50" y="54.5" text-anchor="middle" font-size="11">⭐</text>
+    <path d="M50 2 L56 13 L44 13 Z" fill="#fff" stroke="#2B1B63" stroke-width="1.5" stroke-linejoin="round"/>
+  </svg>`;
+}
 let backTo = null; // where the back button goes from a preview
 const enPart = t => String(t).split('|')[0];
 const emojiOf = t => (enPart(t).match(/\p{Extended_Pictographic}\uFE0F?/gu) || ['🎁']).pop();
@@ -1248,27 +1320,46 @@ async function winCardBlob(pz, at) {
   return new Promise(res => c.toBlob(res, 'image/png'));
 }
 
+// The picture is drawn the moment the kid wins, not when the button is tapped: both
+// navigator.share and opening a new tab need the browser's "the user just tapped" flag,
+// and an await in the click handler throws that flag away — which is why nothing opened.
 let lastWin = null;
-async function shareWin(btn) {
-  if (!lastWin) return;
-  const { pz, msg, at } = lastWin;
-  const was = btn.innerHTML; btn.disabled = true; btn.innerHTML = 'מכין את התמונה…';
-  let blob = null;
-  try { blob = await winCardBlob(pz, at); } catch (e) {}
-  btn.disabled = false; btn.innerHTML = was;
-  const name = `win-${winStamp(at || Date.now()).code}.png`;
-  const file = blob ? new File([blob], name, { type: 'image/png' }) : null;
-  if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-    try { await navigator.share({ files: [file], text: msg }); return; } catch (e) { if (e && e.name === 'AbortError') return; }
-  }
-  // no file sharing here (usually a desktop browser): save the picture, then open WhatsApp with the words
+const SHARE_LABEL = '📤 שלח לאמא ולאבא';
+function shareButtons() { return $$('[data-share]'); }
+function prepWin(pz, msg, at) {
+  const mine = lastWin = { pz, msg, at, blob: null, name: `win-${winStamp(at).code}.png` };
+  winCardBlob(pz, at).then(b => {
+    if (lastWin !== mine) return;
+    mine.blob = b;
+    for (const el of shareButtons()) { el.disabled = false; el.innerHTML = SHARE_LABEL; }
+  }).catch(() => { for (const el of shareButtons()) { el.disabled = false; el.innerHTML = SHARE_LABEL; } });
+}
+function shareNote(btn, txt) {
+  const n = btn.parentElement && btn.parentElement.querySelector('.sharenote');
+  if (n) n.textContent = txt;
+}
+// every step below runs straight away inside the tap — nothing is awaited before share/open
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-share]');
+  if (!b || !lastWin) return;
+  e.preventDefault();
+  const { blob, name, msg } = lastWin;
   if (blob) {
+    const file = new File([blob], name, { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      // phones: the system share sheet hands the picture to the WhatsApp app itself
+      navigator.share({ files: [file], text: msg }).catch(() => {});
+      return;
+    }
+    // desktop: no browser here can hand a file to WhatsApp, so copy the picture and let them paste it
+    let copied = false;
+    try { navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]); copied = true; } catch (err) {}
     const u = URL.createObjectURL(blob), a = document.createElement('a');
     a.href = u; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(u), 4000);
+    shareNote(b, copied ? 'התמונה הועתקה וגם נשמרה. בוואטסאפ שנפתח — הדביקו אותה (⌘V).' : 'התמונה נשמרה אצלכם. גררו אותה לוואטסאפ שנפתח.');
   }
   window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
-}
-document.addEventListener('click', e => { const b = e.target.closest('[data-share]'); if (b) { e.preventDefault(); shareWin(b); } });
+});
 function tick() { // tiny click as a slice passes the pointer
   if (!sfxOn) return;
   try {
@@ -1471,14 +1562,14 @@ function wheelView(preview) {
       if (!preview) { const s2 = load(); day(s2).spins++; s2.wins.unshift({ date: today(), prize: prizes[win] }); s2.wins = s2.wins.slice(0, 60); save(s2); g2 = goalState(s2); }
       const pz = prizes[win], he = heOf(pz), who = KID && KID.name ? KID.name : '';
       const msg = `אמא ואבא! ${who ? who + ' כאן. ' : ''}זכיתי בגלגל ההפתעות 🎉\n${emojiOf(pz)} ${textOf(pz)}${he ? `\n(${he})` : ''}\nאתם חייבים לי 😄`;
-      lastWin = { pz, msg, at: Date.now() };
       const details = `
         ${he ? `<button class="hebtn" data-he aria-expanded="false"><span class="heicon" aria-hidden="true">א</span><span class="helab">מה זה בעברית?</span></button><p class="hebubble" hidden>${esc(he)}</p>` : ''}
-        <button type="button" class="btn sharebtn" data-share>📤 שלח לאמא ולאבא</button>
+        <button type="button" class="btn sharebtn" data-share disabled>מכין את התמונה…</button>
         <p class="sharenote">נשלחת תמונה מעוצבת של הזכייה. בחר וואטסאפ, ואז את הצ׳אט.</p>`;
       // small summary that stays under the wheel
       $('#prize').innerHTML = `<div class="prize"><p class="en pwin">You won!</p><p class="pemoji">${emojiOf(pz)}</p><p class="en ptext">${esc(textOf(pz))}</p>${details}</div>`;
       showWin(pz, details);
+      prepWin(pz, msg, Date.now()); // after the buttons exist, so they can be switched on when the picture is ready
       sfx('win'); setTimeout(() => say(textOf(prizes[win])), 600);
       const b = $('#go'); b.disabled = g2.avail < 1; b.innerHTML = preview ? 'AGAIN!' : g2.avail ? `AGAIN! <small>×${g2.avail}</small>` : 'SPIN!';
     }
@@ -2043,7 +2134,7 @@ function writeView() {
     W = wrap.clientWidth; H = Math.round(Math.min(330, Math.max(230, W * 0.52)));
     wrap.style.height = H + 'px';
     for (const c of [g, d]) { c.width = W * dpr; c.height = H * dpr; c.style.width = W + 'px'; c.style.height = H + 'px'; c.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0); }
-    ink = []; resetMatch(); drawGuide(); redrawInk();
+    ink = []; resetMatch(); hist = []; refreshUndo(); drawGuide(); redrawInk();
   }
   function geometry() {
     lay = layoutGlyphs(chars());
@@ -2103,11 +2194,24 @@ function writeView() {
     const tick = () => { n += 2; drawGuide(n); if (n < total) anim = requestAnimationFrame(tick); else setTimeout(() => drawGuide(), 600); };
     anim = requestAnimationFrame(tick);
   }
-  function clear() { d.getContext('2d').clearRect(0, 0, W, H); ink = []; resetMatch(); $('#wfb').innerHTML = ''; }
+  function clear() { d.getContext('2d').clearRect(0, 0, W, H); ink = []; resetMatch(); hist = []; refreshUndo(); $('#wfb').innerHTML = ''; }
 
   // drawing
   // ink = the child's own strokes that are not recognised yet; matched[g][s] = template stroke s of letter g was recognised
   let drawing = false, last = null, idle = 0, matched = [], morphing = null, snappedRaw = [];
+  // undo: a snapshot taken before each stroke, so one tap takes back the last stroke
+  // instead of wiping the whole letter. Snapshots are taken before the stroke is drawn,
+  // so whatever recognising it triggers afterwards is undone with it.
+  let hist = [];
+  const snapshot = () => { hist.push({ ink: ink.map(s => s.slice()), matched: matched.map(g => g.slice()) }); if (hist.length > 40) hist.shift(); refreshUndo(); };
+  function refreshUndo() { const u = $('#und'); if (u) u.disabled = !hist.length; }
+  function undo() {
+    const h = hist.pop(); if (!h) return;
+    clearTimeout(idle); morphing = null; drawing = false;
+    ink = h.ink; matched = h.matched;
+    const fb = $('#wfb'); if (fb) fb.innerHTML = '';
+    redrawInk(); refreshUndo();
+  }
   const pt = e => { const r = d.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
   const inkW = () => Math.max(5, U * 0.09);
   function resetMatch() { matched = strokesPx.map(gl => gl.map(() => false)); snappedRaw = strokesPx.map(() => []); }
@@ -2188,6 +2292,7 @@ function writeView() {
   }
   d.addEventListener('pointerdown', e => {
     e.preventDefault(); if (state !== 'draw' || morphing) return; clearTimeout(idle);
+    snapshot();
     drawing = true; try { d.setPointerCapture(e.pointerId); } catch (_) {} last = pt(e); ink.push([last]); seg(last, [last[0] + 0.1, last[1]]);
   });
   d.addEventListener('pointermove', e => { if (!drawing) return; const p = pt(e); seg(last, p); last = p; });
@@ -2260,7 +2365,8 @@ function writeView() {
   function renderButtons(ok) {
     const wb = $('#wb');
     if (mode === 'trace') {
-      wb.innerHTML = `<button class="btn" id="clr">🧽 נקה</button>
+      wb.innerHTML = `<button class="btn" id="und">↶ אחורה</button>
+        <button class="btn" id="clr">🧽 נקה</button>
         <button class="btn" id="demo">▶ איך כותבים</button>
         <button class="btn" id="gh">${ghost ? 'הסתר דוגמה' : 'הצג דוגמה'}</button>
         <button class="btn" id="chk">✓ בדוק אותי</button>
@@ -2270,7 +2376,7 @@ function writeView() {
       $('#chk').onclick = () => check(false);
       $('#nxt').onclick = nextTrace;
     } else if (state === 'draw') {
-      wb.innerHTML = `<button class="btn" id="clr">🧽 נקה</button><button class="btn primary" id="chk">✓ בדוק אותי</button>`;
+      wb.innerHTML = `<button class="btn" id="und">↶ אחורה</button><button class="btn" id="clr">🧽 נקה</button><button class="btn primary" id="chk">✓ בדוק אותי</button>`;
       $('#chk').onclick = () => check(false);
     } else {
       wb.innerHTML = `<button class="btn" id="retry">↻ לנסות שוב</button><button class="btn" id="demo">▶ איך כותבים</button><button class="btn primary" id="nx">אות הבאה ←</button>`;
@@ -2279,6 +2385,7 @@ function writeView() {
       $('#nx').onclick = () => { newDict(); clear(); render(); say(NAME[LETTERS[dict.i][0]]); };
     }
     const c = $('#clr'); if (c) c.onclick = () => { clear(); won = false; };
+    const u = $('#und'); if (u) { u.onclick = () => { undo(); won = false; }; u.disabled = !hist.length; }
   }
   function render() {
     $$('.seg [data-mode]', app).forEach(b => b.classList.toggle('on', b.dataset.mode === mode));
