@@ -335,6 +335,16 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .optsay:hover{transform:scale(1.08)}
 .optsay:active{transform:scale(.92)}
 .optsay .ji{height:22px}
+.peekbtn{justify-self:start;font-size:15px;min-height:42px}
+.locked{display:grid;gap:8px;justify-items:center;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.3);border-radius:22px;padding:14px 18px;width:100%;max-width:340px}
+.lockrow{display:flex;align-items:center;gap:8px;font:600 17px var(--f-display);color:#FFE9A8}
+.lockico .ji{height:26px}
+.lockbig{margin:0;font:700 clamp(22px,6vw,28px)/1.25 var(--f-display);color:#fff;text-wrap:balance}
+.lockbig b{color:#FFD23F;font-size:1.25em}
+.lockmeter{width:100%;height:14px;border-radius:99px;background:rgba(255,255,255,.18);overflow:hidden}
+.lockmeter i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#FFE27A,#FFB020)}
+.locknote{margin:0;font-size:15px;color:#E6DEFF}
+.spinbig.gohome{font-size:clamp(20px,5.5vw,24px);letter-spacing:0;animation:none}
 /* story */
 .story{padding:16px;margin-bottom:14px}
 .sthead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
@@ -820,7 +830,7 @@ function home() {
     ${st.wheel
       ? (G.avail
         ? `<button class="btn spinbtn" id="spin">🎡 הגעת ליעד! סובב את גלגל ההפתעות${G.avail > 1 ? ` (${G.avail})` : ''}</button>`
-        : `<p class="gleft">נשארו עוד <b>${G.left} ${G.unit}</b> לגלגל ההפתעות 🎡</p>`)
+        : `<p class="gleft">נשארו עוד <b>${G.left} ${G.unit}</b> לגלגל ההפתעות 🎡</p><button class="btn peekbtn" id="peek">🎡 הצצה לגלגל</button>`)
       : (G.earned
         ? `<p class="gleft">🏆 <b>הגעת ליעד היומי!</b> כל הכבוד!${G.earned > 1 ? ` (${G.earned} פעמים)` : ''}</p>`
         : `<p class="gleft">נשארו עוד <b>${G.left} ${G.unit}</b> ליעד</p>`)}
@@ -859,6 +869,7 @@ function home() {
   const gp = $('#gparent'); if (gp) gp.onclick = () => go(parentCloud);
   $$('[data-lvl]', app).forEach(b => b.onclick = () => { const s = load(); s.level = b.dataset.lvl; save(s); home(); });
   const sp = $('#spin'); if (sp) sp.onclick = () => go(wheelView);
+  const pk = $('#peek'); if (pk) pk.onclick = () => go(wheelView);
 }
 
 /* ---------- cloud: parent accounts (Google) and kid links ---------- */
@@ -1118,11 +1129,17 @@ function wheelView(preview) {
   const st = load(), prizes = preview ? preview.prizes : (st.prizes.length ? st.prizes : DEFAULT_PRIZES);
   const G = preview ? { avail: 99 } : goalState(st);
   const box = `<section class="wstage">
-      <p class="whead en">${G.avail ? 'Spin the wheel!' : 'No spins right now'}</p>
+      <p class="whead en">${G.avail ? 'Spin the wheel!' : 'Surprise Wheel'}</p>
       <div class="wheelwrap"><canvas id="wheel" aria-label="גלגל ההפתעות"></canvas><canvas id="confetti" aria-hidden="true"></canvas></div>
       <div class="wlabel en" id="wlabel" aria-live="off"></div>
-      <button class="spinbig" dir="ltr" id="go" ${G.avail ? '' : 'disabled'}>SPIN!${!preview && G.avail > 1 ? ` <small>×${G.avail}</small>` : ''}</button>
-      ${G.avail ? '' : `<p class="wleft">נשארו עוד <b>${G.left} ${G.unit}</b> כדי לסובב</p>`}
+      ${G.avail ? `<button class="spinbig" dir="ltr" id="go">SPIN!${!preview && G.avail > 1 ? ` <small>×${G.avail}</small>` : ''}</button>` : `
+      <div class="locked">
+        <div class="lockrow"><span class="lockico">🔒</span><span>הגלגל עוד נעול</span></div>
+        <p class="lockbig">עוד <b>${G.left}</b> ${G.unit} והגלגל נפתח!</p>
+        <div class="lockmeter"><i style="width:${Math.round(G.pct)}%"></i></div>
+        <p class="locknote">כל תשובה נכונה מקרבת אותך. בהצלחה! 💪</p>
+      </div>
+      <button class="spinbig gohome" id="gohome">חזרה לתרגול ←</button>`}
       <div id="prize" aria-live="polite"></div>
     </section>`;
   let wrapW = app.clientWidth;
@@ -1235,6 +1252,8 @@ function wheelView(preview) {
     requestAnimationFrame(step);
   }
 
+  const gh = $('#gohome'); if (gh) gh.onclick = () => go(home);
+  if (!$('#go')) return;
   $('#go').onclick = () => {
     if (spinning) return;
     if (!preview && goalState(load()).avail < 1) return;
