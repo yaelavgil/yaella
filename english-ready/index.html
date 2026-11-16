@@ -444,7 +444,7 @@ function clip(text, slow) {
     const fin = ok => { if (done) return; done = true; player.onended = player.onerror = null; res(ok); };
     player.onended = () => fin(true);
     player.onerror = () => fin(false);
-    player.src = 'audio/' + slug(text) + '.m4a';
+    player.src = 'audio/' + slug(text) + '.mp3';
     player.playbackRate = slow ? 0.7 : 1;
     try { player.preservesPitch = true; } catch (e) {}
     const p = player.play();
@@ -471,7 +471,7 @@ function hush() { token++; try { player.pause(); } catch (e) {} if (canTTS) spee
 let primed = false;
 document.addEventListener('pointerdown', () => {
   if (primed) return; primed = true;
-  try { player.src = 'audio/silence.m4a'; const p = player.play(); if (p && p.catch) p.catch(() => {}); } catch (e) {}
+  try { player.src = 'audio/silence.mp3'; const p = player.play(); if (p && p.catch) p.catch(() => {}); } catch (e) {}
   if (canTTS) { try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } catch (e) {} }
 }, { capture: true });
 
