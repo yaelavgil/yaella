@@ -1346,7 +1346,10 @@ document.addEventListener('click', e => {
   const { blob, name, msg } = lastWin;
   if (blob) {
     const file = new File([blob], name, { type: 'image/png' });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    // A Mac can open a share sheet too, but WhatsApp does not put itself in it, so that
+    // route dead-ends there. Use the sheet on touch devices, where WhatsApp is in it.
+    const phone = matchMedia('(pointer: coarse)').matches && navigator.maxTouchPoints > 0;
+    if (phone && navigator.canShare && navigator.canShare({ files: [file] })) {
       // phones: the system share sheet hands the picture to the WhatsApp app itself
       navigator.share({ files: [file], text: msg }).catch(() => {});
       return;
@@ -2108,7 +2111,9 @@ function fitInto(inkStrokes, tplStrokes) {
   const d = centre(inkStrokes.flat()), t = centre(tplStrokes.flat());
   const dw = d.x1 - d.x0, dh = d.y1 - d.y0, tw = t.x1 - t.x0, th = t.y1 - t.y0;
   let sy = dh > 4 ? th / dh : 1, sx = dw > 4 && tw > th * 0.25 ? tw / dw : sy;
-  sx = Math.min(Math.max(sx, sy * 0.6), sy * 1.7);
+  // a child's letter leans and spreads sideways far more than it does vertically,
+  // so allow the width to stretch or squash well beyond the height before judging
+  sx = Math.min(Math.max(sx, sy * 0.5), sy * 2.0);
   const dcx = (d.x0 + d.x1) / 2, dcy = (d.y0 + d.y1) / 2, tcx = (t.x0 + t.x1) / 2, tcy = (t.y0 + t.y1) / 2;
   return inkStrokes.map(st => st.map(([x, y]) => [tcx + (x - dcx) * sx, tcy + (y - dcy) * sy]));
 }
@@ -2315,7 +2320,7 @@ function writeView() {
     const pool = /[A-Z]/.test(ch) ? ALPHA.map(c => c.toUpperCase()) : ALPHA;
     let mine = 9, best = 9;
     for (const c of pool) { const t = tplOf(c), sc = chamfer(fitInto(inkS, t), t); if (c === ch) mine = sc; else best = Math.min(best, sc); }
-    return mine <= 0.28 && mine <= best * 1.15;
+    return mine <= 0.31 && mine <= best * 1.18;
   }
   function judgeLetters() { // -> per letter: 'ok' | 'size' (right letter, but its size or place on the lines is off) | 'no'
     const boxes = strokesPx.map(gl => centre(gl.flat())), letters = chars();
