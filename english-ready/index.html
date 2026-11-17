@@ -1075,7 +1075,7 @@ const DEFAULT_PRIZES = [
   'A snack 🍿',
   '30 more minutes of screen time 📱',
 ];
-const fresh = () => ({ stars: 0, days: [], done: {}, best: {}, td: null, goal: { type: 'abc', n: 26 }, prizes: DEFAULT_PRIZES.slice(), wins: [], wheel: true, level: 'medium', testLevel: 'medium', allowLevelUp: true, pack: 'g4-mapping' });
+const fresh = () => ({ stars: 0, days: [], done: {}, best: {}, td: null, goal: { type: 'stars', n: 25 }, prizes: DEFAULT_PRIZES.slice(), wins: [], wheel: true, level: 'medium', testLevel: 'medium', allowLevelUp: true, pack: 'g4-mapping' });
 const PROGRESS_KEYS = ['stars', 'days', 'done', 'best', 'td', 'mock', 'mocks', 'wins', 'level', 'lt', 'allGreen', 'allGreenSeen', 'firstGift', 'updatedAt'];
 const SETTING_KEYS = ['goal', 'prizes', 'wheel', 'level', 'testLevel', 'allowLevelUp', 'pack'];
 const defaultSettings = () => { const f = fresh(); return Object.fromEntries(SETTING_KEYS.map(k => [k, f[k]])); };
@@ -1093,7 +1093,7 @@ function load() {
 // kids set up before the alphabet road carry the old default of 25 stars a day, which was
 // about four minutes of work. Treat that untouched default as the new road; a parent who
 // wants the old counting back can pick it again in the settings.
-function abcMigrate(st) { if (st.goal && !st.goal.set && st.goal.type === 'stars' && +st.goal.n === 25) st.goal = { type: 'abc', n: ABC_GOAL }; return st; } // .set = a goal a parent chose on purpose
+function abcMigrate(st) { if (!st.goal || !st.goal.type || st.goal.type === 'abc' || st.goal.type === 'lvl') st.goal = { type: 'stars', n: 25 }; return st; } // the letters goal was retired: stars only (letters stay as stats)
 function save(s) {
   if (KID) {
     const pr = Object.fromEntries(PROGRESS_KEYS.filter(k => k !== 'level' && k !== 'updatedAt' && s[k] !== undefined).map(k => [k, s[k]]));
@@ -1187,7 +1187,7 @@ function recordLetter(letter, skill, ok) {
   if (!d.prac.includes(l)) d.prac.push(l);
   if (after > before && !d.up.includes(l)) d.up.push(l);
   if (s.allGreen && ok) { const n = (s.goal && s.goal.n) || LVL_GOAL_DEFAULT; const list = reviewList(s, d, n); d.rev = d.rev || []; if (list.includes(l) && !d.rev.includes(l)) d.rev.push(l); }
-  if (!s.allGreen && letterLevels(s).every(v => v === 2)) { s.allGreen = today(); d.bonus = (d.bonus || 0) + 1; allGreenNow = true; }
+  if (!s.allGreen && letterLevels(s).every(v => v === 2)) { s.allGreen = today(); }
   save(s);
 }
 // pick the next letter to practise: letters he doesn't know yet come up more often
@@ -1309,7 +1309,7 @@ function home() {
     ${G.lvl ? `${letterMapHTML(st, { click: true })}
       <button class="btn focusbtn" id="focus">🎯 לתרגל את האותיות שלי</button>` : ''}
     <p class="gnow">היום תרגלת: <b>⭐ ${G.d.stars} כוכבים</b> · <b>⏱ ${G.mins} דקות</b>${G.d.spins ? ` · 🎡 ${G.d.spins} סיבובים` : ''}</p>
-    ${G.lvl ? '' : (() => { const lv = letterLevels(st); return `<button class="ltline" id="ltline"><span>🔤 האותיות שלי</span><span class="ltdots" dir="ltr">${lv.map(v => `<i class="l${v}"></i>`).join('')}</span><span class="ltnum">${lv.filter(v => v === 2).length} ירוקות · ${lv.filter(v => v === 1).length} בדרך</span></button>`; })()}
+    
   </section>`}
 
   ${KID && KID.mode === 'learn' ? '' : `<section class="zone test">
@@ -1347,7 +1347,7 @@ function home() {
   layoutGoalPath();
   const ll = $('#ltline'); if (ll) ll.onclick = lettersPopup;
   $$('.goal [data-lt]', app).forEach(x => { x.onclick = () => letterCard(x.dataset.lt); x.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); letterCard(x.dataset.lt); } }; });
-  if (st.allGreen && !st.allGreenSeen) { const s2 = load(); s2.allGreenSeen = today(); save(s2); celebrateAll(); }
+
   const pk = $('#peek'); if (pk) pk.onclick = () => go(wheelView);
 }
 
@@ -1478,7 +1478,7 @@ function renderParentBar() {
       const d = kidDay(k), mins = Math.floor((d.ms || 0) / 60000);
       const abc = ((k.settings || {}).goal || {}).type !== 'mins' && ((k.settings || {}).goal || {}).type !== 'stars';
       const greens = letterLevels(k.progress || {}).filter(v => v === 2).length;
-      const prog = abc ? `${(d.up || []).length} אותיות התקדמו · ${greens}/26 ירוקות` : `${d.stars || 0} כוכבים`;
+      const prog = `${d.stars || 0} כוכבים היום · ${greens}/26 אותיות ירוקות`;
       return `<article class="kst" data-k="${k.id}">
         <button class="kstmain" data-open="${k.id}" aria-expanded="false">
           <span class="kstname">${esc(k.name)}</span>
@@ -1632,8 +1632,8 @@ function settingsSheet(kidId, tab) {
       bindSeg('ll', v => st.level = v); bindSeg('tl', v => st.testLevel = v);
       $s('#shalu').onchange = e => { st.allowLevelUp = e.target.checked; touch(); };
     } else if (cur === 'goal') {
-      const gt = (st.goal.type === 'abc' || !st.goal.type) ? 'lvl' : st.goal.type;
-      if (gt === 'lvl' && st.goal.type !== 'lvl') st.goal = { type: 'lvl', n: LVL_GOAL_DEFAULT };
+      const gt = st.goal.type === 'mins' ? 'mins' : 'stars';
+      if (gt !== st.goal.type) st.goal = { type: 'stars', n: 25 };
       B.innerHTML = `
         <button type="button" class="trycard" id="shtry" ${st.wheel ? '' : 'hidden'} aria-label="נסו את גלגל ההפתעות בעצמכם">
           <span class="trywheel">${miniWheel(st.prizes.length)}</span>
@@ -1641,8 +1641,8 @@ function settingsSheet(kidId, tab) {
           <span class="tryarrow" aria-hidden="true">←</span>
         </button>
         <div class="shgrp"><h3>היעד היומי</h3>
-          <div class="seg" role="group" aria-label="סוג יעד">${segs('gt', gt, [['lvl', 'אותיות שהתקדמו'], ['stars', 'כוכבים'], ['mins', 'דקות']])}</div>
-          <label class="shfield" id="shgnrow">כמה ביום? <input id="shgn" type="number" min="1" max="${gt === 'lvl' ? 26 : 500}" value="${st.goal.n || LVL_GOAL_DEFAULT}" class="pin"></label>
+          <div class="seg" role="group" aria-label="סוג יעד">${segs('gt', gt, [['stars', 'כוכבים'], ['mins', 'דקות']])}</div>
+          <label class="shfield" id="shgnrow">כמה ביום? <input id="shgn" type="number" min="1" max="500" value="${st.goal.n || 25}" class="pin"></label>
           <p class="hint" id="shgnote">${GOAL_NOTE[gt]}</p></div>
         <div class="shgrp"><h3>גלגל ההפתעות</h3>
           <div class="seg" role="group" aria-label="גלגל ההפתעות">${segs('wh', st.wheel ? '1' : '0', [['1', 'פעיל'], ['0', 'כבוי: רק כוכבים']])}</div></div>
@@ -1918,7 +1918,7 @@ function progressView() {
       <p class="bignum">⭐ ${G.d.stars} <small>כוכבים</small> · ⏱ ${G.mins} <small>דקות</small></p>
       <p class="gleft">${G.earned ? '🏆 הגעת ליעד היומי!' : `נשארו עוד <b>${G.left} ${G.unit}</b> ליעד`}</p>
       <h2>מפת האותיות שלי</h2>
-      ${letterMapHTML(st)}
+      ${letterMapHTML(st, { click: true })}
       <h2>השבוע</h2>
       <div class="week">${last7.map(d => { const on = (st.days || []).includes(d); const wd = DAYS[new Date(d.split('-')[0], d.split('-')[1] - 1, d.split('-')[2]).getDay()]; return `<span class="wday ${on ? 'on' : ''}" title="${fmt(d)}">${on ? '✓' : ''}<small>${wd}</small></span>`; }).join('')}</div>
       <p>סך הכול: <b>⭐ ${st.stars}</b> כוכבים · <b>${(st.days || []).length}</b> ימי תרגול</p>
@@ -1933,6 +1933,7 @@ function progressView() {
       ${(st.wins || []).length ? `<h3>מה זכיתי בגלגל</h3>${winRowsHTML(st.wins.slice(0, 10))}` : ''}
     </section>`;
   $$('[data-practice]', app).forEach(b => b.onclick = () => MODS.find(m => m.id === b.dataset.practice).run());
+  $$('[data-lt]', app).forEach(x => x.onclick = () => letterCard(x.dataset.lt));
 }
 
 /* ---------- surprise wheel ---------- */
