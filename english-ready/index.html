@@ -1190,13 +1190,27 @@ function recordLetter(letter, skill, ok) {
   if (!s.allGreen && letterLevels(s).every(v => v === 2)) { s.allGreen = today(); }
   save(s);
 }
-// pick the next letter to practise: letters he doesn't know yet come up more often
-let FOCUS = null;
-function pickLetter() {
+// pick the next letter to practise. Coverage first: for this skill, a letter he has never got right
+// comes before anything else; then letters under 80% in this skill; then the usual weighted mix.
+// BUILT keeps one practice round from asking the same letter twice while others are still waiting.
+let FOCUS = null, BUILT = new Set();
+const skRec = (s, c, sk) => ((s.lt || {})[c] || {})[sk] || [0, 0];
+function uncoveredLetters(s, sk) { return ALPHA.filter(c => !skRec(s, c, sk)[0]); }
+function pickLetter(sk, allowed) {
   if (FOCUS && FOCUS.length) return pick(FOCUS);
+  if (sk) {
+    const s = load(), ok = c => (!allowed || allowed.includes(c)) && !BUILT.has(c);
+    const unc = uncoveredLetters(s, sk).filter(ok);
+    if (unc.length) { const c = pick(unc); BUILT.add(c); return c; }
+    const weak = ALPHA.filter(c => { const r = skRec(s, c, sk); return ok(c) && r[1] && r[0] / r[1] < 0.8; });
+    if (weak.length) { const c = pick(weak); BUILT.add(c); return c; }
+  }
+  return pickLetterMix(allowed);
+}
+function pickLetterMix(allowed) {
   const s = load(), lv = letterLevels(s), d = day(s);
   const rev = s.allGreen ? reviewList(s, d, (s.goal && s.goal.n) || LVL_GOAL_DEFAULT) : [];
-  const w = ALPHA.map((c, i) => rev.includes(c) && !(d.rev || []).includes(c) ? 6 : [5, 3, 1][lv[i]]);
+  const w = ALPHA.map((c, i) => allowed && !allowed.includes(c) ? 0 : rev.includes(c) && !(d.rev || []).includes(c) ? 6 : [5, 3, 1][lv[i]]);
   let t = Math.random() * w.reduce((a, b) => a + b, 0);
   for (let i = 0; i < 26; i++) { t -= w[i]; if (t <= 0) return ALPHA[i]; }
   return pick(ALPHA);
@@ -2460,9 +2474,9 @@ function fillOpts(ans, conf, ok, pool, n = optN()) {
 }
 const wordHTML = wd => `<span class="rv">${wd.e} <b>${wd.w[0]}</b>${wd.w.slice(1)}</span>`;
 
-function wordFor(pool) { const L = pickLetter(); const m = pool.filter(x => x.L.toLowerCase() === L); return m.length ? pick(m) : pick(pool); }
+function wordFor(pool, sk) { const has = [...new Set(pool.map(x => x.L.toLowerCase()))]; const L = pickLetter(sk, has); const m = pool.filter(x => x.L.toLowerCase() === L); return m.length ? pick(m) : pick(pool); }
 function qSound() {
-  const wd = wordFor(WORDS.filter(x => x.f !== 't'));
+  const wd = wordFor(WORDS.filter(x => x.f !== 't'), 'snd');
   const ans = wd.L.toLowerCase();
   const opts = fillOpts(ans, SOUNDCONF[ans], l => !clash(wd, l), ALPHA);
   return { key: 's:' + wd.w, hue: wd.hue, speak: wd.w, lt: ans, sk: 'snd',
@@ -2473,7 +2487,7 @@ function qSound() {
 }
 function qPic() {
   const pics = WORDS.filter(x => !x.f);
-  const wd = wordFor(pics), l = wd.L.toLowerCase();
+  const wd = wordFor(pics, 'snd'), l = wd.L.toLowerCase();
   const chosen = [wd];
   for (const x of shuffle(pics)) { if (chosen.length >= 3) break; if (!chosen.some(c => c.L === x.L) && !clash(x, l)) chosen.push(x); }
   return { key: 'p:' + wd.w, hue: wd.hue, sayAfter: wd.w, lt: l, sk: 'snd',
@@ -2483,7 +2497,7 @@ function qPic() {
     hint: { he: `האות <span class="en">${wd.L}</span> נשמעת בערך כמו <b>${heSound(wd.L)}</b>. הקשב לשמות של התמונות`, say: chosen.map(x => x.w).join('|') } };
 }
 function qCase() {
-  const U = pickLetter().toUpperCase(), l = U.toLowerCase(), h = hueOf(ALPHA.indexOf(l));
+  const U = pickLetter('cas').toUpperCase(), l = U.toLowerCase(), h = hueOf(ALPHA.indexOf(l));
   if (Math.random() < 0.55) {
     return { key: 'c:' + U, hue: h, lt: l, sk: 'cas', prompt: `<div class="bigletter en">${U}</div><p class="ask">מה האות הקטנה של <span class="en">${U}</span>?</p>`,
       layout: 'letters', options: fillOpts(l, LOWC[l], () => true, ALPHA).map(x => ({ v: x, html: `<span class="en">${x}</span>` })),
@@ -2495,7 +2509,7 @@ function qCase() {
     answer: U, rv: `${l} → ${U}`, hint: { he: `איך נראית האות הגדולה? ${SHAPE_UP[U]}` } };
 }
 function qName() {
-  const l = pickLetter(), U = l.toUpperCase();
+  const l = pickLetter('nam'), U = l.toUpperCase();
   return { key: 'n:' + l, hue: hueOf(ALPHA.indexOf(l)), speak: NAME[U], lt: l, sk: 'nam',
     prompt: `<div class="pic" aria-hidden="true">🔊</div><p class="ask">שמע את שם האות ובחר אותה</p>`,
     layout: 'letters', options: fillOpts(l, NAMECONF[l], () => true, ALPHA).map(x => ({ v: x, html: `<span class="en">${x.toUpperCase()}${x}</span>` })),
@@ -2593,7 +2607,7 @@ function storyQs(st) {
     hint: { he: 'התשובה נמצאת במשפט המסומן בסיפור. קרא אותו שוב לאט.', mark: STORY_HINT[q] } }));
 }
 function build(gens, n) {
-  const out = [], keys = new Set();
+  const out = [], keys = new Set(); BUILT = new Set();
   for (let tries = 0; out.length < n && tries < 400; tries++) {
     const q = gens[out.length % gens.length]();
     if (keys.has(q.key)) continue; keys.add(q.key); out.push(q);
@@ -3370,10 +3384,16 @@ function writeView() {
       : `<div class="fb bad"><div class="msg"><b>עוד לא.</b> כך כותבים את האות. אפשר לנסות שוב.</div></div>`;
     renderButtons(ok);
   }
-  function nextTrace() { idx = (idx + 1) % 26; won = false; eraser = false; d.classList.remove('erase'); clear(); render(); }
+  function nextTrace() {
+    const s = load(), need = i => !skRec(s, ALPHA[i], 'wu')[0] || !skRec(s, ALPHA[i], 'wl')[0];
+    let j = 1; while (j < 26 && !need((idx + j) % 26)) j++;
+    idx = (idx + (j < 26 ? j : 1)) % 26; won = false; eraser = false; d.classList.remove('erase'); clear(); render(); }
   function newDict() {
-    let i; do { i = rint(0, 25); } while (dict && i === dict.i);
-    dict = { i, cs: Math.random() < 0.5 ? 'up' : 'low' }; ghost = false; state = 'draw';
+    const s = load(), open = [];
+    ALPHA.forEach((c, i) => { if (dict && i === dict.i) return; if (!skRec(s, c, 'wu')[0]) open.push([i, 'up']); if (!skRec(s, c, 'wl')[0]) open.push([i, 'low']); });
+    if (open.length) { const [i, cs] = pick(open); dict = { i, cs }; }
+    else { let i; do { i = rint(0, 25); } while (dict && i === dict.i); dict = { i, cs: Math.random() < 0.5 ? 'up' : 'low' }; }
+    ghost = false; state = 'draw';
   }
   function renderButtons(ok) {
     const wb = $('#wb');
