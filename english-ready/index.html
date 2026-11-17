@@ -561,6 +561,44 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .kstmore{flex:1 1 100%;border-top:1px solid var(--line);margin-top:6px;padding-top:8px;display:grid;gap:7px}
 .kstline{margin:0;font-size:14px;color:var(--muted)}
 
+.giftbox{display:grid;gap:8px;justify-items:center;text-align:center;background:#FFF3C4;border:2px solid #FFD23F;border-radius:18px;padding:14px 16px;width:100%;animation:pop .5s both}
+.giftbox b{font:700 20px var(--f-display)}
+/* ---- letter map ---- */
+.lmap{display:grid;grid-template-columns:repeat(13,minmax(0,1fr));gap:5px;width:100%}
+.lm{aspect-ratio:1;display:grid;place-items:center;border-radius:9px;font:700 clamp(13px,3.4vw,17px)/1 var(--f-en);border:1.5px solid var(--line);background:var(--surface);color:#9AA0B4;position:relative}
+.lm.l1{background:#FFE9A8;border-color:#F2C14E;color:#7A5A00}
+.lm.l2{background:#C9F0D8;border-color:#4FB57E;color:#145C34}
+.lm.up::after{content:"";position:absolute;top:-4px;inset-inline-end:-4px;width:10px;height:10px;border-radius:50%;background:#FF5D8F;border:2px solid var(--surface)}
+.lm.rev{box-shadow:0 0 0 2px #4D8DFF inset}
+.lm.revok{box-shadow:0 0 0 2px #4D8DFF inset;background:#D6E6FF;color:#1C3F80}
+.lm[role=button]{cursor:pointer}
+.lm.sel{outline:3px solid var(--ink);outline-offset:1px}
+.lmkey{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin:6px 0 0;font-size:13px;color:var(--muted)}
+.lk{display:inline-block;width:13px;height:13px;border-radius:4px;border:1.5px solid var(--line);vertical-align:-2px;margin-inline-end:4px;background:var(--surface)}
+.lk.l1{background:#FFE9A8;border-color:#F2C14E}.lk.l2{background:#C9F0D8;border-color:#4FB57E}
+.lk.up{border-radius:50%;background:#FF5D8F;border-color:#FF5D8F;width:10px;height:10px}
+.gsub{margin:0;font-size:15px;color:var(--ink)}
+.focusbtn{justify-self:start;font-size:15px;min-height:44px}
+.ltcard{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:center;margin-top:4px}
+.ltbig{font-size:34px;line-height:1}
+.ltst{justify-self:start;font-weight:700;font-size:14px;padding:2px 10px;border-radius:999px;background:var(--bg)}
+.ltst.l1{background:#FFE9A8}.ltst.l2{background:#C9F0D8}
+.lttab{grid-column:1/-1;border-collapse:collapse;width:100%;font-size:14px}
+.lttab td{padding:5px 6px;border-top:1px solid var(--line)}
+.lttab td:nth-child(2){font-variant-numeric:tabular-nums;text-align:center;width:4.5em}
+.lttab td:nth-child(3){text-align:center;width:2em;color:var(--good);font-weight:700}
+.ltcard .hint{grid-column:1/-1;margin:0}
+/* wins: picture, words, date each in their own place */
+.winrows{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.winrows li{display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;gap:12px;padding:8px 10px;border-radius:12px;background:var(--bg)}
+.wrill{width:44px;height:44px;display:grid;place-items:center;border-radius:12px;background:var(--surface);font-size:26px}
+.wrill .ji{height:32px}
+.wrtx{display:grid;gap:1px;min-width:0}
+.wrtx .en{font-weight:600;direction:ltr;text-align:right;unicode-bidi:plaintext}
+.wrtx small{color:var(--muted);font-size:13px}
+.wrdate{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+@media (max-width:420px){.lmap{gap:3px}.lm{border-radius:6px}}
+
 /* ---- gear + settings window ---- */
 .gearbtn{width:42px;height:42px;flex:none;display:grid;place-items:center;border-radius:12px;border:1.5px solid var(--line);
   background:var(--surface);color:var(--muted);cursor:pointer;transition:transform .25s var(--ease),color .2s,background-color .2s}
@@ -972,7 +1010,7 @@ const DEFAULT_PRIZES = [
   '30 more minutes of screen time 📱',
 ];
 const fresh = () => ({ stars: 0, days: [], done: {}, best: {}, td: null, goal: { type: 'abc', n: 26 }, prizes: DEFAULT_PRIZES.slice(), wins: [], wheel: true, level: 'medium', testLevel: 'medium', allowLevelUp: true, pack: 'g4-mapping' });
-const PROGRESS_KEYS = ['stars', 'days', 'done', 'best', 'td', 'mock', 'mocks', 'wins', 'level', 'updatedAt'];
+const PROGRESS_KEYS = ['stars', 'days', 'done', 'best', 'td', 'mock', 'mocks', 'wins', 'level', 'lt', 'allGreen', 'allGreenSeen', 'firstGift', 'updatedAt'];
 const SETTING_KEYS = ['goal', 'prizes', 'wheel', 'level', 'testLevel', 'allowLevelUp', 'pack'];
 const defaultSettings = () => { const f = fresh(); return Object.fromEntries(SETTING_KEYS.map(k => [k, f[k]])); };
 // KID is set when the app is opened from a parent's link: settings come from the parent, progress is saved to the cloud
@@ -1040,15 +1078,96 @@ document.addEventListener('pointerdown', () => {
   if (practicing && lastAct && now - lastAct < 90000) { const s = load(); day(s).ms += now - lastAct; save(s); }
   lastAct = practicing ? now : 0;
 }, { capture: true });
+/* ---------- letters: what he really knows, one letter at a time ----------
+   Every letter question and every written letter is recorded against its letter, by skill:
+   snd = sound (word -> first letter, letter -> picture), cas = big<->small, nam = letter name,
+   wu / wl = writing the big / small letter. A letter is
+     0 not yet  - nothing right yet
+     1 on its way - something right
+     2 mastered - sound, big<->small and name each right at 80%+, and both cases written right;
+                  a mastered letter not practised for 7 days drops back to 1 (so it gets reviewed). */
+const LT_SKILLS = [['snd', 'צליל'], ['cas', 'גדולה↔קטנה'], ['nam', 'שם האות'], ['wu', 'כתיבה גדולה'], ['wl', 'כתיבה קטנה']];
+const LVL_GOAL_DEFAULT = 8;
+const dayNum = d => { const [y, m, dd] = String(d).split('-').map(Number); return Math.round(new Date(y, m - 1, dd).getTime() / 864e5); };
+function letterLevel(r, now) {
+  if (!r) return 0;
+  const has = k => r[k] && r[k][0] > 0, acc = k => (r[k] && r[k][1]) ? r[k][0] / r[k][1] : 0;
+  if (!LT_SKILLS.some(([k]) => has(k))) return 0;
+  const full = ['snd', 'cas', 'nam'].every(k => has(k) && acc(k) >= 0.8) && has('wu') && has('wl');
+  if (!full) return 1;
+  return (r.last && dayNum(now || today()) - dayNum(r.last) > 7) ? 1 : 2;
+}
+const letterLevels = s => ALPHA.map(c => letterLevel((s.lt || {})[c]));
+// once every letter has been mastered, the goal becomes a daily review list
+function reviewList(s, d, n) {
+  if (d.revList) return d.revList;
+  const lt = s.lt || {};
+  const score = c => { const r = lt[c] || {}; const tot = LT_SKILLS.reduce((a, [k]) => a + ((r[k] || [0, 0])[1]), 0), ok = LT_SKILLS.reduce((a, [k]) => a + ((r[k] || [0, 0])[0]), 0);
+    return (r.last ? dayNum(r.last) : 0) + (tot ? ok / tot : 0) * 3; };          // oldest and least accurate first
+  d.revList = ALPHA.slice().sort((a, b) => score(a) - score(b)).slice(0, Math.max(1, Math.min(26, n)));
+  return d.revList;
+}
+let allGreenNow = false;
+function recordLetter(letter, skill, ok) {
+  if (!letter) return;
+  const s = load(), l = String(letter).toLowerCase(); if (!ALPHA.includes(l)) return;
+  s.lt = s.lt || {};
+  const r = s.lt[l] = s.lt[l] || {};
+  const before = letterLevel(r);
+  r[skill] = r[skill] || [0, 0]; r[skill][1]++; if (ok) r[skill][0]++;
+  r.last = today();
+  const after = letterLevel(r), d = day(s);
+  d.up = d.up || []; d.prac = d.prac || [];
+  if (!d.prac.includes(l)) d.prac.push(l);
+  if (after > before && !d.up.includes(l)) d.up.push(l);
+  if (s.allGreen && ok) { const n = (s.goal && s.goal.n) || LVL_GOAL_DEFAULT; const list = reviewList(s, d, n); d.rev = d.rev || []; if (list.includes(l) && !d.rev.includes(l)) d.rev.push(l); }
+  if (!s.allGreen && letterLevels(s).every(v => v === 2)) { s.allGreen = today(); d.bonus = (d.bonus || 0) + 1; allGreenNow = true; }
+  save(s);
+}
+// pick the next letter to practise: letters he doesn't know yet come up more often
+let FOCUS = null;
+function pickLetter() {
+  if (FOCUS && FOCUS.length) return pick(FOCUS);
+  const s = load(), lv = letterLevels(s), d = day(s);
+  const rev = s.allGreen ? reviewList(s, d, (s.goal && s.goal.n) || LVL_GOAL_DEFAULT) : [];
+  const w = ALPHA.map((c, i) => rev.includes(c) && !(d.rev || []).includes(c) ? 6 : [5, 3, 1][lv[i]]);
+  let t = Math.random() * w.reduce((a, b) => a + b, 0);
+  for (let i = 0; i < 26; i++) { t -= w[i]; if (t <= 0) return ALPHA[i]; }
+  return pick(ALPHA);
+}
+function weakLetters(n) {
+  const s = load(), lt = s.lt || {}, lv = letterLevels(s);
+  const acc = c => { const r = lt[c] || {}; const tot = LT_SKILLS.reduce((a, [k]) => a + ((r[k] || [0, 0])[1]), 0), ok = LT_SKILLS.reduce((a, [k]) => a + ((r[k] || [0, 0])[0]), 0); return tot ? ok / tot : 0; };
+  if (s.allGreen) { const d = day(s); return reviewList(s, d, (s.goal && s.goal.n) || LVL_GOAL_DEFAULT).filter(c => !(d.rev || []).includes(c)).slice(0, n); }
+  return ALPHA.map((c, i) => [c, lv[i], acc(c)]).sort((a, b) => a[1] - b[1] || b[2] - a[2] || Math.random() - .5).filter(x => x[1] < 2).slice(0, n).map(x => x[0]);
+}
+function letterMapHTML(s, opts = {}) {
+  const lv = letterLevels(s), d = (s.td && s.td.date === today()) ? s.td : {};
+  const rev = s.allGreen ? (d.revList || []) : [];
+  return `<div class="lmap" dir="ltr" role="img" aria-label="מפת האותיות: ${lv.filter(v => v === 2).length} שולט, ${lv.filter(v => v === 1).length} בדרך">
+    ${ALPHA.map((c, i) => `<span class="lm l${lv[i]}${(d.up || []).includes(c) ? ' up' : ''}${rev.includes(c) ? ((d.rev || []).includes(c) ? ' revok' : ' rev') : ''}" ${opts.click ? `data-lt="${c}" role="button" tabindex="0"` : ''} title="${c.toUpperCase()}${c}">${c.toUpperCase()}</span>`).join('')}
+  </div>
+  <p class="lmkey"><span class="lk l0"></span>עוד לא <span class="lk l1"></span>בדרך <span class="lk l2"></span>שולט <span class="lk up"></span>התקדמה היום</p>`;
+}
+
 function goalState(s) {
   const d = day(s), g = s.goal, mins = Math.floor(d.ms / 60000);
-  if (g.type === 'abc') { // the alphabet road: all 26, and one spin a day, no more
+  if (g.type === 'lvl' || g.type === 'abc') { // letters that moved up today; after all 26, the review list
+    const n = g.type === 'lvl' ? Math.max(1, +g.n || LVL_GOAL_DEFAULT) : LVL_GOAL_DEFAULT;
+    const review = !!s.allGreen;
+    if (review) reviewList(s, d, n);
+    const value = review ? (d.rev || []).length : (d.up || []).length;
+    const earned = Math.floor(value / n) + (d.bonus || 0);
+    return { d, g, mins, value, earned, lvl: true, review, n, avail: Math.max(0, earned - d.spins),
+      left: n - (value % n), unit: review ? 'אותיות לחזרה' : 'אותיות להתקדם', pct: Math.min(100, ((value % n) / n) * 100) };
+  }
+  if (g.type === 'abc-old') {
     const value = d.letters, earned = value >= ABC_GOAL ? 1 : 0;
     return { d, g, mins, value, earned, abc: true, avail: Math.max(0, earned - d.spins),
       left: Math.max(0, ABC_GOAL - value), unit: 'אותיות', pct: Math.min(100, (value / ABC_GOAL) * 100) };
   }
   const value = g.type === 'mins' ? mins : d.stars;
-  const earned = Math.floor(value / g.n), avail = Math.max(0, earned - d.spins);
+  const earned = Math.floor(value / g.n) + (d.bonus || 0), avail = Math.max(0, earned - d.spins);
   const left = g.n * (earned + 1) - value;
   return { d, g, mins, value, earned, avail, left, unit: g.type === 'mins' ? 'דקות' : 'כוכבים', pct: Math.min(100, ((value % g.n) / g.n) * 100) };
 }
@@ -1111,8 +1230,11 @@ function home() {
   </header>
 
   ${KID && KID.mode === 'test' ? '' : `<section class="goal stk h3">
-    <div class="goalhead"><span class="glabel">🎯 היעד היומי</span>${G.abc ? `<span class="gbig" dir="ltr">${G.value} / ${ABC_GOAL}</span>` : `<span class="gbig">${G.g.n} ${G.unit}</span>`}</div>
-    ${G.abc
+    <div class="goalhead"><span class="glabel">🎯 היעד היומי</span>${G.lvl ? `<span class="gbig" dir="ltr">${Math.min(G.value, G.n)} / ${G.n}</span>` : G.abc ? `<span class="gbig" dir="ltr">${G.value} / ${ABC_GOAL}</span>` : `<span class="gbig">${G.g.n} ${G.unit}</span>`}</div>
+    ${G.lvl ? `<p class="gsub">${G.review ? `כל האותיות אצלך! היום חוזרים על <b>${G.n}</b> אותיות כדי לא לשכוח.` : `<b>${G.n}</b> אותיות צריכות להתקדם היום: מלבן לצהוב, או מצהוב לירוק.`}</p>
+      ${letterMapHTML(st)}
+      <button class="btn focusbtn" id="focus">🎯 לתרגל את האותיות שלי</button>` : ''}
+    ${G.lvl ? '' : G.abc
       ? `<div class="abcroad" role="progressbar" aria-valuemin="0" aria-valuemax="${ABC_GOAL}" aria-valuenow="${G.value}" aria-label="האותיות שאספת היום">
            ${LETTER_ROW.map((L, i) => `<span class="abl${i < G.value ? ' on' : ''}">${L}</span>`).join('')}
          </div>`
@@ -1159,6 +1281,8 @@ function home() {
   if (!KID && CLOUD_OK) parentBar();
   $$('[data-lvl]', app).forEach(b => b.onclick = () => { const s = load(); s.level = b.dataset.lvl; save(s); home(); });
   const sp = $('#spin'); if (sp) sp.onclick = () => go(wheelView);
+  const fb_ = $('#focus'); if (fb_) fb_.onclick = () => go(focusQuiz);
+  if (st.allGreen && !st.allGreenSeen) { const s2 = load(); s2.allGreenSeen = today(); save(s2); celebrateAll(); }
   const pk = $('#peek'); if (pk) pk.onclick = () => go(wheelView);
 }
 
@@ -1288,7 +1412,8 @@ function renderParentBar() {
     ${PKIDS.length ? `<div class="kstrip">${PKIDS.map(k => {
       const d = kidDay(k), mins = Math.floor((d.ms || 0) / 60000);
       const abc = ((k.settings || {}).goal || {}).type !== 'mins' && ((k.settings || {}).goal || {}).type !== 'stars';
-      const prog = abc ? `${d.letters || 0}/26 אותיות` : `${d.stars || 0} כוכבים`;
+      const greens = letterLevels(k.progress || {}).filter(v => v === 2).length;
+      const prog = abc ? `${(d.up || []).length} אותיות התקדמו · ${greens}/26 ירוקות` : `${d.stars || 0} כוכבים`;
       return `<article class="kst" data-k="${k.id}">
         <button class="kstmain" data-open="${k.id}" aria-expanded="false">
           <span class="kstname">${esc(k.name)}</span>
@@ -1341,6 +1466,13 @@ function sendKidLink(btn, k) {
 
 /* ---------- settings: one window with tabs, opened from the gear ---------- */
 const GEAR_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>';
+const GOAL_NOTE = {
+  lvl: 'אות "מתקדמת" כשהיא עוברת מלבן לצהוב (צדק בה פעם ראשונה) או מצהוב לירוק (צדק בצליל, בגדולה↔קטנה ובשם האות ב־80% לפחות, וכתב אותה גדולה וקטנה). התרגול מכוון לאותיות שעוד לא ירוקות. כשכל 26 ירוקות הוא מקבל סיבוב בונוס, ומשם היעד הופך לחזרה יומית על אותיות שלא תרגל מזמן או שהדיוק בהן ירד. אות שלא תורגלה שבוע חוזרת לצהוב.',
+  stars: 'כוכב = תשובה נכונה בניסיון הראשון, או אות שנכתבה נכון. בכל הגעה ליעד הוא מקבל סיבוב בגלגל.',
+  mins: 'דקות פעילות במסכי התרגול. בכל הגעה ליעד הוא מקבל סיבוב בגלגל.',
+};
+const winRowsHTML = wins => wins.length ? `<ul class="winrows">${wins.map(w => { const he = heOf(w.prize);
+  return `<li><span class="wrill" aria-hidden="true">${emojiOf(w.prize)}</span><span class="wrtx"><span class="en">${esc(textOf(w.prize))}</span>${he ? `<small>${esc(he)}</small>` : ''}</span><span class="wrdate">${w.date.split('-').slice(1).reverse().join('.')}</span></li>`; }).join('')}</ul>` : '<p class="hint">עוד אין.</p>';
 const SHEET_TABS = [['learn', 'לימוד'], ['goal', 'יעד והפתעות'], ['prog', 'התקדמות'], ['link', 'קישור'], ['kid', 'פרטים']];
 function settingsSheet(kidId, tab) {
   const old = document.querySelector('.sheetov'); if (old) old.remove();
@@ -1435,12 +1567,13 @@ function settingsSheet(kidId, tab) {
       bindSeg('ll', v => st.level = v); bindSeg('tl', v => st.testLevel = v);
       $s('#shalu').onchange = e => { st.allowLevelUp = e.target.checked; touch(); };
     } else if (cur === 'goal') {
-      const gt = st.goal.type || 'abc';
+      const gt = (st.goal.type === 'abc' || !st.goal.type) ? 'lvl' : st.goal.type;
+      if (gt === 'lvl' && st.goal.type !== 'lvl') st.goal = { type: 'lvl', n: LVL_GOAL_DEFAULT };
       B.innerHTML = `
         <div class="shgrp"><h3>היעד היומי</h3>
-          <div class="seg" role="group" aria-label="סוג יעד">${segs('gt', gt, [['abc', 'כל האותיות A–Z'], ['stars', 'כוכבים'], ['mins', 'דקות']])}</div>
-          <label class="shfield" id="shgnrow" ${gt === 'abc' ? 'hidden' : ''}>כמה ביום? <input id="shgn" type="number" min="1" max="500" value="${gt === 'abc' ? 25 : st.goal.n}" class="pin"></label>
-          <p class="hint" id="shgnote">${gt === 'abc' ? 'בכל יום הוא עובר על כל 26 האותיות, ומקבל סיבוב אחד בגלגל.' : 'בכל הגעה ליעד הוא מקבל סיבוב בגלגל.'}</p></div>
+          <div class="seg" role="group" aria-label="סוג יעד">${segs('gt', gt, [['lvl', 'אותיות שהתקדמו'], ['stars', 'כוכבים'], ['mins', 'דקות']])}</div>
+          <label class="shfield" id="shgnrow">כמה ביום? <input id="shgn" type="number" min="1" max="${gt === 'lvl' ? 26 : 500}" value="${st.goal.n || LVL_GOAL_DEFAULT}" class="pin"></label>
+          <p class="hint" id="shgnote">${GOAL_NOTE[gt]}</p></div>
         <div class="shgrp"><h3>גלגל ההפתעות</h3>
           <div class="seg" role="group" aria-label="גלגל ההפתעות">${segs('wh', st.wheel ? '1' : '0', [['1', 'פעיל'], ['0', 'כבוי: רק כוכבים']])}</div></div>
         <div class="shgrp" id="shprz" ${st.wheel ? '' : 'hidden'}><h3>ההפתעות</h3>
@@ -1448,11 +1581,11 @@ function settingsSheet(kidId, tab) {
           <textarea id="shpz" rows="6" class="en ptext-in">${esc(st.prizes.join('\n'))}</textarea>
           <button type="button" class="btn wtrybtn" id="shtry"><span class="wtmini"></span>נסו את הגלגל</button></div>`;
       bindSeg('gt', v => {
-        st.goal = v === 'abc' ? { type: 'abc', n: ABC_GOAL } : { type: v, n: parseInt($s('#shgn').value, 10) || 25 };
-        $s('#shgnrow').hidden = v === 'abc';
-        $s('#shgnote').textContent = v === 'abc' ? 'בכל יום הוא עובר על כל 26 האותיות, ומקבל סיבוב אחד בגלגל.' : 'בכל הגעה ליעד הוא מקבל סיבוב בגלגל.';
+        const def = v === 'lvl' ? LVL_GOAL_DEFAULT : v === 'mins' ? 15 : 25;
+        st.goal = { type: v, n: def }; $s('#shgn').value = def; $s('#shgn').max = v === 'lvl' ? 26 : 500;
+        $s('#shgnote').textContent = GOAL_NOTE[v];
       });
-      $s('#shgn').oninput = e => { if (st.goal.type !== 'abc') { st.goal.n = Math.max(1, Math.min(500, parseInt(e.target.value, 10) || 1)); touch(); } };
+      $s('#shgn').oninput = e => { st.goal.n = Math.max(1, Math.min(st.goal.type === 'lvl' ? 26 : 500, parseInt(e.target.value, 10) || 1)); touch(); };
       bindSeg('wh', v => { st.wheel = v === '1'; $s('#shprz').hidden = !st.wheel; });
       $s('#shpz').oninput = e => { const list = e.target.value.split('\n').map(x => x.trim()).filter(Boolean); st.prizes = list.length >= 2 ? list.slice(0, 12) : DEFAULT_PRIZES.slice(); touch(); };
       $s('#shtry').onclick = () => wheelView({ prizes: st.prizes });
@@ -1460,15 +1593,24 @@ function settingsSheet(kidId, tab) {
       const d = kidDay(kid), m = p.mock;
       B.innerHTML = `
         <div class="shstats">
-          <div><b>${d.letters || 0}<small>/26</small></b><span>אותיות היום</span></div>
+          <div><b>${letterLevels(p).filter(v => v === 2).length}<small>/26</small></b><span>אותיות ירוקות</span></div>
+          <div><b>${(d.up || []).length}</b><span>אותיות התקדמו היום</span></div>
           <div><b>${d.stars || 0}</b><span>כוכבים היום</span></div>
           <div><b>${Math.floor((d.ms || 0) / 60000)}</b><span>דקות היום</span></div>
-          <div><b>${(p.days || []).length}</b><span>ימי תרגול</span></div>
         </div>
+        <div class="shgrp"><h3>מפת האותיות</h3>${letterMapHTML(p, { click: true })}
+          <div id="shlt"><p class="hint">לחצו על אות כדי לראות מה הוא כבר יודע בה.</p></div></div>
         <div class="shgrp"><h3>מבחן ניסיון אחרון</h3>
           ${m ? `<p>${m.date.split('-').slice(1).reverse().join('.')}: <b>${m.score}/${m.n}</b></p>${secTable(m.secs).replace(/<button[^>]*>לתרגל<\/button>/g, '')}` : '<p class="hint">עוד לא עשה מבחן ניסיון.</p>'}</div>
-        <div class="shgrp"><h3>זכיות בגלגל</h3>
-          ${(p.wins || []).length ? `<ul class="wins">${p.wins.slice(0, 12).map(w => `<li><span class="en">${esc(enPart(w.prize))}</span> · ${w.date.split('-').slice(1).reverse().join('.')}</li>`).join('')}</ul>` : '<p class="hint">עוד אין.</p>'}</div>`;
+        <div class="shgrp"><h3>זכיות בגלגל</h3>${winRowsHTML((p.wins || []).slice(0, 12))}</div>`;
+      const showLt = c => {
+        const r = (p.lt || {})[c] || {}, lv = letterLevel(r);
+        $s('#shlt').innerHTML = `<div class="ltcard"><b class="ltbig en">${c.toUpperCase()}${c}</b><span class="ltst l${lv}">${['עוד לא', 'בדרך', 'שולט'][lv]}</span>
+          <table class="lttab"><tbody>${LT_SKILLS.map(([k, t]) => { const v = r[k] || [0, 0]; return `<tr><td>${t}</td><td dir="ltr">${v[0]}/${v[1]}</td><td>${v[1] ? (v[0] / v[1] >= .8 ? '✓' : '') : '—'}</td></tr>`; }).join('')}</tbody></table>
+          <p class="hint">${r.last ? `תרגל לאחרונה: ${r.last.split('-').slice(1).reverse().join('.')}` : 'עוד לא תרגל את האות הזאת.'}</p></div>`;
+        $$s('.lm').forEach(x => x.classList.toggle('sel', x.dataset.lt === c));
+      };
+      $$s('[data-lt]').forEach(x => { x.onclick = () => showLt(x.dataset.lt); x.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showLt(x.dataset.lt); } }; });
     } else if (cur === 'link') {
       const url = kidLink(kid.id, st.linkMode);
       B.innerHTML = `
@@ -1705,6 +1847,8 @@ function progressView() {
       <h2>היום</h2>
       <p class="bignum">⭐ ${G.d.stars} <small>כוכבים</small> · ⏱ ${G.mins} <small>דקות</small></p>
       <p class="gleft">${G.earned ? '🏆 הגעת ליעד היומי!' : `נשארו עוד <b>${G.left} ${G.unit}</b> ליעד`}</p>
+      <h2>מפת האותיות שלי</h2>
+      ${letterMapHTML(st)}
       <h2>השבוע</h2>
       <div class="week">${last7.map(d => { const on = (st.days || []).includes(d); const wd = DAYS[new Date(d.split('-')[0], d.split('-')[1] - 1, d.split('-')[2]).getDay()]; return `<span class="wday ${on ? 'on' : ''}" title="${fmt(d)}">${on ? '✓' : ''}<small>${wd}</small></span>`; }).join('')}</div>
       <p>סך הכול: <b>⭐ ${st.stars}</b> כוכבים · <b>${(st.days || []).length}</b> ימי תרגול</p>
@@ -1716,7 +1860,7 @@ function progressView() {
     <section class="stk pbox">
       <h2>השיאים שלי בתרגול</h2>
       <ul class="bests">${MODS.filter(m => st.best[m.id] != null).map(m => `<li>${m.t}: <b>${st.best[m.id]}%</b></li>`).join('') || '<li class="hint">עוד אין.</li>'}</ul>
-      ${(st.wins || []).length ? `<h3>מה זכיתי בגלגל</h3><ul class="wins">${st.wins.slice(0, 10).map(w => `<li><span class="en">${esc(enPart(w.prize))}</span> · ${fmt(w.date)}</li>`).join('')}</ul>` : ''}
+      ${(st.wins || []).length ? `<h3>מה זכיתי בגלגל</h3>${winRowsHTML(st.wins.slice(0, 10))}` : ''}
     </section>`;
   $$('[data-practice]', app).forEach(b => b.onclick = () => MODS.find(m => m.id === b.dataset.practice).run());
 }
@@ -2231,11 +2375,12 @@ function fillOpts(ans, conf, ok, pool, n = optN()) {
 }
 const wordHTML = wd => `<span class="rv">${wd.e} <b>${wd.w[0]}</b>${wd.w.slice(1)}</span>`;
 
+function wordFor(pool) { const L = pickLetter(); const m = pool.filter(x => x.L.toLowerCase() === L); return m.length ? pick(m) : pick(pool); }
 function qSound() {
-  const wd = pick(WORDS.filter(x => x.f !== 't'));
+  const wd = wordFor(WORDS.filter(x => x.f !== 't'));
   const ans = wd.L.toLowerCase();
   const opts = fillOpts(ans, SOUNDCONF[ans], l => !clash(wd, l), ALPHA);
-  return { key: 's:' + wd.w, hue: wd.hue, speak: wd.w,
+  return { key: 's:' + wd.w, hue: wd.hue, speak: wd.w, lt: ans, sk: 'snd',
     prompt: `<div class="pic">${wd.e}</div><p class="ask">שמע את המילה. באיזו אות היא מתחילה?</p>`,
     layout: 'letters', options: opts.map(l => ({ v: l, html: `<span class="en">${l.toUpperCase()}${l}</span>` })),
     answer: ans, reveal: wordHTML(wd), rv: `${wd.e} ${wd.w} → ${ans.toUpperCase()}${ans}`,
@@ -2243,30 +2388,30 @@ function qSound() {
 }
 function qPic() {
   const pics = WORDS.filter(x => !x.f);
-  const wd = pick(pics), l = wd.L.toLowerCase();
+  const wd = wordFor(pics), l = wd.L.toLowerCase();
   const chosen = [wd];
   for (const x of shuffle(pics)) { if (chosen.length >= 3) break; if (!chosen.some(c => c.L === x.L) && !clash(x, l)) chosen.push(x); }
-  return { key: 'p:' + wd.w, hue: wd.hue, sayAfter: wd.w,
+  return { key: 'p:' + wd.w, hue: wd.hue, sayAfter: wd.w, lt: l, sk: 'snd',
     prompt: `<div class="bigletter en">${wd.L}${l}</div><p class="ask">איזו תמונה מתחילה באות <span class="en">${wd.L}</span>?</p>`,
     layout: 'emoji', options: shuffle(chosen).map(x => ({ v: x.w, html: x.e, label: x.w, say: x.w })),
     answer: wd.w, rv: `${wd.L} → ${wd.e} ${wd.w}`,
     hint: { he: `האות <span class="en">${wd.L}</span> נשמעת בערך כמו <b>${heSound(wd.L)}</b>. הקשב לשמות של התמונות`, say: chosen.map(x => x.w).join('|') } };
 }
 function qCase() {
-  const U = pick(ALPHA).toUpperCase(), l = U.toLowerCase(), h = hueOf(ALPHA.indexOf(l));
+  const U = pickLetter().toUpperCase(), l = U.toLowerCase(), h = hueOf(ALPHA.indexOf(l));
   if (Math.random() < 0.55) {
-    return { key: 'c:' + U, hue: h, prompt: `<div class="bigletter en">${U}</div><p class="ask">מה האות הקטנה של <span class="en">${U}</span>?</p>`,
+    return { key: 'c:' + U, hue: h, lt: l, sk: 'cas', prompt: `<div class="bigletter en">${U}</div><p class="ask">מה האות הקטנה של <span class="en">${U}</span>?</p>`,
       layout: 'letters', options: fillOpts(l, LOWC[l], () => true, ALPHA).map(x => ({ v: x, html: `<span class="en">${x}</span>` })),
       answer: l, rv: `${U} → ${l}`, hint: { he: `איך נראית האות הקטנה? ${SHAPE_LOW[l]}` } };
   }
   const UP = ALPHA.map(x => x.toUpperCase());
-  return { key: 'C:' + l, hue: h, prompt: `<div class="bigletter en">${l}</div><p class="ask">מה האות הגדולה של <span class="en">${l}</span>?</p>`,
+  return { key: 'C:' + l, hue: h, lt: l, sk: 'cas', prompt: `<div class="bigletter en">${l}</div><p class="ask">מה האות הגדולה של <span class="en">${l}</span>?</p>`,
     layout: 'letters', options: fillOpts(U, UPC[U], () => true, UP).map(x => ({ v: x, html: `<span class="en">${x}</span>` })),
     answer: U, rv: `${l} → ${U}`, hint: { he: `איך נראית האות הגדולה? ${SHAPE_UP[U]}` } };
 }
 function qName() {
-  const l = pick(ALPHA), U = l.toUpperCase();
-  return { key: 'n:' + l, hue: hueOf(ALPHA.indexOf(l)), speak: NAME[U],
+  const l = pickLetter(), U = l.toUpperCase();
+  return { key: 'n:' + l, hue: hueOf(ALPHA.indexOf(l)), speak: NAME[U], lt: l, sk: 'nam',
     prompt: `<div class="pic" aria-hidden="true">🔊</div><p class="ask">שמע את שם האות ובחר אותה</p>`,
     layout: 'letters', options: fillOpts(l, NAMECONF[l], () => true, ALPHA).map(x => ({ v: x, html: `<span class="en">${x.toUpperCase()}${x}</span>` })),
     answer: l, rv: `🔊 ${U}${l}`, hint: { he: `זו האות שבה מתחילה המילה ${hintWord(U)[1]} (הקשב לשתיהן)`, say: NAME[U] + '|' + hintWord(U)[0], slow: true } };
@@ -2431,6 +2576,22 @@ function flyStar(from) {
     { transform: `translate(${dx}px,${dy}px) scale(.5)`, opacity: .9 },
   ], { duration: 750, easing: 'cubic-bezier(.5,0,.3,1)' }).onfinish = () => { s.remove(); done(); };
 }
+function focusQuiz() {
+  setLvl();
+  FOCUS = weakLetters(6);
+  if (!FOCUS.length) FOCUS = null;
+  const qs = build([qSound, qCase, qName, qPic, qCase, qSound], 10);
+  FOCUS = null;
+  runQuiz('focus', 'האותיות שלי', qs, focusQuiz);
+}
+function celebrateAll() {
+  const ov = document.createElement('div');
+  ov.className = 'winov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true');
+  ov.innerHTML = `<div class="wincard"><p class="wtitle">🏆</p><p class="wtext">כל 26 האותיות ירוקות!</p><p>קיבלת סיבוב בונוס בגלגל. מעכשיו כל יום חוזרים על כמה אותיות, כדי שלא ישכחו עד המבחן.</p><div class="wdetails" style="opacity:1;transform:none;pointer-events:auto"><button class="btn primary" id="agok">איזה כיף!</button></div></div>`;
+  document.body.appendChild(ov);
+  sfx('win');
+  ov.querySelector('#agok').onclick = () => { ov.remove(); home(); };
+}
 const SECS = { sounds:'צלילים', letters:'גדולות וקטנות', sentences:'קריאת משפטים', stories:'הבנת הנקרא', numbers:'מספרים עד 12' };
 function runQuiz(mod, title, qs, again) {
   let i = 0, score = 0; const wrong = [], secs = {};
@@ -2455,6 +2616,7 @@ function runQuiz(mod, title, qs, again) {
   function tally(ok) {
     const q = qs[i];
     if (ok) { score++; addStar(); flyStar($('.opt.okpick, .opt:focus') || $('.qcard')); } else wrong.push(q.rv);
+    if (q.lt) recordLetter(q.lt, q.sk, ok);
     if (q.sec) { secs[q.sec] = secs[q.sec] || [0, 0]; secs[q.sec][1]++; if (ok) secs[q.sec][0]++; }
   }
   function close(msgHTML, good) {
@@ -2523,6 +2685,9 @@ function runQuiz(mod, title, qs, again) {
     if (isMock) { const s = load(); s.mock = { date: today(), score, n: qs.length, secs, level: lvl }; s.mocks = [s.mock, ...(s.mocks || [])].slice(0, 20); save(s); }
     // a finished round is worth a letter, and a round at 90% or better is worth two
     const gotLetters = isMock ? 0 : grantLetters(pct >= 90 ? 2 : 1);
+    // the very first round of practice: a spin on the house, whatever the score (stars are kept as earned)
+    let firstGift = false;
+    { const s0 = load(); if (!s0.firstGift && s0.wheel !== false) { s0.firstGift = today(); const d0 = day(s0); d0.bonus = (d0.bonus || 0) + 1; save(s0); firstGift = true; } }
     const stars = pct >= 90 ? 3 : pct >= 70 ? 2 : 1;
     const msg = pct >= 90 ? 'מעולה! אתה מוכן!' : pct >= 70 ? 'יפה מאוד! עוד קצת תרגול ואתה שם.' : 'כל סיבוב מקדם אותך. ננסה שוב?';
     app.innerHTML = `${top(title)}
@@ -2531,12 +2696,14 @@ function runQuiz(mod, title, qs, again) {
         <div class="score">${score}/${qs.length}</div>
         <p class="hint">נספרות רק תשובות נכונות בניסיון הראשון.</p>
         <h2>${msg}</h2>
+        ${firstGift ? `<div class="giftbox"><b>🎉 סיבוב פתיחה עלינו!</b><span>לכבוד האימון הראשון שלך מגיע לך סיבוב בגלגל ההפתעות, מתנה. הכוכבים שהרווחת נשארים שלך.</span><button class="btn spinbtn" id="giftspin">🎡 לסובב עכשיו</button></div>` : ''}
         ${isMock ? secTable(secs) : ''}
         ${wrong.length ? `<div class="review"><b>כדאי לחזור על:</b><ul>${wrong.map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>` : ''}
         ${!isMock && pct >= 90 && lvl !== 'hard' && load().allowLevelUp !== false ? `<div class="lvlup"><b>עברת את זה בקלות! 🚀</b><button class="btn primary" id="lvlup">⬆ לעלות לרמה ${LEVELS[lvl === 'easy' ? 'medium' : 'hard']}</button></div>` : ''}
         <div class="row center"><button class="btn ${!isMock && pct >= 90 && lvl !== 'hard' && load().allowLevelUp !== false ? '' : 'primary'}" id="again">${isMock ? 'מבחן חדש' : 'עוד סיבוב'}</button><button class="btn" data-back="home">לדף הבית</button></div>
       </section>`;
     $('#again').onclick = () => go(again);
+    const gs = $('#giftspin'); if (gs) { gs.onclick = () => go(wheelView); sfx('win'); }
     const lu = $('#lvlup'); if (lu) lu.onclick = () => { const s = load(); s.level = lvl === 'easy' ? 'medium' : 'hard'; save(s); go(again); };
     $$('[data-practice]', app).forEach(b => b.onclick = () => MODS.find(m => m.id === b.dataset.practice).run());
   }
@@ -2778,7 +2945,7 @@ function writeView() {
   }
   // hush(): moving to another letter has to silence the one before it. Without this the name of the
   // previous letter keeps being read out over the new one, which sounds like the app has frozen.
-  function clear() { hush(); cancelAnimationFrame(anim); d.getContext('2d').clearRect(0, 0, W, H); ink = []; resetMatch(); hist = []; refreshUndo(); missing = []; hinting = false; $('#wfb').innerHTML = ''; }
+  function clear() { hush(); cancelAnimationFrame(anim); d.getContext('2d').clearRect(0, 0, W, H); ink = []; resetMatch(); hist = []; refreshUndo(); missing = []; hinting = false; $('#wfb').innerHTML = ''; try { wRec = new Set(); } catch (e) {} }
   // rub out just what the eraser passes over, like a paint program: the child fixes one line instead
   // of losing the letter. A guide line the eraser touches is released back to "not drawn yet".
   function eraseAt(p) {
@@ -2895,7 +3062,12 @@ function writeView() {
     if (matched.every(gl => gl.every(Boolean))) { check(true); return; }
     if (doneG.length) { sfx('ok'); $('#wfb').innerHTML = `<div class="fb good"><div class="msg"><b>✓ <span class="en">${letters[doneG[0]]}</span> נכונה!</b> עכשיו ${letters.length > 1 ? 'האות השנייה' : ''}</div></div>`; }
   }
+  let wRec = new Set(); // letters already recorded in this attempt
+  function recW(letters, results) {
+    letters.forEach((L, i) => { const key = L + i; if (wRec.has(key)) return; wRec.add(key); recordLetter(L, L === L.toUpperCase() ? 'wu' : 'wl', results[i]); });
+  }
   function success(tip) {
+    recW(chars(), chars().map(() => true));
     if (won) return;
     won = true; addStar(); markDone('write'); writeRun(); sfx('ok');
     $('#wfb').innerHTML = `<div class="fb good"><div class="msg"><b><span class="en">${pick(PRAISE)}</span> ⭐ כתבת נכון!</b>${tip ? `<span>${tip}</span>` : ''}</div><button class="btn primary" id="wnext">אות הבאה ←</button></div>`;
@@ -2980,6 +3152,7 @@ function writeView() {
         success(r.includes('size') ? ' שים לב לגודל: אות גדולה מגיעה עד הקו העליון, ואות קטנה כמו a נכנסת בין הקו המקווקו לקו התחתון.' : '');
       } else if (!auto) {
         sfx('no');
+        recW(letters, r.map(x => x !== 'no'));
         ghost = true; renderButtons(); drawGuide();
         // one chip per letter, each a self-contained LTR letter + Hebrew verdict, so the two
         // directions never share a line and get reordered by the browser
@@ -2996,6 +3169,7 @@ function writeView() {
     // dictation: shape matters, size and place are free (there is no guide letter)
     state = 'checked'; ghost = true; drawGuide();
     const ok = recognise(ink, chars()[0]);
+    recordLetter(chars()[0], chars()[0] === chars()[0].toUpperCase() ? 'wu' : 'wl', ok);
     if (ok) { addStar(); markDone('write'); writeRun(); }
     sfx(ok ? 'ok' : 'no');
     $('#wfb').innerHTML = ok
