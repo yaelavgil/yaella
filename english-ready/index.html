@@ -622,6 +622,20 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .pmark{position:absolute;z-index:2;transform:translate(-50%,-110%);font-size:20px;line-height:1;pointer-events:none;animation:pbob 1.6s ease-in-out infinite}
 .pmark .ji{height:22px}
 @media (prefers-reduced-motion:reduce){.pn.cur,.pwheel.open,.pmark,.pwheel.open .mwspin{animation:none}}
+.trycard{display:flex;align-items:center;gap:14px;width:100%;text-align:start;cursor:pointer;color:#fff;border:0;border-radius:18px;padding:12px 16px;
+  background:radial-gradient(120% 140% at 85% 0%,#7B4DFF 0%,#4B21C9 55%,#2A0F86 100%);box-shadow:0 6px 18px rgba(60,20,160,.25);transition:transform .18s var(--ease),box-shadow .18s}
+.trycard[hidden]{display:none}
+.trycard:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(60,20,160,.32)}
+.trycard:active{transform:translateY(1px)}
+.trywheel{width:64px;height:64px;flex:none;filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))}
+.trywheel .mw{width:100%;height:100%;display:block}
+.trywheel .mwspin{animation:mwturn 9s linear infinite;transform-origin:50% 50%}
+.trycard:hover .mwspin{animation-duration:2s}
+.trytx{flex:1;display:grid;gap:2px;min-width:0}
+.trytx b{font:700 19px var(--f-display)}
+.trytx small{font-size:13px;color:#E6DEFF}
+.tryarrow{font-size:22px;opacity:.8}
+@media (prefers-reduced-motion:reduce){.trywheel .mwspin{animation:none}}
 /* letter card */
 .lcov{position:fixed;inset:0;z-index:66;background:rgba(26,20,40,.45);display:grid;place-items:center;padding:16px;animation:fade .2s both}
 .lcard{position:relative;width:min(420px,100%);background:var(--bg);border-radius:22px;padding:18px;display:grid;gap:12px;box-shadow:0 24px 70px rgba(20,10,40,.35);animation:sheetin .25s var(--ease) both}
@@ -1615,6 +1629,11 @@ function settingsSheet(kidId, tab) {
       const gt = (st.goal.type === 'abc' || !st.goal.type) ? 'lvl' : st.goal.type;
       if (gt === 'lvl' && st.goal.type !== 'lvl') st.goal = { type: 'lvl', n: LVL_GOAL_DEFAULT };
       B.innerHTML = `
+        <button type="button" class="trycard" id="shtry" ${st.wheel ? '' : 'hidden'} aria-label="נסו את גלגל ההפתעות בעצמכם">
+          <span class="trywheel">${miniWheel(st.prizes.length)}</span>
+          <span class="trytx"><b>נסו בעצמכם</b><small>כך ${esc(kid.name)} רואה את גלגל ההפתעות. הסיבובים כאן לא נספרים.</small></span>
+          <span class="tryarrow" aria-hidden="true">←</span>
+        </button>
         <div class="shgrp"><h3>היעד היומי</h3>
           <div class="seg" role="group" aria-label="סוג יעד">${segs('gt', gt, [['lvl', 'אותיות שהתקדמו'], ['stars', 'כוכבים'], ['mins', 'דקות']])}</div>
           <label class="shfield" id="shgnrow">כמה ביום? <input id="shgn" type="number" min="1" max="${gt === 'lvl' ? 26 : 500}" value="${st.goal.n || LVL_GOAL_DEFAULT}" class="pin"></label>
@@ -1623,15 +1642,14 @@ function settingsSheet(kidId, tab) {
           <div class="seg" role="group" aria-label="גלגל ההפתעות">${segs('wh', st.wheel ? '1' : '0', [['1', 'פעיל'], ['0', 'כבוי: רק כוכבים']])}</div></div>
         <div class="shgrp" id="shprz" ${st.wheel ? '' : 'hidden'}><h3>ההפתעות</h3>
           <p class="hint">אחת בכל שורה, באנגלית. תרגום לעברית אחרי קו: <span class="en" dir="ltr">A pizza night 🍕 | ערב פיצה</span></p>
-          <textarea id="shpz" rows="6" class="en ptext-in">${esc(st.prizes.join('\n'))}</textarea>
-          <button type="button" class="btn wtrybtn" id="shtry"><span class="wtmini"></span>נסו את הגלגל</button></div>`;
+          <textarea id="shpz" rows="6" class="en ptext-in">${esc(st.prizes.join('\n'))}</textarea></div>`;
       bindSeg('gt', v => {
         const def = v === 'lvl' ? LVL_GOAL_DEFAULT : v === 'mins' ? 15 : 25;
         st.goal = { type: v, n: def }; $s('#shgn').value = def; $s('#shgn').max = v === 'lvl' ? 26 : 500;
         $s('#shgnote').textContent = GOAL_NOTE[v];
       });
       $s('#shgn').oninput = e => { st.goal.n = Math.max(1, Math.min(st.goal.type === 'lvl' ? 26 : 500, parseInt(e.target.value, 10) || 1)); touch(); };
-      bindSeg('wh', v => { st.wheel = v === '1'; $s('#shprz').hidden = !st.wheel; });
+      bindSeg('wh', v => { st.wheel = v === '1'; $s('#shprz').hidden = !st.wheel; $s('#shtry').hidden = !st.wheel; });
       $s('#shpz').oninput = e => { const list = e.target.value.split('\n').map(x => x.trim()).filter(Boolean); st.prizes = list.length >= 2 ? list.slice(0, 12) : DEFAULT_PRIZES.slice(); touch(); };
       $s('#shtry').onclick = () => wheelView({ prizes: st.prizes });
     } else if (cur === 'prog') {
