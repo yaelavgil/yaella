@@ -736,6 +736,10 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .mnode.cur{background:conic-gradient(#FFD23F var(--ring,0%),transparent 0) border-box,linear-gradient(#6FA3FF,#3D7BFF) padding-box;border:5px solid transparent}
 .ltime{display:grid;gap:6px;justify-items:center;margin:4px 0}
 .mbar.big{width:200px;height:12px}
+.jbanner{display:grid;gap:8px;justify-items:center;padding:12px;margin-bottom:10px;border-radius:16px;background:linear-gradient(135deg,#FFF1B8,#FFD9A0);color:#5A3A00;text-align:center;animation:pop .4s both}
+.lorder{font:700 28px var(--f-en);letter-spacing:2px;margin:0;color:var(--muted)}
+.lorder b{color:#E39B00;font-size:36px}
+.stl:not(.en){font-size:20px}
 /* letter card */
 .lcov{position:fixed;inset:0;z-index:66;background:rgba(26,20,40,.45);display:grid;place-items:center;padding:16px;animation:fade .2s both}
 .lcard{position:relative;width:min(420px,100%);background:var(--bg);border-radius:22px;padding:18px;display:grid;gap:12px;box-shadow:0 24px 70px rgba(20,10,40,.35);animation:sheetin .25s var(--ease) both}
@@ -1249,7 +1253,7 @@ document.addEventListener('pointerdown', () => {
   const now = Date.now();
   if (practicing && lastAct && now - lastAct < 90000) {
     const s = load(); day(s).ms += now - lastAct;
-    if (inStage && s.jour && STAGE) { const J = s.jour; if (J.ck !== STAGE.k) { J.ck = STAGE.k; J.cms = 0; } J.cms = (J.cms || 0) + (now - lastAct); }
+    if (s.jour && (s.goal || {}).type === 'journey' && s.jour.n < JOUR_N) { const J = s.jour; if (J.ck !== J.n) { J.ck = J.n; J.cms = 0; } J.cms = (J.cms || 0) + (now - lastAct); }
     save(s);
   }
   lastAct = practicing ? now : 0;
@@ -1793,8 +1797,8 @@ function settingsSheet(kidId, tab) {
           <span class="tryarrow" aria-hidden="true">←</span>
         </button>
         <div class="shgrp"><h3>מסע 26 האותיות</h3>
-          <p class="hint">כל אות דורשת זמן תרגול אמיתי (סבבים של כ־10 שאלות, ובסוף כותבים את האות). האות הראשונה של כל יום פותחת סיבוב בגלגל, פעם ביום לכל היותר. אחרי Z מחכה מגה גלגל. נספרות רק דקות של עבודה פעילה.</p>
-          <label class="shfield">כמה דקות תרגול לאות</label>
+          <p class="hint">כל שלב במפה הוא זמן תרגול אמיתי בכל נושאי המבחן (כל תרגול נספר), ובסופו הילד מקבל את האות הבאה, לפי הסדר A→Z. השלב הראשון של כל יום פותח סיבוב בגלגל, פעם ביום לכל היותר. אחרי Z מחכה מגה גלגל. נספרות רק דקות של עבודה פעילה.</p>
+          <label class="shfield">כמה דקות תרגול לשלב (ובסופו אות)</label>
           <div class="seg" role="group" aria-label="דקות לאות">${segs('lm', String(letterMin(st)), [['15', '15 דק׳'], ['20', '20'], ['30', '30'], ['40', '40']])}</div>
           <label class="shfield">הגבלה יומית לכל התרגול (שיעור שהתחיל אפשר לסיים)</label>
           <div class="seg" role="group" aria-label="הגבלה יומית">${segs('mx', String(dayMax(st)), [['45', '45 דק׳'], ['60', 'שעה'], ['90', 'שעה וחצי'], ['0', 'בלי']])}</div>
@@ -2933,7 +2937,8 @@ function journeyCardHTML(G, st) {
   if (G.mega && st.wheel && !G.megaWait) action = `<button class="btn spinbtn megabtn" id="megaspin">👑 אספת את כל 26 האותיות! למגה גלגל</button>`;
   else if (G.avail && st.wheel) action = `<button class="btn spinbtn" id="spin">🎡 האות הראשונה של היום! לסובב את הגלגל</button>`;
   else if (G.capped) action = `<div class="jrest">🌙 <b>להיום מספיק, כל הכבוד!</b><span>תרגלת ${G.maxM} דקות היום. המוח צריך גם מנוחה. נמשיך מחר.</span></div>`;
-  else if (J.n < JOUR_N) action = `<button class="btn stagebtn" id="stagego"><span class="stl en">${nextL}${nextL.toLowerCase()}</span><span>שלב ${J.n + 1}: לאסוף את האות ${nextL}<small class="stmin">⏱ ${G.cmin}/${G.lmin} דקות</small></span><span aria-hidden="true">←</span></button>`;
+  else if (J.n < JOUR_N && G.cmin >= G.lmin) action = `<button class="btn spinbtn" id="claim">🎁 הגעת לסוף השלב! לקבל את האות <span class="en">${nextL}</span></button>`;
+  else if (J.n < JOUR_N) action = `<button class="btn stagebtn" id="stagego"><span class="stl">▶</span><span>להמשיך במסע · שלב ${J.n + 1}<small class="stmin">⏱ ${G.cmin}/${G.lmin} דקות · 🎁 בסוף: האות <span class="en">${nextL}</span></small></span><span aria-hidden="true">←</span></button>`;
   else if (!G.mega) action = `<div class="jdone"><b>🏆 סיימת את כל המסע! אתה מוכן למבחן.</b><button class="btn" id="jnew">להתחיל מסע חדש</button></div>`;
   else action = '';
   const wait = st.wheel && (G.waiting || G.megaWait)
@@ -2947,7 +2952,7 @@ function journeyCardHTML(G, st) {
       ${G.maxM ? `<span class="mtime">⏱ היום <b>${G.mins}</b>/${G.maxM} דקות<span class="mbar"><i style="width:${Math.min(100, Math.round(G.mins / G.maxM * 100))}%"></i></span></span>` : ''}</div>`;
   return `<section class="goal stk h3 journey">
     <div class="goalhead"><span class="glabel">🔤 מסע 26 האותיות</span><span class="gbig" dir="ltr">${J.n} / ${JOUR_N}</span></div>
-    <p class="gsub">כל אות = <b>${G.lmin} דקות</b> תרגול. ${st.wheel ? 'האות הראשונה של כל יום פותחת את <b>הגלגל</b> (פעם ביום). ב־Z: <b>מגה גלגל</b>.' : ''}</p>
+    <p class="gsub">כל <b>${G.lmin} דקות</b> תרגול = שלב במפה, ובסוף כל שלב מקבלים אות באנגלית 🎁. כל תרגול נספר. ${st.wheel ? 'השלב הראשון של כל יום פותח את <b>הגלגל</b>. ב־Z: <b>מגה גלגל</b>.' : ''}</p>
     ${action}
     ${wait}
     ${mission}
@@ -2964,16 +2969,16 @@ function stagePop(el) {
   pop.innerHTML = state === 'rest'
     ? `<b>שלב ${k + 1} · האות <span class="en">${L}</span></b><span>🌙 להיום מספיק. נמשיך מחר!</span>`
     : state === 'lock'
-    ? `<b>שלב ${k + 1} · האות <span class="en">${L}</span></b><span>🔒 עוד נעול. קודם אוספים את <span class="en">${ALPHA[J.n].toUpperCase()}</span>.</span>`
-    : `<b>שלב ${k + 1} · האות <span class="en">${L}${L.toLowerCase()}</span></b>
-       <span>${state === 'cur' ? `${G_.lmin} דקות תרגול בסבבים של כ־10 שאלות (עד עכשיו: ${G_.cmin}), ואז כותבים את האות.` : 'האות כבר שלך ✓. אפשר לתרגל אותה שוב.'}</span>
-       <button class="btn ${state === 'cur' ? 'primary' : ''}" data-popgo>${state === 'cur' ? '▶ להתחיל' : '↻ לתרגל שוב'}</button>`;
+    ? `<b>שלב ${k + 1} · 🎁 האות <span class="en">${L}</span></b><span>🔒 עוד נעול. קודם מסיימים את שלב ${J.n + 1}.</span>`
+    : `<b>שלב ${k + 1} · 🎁 האות <span class="en">${L}${L.toLowerCase()}</span></b>
+       <span>${state === 'cur' ? `${G_.lmin} דקות תרגול (עד עכשיו: ${G_.cmin}). בסוף השלב מקבלים את האות <span class="en">${L}</span> 🎁` : `את האות <span class="en">${L}</span> קיבלת בשלב ${k + 1} ✓`}</span>
+       ${state === 'cur' ? '<button class="btn primary" data-popgo>▶ להמשיך במסע</button>' : ''}`;
   card.appendChild(pop);
   const cb = card.getBoundingClientRect(), r = el.getBoundingClientRect();
   const x = Math.max(12, Math.min(cb.width - pop.offsetWidth - 12, r.left + r.width / 2 - cb.left - pop.offsetWidth / 2));
   pop.style.left = x + 'px'; pop.style.top = (r.bottom - cb.top + card.scrollTop + 10) + 'px';
   pop.style.setProperty('--ax', (r.left + r.width / 2 - cb.left - x) + 'px');
-  const g = pop.querySelector('[data-popgo]'); if (g) g.onclick = () => go(stageQuiz, k);
+  const g = pop.querySelector('[data-popgo]'); if (g) g.onclick = () => go(stageQuiz);
   pop.onclick = e => e.stopPropagation();
   setTimeout(() => document.addEventListener('click', function off() { pop.remove(); document.removeEventListener('click', off); }), 0);
   if (g) g.focus();
@@ -2998,7 +3003,8 @@ function wireJourney() {
     const cur = m.querySelector('.mnode.cur') || m.querySelector('.mend');
     if (cur) requestAnimationFrame(() => { m.style.scrollBehavior = 'auto'; const r = cur.getBoundingClientRect(), mb = m.getBoundingClientRect(); m.scrollTop = Math.max(0, m.scrollTop + r.top - mb.top - m.clientHeight / 2 + r.height / 2); m.style.scrollBehavior = ''; drawJourneyMap(); });
   }
-  const sg = $('#stagego'); if (sg) sg.onclick = () => go(stageQuiz, jour(load()).n);
+  const sg = $('#stagego'); if (sg) sg.onclick = () => go(stageQuiz);
+  const cl = $('#claim'); if (cl) cl.onclick = () => claimLetter();
   $$('.journey .mnode[data-stage]', app).forEach(x => { x.onclick = e => { e.stopPropagation(); stagePop(x); }; x.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); x.click(); } }; });
   const mw = $('#pmegaw'); if (mw) mw.onclick = () => { const g = goalState(load()); WHEEL_MEGA = g.mega && !g.megaWait; go(wheelView); };
   const ms = $('#megaspin'); if (ms) ms.onclick = () => { WHEEL_MEGA = true; go(wheelView); };
@@ -3009,94 +3015,78 @@ function wireJourney() {
    other test subjects in turn), then writing the letter big and small. The last stage, Z, is a
    rehearsal of the whole test. */
 let STAGE = null;
-function stageQuiz(k) {
-  if (goalState(load()).capped) { go(home); return; }
+const stopReached = s => { const J = jour(s); return J.n < JOUR_N && J.ck === J.n && (J.cms || 0) >= letterMin(s) * 60000; };
+/* a round on the journey: mixed practice of the whole test (letters he has not covered come first),
+   a different subject block each round. The stop on the map is reached by time, not by a letter. */
+function stageQuiz() {
+  if (goalState(load()).capped) { restView(); return; }
   setLvl();
-  const L = ALPHA[k];
-  STAGE = { k, t0: Date.now() }; inStage = true;
-  { const s0 = load(), J0 = jour(s0); if (J0.ck !== k && J0.n === k) { J0.ck = k; J0.cms = 0; J0.cr = 0; save(s0); } }
-  const round = (jour(load()).cr || 0);
-  FOCUS = [L];
-  const mine = build([qSound, qCase, qName], 3);
-  FOCUS = null;
-  let qs;
-  if (k === JOUR_N - 1) {
-    qs = [...mine, ...build([qSound, qPic, qCase, qName], 4), ...shuffle(SENTENCES).slice(0, 3).map((it, i) => qSentence(it, i === 1)),
-      ...storyQs(pick(STORIES.filter(st => !st.hard))), ...build([qNumListen, qNumWord, qNumDigit, qNumCount], 3)];
-  } else {
-    const cover = build([qPic, qCase, qName, qSound], 3);
-    const t = (k + round) % 4;
-    const topic = t === 0 ? build(SETS.numbers[lvl], 4)
-      : t === 1 ? shuffle(SENTENCES).slice(0, 3).map((it, i) => qSentence(it, i % 2 === 1))
-      : t === 2 ? storyQs(pick(STORIES.filter(st => lvl === 'hard' ? st.hard : !st.hard))).slice(0, 4)
-      : build(lvl === 'easy' ? [qSeq, qPic, qSeq] : [qMissing, qSeq, qSpell], 3);
-    qs = [...mine, ...cover, ...topic];
-  }
-  runQuiz('stage', `שלב ${k + 1} · האות ${L.toUpperCase()}`, qs, () => stageQuiz(k));
+  const s0 = load(), J0 = jour(s0);
+  if (J0.ck !== J0.n) { J0.ck = J0.n; J0.cms = 0; J0.cr = 0; save(s0); }
+  const round = J0.cr || 0;
+  STAGE = { k: J0.n };
+  const base = build([qSound, qCase, qPic, qName, qSeq], 5);
+  const t = round % 5;
+  const block = t === 0 ? build(SETS.numbers[lvl], 4)
+    : t === 1 ? shuffle(SENTENCES).slice(0, 3).map((it, i) => qSentence(it, i % 2 === 1))
+    : t === 2 ? storyQs(pick(STORIES.filter(st => lvl === 'hard' ? st.hard : !st.hard))).slice(0, 4)
+    : t === 3 ? build(lvl === 'easy' ? [qSeq, qPic, qCase] : [qMissing, qSpell, qSeq], 4)
+    : build([qNumListen, qNumWord], 2).concat(shuffle(SENTENCES).slice(0, 2).map((it, i) => qSentence(it, i === 1)));
+  runQuiz('stage', `המסע · שלב ${J0.n + 1}`, [...base, ...block], stageQuiz);
 }
-function stageFinish(k, score, n) {
-  const pct = Math.round((score / n) * 100), L = ALPHA[k].toUpperCase();
+function stageFinish(score, n) {
   const s0 = load(), J0 = jour(s0); J0.cr = (J0.cr || 0) + 1; save(s0);
-  const newL = J0.n === k, need = letterMin(s0), have = newL ? curLetterMin(s0) : need;
-  const pass = pct >= 60 && have >= need;
-  if (pct >= 60 && !pass) { sfx('ok'); return stageMore(k, score, n, need, have); }
-  sfx(pass ? 'win' : 'ok');
-  app.innerHTML = `${top(`שלב ${k + 1} · האות ${L}`)}
+  if (stopReached(s0)) return claimLetter();
+  sfx('ok');
+  const need = letterMin(s0), have = curLetterMin(s0), rest = restNow(), L = (ALPHA[J0.n] || 'z').toUpperCase();
+  app.innerHTML = `${top(`המסע · שלב ${J0.n + 1}`)}
     <section class="result stk">
-      <div class="stagebig en ${pass ? 'got' : ''}">${L}${L.toLowerCase()}</div>
       <div class="score">${score}/${n}</div>
-      ${pass
-        ? `<h2>עברת את השלב! 🎉</h2><p>${jour(load()).n > k ? `עכשיו כותבים את האות <span class="en">${L}</span>, גדולה וקטנה.` : `נשאר רק לכתוב את האות <span class="en">${L}</span>, גדולה וקטנה, והיא שלך.`}</p>
-           <div class="row center"><button class="btn primary" id="stw">✍️ לכתוב את <span class="en">${L}${L.toLowerCase()}</span></button></div>`
-        : `<h2>כמעט!</h2><p>בסבב הזה היו פחות מ־6 תשובות נכונות בניסיון הראשון. הדקות נספרות בכל מקרה. בוא ננסה שוב, עם שאלות חדשות.</p>
-           <div class="row center"><button class="btn primary" id="again">↻ לנסות שוב</button><button class="btn" data-back="home">לדף הבית</button></div>`}
-    </section>`;
-  const w = $('#stw'); if (w) w.onclick = () => { WRITE_START = { i: k, cs: 'both', stage: k }; go(writeView); inStage = true; };
-  const a = $('#again'); if (a) a.onclick = () => go(stageQuiz, k);
-}
-function stageMore(k, score, n, need, have) {
-  const L = ALPHA[k].toUpperCase(), rest = restNow();
-  app.innerHTML = `${top(`שלב ${k + 1} · האות ${L}`)}
-    <section class="result stk">
-      <div class="stagebig en">${L}${L.toLowerCase()}</div>
-      <div class="score">${score}/${n}</div>
-      <h2>סבב מצוין! 💪</h2>
-      <div class="ltime"><span>⏱ בדרך לאות <span class="en">${L}</span>: <b>${have}/${need}</b> דקות</span><span class="mbar big"><i style="width:${Math.min(100, Math.round(have / need * 100))}%"></i></span></div>
-      <p>${rest ? 'להיום מספיק. ממשיכים מחר מאותה נקודה, הדקות נשמרות.' : `עוד <b>${need - have}</b> דקות תרגול, והאות שלך. ממשיכים עם שאלות חדשות.`}</p>
+      <h2>${score / n >= 0.8 ? 'סבב מצוין! 💪' : score / n >= 0.5 ? 'יפה! ממשיכים 💪' : 'כל סבב מקדם אותך 💪'}</h2>
+      <div class="ltime"><span>⏱ עד סוף השלב: <b>${have}/${need}</b> דקות</span><span class="mbar big"><i style="width:${Math.min(100, Math.round(have / need * 100))}%"></i></span>
+        <span>🎁 בסוף השלב מחכה האות <b class="en">${L}</b></span></div>
+      <p>${rest ? 'להיום מספיק. ממשיכים מחר, הדקות נשמרות.' : `עוד <b>${need - have}</b> דקות תרגול. כל תרגול נספר: סבבי מסע, תרגול לפי נושא וכתיבה.`}</p>
       <div class="row center">${rest ? '' : `<button class="btn primary" id="more">▶ עוד סבב</button>`}<button class="btn" data-back="home">לדף הבית</button></div>
     </section>`;
-  const m = $('#more'); if (m) m.onclick = () => go(stageQuiz, k);
+  const m = $('#more'); if (m) m.onclick = () => go(stageQuiz);
 }
-function claimLetter(k) {
+// any practice screen can end a stop: offer the letter there
+function journeyBanner(where) {
+  const s = load(); if ((s.goal || {}).type !== 'journey' || !stopReached(s) || !where) return;
+  const L = ALPHA[jour(s).n].toUpperCase();
+  const b = document.createElement('div'); b.className = 'jbanner';
+  b.innerHTML = `<b>🎁 הגעת לסוף השלב!</b><button class="btn primary">לקבל את האות <span class="en">${L}</span></button>`;
+  b.querySelector('button').onclick = () => claimLetter();
+  where.prepend(b);
+}
+function claimLetter() {
   const s = load(), J = jour(s), d = day(s);
-  if (J.n > k) { go(home); return; } // practising a letter he already has
-  if (J.n === k) {
-    J.n = k + 1; d.jl = (d.jl || 0) + 1; J.cms = 0; J.cr = 0; J.ck = k + 1;
-    if (STAGE && STAGE.k === k && STAGE.t0) { J.lm = [...(J.lm || []), Math.max(2, Math.min(25, Math.round((Date.now() - STAGE.t0) / 60000)))].slice(-8); }
-  }
+  if (!stopReached(s)) { go(home); return; }
+  const k = J.n;
+  J.n = k + 1; d.jl = (d.jl || 0) + 1; J.cms = 0; J.cr = 0; J.ck = k + 1;
   save(s); go(letterWon, k);
 }
 function letterWon(k) {
   const st = load(), G = goalState(st), L = ALPHA[k].toUpperCase();
-  const atStop = !!G.avail, atEnd = k + 1 === JOUR_N, wheelWait = st.wheel && (G.waiting || G.megaWait);
-  sfx('win');
+  const atStop = !!G.avail, atEnd = k + 1 === JOUR_N;
+  sfx('win'); setTimeout(() => say(NAME[L]), 500);
   app.innerHTML = `${top('קיבלת אות!')}
     <section class="result stk lwon">
+      <p class="hint">🏁 סיימת את שלב ${k + 1}</p>
       <div class="stagebig en got pop">${L}${L.toLowerCase()}</div>
       <h2>האות <span class="en">${L}</span> שלך! 🎉</h2>
+      ${k ? `<p class="lorder" dir="ltr"><span class="en">${ALPHA[k - 1].toUpperCase()}</span> → <b class="en">${L}</b>${atEnd ? '' : ` → <span class="en">${ALPHA[k + 1].toUpperCase()}</span>`}</p><p class="hint">אחרי <span class="en">${ALPHA[k - 1].toUpperCase()}</span> באה <span class="en">${L}</span></p>` : ''}
       <p class="hint">${G.J.n}/${JOUR_N} אותיות במסע</p>
-      ${wheelWait ? `<p class="jwait">${G.megaWait ? '👑 המגה גלגל' : '🎡 עברת אות עם גלגל! הוא'} נפתח אחרי עוד <b>${G.waiting || G.megaWait} דקות</b> תרגול היום.</p>` : ''}
-      ${G.target ? `<p>המשימה של היום: <b>${Math.min(G.todayN, G.target)}/${G.target}</b>${G.todayN >= G.target ? ' · <b>בוצעה! כל הכבוד!</b>' : ''}</p>` : ''}
       <div class="row center">
-        ${atEnd && st.wheel && !G.megaWait ? `<button class="btn spinbtn megabtn" id="megaspin">👑 למגה גלגל!</button>`
-          : atStop && st.wheel ? `<button class="btn spinbtn" id="spin">🎡 הגלגל נפתח! לסובב</button>`
+        ${atEnd && st.wheel ? `<button class="btn spinbtn megabtn" id="megaspin">👑 למגה גלגל!</button>`
+          : atStop && st.wheel ? `<button class="btn spinbtn" id="spin">🎡 הגלגל של היום נפתח! לסובב</button>`
           : atEnd ? '' : G.capped ? `<p class="jrest">🌙 <b>להיום מספיק, כל הכבוד!</b> נמשיך מחר.</p>`
-          : `<button class="btn primary" id="nextst">לשלב הבא: <span class="en">${ALPHA[k + 1].toUpperCase()}</span> ←</button>`}
+          : `<button class="btn primary" id="nextst">להמשיך במסע ←</button>`}
         <button class="btn" data-back="home">לדף הבית</button></div>
     </section>`;
   const sp = $('#spin'); if (sp) sp.onclick = () => go(wheelView);
   const ms = $('#megaspin'); if (ms) ms.onclick = () => { WHEEL_MEGA = true; go(wheelView); };
-  const nx = $('#nextst'); if (nx) nx.onclick = () => go(stageQuiz, k + 1);
+  const nx = $('#nextst'); if (nx) nx.onclick = () => go(stageQuiz);
 }
 
 function lettersPopup() {
@@ -3225,7 +3215,7 @@ function runQuiz(mod, title, qs, again) {
     if (wrongs.length > 1) { const w = pick(wrongs); w.disabled = true; w.classList.add('dim'); }
   }
   function finish() {
-    if (mod === 'stage' && STAGE) { markDone('stage'); return stageFinish(STAGE.k, score, qs.length); }
+    if (mod === 'stage') { markDone('stage'); return stageFinish(score, qs.length); }
     const pct = Math.round((score / qs.length) * 100);
     markDone(mod, pct);
     const isMock = mod === 'mock';
@@ -3249,6 +3239,7 @@ function runQuiz(mod, title, qs, again) {
         <div class="row center"><button class="btn ${!isMock && pct >= 90 && lvl !== 'hard' && load().allowLevelUp !== false ? '' : 'primary'}" id="again">${isMock ? 'מבחן חדש' : 'עוד סיבוב'}</button><button class="btn" data-back="home">לדף הבית</button></div>
       </section>`;
     $('#again').onclick = () => go(again);
+    journeyBanner($('.result', app));
     const gs = $('#giftspin'); if (gs) { gs.onclick = () => go(wheelView); sfx('win'); }
     const lu = $('#lvlup'); if (lu) lu.onclick = () => { const s = load(); s.level = lvl === 'easy' ? 'medium' : 'hard'; save(s); go(again); };
     $$('[data-practice]', app).forEach(b => b.onclick = () => MODS.find(m => m.id === b.dataset.practice).run());
@@ -3623,7 +3614,7 @@ function writeView() {
     won = true; addStar(); markDone('write'); writeRun(); sfx('ok');
     $('#wfb').innerHTML = `<div class="fb good"><div class="msg"><b><span class="en">${pick(PRAISE)}</span> ⭐ כתבת נכון!</b>${tip ? `<span>${tip}</span>` : ''}</div><button class="btn primary" id="wnext">אות הבאה ←</button></div>`;
     $('#wnext').onclick = nextTrace;
-    if (STG != null) { $('#wnext').innerHTML = `🎁 לקבל את האות ${LETTERS[idx][0]}`; $('#wnext').onclick = () => claimLetter(STG); }
+    journeyBanner($('#wfb'));
     say(NAME[LETTERS[idx][0]]);
   }
   d.addEventListener('pointerdown', e => {
