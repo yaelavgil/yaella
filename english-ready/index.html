@@ -2073,6 +2073,8 @@ async function winCardBlob(pz, at) {
 let lastWin = null;
 const SHARE_LABEL = '📤 שלח לאמא ולאבא';
 function shareButtons() { return $$('[data-share]'); }
+// buttons that appear after the picture is ready (the big win card shows up a moment later) are switched on too
+function syncShare() { if (lastWin && lastWin.blob) for (const el of shareButtons()) { el.disabled = false; el.innerHTML = SHARE_LABEL; } }
 // Where the card is kept so a link can point at it. WhatsApp's crawler never runs the
 // page's script, so w.html carries one fixed preview for every win; the win itself is
 // fetched by the page when somebody opens it.
@@ -2298,7 +2300,7 @@ function wheelView(preview) {
         <p class="en wtext">${esc(textOf(pz))}</p>
         <div class="wdetails">${details}<button class="btn wclose" id="wclose">סגירה</button></div>
       </div>`;
-    document.body.appendChild(ov);
+    document.body.appendChild(ov); syncShare();
     const card = ov.querySelector('.wincard'), r = cv.getBoundingClientRect();
     const sx = r.left + r.width / 2, sy = r.top + r.height * 0.18; // the slice under the pointer
     const cr = card.getBoundingClientRect(), dx = sx - (cr.left + cr.width / 2), dy = sy - (cr.top + cr.height / 2);
