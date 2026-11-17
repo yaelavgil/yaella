@@ -61,6 +61,8 @@ button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:tra
 .btn.sm{min-height:40px;padding:4px 12px;font-size:15px;border-width:2px;box-shadow:0 3px 0 var(--shadow)}
 .btn.primary{background:var(--c2);color:var(--on)}
 .btn.icon{width:48px;padding:0;font-size:22px;flex:none}
+.btn.on{background:var(--t1);border-color:var(--c1);color:var(--c1)}
+canvas.erase{cursor:cell}
 .btn:active,.opt:active:not(:disabled),.tile:active,.ab:active,.wrow:active{transform:translate(2px,2px);box-shadow:0 2px 0 var(--shadow)}
 :focus-visible{outline:3px solid var(--c2);outline-offset:3px}
 .link{background:none;border:0;padding:2px 4px;color:var(--c2);text-decoration:underline;font-size:15px}
@@ -130,6 +132,11 @@ h2{font:600 24px/1.2 var(--f-display);margin:0;text-wrap:balance}
 .fb .msg{min-width:0;flex:1 1 220px;display:grid;gap:4px}
 .fb .msg b{font:600 20px var(--f-display)}
 .fb .btn{flex:1 1 140px}
+.wfrow{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 2px}
+.wfl{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:999px;background:var(--surface);border:2px solid var(--line);font-size:14px;font-weight:500}
+.fb .msg .wfl b{font:700 19px/1 var(--f-en);direction:ltr;unicode-bidi:isolate;color:var(--ink)}
+.wfl.ok{border-color:var(--good);color:var(--good)}
+.wfl.bad{border-color:var(--bad);color:var(--bad)}
 .rv{font-family:var(--f-en);font-size:20px}
 .rv b{color:var(--c)}
 
@@ -2472,17 +2479,68 @@ function writeView() {
     }
     dots = [];
     strokesPx.forEach(gl => gl.forEach((st, j) => arrowsFor(ctx, st, j + 1, col)));
+    if (hinting) hintMissing(ctx);
+  }
+  // show the line that is still missing, on the board, where it belongs: the guide stroke in red with
+  // a start dot and an arrow at its end. Everything the child already got right stays as it was.
+  function hintMissing(ctx) {
+    const bad = css(document.body, '--bad');
+    ctx.save();
+    missing.forEach((ss, g) => ss.forEach(s => {
+      const st = strokesPx[g][s]; if (!st || st.length < 2) return;
+      ctx.globalAlpha = 0.9; ctx.strokeStyle = bad; ctx.lineWidth = U * 0.11;
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.setLineDash([U * 0.16, U * 0.16]);
+      path(ctx, st); ctx.stroke(); ctx.setLineDash([]);
+      // start here
+      ctx.globalAlpha = 1; ctx.fillStyle = bad;
+      ctx.beginPath(); ctx.arc(st[0][0], st[0][1], U * 0.13, 0, 7); ctx.fill();
+      // ...and go that way
+      const a = st[Math.max(0, st.length - 6)], b2 = st[st.length - 1];
+      const an = Math.atan2(b2[1] - a[1], b2[0] - a[0]), h = U * 0.26;
+      ctx.beginPath();
+      ctx.moveTo(b2[0], b2[1]);
+      ctx.lineTo(b2[0] - h * Math.cos(an - 0.42), b2[1] - h * Math.sin(an - 0.42));
+      ctx.lineTo(b2[0] - h * Math.cos(an + 0.42), b2[1] - h * Math.sin(an + 0.42));
+      ctx.closePath(); ctx.fill();
+    }));
+    ctx.restore();
   }
   function demo() {
     cancelAnimationFrame(anim); const total = strokesPx.flat().reduce((a, st) => a + st.length, 0); let n = 0;
     const tick = () => { n += 2; drawGuide(n); if (n < total) anim = requestAnimationFrame(tick); else setTimeout(() => drawGuide(), 600); };
     anim = requestAnimationFrame(tick);
   }
-  function clear() { d.getContext('2d').clearRect(0, 0, W, H); ink = []; resetMatch(); hist = []; refreshUndo(); $('#wfb').innerHTML = ''; }
+  // hush(): moving to another letter has to silence the one before it. Without this the name of the
+  // previous letter keeps being read out over the new one, which sounds like the app has frozen.
+  function clear() { hush(); cancelAnimationFrame(anim); d.getContext('2d').clearRect(0, 0, W, H); ink = []; resetMatch(); hist = []; refreshUndo(); missing = []; hinting = false; $('#wfb').innerHTML = ''; }
+  // rub out just what the eraser passes over, like a paint program: the child fixes one line instead
+  // of losing the letter. A guide line the eraser touches is released back to "not drawn yet".
+  function eraseAt(p) {
+    const R = U * 0.26, near = q => Math.hypot(q[0] - p[0], q[1] - p[1]) <= R;
+    let hit = false;
+    const out = [];
+    for (const st of ink) {
+      if (!st.some(near)) { out.push(st); continue; }
+      hit = true;
+      let run = []; // erasing the middle of a line leaves the two ends behind
+      for (const q of st) { if (near(q)) { if (run.length > 1) out.push(run); run = []; } else run.push(q); }
+      if (run.length > 1) out.push(run);
+    }
+    ink = out;
+    strokesPx.forEach((gl, g) => gl.forEach((t, s) => {
+      if (!matched[g] || !matched[g][s] || !t.some(near)) return;
+      matched[g][s] = false; hit = true;
+      snappedRaw[g] = snappedRaw[g].filter(st => !st.some(near)); // its raw line goes with it
+    }));
+    return hit;
+  }
 
   // drawing
   // ink = the child's own strokes that are not recognised yet; matched[g][s] = template stroke s of letter g was recognised
   let drawing = false, last = null, idle = 0, matched = [], morphing = null, snappedRaw = [];
+  // missing[g] = guide strokes of letter g that are not drawn yet; set by judgeLetters, read by the
+  // hint drawing so the child is shown WHICH line to add instead of being told to start over
+  let missing = [], hinting = false, eraser = false;
   // undo: a snapshot taken before each stroke, so one tap takes back the last stroke
   // instead of wiping the whole letter. Snapshots are taken before the stroke is drawn,
   // so whatever recognising it triggers afterwards is undone with it.
@@ -2549,7 +2607,10 @@ function writeView() {
     ink.splice(ink.indexOf(st), 1);
     snappedRaw[cands[0][0]].push(st); // keep the original line: the final check looks at what was really drawn
     const target = resample(cands.flatMap(([g, s]) => strokesPx[g][s]), 60), from = resample(st, 60);
-    const finish = () => { morphing = null; cands.forEach(([g, s]) => matched[g][s] = true); redrawInk(); afterMatch(cands); };
+    // Book the match now, not when the animation ends: the morph is decoration, and until it is booked
+    // a second stroke could claim the same template stroke.
+    cands.forEach(([g, s]) => matched[g][s] = true);
+    const finish = () => { morphing = null; redrawInk(); afterMatch(cands); };
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) { finish(); return true; }
     const t0 = performance.now();
     const step = t => {
@@ -2563,6 +2624,7 @@ function writeView() {
   }
   function afterMatch(cands) {
     const letters = chars();
+    if (drawing) return; // mid-stroke: do not judge yet, the pointerup will come round again
     const doneG = [...new Set(cands.map(c => c[0]))].filter(g => matched[g].every(Boolean));
     if (matched.every(gl => gl.every(Boolean))) { check(true); return; }
     if (doneG.length) { sfx('ok'); $('#wfb').innerHTML = `<div class="fb good"><div class="msg"><b>✓ <span class="en">${letters[doneG[0]]}</span> נכונה!</b> עכשיו ${letters.length > 1 ? 'האות השנייה' : ''}</div></div>`; }
@@ -2575,13 +2637,24 @@ function writeView() {
     say(NAME[LETTERS[idx][0]]);
   }
   d.addEventListener('pointerdown', e => {
-    e.preventDefault(); if (state !== 'draw' || morphing) return; clearTimeout(idle);
+    // NOT blocked while morphing: the snap animation lasts 260ms, and a child who carries straight on to
+    // the next stroke had it silently dropped — the letter still looked finished on screen, because what
+    // is drawn there is the snapped guide and not their own ink, so the check failed on a letter that
+    // looked complete. The morph is cosmetic; drawing over it is fine.
+    e.preventDefault(); if (state !== 'draw') return; clearTimeout(idle);
     snapshot();
-    drawing = true; try { d.setPointerCapture(e.pointerId); } catch (_) {} last = pt(e); ink.push([last]); seg(last, [last[0] + 0.1, last[1]]);
+    drawing = true; try { d.setPointerCapture(e.pointerId); } catch (_) {} last = pt(e);
+    if (eraser) { hinting = false; eraseAt(last); redrawInk(); drawGuide(); return; }
+    ink.push([last]); seg(last, [last[0] + 0.1, last[1]]);
   });
-  d.addEventListener('pointermove', e => { if (!drawing) return; const p = pt(e); seg(last, p); last = p; });
+  d.addEventListener('pointermove', e => {
+    if (!drawing) return; const p = pt(e);
+    if (eraser) { if (eraseAt(p)) { redrawInk(); drawGuide(); } last = p; return; }
+    seg(last, p); last = p;
+  });
   ['pointerup', 'pointercancel'].forEach(t => d.addEventListener(t, () => {
     if (!drawing) return; drawing = false;
+    if (eraser) { refreshUndo(); return; }
     if (mode === 'trace') {
       const st = ink[ink.length - 1];
       if (!liveMatch(st)) { clearTimeout(idle); idle = setTimeout(() => check(true), 800); }
@@ -2609,10 +2682,27 @@ function writeView() {
       let best = 0; boxes.forEach((b, g) => { if (Math.abs((b.x0 + b.x1) / 2 - cx) < Math.abs((boxes[best].x0 + boxes[best].x1) / 2 - cx)) best = g; });
       groups[best].push(st);
     }
+    // In tracing there is a grey letter on screen in a known place, so the question is "is each of its
+    // lines drawn?" — not "which of the 26 letters is this?". Judging stroke by stroke is the same test
+    // liveMatch already applies, and it leaves us knowing exactly WHICH line is missing, which is what
+    // the hint arrow needs. missing[g] = indices of that letter's guide strokes still undrawn.
+    missing = strokesPx.map(() => []);
     return strokesPx.map((gl, g) => {
       const mine = groups[g].concat(snappedRaw[g]); // what was really drawn for this letter
-      if (!mine.length || !recognise(mine, letters[g])) return 'no';
-      const b = centre(mine.flat()), t = boxes[g], h = (b.y1 - b.y0) / Math.max(1, t.y1 - t.y0);
+      const pts = mine.flat(), tol = U * 0.34;
+      gl.forEach((t, s) => {
+        if (matched[g] && matched[g][s]) return;
+        const cov = pts.length ? t.filter(p => nearest(p, pts) <= tol).length / t.length : 0;
+        if (cov < 0.75) missing[g].push(s);
+      });
+      if (missing[g].length) return 'no';
+      // guard against a shape that happens to blanket the letter (a big scribble, or an O over a B):
+      // most of what the child drew has to sit ON the letter, not just across it
+      if (pts.length) {
+        const tpl = gl.flat();
+        if (pts.filter(p => nearest(p, tpl) <= tol * 1.25).length / pts.length < 0.7) { missing[g] = gl.map((_, s) => s); return 'no'; }
+      }
+      const b = centre(mine.length ? pts : gl.flat()), t = boxes[g], h = (b.y1 - b.y0) / Math.max(1, t.y1 - t.y0);
       return Math.abs(b.y0 - t.y0) < U * 0.5 && Math.abs(b.y1 - t.y1) < U * 0.5 && h > 0.7 && h < 1.4 ? 'ok' : 'size';
     });
   }
@@ -2625,9 +2715,15 @@ function writeView() {
       } else if (!auto) {
         sfx('no');
         ghost = true; renderButtons(); drawGuide();
-        const parts = letters.length > 1 ? letters.map((l, i) => `<span class="en">${l}</span> ${r[i] === 'no' ? '– עוד לא' : '✓'}`).join(' · ') + '. ' : '';
-        $('#wfb').innerHTML = `<div class="fb bad"><div class="msg"><b>כמעט!</b> ${parts}נסה לכתוב על האות האפורה ולעקוב אחרי המספרים והחצים.</div><button class="btn" id="wagain">↻ לנסות שוב</button></div>`;
-        $('#wagain').onclick = () => { clear(); won = false; };
+        // one chip per letter, each a self-contained LTR letter + Hebrew verdict, so the two
+        // directions never share a line and get reordered by the browser
+        const chips = letters.length > 1
+          ? `<span class="wfrow">${letters.map((l, i) => `<span class="wfl ${r[i] === 'no' ? 'bad' : 'ok'}"><b>${l}</b>${r[i] === 'no' ? '✗ עוד לא' : '✓ נכונה'}</span>`).join('')}</span>` : '';
+        hinting = true; drawGuide(); // put the arrow on the board, over the line that is missing
+        const nMiss = missing.reduce((a, ss) => a + ss.length, 0);
+        $('#wfb').innerHTML = `<div class="fb bad"><div class="msg"><b>כמעט!</b>${chips}<span>${nMiss === 1 ? 'נשאר קו אחד — הוא מסומן באדום על הלוח. מתחילים בנקודה ומושכים לכיוון החץ.' : 'הקווים שחסרים מסומנים באדום על הלוח. מתחילים בנקודה ומושכים לכיוון החץ.'}</span></div><button class="btn" id="wagain">🧽 למחוק הכל</button></div>`;
+        // everything already drawn stays; only a deliberate tap wipes the lot
+        $('#wagain').onclick = () => { clear(); won = false; render(); };
       }
       return;
     }
@@ -2641,7 +2737,7 @@ function writeView() {
       : `<div class="fb bad"><div class="msg"><b>עוד לא.</b> כך כותבים את האות. אפשר לנסות שוב.</div></div>`;
     renderButtons(ok);
   }
-  function nextTrace() { idx = (idx + 1) % 26; won = false; clear(); render(); }
+  function nextTrace() { idx = (idx + 1) % 26; won = false; eraser = false; d.classList.remove('erase'); clear(); render(); }
   function newDict() {
     let i; do { i = rint(0, 25); } while (dict && i === dict.i);
     dict = { i, cs: Math.random() < 0.5 ? 'up' : 'low' }; ghost = false; state = 'draw';
@@ -2650,12 +2746,14 @@ function writeView() {
     const wb = $('#wb');
     if (mode === 'trace') {
       wb.innerHTML = `<button class="btn" id="und">↶ אחורה</button>
-        <button class="btn" id="clr">🧽 נקה</button>
+        <button class="btn${eraser ? ' on' : ''}" id="era" aria-pressed="${eraser}">🧼 מחק</button>
+        <button class="btn" id="clr">🧽 נקה הכל</button>
         <button class="btn" id="demo">▶ איך כותבים</button>
         <button class="btn" id="gh">${ghost ? 'הסתר דוגמה' : 'הצג דוגמה'}</button>
         <button class="btn" id="chk">✓ בדוק אותי</button>
         <button class="btn primary" id="nxt">אות הבאה ←</button>`;
       $('#gh').onclick = () => { ghost = !ghost; renderButtons(); drawGuide(); };
+      $('#era').onclick = () => { eraser = !eraser; d.classList.toggle('erase', eraser); renderButtons(); };
       $('#demo').onclick = demo;
       $('#chk').onclick = () => check(false);
       $('#nxt').onclick = nextTrace;
