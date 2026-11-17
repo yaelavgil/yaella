@@ -603,6 +603,9 @@ html.noscroll{overflow:hidden}
 .shfoot{display:flex;align-items:center;gap:12px;padding:12px 18px;border-top:1px solid var(--line);background:var(--surface)}
 .shok{flex:1;font-size:14px;color:var(--good);font-weight:600}
 .shfoot.nosave #shsave{visibility:hidden}
+.shlogin{justify-items:start}
+.shlogin p{margin:0}
+#shout[hidden]{display:none}
 #shsave:disabled{opacity:.45;cursor:default;box-shadow:none}
 .sheet .packs{gap:6px}
 .sheet .pack{padding:8px 12px}
@@ -1250,25 +1253,26 @@ const kidLink = (id, mode) => `${location.origin}${location.pathname}?k=${id}&m=
    Getting in used to mean scrolling past everything a child sees to a link at the very
    bottom. The way in now sits above the page, and once a parent is in, each child's day
    and a one-tap link are there with it. */
-let PAPI = null, PUSER = null, PKIDS = [];
+let PAPI = null, PUSER = null, PKIDS = [], PKIDS_LOADED = null;
 const kidDay = k => { const p = k.progress || {}; return (p.td && p.td.date === today()) ? p.td : { stars: 0, ms: 0, letters: 0, spins: 0 }; };
 const kidMode = k => ((k.settings || {}).linkMode) || 'learn';
 
 async function parentBar() {
   const bar = $('#pbar'); if (!bar) return;
   bar.innerHTML = `<div class="pbrow"><span class="pbwho">אזור ההורים</span><button class="gearbtn" id="pgo" aria-label="הגדרות וכניסת הורים" title="הגדרות">${GEAR_SVG}</button></div>`;
-  $('#pgo').onclick = () => go(parentCloud);
+  $('#pgo').onclick = () => settingsSheet();
   let A; try { A = PAPI || (PAPI = await api()); } catch (e) { return; }
   A.onUser(async u => {
     if (!$('#pbar')) return;
     PUSER = u;
     if (!u) { // signed out: just the way in
       $('#pbar').innerHTML = `<div class="pbrow"><span class="pbwho">אזור ההורים</span><button class="gearbtn" id="pgo" aria-label="הגדרות וכניסת הורים" title="הגדרות">${GEAR_SVG}</button></div>`;
-      const b = $('#pgo'); if (b) b.onclick = () => go(parentCloud);
+      const b = $('#pgo'); if (b) b.onclick = () => settingsSheet();
       return;
     }
     try { PKIDS = await A.listKids(u.uid); } catch (e) { PKIDS = []; }
     PKIDS.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+    PKIDS_LOADED = u.uid;
     renderParentBar();
   });
 }
@@ -1516,8 +1520,45 @@ function settingsSheet(kidId, tab) {
       $s('#shok').textContent = 'נשמר ✓'; kidsRow();
     } catch (e) { b.disabled = false; $s('#shok').textContent = 'השמירה נכשלה. נסו שוב.'; }
   };
-  if (!kid) cur = 'add';
-  loadKid(); kidsRow(); tabs(); body();
+  function start() {
+    kid = PKIDS.find(k => k.id === kidId) || PKIDS[0] || null;
+    if (!kid) cur = 'add';
+    $s('#shout').hidden = false;
+    $s('.shwho').textContent = PUSER ? (PUSER.name || PUSER.email || '') : '';
+    loadKid(); kidsRow(); tabs(); body();
+  }
+  function waiting() { $s('#shkids').innerHTML = ''; $s('#shtabs').hidden = true; $s('.shfoot').classList.add('nosave'); $s('#shout').hidden = true; $s('#shbody').innerHTML = '<p class="loading">טוען…</p>'; }
+  function loginView() {
+    waiting();
+    $s('#shbody').innerHTML = `<div class="shform shlogin">
+      <h3>כניסה להורים</h3>
+      <p>אחרי הכניסה אפשר להגדיר לכל ילד יעד, גלגל הפתעות ורמה, לשלוח לו קישור ולראות את ההתקדמות שלו.</p>
+      <button class="btn gbtn" id="shgin"><span class="gmark" aria-hidden="true">G</span> התחברות עם Google</button>
+      <p class="hint" id="shgerr" hidden>הכניסה לא הצליחה. נסו שוב.</p>
+      <p class="hint">הילד לא צריך חשבון: הקישור שתשלחו לו פתוח לכל מי שמקבל אותו.</p>
+      <button class="link" id="shdev">הגדרות במכשיר הזה, בלי חשבון</button></div>`;
+    $s('#shgin').onclick = async () => { try { $s('#shbody').innerHTML = '<p class="loading">מתחברים…</p>'; await PAPI.signIn(); } catch (e) { loginView(); $s('#shgerr').hidden = false; } };
+    $s('#shdev').onclick = () => { ov.remove(); document.documentElement.classList.remove('noscroll'); go(parentSettings); };
+  }
+  async function signedIn(u) {
+    if (!document.body.contains(ov)) return;
+    if (!u) { loginView(); return; }
+    PUSER = u;
+    if (PKIDS_LOADED !== u.uid) {
+      waiting();
+      try { PKIDS = await PAPI.listKids(u.uid); } catch (e) { PKIDS = []; }
+      PKIDS.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0)); PKIDS_LOADED = u.uid;
+    }
+    if (document.body.contains(ov) && !$s('.shtab.on, .shform:not(.shlogin)')) start();
+  }
+  if (PUSER && PKIDS_LOADED === PUSER.uid) start();
+  else {
+    waiting();
+    (async () => {
+      try { PAPI = PAPI || await api(); } catch (e) { $s('#shbody').innerHTML = '<p class="loading">אין חיבור לשרת. נסו שוב בעוד רגע.</p>'; return; }
+      PAPI.onUser(u => signedIn(u));
+    })();
+  }
 }
 
 function parentPanel() { settingsSheet(); }
