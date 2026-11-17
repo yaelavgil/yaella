@@ -2610,7 +2610,7 @@ function letterCard(c) {
     <table class="lttab"><tbody>${LT_SKILLS.map(([k, t]) => { const v = r[k] || [0, 0];
       return `<tr><td>${t}</td><td dir="ltr">${v[1] ? `${v[0]}/${v[1]}` : '—'}</td><td>${v[1] && v[0] / v[1] >= .8 ? '✓' : ''}</td></tr>`; }).join('')}</tbody></table>
     <p class="lcnote">${lv === 2 ? 'כל הכבוד! האות הזאת ירוקה. כדאי לחזור עליה מדי פעם.' : stale ? 'הייתה ירוקה, אבל לא תרגלת אותה שבוע. תרגול אחד מחזיר אותה לירוק.' : `כדי שתהיה ירוקה חסר: <b>${miss.join(' · ')}</b>`}</p>
-    <div class="lcbtns"><button class="btn primary" id="lcwr">✍️ לכתוב את ${U}</button></div>
+    <div class="lcbtns"><button class="btn primary" id="lcgo">🎯 להמשיך לצבור אותיות</button><button class="btn" id="lcwr">✍️ לכתוב את ${U}</button></div>
   </div>`;
   document.body.appendChild(ov);
   const close = () => { ov.remove(); document.removeEventListener('keydown', esc_); };
@@ -2618,13 +2618,14 @@ function letterCard(c) {
   document.addEventListener('keydown', esc_);
   ov.addEventListener('click', e => { if (e.target === ov) close(); });
   ov.querySelector('.lcx').onclick = close;
+  ov.querySelector('#lcgo').onclick = () => { close(); go(focusQuiz); };
   ov.querySelector('#lcwr').onclick = () => {
     close();
     const needLow = !(r.wl && r.wl[0] > 0), needUp = !(r.wu && r.wu[0] > 0);
     WRITE_START = { i: ALPHA.indexOf(c), cs: needUp && !needLow ? 'up' : needLow && !needUp ? 'low' : 'both' };
     go(writeView);
   };
-  ov.querySelector('#lcwr').focus();
+  ov.querySelector('#lcgo').focus();
 }
 function letterQuiz(c) {
   setLvl(); FOCUS = [c];
