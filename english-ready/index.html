@@ -591,6 +591,7 @@ html.noscroll{overflow:hidden}
 .shgrp h3{margin:0;font:700 16px var(--f-display)}
 .shgrp p{margin:0}
 .shgrp.danger{border-color:#F3B4AE}
+.shdone{color:var(--good)}
 .shfield{display:flex;align-items:center;gap:10px;font-weight:600}
 .shform{display:grid;gap:12px;background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:16px}
 .shform h3{margin:0;font:700 18px var(--f-display)}
@@ -1479,10 +1480,22 @@ function settingsSheet(kidId, tab) {
     } else if (cur === 'kid') {
       B.innerHTML = `
         <div class="shgrp"><h3>שם</h3><input id="shname" class="pin wide" maxlength="20" value="${esc(name)}" aria-label="שם הילד"></div>
+        <div class="shgrp"><h3>איפוס ההתקדמות</h3>
+          <p class="hint">מתחיל מאפס: כוכבים, אותיות היום, דקות, ימי תרגול, תוצאות מבחנים וזכיות בגלגל. ההגדרות והקישור נשארים.</p>
+          <div class="row" id="shresrow"><button class="btn" id="shres">איפוס ההתקדמות</button></div></div>
         <div class="shgrp danger"><h3>מחיקת ${esc(kid.name)}</h3>
           <p class="hint">הקישור שלו יפסיק לעבוד וההתקדמות תימחק.</p>
           <div class="row" id="shdelrow"><button class="btn" id="shdel">מחיקה</button></div></div>`;
       $s('#shname').oninput = e => { name = e.target.value.trim() || kid.name; touch(); };
+      $s('#shres').onclick = () => {
+        $s('#shresrow').innerHTML = `<b>לאפס את כל ההתקדמות של ${esc(kid.name)}? אי אפשר לבטל.</b><button class="btn" id="shres2">כן, לאפס</button><button class="btn" id="shres0">ביטול</button>`;
+        $s('#shres0').onclick = body;
+        $s('#shres2').onclick = async () => {
+          const fresh_ = { updatedAt: Date.now(), resetAt: Date.now() }; // newer than any copy on his device, so the reset wins
+          try { await PAPI.saveProgress(kid.id, fresh_); kid.progress = fresh_; $s('#shresrow').innerHTML = '<b class="shdone">אופס ✓ אם הקישור שלו פתוח עכשיו, רעננו אותו.</b>'; }
+          catch (e) { $s('#shresrow').innerHTML = '<b>האיפוס נכשל. נסו שוב.</b>'; }
+        };
+      };
       $s('#shdel').onclick = () => {
         $s('#shdelrow').innerHTML = `<b>למחוק את ${esc(kid.name)}?</b><button class="btn" id="shdel2">כן, למחוק</button><button class="btn" id="shdel0">ביטול</button>`;
         $s('#shdel0').onclick = body;
