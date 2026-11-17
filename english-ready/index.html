@@ -561,6 +561,61 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .kstmore{flex:1 1 100%;border-top:1px solid var(--line);margin-top:6px;padding-top:8px;display:grid;gap:7px}
 .kstline{margin:0;font-size:14px;color:var(--muted)}
 
+/* ---- gear + settings window ---- */
+.gearbtn{width:42px;height:42px;flex:none;display:grid;place-items:center;border-radius:12px;border:1.5px solid var(--line);
+  background:var(--surface);color:var(--muted);cursor:pointer;transition:transform .25s var(--ease),color .2s,background-color .2s}
+.gearbtn:hover{color:var(--ink);transform:rotate(45deg)}
+.gearbtn:focus-visible{outline:3px solid var(--c2);outline-offset:2px}
+html.noscroll{overflow:hidden}
+.sheetov{position:fixed;inset:0;z-index:65;background:rgba(26,20,40,.45);display:grid;place-items:center;padding:20px;animation:fade .2s both}
+.sheet{width:min(760px,100%);height:min(720px,calc(100dvh - 40px));display:grid;grid-template-rows:auto auto auto minmax(0,1fr) auto;
+  background:var(--bg);border-radius:22px;box-shadow:0 24px 70px rgba(20,10,40,.35);overflow:hidden;animation:sheetin .28s var(--ease) both}
+@keyframes sheetin{from{transform:translateY(16px) scale(.98);opacity:0}}
+.shhead{display:flex;align-items:center;gap:10px;padding:14px 18px 10px;border-bottom:1px solid var(--line);background:var(--surface)}
+.shgear{color:var(--muted);display:grid}
+.shtitle{font:700 20px var(--f-display)}
+.shwho{flex:1;min-width:0;font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:end}
+.shx{width:38px;height:38px;flex:none;border-radius:50%;border:0;background:var(--bg);font-size:18px;cursor:pointer;color:var(--ink)}
+.shx:hover{background:var(--line)}
+.shkids{display:flex;gap:8px;padding:12px 18px 4px;overflow-x:auto;background:var(--surface)}
+.shkid{flex:none;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:6px 16px;font:600 15px var(--f-body);cursor:pointer;min-height:38px}
+.shkid.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.shkid.add{color:var(--c2);border-style:dashed}
+.shtabs{display:flex;gap:4px;padding:0 14px;overflow-x:auto;background:var(--surface);border-bottom:1px solid var(--line);scrollbar-width:none}
+.shtabs[hidden]{display:none}
+.shtab{flex:none;border:0;background:none;color:var(--muted);font:600 15px var(--f-body);padding:12px 12px 10px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px;min-height:44px}
+.shtab:hover{color:var(--ink)}
+.shtab.on{color:var(--ink);border-bottom-color:var(--c2)}
+.shbody{overflow:auto;padding:18px;display:grid;gap:14px;align-content:start;overscroll-behavior:contain}
+.shgrp{display:grid;gap:9px;background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:14px 16px}
+.shgrp h3{margin:0;font:700 16px var(--f-display)}
+.shgrp p{margin:0}
+.shgrp.danger{border-color:#F3B4AE}
+.shfield{display:flex;align-items:center;gap:10px;font-weight:600}
+.shform{display:grid;gap:12px;background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:16px}
+.shform h3{margin:0;font:700 18px var(--f-display)}
+.shstats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.shstats div{background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:12px;display:grid;gap:2px;text-align:center}
+.shstats b{font:700 26px var(--f-display);font-variant-numeric:tabular-nums}
+.shstats small{font-size:14px;color:var(--muted)}
+.shstats span{font-size:13px;color:var(--muted)}
+.shfoot{display:flex;align-items:center;gap:12px;padding:12px 18px;border-top:1px solid var(--line);background:var(--surface)}
+.shok{flex:1;font-size:14px;color:var(--good);font-weight:600}
+.shfoot.nosave #shsave{visibility:hidden}
+#shsave:disabled{opacity:.45;cursor:default;box-shadow:none}
+.sheet .packs{gap:6px}
+.sheet .pack{padding:8px 12px}
+@media (max-width:600px){
+  .sheetov{padding:0;place-items:end stretch}
+  .sheet{width:100%;height:100dvh;border-radius:0}
+  .shstats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .shtabs{padding:0 6px;gap:0}
+  .shtab{flex:1 1 auto;padding:12px 6px 10px;font-size:14px}
+  .shhead{padding-top:calc(12px + env(safe-area-inset-top,0px))}
+  .shfoot{padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+}
+@media (prefers-reduced-motion:reduce){.sheet,.sheetov{animation:none}.gearbtn:hover{transform:none}}
+
 /* ---- the slide-in menu ---- */
 .pdrawer{position:fixed;inset:0;z-index:60;background:rgba(26,20,40,.42);display:flex;justify-content:flex-start;
   animation:fade .2s both}
@@ -1200,14 +1255,14 @@ const kidMode = k => ((k.settings || {}).linkMode) || 'learn';
 
 async function parentBar() {
   const bar = $('#pbar'); if (!bar) return;
-  bar.innerHTML = `<button class="btn pin-btn" id="pgo"><span class="gmark" aria-hidden="true">G</span> כניסת הורים</button>`;
+  bar.innerHTML = `<div class="pbrow"><span class="pbwho">אזור ההורים</span><button class="gearbtn" id="pgo" aria-label="הגדרות וכניסת הורים" title="הגדרות">${GEAR_SVG}</button></div>`;
   $('#pgo').onclick = () => go(parentCloud);
   let A; try { A = PAPI || (PAPI = await api()); } catch (e) { return; }
   A.onUser(async u => {
     if (!$('#pbar')) return;
     PUSER = u;
     if (!u) { // signed out: just the way in
-      $('#pbar').innerHTML = `<button class="btn pin-btn" id="pgo"><span class="gmark" aria-hidden="true">G</span> כניסת הורים</button>`;
+      $('#pbar').innerHTML = `<div class="pbrow"><span class="pbwho">אזור ההורים</span><button class="gearbtn" id="pgo" aria-label="הגדרות וכניסת הורים" title="הגדרות">${GEAR_SVG}</button></div>`;
       const b = $('#pgo'); if (b) b.onclick = () => go(parentCloud);
       return;
     }
@@ -1223,7 +1278,7 @@ function renderParentBar() {
   bar.innerHTML = `
     <div class="pbrow">
       <span class="pbwho">שלום ${who}</span>
-      <button class="btn sm" id="popen" aria-haspopup="dialog">תפריט ההורים</button>
+      <button class="gearbtn" id="popen" aria-haspopup="dialog" aria-label="הגדרות" title="הגדרות">${GEAR_SVG}</button>
     </div>
     ${PKIDS.length ? `<div class="kstrip">${PKIDS.map(k => {
       const d = kidDay(k), mins = Math.floor((d.ms || 0) / 60000);
@@ -1236,8 +1291,8 @@ function renderParentBar() {
         </button>
         <button class="btn sm kstlink" data-link="${k.id}">שליחת קישור</button>
       </article>`;
-    }).join('')}</div>` : '<p class="hint pbhint">עוד אין ילדים. פתחו את תפריט ההורים כדי להוסיף.</p>'}`;
-  $('#popen').onclick = () => parentPanel();
+    }).join('')}</div>` : '<p class="hint pbhint">עוד אין ילדים. לחצו על גלגל השיניים כדי להוסיף.</p>'}`;
+  $('#popen').onclick = () => settingsSheet();
   $$('[data-link]', bar).forEach(b => b.onclick = () => sendKidLink(b, PKIDS.find(k => k.id === b.dataset.link)));
   $$('[data-open]', bar).forEach(b => b.onclick = () => {
     const k = PKIDS.find(x => x.id === b.dataset.open);
@@ -1255,7 +1310,7 @@ function renderParentBar() {
         <button class="btn sm" data-set="${k.id}">הגדרות הילד</button>
       </div>`;
     art.appendChild(div);
-    div.querySelector('[data-set]').onclick = () => kidSettings(PAPI, PUSER, k);
+    div.querySelector('[data-set]').onclick = () => settingsSheet(k.id, 'learn');
     div.querySelector('[data-copy]').onclick = async e => {
       const t = e.currentTarget;
       try { await navigator.clipboard.writeText(t.dataset.copy); t.textContent = 'הועתק'; }
@@ -1279,39 +1334,194 @@ function sendKidLink(btn, k) {
   setTimeout(() => { btn.textContent = was; }, 2200);
 }
 
-function parentPanel() {
+/* ---------- settings: one window with tabs, opened from the gear ---------- */
+const GEAR_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>';
+const SHEET_TABS = [['learn', 'לימוד'], ['goal', 'יעד והפתעות'], ['prog', 'התקדמות'], ['link', 'קישור'], ['kid', 'פרטים']];
+function settingsSheet(kidId, tab) {
+  const old = document.querySelector('.sheetov'); if (old) old.remove();
+  let kid = PKIDS.find(k => k.id === kidId) || PKIDS[0] || null;
+  let cur = tab || 'learn', st = null, name = '', dirty = false;
   const ov = document.createElement('div');
-  ov.className = 'pdrawer';
-  ov.innerHTML = `<div class="pdbox" role="dialog" aria-modal="true" aria-label="תפריט ההורים">
-    <div class="pdhead"><b>תפריט ההורים</b><button class="btn icon" id="pdx" aria-label="סגירה">✕</button></div>
-    <p class="pdwho">${esc(PUSER && (PUSER.name || PUSER.email) || '')}</p>
-    <nav class="pdnav">
-      ${PKIDS.map(k => `<button class="pditem" data-s="${k.id}"><b>${esc(k.name)}</b><small>הגדרות והתקדמות</small></button>`).join('')}
-      <button class="pditem" id="pdadd"><b>הוספת ילד</b><small>שם פרטי בלבד</small></button>
-      <button class="pditem" id="pdall"><b>כל הילדים והקישורים</b><small>המסך המלא</small></button>
-      <button class="pditem" id="pddev"><b>הגדרות במכשיר הזה</b><small>בלי חשבון</small></button>
-    </nav>
-    <button class="link pdout" id="pdout">יציאה מהחשבון</button>
+  ov.className = 'sheetov';
+  ov.innerHTML = `<div class="sheet" role="dialog" aria-modal="true" aria-label="הגדרות">
+    <header class="shhead">
+      <span class="shgear" aria-hidden="true">${GEAR_SVG}</span><b class="shtitle">הגדרות</b>
+      <span class="shwho">${esc(PUSER && (PUSER.name || PUSER.email) || '')}</span>
+      <button class="shx" id="shx" aria-label="סגירה">✕</button>
+    </header>
+    <div class="shkids" id="shkids" role="tablist" aria-label="ילד"></div>
+    <nav class="shtabs" id="shtabs" role="tablist" aria-label="נושא"></nav>
+    <section class="shbody" id="shbody" role="tabpanel"></section>
+    <footer class="shfoot">
+      <button class="link" id="shout">יציאה מהחשבון</button>
+      <span class="shok" id="shok" aria-live="polite"></span>
+      <button class="btn primary" id="shsave" disabled>שמירה</button>
+    </footer>
   </div>`;
   document.body.appendChild(ov);
-  const close = () => { ov.remove(); document.removeEventListener('keydown', esc_); };
+  document.documentElement.classList.add('noscroll');
+  const $s = q => ov.querySelector(q), $$s = q => [...ov.querySelectorAll(q)];
+  const close = () => {
+    if (dirty && !ov.dataset.confirm) { ov.dataset.confirm = '1'; $s('#shok').textContent = 'יש שינויים שלא נשמרו. לחיצה נוספת תסגור בלי לשמור.'; return; }
+    ov.remove(); document.documentElement.classList.remove('noscroll'); document.removeEventListener('keydown', esc_); renderParentBar();
+  };
   const esc_ = e => { if (e.key === 'Escape') close(); };
   document.addEventListener('keydown', esc_);
   ov.addEventListener('click', e => { if (e.target === ov) close(); });
-  ov.querySelector('#pdx').onclick = close;
-  ov.querySelector('#pdall').onclick = () => { close(); go(parentCloud); };
-  ov.querySelector('#pddev').onclick = () => { close(); go(parentSettings); };
-  ov.querySelector('#pdadd').onclick = () => { close(); go(parentCloud); };
-  ov.querySelector('#pdout').onclick = async () => { close(); try { await PAPI.signOut(); } catch (e) {} };
-  ov.querySelectorAll('[data-s]').forEach(b => b.onclick = () => { close(); kidSettings(PAPI, PUSER, PKIDS.find(k => k.id === b.dataset.s)); });
+  $s('#shx').onclick = close;
+  $s('#shout').onclick = async () => { ov.remove(); document.documentElement.classList.remove('noscroll'); try { await PAPI.signOut(); } catch (e) {} };
+
+  function loadKid() {
+    st = kid ? Object.assign(defaultSettings(), JSON.parse(JSON.stringify(kid.settings || {}))) : null;
+    if (st && !st.linkMode) st.linkMode = 'learn';
+    name = kid ? kid.name : ''; dirty = false; delete ov.dataset.confirm;
+    $s('#shsave').disabled = true; $s('#shok').textContent = '';
+  }
+  const touch = () => { dirty = true; delete ov.dataset.confirm; $s('#shsave').disabled = false; $s('#shok').textContent = ''; };
+
+  function kidsRow() {
+    $s('#shkids').innerHTML = PKIDS.map(k => `<button role="tab" class="shkid ${kid && k.id === kid.id ? 'on' : ''}" aria-selected="${kid && k.id === kid.id}" data-kid="${k.id}">${esc(k.name)}</button>`).join('')
+      + `<button class="shkid add" id="shadd" aria-label="הוספת ילד">+ ילד</button>`;
+    $$s('[data-kid]').forEach(b => b.onclick = () => {
+      if (dirty && !confirmLeave()) return;
+      kid = PKIDS.find(k => k.id === b.dataset.kid); loadKid(); kidsRow(); body();
+    });
+    $s('#shadd').onclick = () => { if (dirty && !confirmLeave()) return; cur = 'add'; kidsRow(); tabs(); body(); };
+  }
+  function confirmLeave() {
+    if (ov.dataset.confirm) return true;
+    ov.dataset.confirm = '1'; $s('#shok').textContent = 'יש שינויים שלא נשמרו. לחיצה נוספת תמשיך בלי לשמור.'; return false;
+  }
+  function tabs() {
+    const show = kid && cur !== 'add';
+    $s('#shtabs').hidden = !show;
+    $s('#shtabs').innerHTML = SHEET_TABS.map(([id, t]) => `<button role="tab" class="shtab ${cur === id ? 'on' : ''}" aria-selected="${cur === id}" data-tab="${id}">${t}</button>`).join('');
+    $$s('[data-tab]').forEach(b => b.onclick = () => { cur = b.dataset.tab; tabs(); body(); });
+    $s('.shfoot').classList.toggle('nosave', !show);
+  }
+  const segs = (attr, curV, opts) => opts.map(([v, t]) => `<button type="button" data-${attr}="${v}" class="${curV === v ? 'on' : ''}">${t}</button>`).join('');
+  const bindSeg = (attr, set) => $$s(`[data-${attr}]`).forEach(b => b.onclick = () => { set(b.dataset[attr]); $$s(`[data-${attr}]`).forEach(x => x.classList.toggle('on', x === b)); touch(); });
+
+  function body() {
+    const B = $s('#shbody');
+    if (cur === 'add' || !kid) {
+      B.innerHTML = `<form class="shform" id="shaddf">
+        <h3>הוספת ילד</h3>
+        <label class="shfield">שם פרטי <input id="shkn" class="pin wide" maxlength="20" required autocomplete="off"></label>
+        <p class="hint">השם יופיע לילד ("שלום גור!"). מי שיש לו את הקישור יכול לראות אותו, אז שם פרטי בלבד.</p>
+        <button class="btn primary">הוספה</button></form>`;
+      $s('#shaddf').onsubmit = async e => {
+        e.preventDefault(); const n = $s('#shkn').value.trim(); if (!n) return;
+        try { const id = await PAPI.createKid(PUSER.uid, n); PKIDS = await PAPI.listKids(PUSER.uid); PKIDS.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0)); kid = PKIDS.find(k => k.id === id) || PKIDS[PKIDS.length - 1]; cur = 'link'; loadKid(); kidsRow(); tabs(); body(); }
+        catch (er) { $s('#shok').textContent = 'ההוספה נכשלה. נסו שוב.'; }
+      };
+      $s('#shkn').focus();
+      return;
+    }
+    const p = kid.progress || {};
+    if (cur === 'learn') {
+      B.innerHTML = `
+        <div class="shgrp"><h3>החומר</h3>
+          <div class="packs">${PACKS.map(x => `<label class="pack ${x.ready ? '' : 'soon'}"><input type="radio" name="pack" value="${x.id}" ${st.pack === x.id ? 'checked' : ''} ${x.ready ? '' : 'disabled'}><b>${x.title}</b><small>${x.desc}</small></label>`).join('')}</div></div>
+        <div class="shgrp"><h3>רמת הלימוד</h3><div class="seg" role="group" aria-label="רמת לימוד">${segs('ll', st.level, Object.entries(LEVELS))}</div>
+          <label class="check"><input type="checkbox" id="shalu" ${st.allowLevelUp ? 'checked' : ''}> הילד יכול לשנות רמה בעצמו (ולעלות רמה אחרי 90%)</label></div>
+        <div class="shgrp"><h3>רמת מבחן הניסיון</h3><div class="seg" role="group" aria-label="רמת מבחן">${segs('tl', st.testLevel, Object.entries(LEVELS))}</div></div>`;
+      $$s('input[name="pack"]').forEach(r => r.onchange = () => { st.pack = r.value; touch(); });
+      bindSeg('ll', v => st.level = v); bindSeg('tl', v => st.testLevel = v);
+      $s('#shalu').onchange = e => { st.allowLevelUp = e.target.checked; touch(); };
+    } else if (cur === 'goal') {
+      const gt = st.goal.type || 'abc';
+      B.innerHTML = `
+        <div class="shgrp"><h3>היעד היומי</h3>
+          <div class="seg" role="group" aria-label="סוג יעד">${segs('gt', gt, [['abc', 'כל האותיות A–Z'], ['stars', 'כוכבים'], ['mins', 'דקות']])}</div>
+          <label class="shfield" id="shgnrow" ${gt === 'abc' ? 'hidden' : ''}>כמה ביום? <input id="shgn" type="number" min="1" max="500" value="${gt === 'abc' ? 25 : st.goal.n}" class="pin"></label>
+          <p class="hint" id="shgnote">${gt === 'abc' ? 'בכל יום הוא עובר על כל 26 האותיות, ומקבל סיבוב אחד בגלגל.' : 'בכל הגעה ליעד הוא מקבל סיבוב בגלגל.'}</p></div>
+        <div class="shgrp"><h3>גלגל ההפתעות</h3>
+          <div class="seg" role="group" aria-label="גלגל ההפתעות">${segs('wh', st.wheel ? '1' : '0', [['1', 'פעיל'], ['0', 'כבוי: רק כוכבים']])}</div></div>
+        <div class="shgrp" id="shprz" ${st.wheel ? '' : 'hidden'}><h3>ההפתעות</h3>
+          <p class="hint">אחת בכל שורה, באנגלית. תרגום לעברית אחרי קו: <span class="en" dir="ltr">A pizza night 🍕 | ערב פיצה</span></p>
+          <textarea id="shpz" rows="6" class="en ptext-in">${esc(st.prizes.join('\n'))}</textarea>
+          <button type="button" class="btn wtrybtn" id="shtry"><span class="wtmini"></span>נסו את הגלגל</button></div>`;
+      bindSeg('gt', v => {
+        st.goal = v === 'abc' ? { type: 'abc', n: ABC_GOAL } : { type: v, n: parseInt($s('#shgn').value, 10) || 25 };
+        $s('#shgnrow').hidden = v === 'abc';
+        $s('#shgnote').textContent = v === 'abc' ? 'בכל יום הוא עובר על כל 26 האותיות, ומקבל סיבוב אחד בגלגל.' : 'בכל הגעה ליעד הוא מקבל סיבוב בגלגל.';
+      });
+      $s('#shgn').oninput = e => { if (st.goal.type !== 'abc') { st.goal.n = Math.max(1, Math.min(500, parseInt(e.target.value, 10) || 1)); touch(); } };
+      bindSeg('wh', v => { st.wheel = v === '1'; $s('#shprz').hidden = !st.wheel; });
+      $s('#shpz').oninput = e => { const list = e.target.value.split('\n').map(x => x.trim()).filter(Boolean); st.prizes = list.length >= 2 ? list.slice(0, 12) : DEFAULT_PRIZES.slice(); touch(); };
+      $s('#shtry').onclick = () => wheelView({ prizes: st.prizes });
+    } else if (cur === 'prog') {
+      const d = kidDay(kid), m = p.mock;
+      B.innerHTML = `
+        <div class="shstats">
+          <div><b>${d.letters || 0}<small>/26</small></b><span>אותיות היום</span></div>
+          <div><b>${d.stars || 0}</b><span>כוכבים היום</span></div>
+          <div><b>${Math.floor((d.ms || 0) / 60000)}</b><span>דקות היום</span></div>
+          <div><b>${(p.days || []).length}</b><span>ימי תרגול</span></div>
+        </div>
+        <div class="shgrp"><h3>מבחן ניסיון אחרון</h3>
+          ${m ? `<p>${m.date.split('-').slice(1).reverse().join('.')}: <b>${m.score}/${m.n}</b></p>${secTable(m.secs).replace(/<button[^>]*>לתרגל<\/button>/g, '')}` : '<p class="hint">עוד לא עשה מבחן ניסיון.</p>'}</div>
+        <div class="shgrp"><h3>זכיות בגלגל</h3>
+          ${(p.wins || []).length ? `<ul class="wins">${p.wins.slice(0, 12).map(w => `<li><span class="en">${esc(enPart(w.prize))}</span> · ${w.date.split('-').slice(1).reverse().join('.')}</li>`).join('')}</ul>` : '<p class="hint">עוד אין.</p>'}</div>`;
+    } else if (cur === 'link') {
+      const url = kidLink(kid.id, st.linkMode);
+      B.innerHTML = `
+        <div class="shgrp"><h3>מה הקישור פותח</h3>
+          <div class="seg" role="group" aria-label="סוג הקישור">${segs('lm', st.linkMode, [['learn', 'לימוד ותרגול'], ['test', 'מבחן ניסיון'], ['all', 'הכול']])}</div></div>
+        <div class="shgrp"><h3>הקישור של ${esc(kid.name)}</h3>
+          <input class="lurl" id="shurl" readonly value="${url}" aria-label="הקישור">
+          <div class="row"><button class="btn" id="shcopy">העתקה</button><button class="btn primary" id="shsend">שליחה לילד</button></div>
+          <p class="hint">הקישור פתוח לכל מי שמקבל אותו, בלי חשבון. ההתקדמות שלו נשמרת ומדווחת לכם.</p></div>`;
+      bindSeg('lm', v => { st.linkMode = v; $s('#shurl').value = kidLink(kid.id, v); });
+      $s('#shcopy').onclick = async e => { try { await navigator.clipboard.writeText($s('#shurl').value); e.target.textContent = 'הועתק ✓'; } catch (er) { $s('#shurl').select(); e.target.textContent = 'סמנו והעתיקו'; } };
+      $s('#shsend').onclick = e => sendKidLink(e.target, Object.assign({}, kid, { settings: st }));
+    } else if (cur === 'kid') {
+      B.innerHTML = `
+        <div class="shgrp"><h3>שם</h3><input id="shname" class="pin wide" maxlength="20" value="${esc(name)}" aria-label="שם הילד"></div>
+        <div class="shgrp danger"><h3>מחיקת ${esc(kid.name)}</h3>
+          <p class="hint">הקישור שלו יפסיק לעבוד וההתקדמות תימחק.</p>
+          <div class="row" id="shdelrow"><button class="btn" id="shdel">מחיקה</button></div></div>`;
+      $s('#shname').oninput = e => { name = e.target.value.trim() || kid.name; touch(); };
+      $s('#shdel').onclick = () => {
+        $s('#shdelrow').innerHTML = `<b>למחוק את ${esc(kid.name)}?</b><button class="btn" id="shdel2">כן, למחוק</button><button class="btn" id="shdel0">ביטול</button>`;
+        $s('#shdel0').onclick = body;
+        $s('#shdel2').onclick = async () => {
+          try { await PAPI.deleteKid(kid.id); } catch (e) {}
+          PKIDS = PKIDS.filter(k => k.id !== kid.id); kid = PKIDS[0] || null; cur = kid ? 'learn' : 'add'; loadKid(); kidsRow(); tabs(); body();
+        };
+      };
+    }
+    B.scrollTop = 0;
+  }
+  $s('#shsave').onclick = async () => {
+    if (!kid || !dirty) return;
+    const b = $s('#shsave'); b.disabled = true;
+    try {
+      await PAPI.saveSettings(kid.id, st, name);
+      kid.settings = JSON.parse(JSON.stringify(st)); kid.name = name; dirty = false; delete ov.dataset.confirm;
+      $s('#shok').textContent = 'נשמר ✓'; kidsRow();
+    } catch (e) { b.disabled = false; $s('#shok').textContent = 'השמירה נכשלה. נסו שוב.'; }
+  };
+  if (!kid) cur = 'add';
+  loadKid(); kidsRow(); tabs(); body();
 }
+
+function parentPanel() { settingsSheet(); }
 
 async function parentCloud() {
   app.innerHTML = `${top('אזור ההורים')}<p class="loading">טוען…</p>`;
   let A;
   try { A = await api(); } catch (e) { app.innerHTML = `${top('אזור ההורים')}<section class="stk pbox"><p>לא הצלחנו להתחבר לשרת. נסו שוב מאוחר יותר.</p></section>`; return; }
   let first = true;
-  A.onUser(u => { if (!first && !$('.pdash, .plogin', app)) return; first = false; u ? parentDash(A, u) : parentLogin(A); });
+  A.onUser(async u => {
+    if (!first && !$('.plogin', app)) return; first = false;
+    if (!u) { parentLogin(A); return; }
+    PAPI = A; PUSER = u;
+    try { PKIDS = await A.listKids(u.uid); } catch (e) { PKIDS = []; }
+    PKIDS.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+    go(home); settingsSheet();
+  });
 }
 function parentLogin(A) {
   app.innerHTML = `${top('אזור ההורים')}
@@ -1365,7 +1575,9 @@ async function parentDash(A, u) {
   };
 }
 const today_ = () => today();
-function kidSettings(A, u, k) {
+function kidSettings(A, u, k) { if (k) { settingsSheet(k.id, 'learn'); return; }
+  return kidSettingsOld(A, u, k); }
+function kidSettingsOld(A, u, k) {
   const st = Object.assign(defaultSettings(), k.settings || {}), p = k.progress || {};
   const segs = (attr, cur) => Object.keys(LEVELS).map(x => `<button type="button" data-${attr}="${x}" class="${cur === x ? 'on' : ''}">${LEVELS[x]}</button>`).join('');
   const m = p.mock;
