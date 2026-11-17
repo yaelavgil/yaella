@@ -595,6 +595,33 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .ltdots i.l1{background:#F2C14E}.ltdots i.l2{background:#4FB57E}
 .ltnum{color:var(--muted);font-weight:500;font-size:14px;margin-inline-start:auto}
 .lmtitle{margin:0 0 0 40px;font:700 18px var(--f-display)}
+/* road to the wheel */
+.gpath{position:relative;display:flex;align-items:center;justify-content:space-between;gap:2px;padding:30px 2px 14px;min-height:110px}
+.pline{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.pl-all{fill:none;stroke:#E2D6BC;stroke-width:5;stroke-linecap:round;stroke-dasharray:2 9}
+.pl-done{fill:none;stroke:#FFC94D;stroke-width:6;stroke-linecap:round}
+.pn{position:relative;z-index:1;flex:0 1 36px;min-width:22px;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;
+  transform:translateY(calc(sin(var(--i) * 0.9rad) * 16px));background:var(--surface);border:3px solid #E2D6BC;box-shadow:0 3px 0 #D3C4A4;
+  font:700 clamp(11px,3vw,15px)/1 var(--f-en);color:#B7AC93;transition:transform .3s var(--ease)}
+.pn .pnum{font:600 11px var(--f-body);opacity:.7}
+.pn.done{background:#FFD23F;border-color:#E9A900;box-shadow:0 3px 0 #B98500;color:#5A3A00}
+.pn.done .ji{height:60%}
+.pn.done b{font-size:clamp(12px,3.4vw,16px)}
+.pn.cur{border-color:#4D8DFF;box-shadow:0 3px 0 #2F62C9,0 0 0 0 rgba(77,141,255,.5);animation:pring 1.8s ease-out infinite;color:#2F62C9}
+@keyframes pring{0%{box-shadow:0 3px 0 #2F62C9,0 0 0 0 rgba(77,141,255,.45)}80%,100%{box-shadow:0 3px 0 #2F62C9,0 0 0 12px rgba(77,141,255,0)}}
+.pend{position:relative;z-index:1;flex:none;width:clamp(52px,15vw,68px);aspect-ratio:1;border-radius:50%;border:0;padding:0;background:none;display:grid;place-items:center;cursor:pointer}
+.pend .mw{width:100%;height:100%;display:block}
+.pwheel.locked .mw{filter:saturate(.35) opacity(.8)}
+.pwheel.open{animation:pbob 1.3s ease-in-out infinite;filter:drop-shadow(0 0 10px rgba(255,201,77,.9))}
+.pwheel.open .mwspin{animation:mwturn 4s linear infinite;transform-origin:50% 50%}
+@keyframes pbob{50%{transform:translateY(-5px) scale(1.06)}}
+.plock{position:absolute;bottom:-4px;inset-inline-end:-4px;width:24px;height:24px;border-radius:50%;background:var(--surface);display:grid;place-items:center;box-shadow:0 1px 4px rgba(0,0,0,.2);font-size:13px}
+.plock .ji{height:15px}
+.ptrophy{font-size:40px;cursor:default}
+.ptrophy.locked{filter:grayscale(1) opacity(.5)}
+.pmark{position:absolute;z-index:2;transform:translate(-50%,-110%);font-size:20px;line-height:1;pointer-events:none;animation:pbob 1.6s ease-in-out infinite}
+.pmark .ji{height:22px}
+@media (prefers-reduced-motion:reduce){.pn.cur,.pwheel.open,.pmark,.pwheel.open .mwspin{animation:none}}
 /* letter card */
 .lcov{position:fixed;inset:0;z-index:66;background:rgba(26,20,40,.45);display:grid;place-items:center;padding:16px;animation:fade .2s both}
 .lcard{position:relative;width:min(420px,100%);background:var(--bg);border-radius:22px;padding:18px;display:grid;gap:12px;box-shadow:0 24px 70px rgba(20,10,40,.35);animation:sheetin .25s var(--ease) both}
@@ -1250,22 +1277,17 @@ function home() {
 
   ${KID && KID.mode === 'test' ? '' : `<section class="goal stk h3">
     <div class="goalhead"><span class="glabel">🎯 היעד היומי</span>${G.lvl ? `<span class="gbig" dir="ltr">${Math.min(G.value, G.n)} / ${G.n}</span>` : G.abc ? `<span class="gbig" dir="ltr">${G.value} / ${ABC_GOAL}</span>` : `<span class="gbig">${G.g.n} ${G.unit}</span>`}</div>
-    ${G.lvl ? `<p class="gsub">${G.review ? `כל האותיות אצלך! היום חוזרים על <b>${G.n}</b> אותיות כדי לא לשכוח.` : `<b>${G.n}</b> אותיות צריכות להתקדם היום: מלבן לצהוב, או מצהוב לירוק.`}</p>
-      ${letterMapHTML(st, { click: true })}
-      <button class="btn focusbtn" id="focus">🎯 לתרגל את האותיות שלי</button>` : ''}
-    ${G.lvl ? '' : G.abc
-      ? `<div class="abcroad" role="progressbar" aria-valuemin="0" aria-valuemax="${ABC_GOAL}" aria-valuenow="${G.value}" aria-label="האותיות שאספת היום">
-           ${LETTER_ROW.map((L, i) => `<span class="abl${i < G.value ? ' on' : ''}">${L}</span>`).join('')}
-         </div>`
-      : `<div class="gmeter" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${G.avail ? 100 : Math.round(G.pct)}"><i style="width:${G.avail ? 100 : G.pct}%"></i></div>`}
+    ${G.lvl ? `<p class="gsub">${G.review ? `כל האותיות אצלך! היום חוזרים על <b>${G.n}</b> אותיות כדי לא לשכוח.` : `<b>${G.n}</b> אותיות צריכות להתקדם היום: מלבן לצהוב, או מצהוב לירוק.`}</p>` : ''}
+    ${goalPathHTML(G, st)}
     ${st.wheel
       ? (G.avail
         ? `<button class="btn spinbtn" id="spin">🎡 הגעת ליעד! סובב את גלגל ההפתעות${G.avail > 1 ? ` (${G.avail})` : ''}</button>`
-        : `<p class="gleft">נשארו עוד <b>${G.left} ${G.unit}</b> לגלגל ההפתעות</p>
-           <button type="button" class="peekwheel" id="peek" aria-label="הצצה לגלגל ההפתעות">${miniWheel((st.prizes || []).length)}<span class="pwcap">הצצה לגלגל</span></button>`)
+        : `<p class="gleft">נשארו עוד <b>${G.left} ${G.unit}</b> לגלגל ההפתעות</p>`)
       : (G.earned
         ? `<p class="gleft">🏆 <b>הגעת ליעד היומי!</b> כל הכבוד!${G.earned > 1 ? ` (${G.earned} פעמים)` : ''}</p>`
         : `<p class="gleft">נשארו עוד <b>${G.left} ${G.unit}</b> ליעד</p>`)}
+    ${G.lvl ? `${letterMapHTML(st, { click: true })}
+      <button class="btn focusbtn" id="focus">🎯 לתרגל את האותיות שלי</button>` : ''}
     <p class="gnow">היום תרגלת: <b>⭐ ${G.d.stars} כוכבים</b> · <b>⏱ ${G.mins} דקות</b>${G.d.spins ? ` · 🎡 ${G.d.spins} סיבובים` : ''}</p>
     ${G.lvl ? '' : (() => { const lv = letterLevels(st); return `<button class="ltline" id="ltline"><span>🔤 האותיות שלי</span><span class="ltdots" dir="ltr">${lv.map(v => `<i class="l${v}"></i>`).join('')}</span><span class="ltnum">${lv.filter(v => v === 2).length} ירוקות · ${lv.filter(v => v === 1).length} בדרך</span></button>`; })()}
   </section>`}
@@ -1302,6 +1324,7 @@ function home() {
   $$('[data-lvl]', app).forEach(b => b.onclick = () => { const s = load(); s.level = b.dataset.lvl; save(s); home(); });
   const sp = $('#spin'); if (sp) sp.onclick = () => go(wheelView);
   const fb_ = $('#focus'); if (fb_) fb_.onclick = () => go(focusQuiz);
+  layoutGoalPath();
   const ll = $('#ltline'); if (ll) ll.onclick = lettersPopup;
   $$('.goal [data-lt]', app).forEach(x => { x.onclick = () => letterCard(x.dataset.lt); x.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); letterCard(x.dataset.lt); } }; });
   if (st.allGreen && !st.allGreenSeen) { const s2 = load(); s2.allGreenSeen = today(); save(s2); celebrateAll(); }
@@ -2637,6 +2660,51 @@ function letterCard(c) {
   };
   ov.querySelector('#lcgo').focus();
 }
+/* ---------- the road to the wheel: steps that light up, like a game map ----------
+   letters goal: one step per letter that moves up (the letter is written on the step);
+   stars / minutes: up to 8 steps, each worth an equal share of the goal. The wheel waits at the end. */
+function goalPathHTML(G, st) {
+  const n = G.lvl ? G.n : G.g.n;
+  const N = G.lvl ? Math.min(n, 10) : Math.min(n, 8);
+  const per = n / N;
+  const inCycle = G.avail ? n : (G.value % n);
+  const done = G.avail ? N : Math.min(N, Math.floor(inCycle / per + 1e-9));
+  const cycleStart = G.lvl ? Math.floor(G.value / n) * n : 0;
+  const ups = G.lvl ? (G.review ? (G.d.rev || []) : (G.d.up || [])).slice(cycleStart) : [];
+  const icon = G.lvl ? '' : G.g.type === 'mins' ? '⏱' : '⭐';
+  const steps = [...Array(N)].map((_, i) => {
+    const state = i < done ? 'done' : i === done ? 'cur' : '';
+    const lab = state === 'done' ? (G.lvl ? `<b class="en">${(ups[i] || '').toUpperCase() || '✓'}</b>` : icon) : `<span class="pnum">${i + 1}</span>`;
+    return `<span class="pn ${state}" style="--i:${i}" aria-hidden="true">${lab}</span>`;
+  }).join('');
+  const prizeN = (st.prizes || []).length;
+  const end = st.wheel
+    ? `<button type="button" class="pend pwheel ${G.avail ? 'open' : 'locked'}" id="pwheel" aria-label="${G.avail ? 'גלגל ההפתעות פתוח! לסובב' : 'הצצה לגלגל ההפתעות'}">${miniWheel(prizeN)}${G.avail ? '' : '<span class="plock" aria-hidden="true">🔒</span>'}</button>`
+    : `<span class="pend ptrophy ${G.avail || G.earned ? 'open' : 'locked'}" aria-hidden="true">🏆</span>`;
+  return `<div class="gpath" role="progressbar" aria-valuemin="0" aria-valuemax="${N}" aria-valuenow="${done}" aria-label="הדרך לגלגל: ${done} מתוך ${N} שלבים">
+    <svg class="pline" aria-hidden="true"><path class="pl-all"/><path class="pl-done"/></svg>
+    ${steps}${end}<span class="pmark" aria-hidden="true">🚀</span></div>`;
+}
+function layoutGoalPath() {
+  const box = $('.gpath', app); if (!box) return;
+  const draw = () => {
+    if (!document.body.contains(box)) return;
+    const b = box.getBoundingClientRect();
+    const pts = [...box.querySelectorAll('.pn, .pend')].map(el => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2 - b.left, r.top + r.height / 2 - b.top]; });
+    if (pts.length < 2) return;
+    const curve = list => list.map((p, i) => i ? (() => { const q = list[i - 1], mx = (q[0] + p[0]) / 2; return `C${mx},${q[1]} ${mx},${p[1]} ${p[0]},${p[1]}`; })() : `M${p[0]},${p[1]}`).join(' ');
+    box.querySelector('.pl-all').setAttribute('d', curve(pts));
+    const nd = box.querySelectorAll('.pn.done').length, k = box.querySelector('.pend.open') ? pts.length : Math.min(pts.length, nd + 1);
+    box.querySelector('.pl-done').setAttribute('d', nd ? curve(pts.slice(0, k)) : '');
+    // the rocket sits above the step he is on now
+    const cur = box.querySelector('.pn.cur') || box.querySelector('.pend'), mk = box.querySelector('.pmark');
+    if (cur && mk) { const r = cur.getBoundingClientRect(); mk.style.left = (r.left + r.width / 2 - b.left) + 'px'; mk.style.top = (r.top - b.top) + 'px'; mk.hidden = !box.querySelector('.pn.cur'); }
+  };
+  draw();
+  try { const ro = new ResizeObserver(draw); ro.observe(box); } catch (e) { window.addEventListener('resize', draw); }
+  const w = $('#pwheel', app); if (w) w.onclick = () => go(wheelView);
+}
+
 function lettersPopup() {
   const st = load();
   const ov = document.createElement('div');
