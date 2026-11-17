@@ -588,6 +588,18 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .lttab td:nth-child(2){font-variant-numeric:tabular-nums;text-align:center;width:4.5em}
 .lttab td:nth-child(3){text-align:center;width:2em;color:var(--good);font-weight:700}
 .ltcard .hint{grid-column:1/-1;margin:0}
+/* letter card */
+.lcov{position:fixed;inset:0;z-index:66;background:rgba(26,20,40,.45);display:grid;place-items:center;padding:16px;animation:fade .2s both}
+.lcard{position:relative;width:min(420px,100%);background:var(--bg);border-radius:22px;padding:18px;display:grid;gap:12px;box-shadow:0 24px 70px rgba(20,10,40,.35);animation:sheetin .25s var(--ease) both}
+.lcx{position:absolute;top:12px;inset-inline-start:12px}
+.lchead{display:flex;align-items:center;gap:16px}
+.lchead > div{display:grid;gap:8px;justify-items:start}
+.lcbig{font-size:56px;line-height:1;padding:10px 16px;border-radius:18px;background:var(--surface);border:2px solid var(--line)}
+.lcbig.l1{background:#FFE9A8;border-color:#F2C14E}.lcbig.l2{background:#C9F0D8;border-color:#4FB57E}
+.lcnote{margin:0;font-size:15px}
+.lcbtns{display:flex;gap:10px;flex-wrap:wrap}
+.lcbtns .btn{flex:1 1 150px;min-height:48px}
+@media (max-width:600px){.lcov{place-items:end stretch;padding:0}.lcard{border-radius:22px 22px 0 0;padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}}
 /* wins: picture, words, date each in their own place */
 .winrows{list-style:none;margin:0;padding:0;display:grid;gap:8px}
 .winrows li{display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;gap:12px;padding:8px 10px;border-radius:12px;background:var(--bg)}
@@ -597,7 +609,7 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .wrtx .en{font-weight:600;direction:ltr;text-align:right;unicode-bidi:plaintext}
 .wrtx small{color:var(--muted);font-size:13px}
 .wrdate{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
-@media (max-width:420px){.lmap{gap:3px}.lm{border-radius:6px}}
+@media (max-width:600px){.lmap{grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}.lm{font-size:20px;border-radius:11px;min-height:40px}}
 
 /* ---- gear + settings window ---- */
 .gearbtn{width:42px;height:42px;flex:none;display:grid;place-items:center;border-radius:12px;border:1.5px solid var(--line);
@@ -1232,7 +1244,7 @@ function home() {
   ${KID && KID.mode === 'test' ? '' : `<section class="goal stk h3">
     <div class="goalhead"><span class="glabel">🎯 היעד היומי</span>${G.lvl ? `<span class="gbig" dir="ltr">${Math.min(G.value, G.n)} / ${G.n}</span>` : G.abc ? `<span class="gbig" dir="ltr">${G.value} / ${ABC_GOAL}</span>` : `<span class="gbig">${G.g.n} ${G.unit}</span>`}</div>
     ${G.lvl ? `<p class="gsub">${G.review ? `כל האותיות אצלך! היום חוזרים על <b>${G.n}</b> אותיות כדי לא לשכוח.` : `<b>${G.n}</b> אותיות צריכות להתקדם היום: מלבן לצהוב, או מצהוב לירוק.`}</p>
-      ${letterMapHTML(st)}
+      ${letterMapHTML(st, { click: true })}
       <button class="btn focusbtn" id="focus">🎯 לתרגל את האותיות שלי</button>` : ''}
     ${G.lvl ? '' : G.abc
       ? `<div class="abcroad" role="progressbar" aria-valuemin="0" aria-valuemax="${ABC_GOAL}" aria-valuenow="${G.value}" aria-label="האותיות שאספת היום">
@@ -1282,6 +1294,7 @@ function home() {
   $$('[data-lvl]', app).forEach(b => b.onclick = () => { const s = load(); s.level = b.dataset.lvl; save(s); home(); });
   const sp = $('#spin'); if (sp) sp.onclick = () => go(wheelView);
   const fb_ = $('#focus'); if (fb_) fb_.onclick = () => go(focusQuiz);
+  $$('.goal [data-lt]', app).forEach(x => { x.onclick = () => letterCard(x.dataset.lt); x.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); letterCard(x.dataset.lt); } }; });
   if (st.allGreen && !st.allGreenSeen) { const s2 = load(); s2.allGreenSeen = today(); save(s2); celebrateAll(); }
   const pk = $('#peek'); if (pk) pk.onclick = () => go(wheelView);
 }
@@ -2576,6 +2589,50 @@ function flyStar(from) {
     { transform: `translate(${dx}px,${dy}px) scale(.5)`, opacity: .9 },
   ], { duration: 750, easing: 'cubic-bezier(.5,0,.3,1)' }).onfinish = () => { s.remove(); done(); };
 }
+const LT_NEED = { snd: 'צליל', cas: 'גדולה↔קטנה', nam: 'שם האות', wu: 'כתיבת האות הגדולה', wl: 'כתיבת האות הקטנה' };
+function letterMissing(r) {
+  r = r || {}; const has = k => r[k] && r[k][0] > 0, acc = k => (r[k] && r[k][1]) ? r[k][0] / r[k][1] : 0;
+  const miss = [];
+  for (const k of ['snd', 'cas', 'nam']) if (!(has(k) && acc(k) >= 0.8)) miss.push(LT_NEED[k] + (has(k) ? ' (עוד קצת דיוק)' : ''));
+  for (const k of ['wu', 'wl']) if (!has(k)) miss.push(LT_NEED[k]);
+  return miss;
+}
+function letterCard(c) {
+  const s = load(), r = (s.lt || {})[c] || {}, lv = letterLevel(r), U = c.toUpperCase();
+  const miss = letterMissing(r), stale = lv === 1 && !miss.length;
+  const ov = document.createElement('div');
+  ov.className = 'lcov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-label', 'האות ' + U);
+  ov.innerHTML = `<div class="lcard">
+    <button class="shx lcx" aria-label="סגירה">✕</button>
+    <div class="lchead"><span class="lcbig en l${lv}">${U}${c}</span>
+      <div><span class="ltst l${lv}">${['עוד לא', 'בדרך', 'שולט'][lv]}</span>
+      <button class="btn sm" data-say="${NAME[U]}">🔊 שם האות</button></div></div>
+    <table class="lttab"><tbody>${LT_SKILLS.map(([k, t]) => { const v = r[k] || [0, 0];
+      return `<tr><td>${t}</td><td dir="ltr">${v[1] ? `${v[0]}/${v[1]}` : '—'}</td><td>${v[1] && v[0] / v[1] >= .8 ? '✓' : ''}</td></tr>`; }).join('')}</tbody></table>
+    <p class="lcnote">${lv === 2 ? 'כל הכבוד! האות הזאת ירוקה. כדאי לחזור עליה מדי פעם.' : stale ? 'הייתה ירוקה, אבל לא תרגלת אותה שבוע. תרגול אחד מחזיר אותה לירוק.' : `כדי שתהיה ירוקה חסר: <b>${miss.join(' · ')}</b>`}</p>
+    <div class="lcbtns"><button class="btn primary" id="lcpr">🎯 לתרגל את ${U}</button><button class="btn" id="lcwr">✍️ לכתוב את ${U}</button></div>
+  </div>`;
+  document.body.appendChild(ov);
+  const close = () => { ov.remove(); document.removeEventListener('keydown', esc_); };
+  const esc_ = e => { if (e.key === 'Escape') close(); };
+  document.addEventListener('keydown', esc_);
+  ov.addEventListener('click', e => { if (e.target === ov) close(); });
+  ov.querySelector('.lcx').onclick = close;
+  ov.querySelector('#lcpr').onclick = () => { close(); go(() => letterQuiz(c)); };
+  ov.querySelector('#lcwr').onclick = () => {
+    close();
+    const needLow = !(r.wl && r.wl[0] > 0), needUp = !(r.wu && r.wu[0] > 0);
+    WRITE_START = { i: ALPHA.indexOf(c), cs: needUp && !needLow ? 'up' : needLow && !needUp ? 'low' : 'both' };
+    go(writeView);
+  };
+  ov.querySelector('#lcpr').focus();
+}
+function letterQuiz(c) {
+  setLvl(); FOCUS = [c];
+  const qs = build([qSound, qCase, qName, qPic, qCase, qName], 8);
+  FOCUS = null;
+  runQuiz('focus', 'האות ' + c.toUpperCase(), qs, () => letterQuiz(c));
+}
 function focusQuiz() {
   setLvl();
   FOCUS = weakLetters(6);
@@ -2837,8 +2894,11 @@ function fitInto(inkStrokes, tplStrokes) {
   return inkStrokes.map(st => st.map(([x, y]) => [tcx + (x - dcx) * sx, tcy + (y - dcy) * sy]));
 }
 
+let WRITE_START = null; // {i, cs} when opened from a letter card
 function writeView() {
-  let mode = 'trace', idx = 0, cs = 'both', ghost = true, dict = null, state = 'draw', won = false;
+  let mode = 'trace', idx = WRITE_START ? WRITE_START.i : 0, cs = WRITE_START ? WRITE_START.cs : 'both';
+  WRITE_START = null;
+  let ghost = true, dict = null, state = 'draw', won = false;
   app.innerHTML = `${top('כתיבת אותיות')}
     <div class="wctl"><div class="seg" role="group" aria-label="סוג תרגול"><button data-mode="trace" class="on">העתקה</button><button data-mode="dict">הכתבה</button></div></div>
     <div id="wtop"></div>
