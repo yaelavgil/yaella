@@ -732,6 +732,10 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .jrest{display:grid;gap:2px;justify-items:center;text-align:center;margin-top:6px;padding:12px;border-radius:16px;background:#EEF0FF;color:#3B3F8C}
 .jpop.rest{background:#5B5FC7}.jpop.rest::before{border-bottom-color:#5B5FC7}
 @media (prefers-reduced-motion:reduce){.mnode.cur,.mhere,.mnode.mega.open{animation:none}.jmap{scroll-behavior:auto}}
+.stmin{display:block;font-size:13px;font-weight:600;opacity:.9;margin-top:2px}
+.mnode.cur{background:conic-gradient(#FFD23F var(--ring,0%),transparent 0) border-box,linear-gradient(#6FA3FF,#3D7BFF) padding-box;border:5px solid transparent}
+.ltime{display:grid;gap:6px;justify-items:center;margin:4px 0}
+.mbar.big{width:200px;height:12px}
 /* letter card */
 .lcov{position:fixed;inset:0;z-index:66;background:rgba(26,20,40,.45);display:grid;place-items:center;padding:16px;animation:fade .2s both}
 .lcard{position:relative;width:min(420px,100%);background:var(--bg);border-radius:22px;padding:18px;display:grid;gap:12px;box-shadow:0 24px 70px rgba(20,10,40,.35);animation:sheetin .25s var(--ease) both}
@@ -1240,10 +1244,14 @@ function markDone(mod, pct) {
 }
 function addStar() { const s = load(); s.stars++; day(s).stars++; save(s); }
 // practice time: time between taps while inside a practice screen (gaps over 90s don't count)
-let practicing = false, lastAct = 0;
+let practicing = false, lastAct = 0, inStage = false;
 document.addEventListener('pointerdown', () => {
   const now = Date.now();
-  if (practicing && lastAct && now - lastAct < 90000) { const s = load(); day(s).ms += now - lastAct; save(s); }
+  if (practicing && lastAct && now - lastAct < 90000) {
+    const s = load(); day(s).ms += now - lastAct;
+    if (inStage && s.jour && STAGE) { const J = s.jour; if (J.ck !== STAGE.k) { J.ck = STAGE.k; J.cms = 0; } J.cms = (J.cms || 0) + (now - lastAct); }
+    save(s);
+  }
   lastAct = practicing ? now : 0;
 }, { capture: true });
 /* ---------- letters: what he really knows, one letter at a time ----------
@@ -1340,7 +1348,9 @@ function letterMapHTML(s, opts = {}) {
 const JOUR_N = 26;
 const jour = s => (s.jour = s.jour || { n: 0, spins: 0, mega: false, round: 1 });
 const jEvery = s => Math.max(3, Math.min(8, +((s.goal || {}).every) || 4));
-const wheelMin = s => { const v = (s.goal || {}).wmin; return v == null ? 20 : +v; };   // minutes of practice today before a wheel opens
+const wheelMin = () => 0; // (retired) the wheel now opens with the day's first letter
+const letterMin = s => { const v = (s.goal || {}).lmin; return v == null ? 30 : Math.max(5, +v); }; // minutes of practice that earn a letter
+const curLetterMin = s => { const J = jour(s); return J.ck === J.n ? Math.floor((J.cms || 0) / 60000) : 0; };
 const dayMax = s => { const v = (s.goal || {}).max; return v == null ? 60 : +v; };      // after this many minutes, no more practice today (0 = no limit)
 const restNow = () => { const s = load(), m = dayMax(s); return !!m && Math.floor((day(s).ms || 0) / 60000) >= m; };
 function restView() {
@@ -1355,27 +1365,23 @@ function avgLesson(s) { const l = (jour(s).lm || []).filter(x => x > 0); return 
 function wheelStops(s) { const e = jEvery(s), out = []; for (let k = e; k < JOUR_N; k += e) out.push(k); return out; } // a spin after letter k (Z has the mega wheel)
 function daysToTest() { const ex = new Date(2026, 10, 23), t = new Date(); t.setHours(0, 0, 0, 0); return Math.round((ex - t) / 864e5); }
 function dailyTarget(s) {
-  const J = jour(s), d = day(s), fixed = +((s.goal || {}).perDay) || 0;
-  const leftAtStart = JOUR_N - J.n + (d.jl || 0);
+  const J = jour(s), d = day(s), leftAtStart = JOUR_N - J.n + (d.jl || 0);
   if (!leftAtStart) return 0;
-  if (fixed) return Math.min(fixed, leftAtStart);
-  const days = daysToTest();
-  return days > 0 ? Math.min(leftAtStart, Math.max(3, Math.ceil(leftAtStart / days))) : Math.min(4, leftAtStart);
+  const m = dayMax(s) || 60;
+  return Math.min(leftAtStart, Math.max(1, Math.floor(m / letterMin(s))));
 }
+function st_wheelToday(s, d) { return (d.jl || 0) >= 1 && !(d.jw >= 1) && (jour(s).n < JOUR_N || (d.jl || 0) > 1); }
 function goalState(s) {
   if ((s.goal || {}).type === 'journey') {
     const d = day(s), J = jour(s), T = dailyTarget(s), todayN = d.jl || 0, mins = Math.floor((d.ms || 0) / 60000);
-    const stops = wheelStops(s), reached = stops.filter(k => k <= J.n).length;
-    const owed = Math.max(0, reached + (s.giftSpins || 0) - (J.spins || 0));   // wheels he has passed and not spun yet
-    const minM = wheelMin(s), maxM = dayMax(s);
+    const stops = [], reached = 0, owed = 0, minM = 0, maxM = dayMax(s);
     const spunToday = (d.jw || 0) >= 1;
-    const avail = owed && !spunToday && mins >= minM ? 1 : 0;
+    const avail = st_wheelToday(s, d) ? 1 : 0;
     const capped = J.n < JOUR_N && !!maxM && mins >= maxM;
-    const next = stops.find(k => k > J.n) || JOUR_N;
     return { d, g: s.goal, mins, journey: true, J, stops, value: J.n, earned: reached, owed, avail, waiting: owed && !spunToday && !avail ? minM - mins : 0,
-      mega: J.n >= JOUR_N && !J.mega, megaWait: J.n >= JOUR_N && !J.mega && mins < minM ? minM - mins : 0,
-      target: T, todayN, capped, spunToday, nextDay: owed && spunToday ? owed : 0, minM, maxM, lesson: avgLesson(s),
-      left: next - J.n, unit: next === JOUR_N ? 'אותיות למגה גלגל' : 'אותיות לגלגל', pct: Math.min(100, (J.n / JOUR_N) * 100) };
+      mega: J.n >= JOUR_N && !J.mega, megaWait: 0,
+      target: T, todayN, capped, spunToday, nextDay: 0, lmin: letterMin(s), cmin: curLetterMin(s), minM, maxM, lesson: letterMin(s),
+      left: 1, unit: 'אות', pct: Math.min(100, (J.n / JOUR_N) * 100) };
   }
   const d = day(s), g = s.goal, mins = Math.floor(d.ms / 60000);
   if (g.type === 'lvl' || g.type === 'abc') { // letters that moved up today; after all 26, the review list
@@ -1411,7 +1417,7 @@ function countdown() {
 let cleanup = null;
 function go(fn, ...a) {
   if (cleanup) { cleanup(); cleanup = null; }
-  practicing = ![home, wheelView, parentSettings, parentCloud].includes(fn); lastAct = 0;
+  practicing = ![home, wheelView, parentSettings, parentCloud].includes(fn); lastAct = 0; inStage = false;
   hush();
   fn(...a);
   window.scrollTo(0, 0);
@@ -1787,15 +1793,11 @@ function settingsSheet(kidId, tab) {
           <span class="tryarrow" aria-hidden="true">←</span>
         </button>
         <div class="shgrp"><h3>מסע 26 האותיות</h3>
-          <p class="hint">כל שיעור (כ־10 שאלות וכתיבת האות) נותן אות. על המפה מסומן גלגל כל כמה אותיות: כשעוברים אותה מקבלים סיבוב. נפתח סיבוב אחד ביום לכל היותר, ורק אחרי מספיק דקות תרגול באותו יום; גלגל נוסף נשמר למחר. אחרי Z מחכה מגה גלגל. משך שיעור נמדד בפועל, ולפיו ההערכה בדקות.</p>
-          <label class="shfield">גלגל על כל</label>
-          <div class="seg" role="group" aria-label="גלגל כל כמה אותיות">${segs('ev', String(jEvery(st)), [['3', '3 אותיות'], ['4', '4'], ['5', '5'], ['6', '6']])}</div>
-          <label class="shfield">הגלגל נפתח רק אחרי תרגול של</label>
-          <div class="seg" role="group" aria-label="דקות לפני גלגל">${segs('wm', String(wheelMin(st)), [['0', 'בלי'], ['15', '15 דק׳'], ['20', '20'], ['25', '25']])}</div>
+          <p class="hint">כל אות דורשת זמן תרגול אמיתי (סבבים של כ־10 שאלות, ובסוף כותבים את האות). האות הראשונה של כל יום פותחת סיבוב בגלגל, פעם ביום לכל היותר. אחרי Z מחכה מגה גלגל. נספרות רק דקות של עבודה פעילה.</p>
+          <label class="shfield">כמה דקות תרגול לאות</label>
+          <div class="seg" role="group" aria-label="דקות לאות">${segs('lm', String(letterMin(st)), [['15', '15 דק׳'], ['20', '20'], ['30', '30'], ['40', '40']])}</div>
           <label class="shfield">הגבלה יומית לכל התרגול (שיעור שהתחיל אפשר לסיים)</label>
           <div class="seg" role="group" aria-label="הגבלה יומית">${segs('mx', String(dayMax(st)), [['45', '45 דק׳'], ['60', 'שעה'], ['90', 'שעה וחצי'], ['0', 'בלי']])}</div>
-          <label class="shfield">אותיות ביום</label>
-          <div class="seg" role="group" aria-label="אותיות ביום">${segs('pd', String(+st.goal.perDay || 0), [['0', 'אוטומטי'], ['3', '3'], ['4', '4'], ['5', '5'], ['6', '6']])}</div>
           <p class="hint" id="shpdnote"></p></div>
         <div class="shgrp"><h3>גלגל ההפתעות</h3>
           <div class="seg" role="group" aria-label="גלגל ההפתעות">${segs('wh', st.wheel ? '1' : '0', [['1', 'פעיל'], ['0', 'כבוי: רק המסע']])}</div></div>
@@ -1805,13 +1807,11 @@ function settingsSheet(kidId, tab) {
           <h3>👑 פרסי המגה גלגל (אחרי Z)</h3>
           <textarea id="shmz" rows="4" class="en ptext-in">${esc(st.megaPrizes.join('\n'))}</textarea>
           <button type="button" class="btn sm" id="shmtry">👑 לנסות את המגה גלגל</button></div>`;
-      const pdNote = () => { const J = (p && p.jour) || { n: 0 }, left = JOUR_N - (J.n || 0), dd = daysToTest(), auto = dd > 0 ? Math.max(3, Math.ceil(left / dd)) : 4;
-        $s('#shpdnote').textContent = +st.goal.perDay ? `${st.goal.perDay} אותיות ≈ ${st.goal.perDay * avgLesson(p)} דקות ביום.` : `אוטומטי: נשארו ${left} אותיות ו־${Math.max(0, dd)} ימים עד המבחן, אז היום ${Math.min(left, auto)} אותיות (≈ ${Math.min(left, auto) * avgLesson(p)} דקות, לפי ${(((p.jour || {}).lm) || []).length ? 'משך השיעורים שלו' : 'הערכה של 6 דקות לשיעור'}).`; };
+      const pdNote = () => { const J = (p && p.jour) || { n: 0 }, left = JOUR_N - (J.n || 0), lm = letterMin(st), mx = dayMax(st) || 60, per = Math.max(1, Math.floor(mx / lm)), days = Math.ceil(left / per), dd = daysToTest();
+        $s('#shpdnote').textContent = `${per} אותיות ביום לכל היותר. נשארו ${left} אותיות: בערך ${days} ימי תרגול${dd > 0 && days > dd ? ` (עד המבחן נשארו ${dd} ימים, אז הוא יגיע בערך לאות ${ALPHA[Math.min(25, (J.n || 0) + dd * per - 1)].toUpperCase()}. כל סבב מתרגל את כל נושאי המבחן, כך שגם בלי לסיים את המסע הוא מתכונן לכולם)` : ''}.`; };
       pdNote();
-      bindSeg('pd', v => { st.goal.perDay = +v; pdNote(); });
-      bindSeg('ev', v => { st.goal.every = +v; });
-      bindSeg('wm', v => { st.goal.wmin = +v; });
-      bindSeg('mx', v => { st.goal.max = +v; });
+      bindSeg('lm', v => { st.goal.lmin = +v; pdNote(); });
+      bindSeg('mx', v => { st.goal.max = +v; pdNote(); });
       bindSeg('wh', v => { st.wheel = v === '1'; $s('#shprz').hidden = !st.wheel; $s('#shtry').hidden = !st.wheel; });
       $s('#shpz').oninput = e => { const list = e.target.value.split('\n').map(x => x.trim()).filter(Boolean); st.prizes = list.length >= 2 ? list.slice(0, 12) : DEFAULT_PRIZES.slice(); touch(); };
       $s('#shtry').onclick = () => wheelView({ prizes: st.prizes });
@@ -2911,10 +2911,10 @@ function journeyMapHTML(G, st) {
   const rows = ALPHA.map((c, k) => {
     const state = k < J.n ? 'done' : k === J.n ? 'cur' : 'lock', U = c.toUpperCase();
     const x = Math.sin(k * 0.85), wd = WORDS.find(w => w.L.toLowerCase() === c && !w.f) || WORDS.find(w => w.L.toLowerCase() === c);
-    const stop = st.wheel && G.stops.includes(k + 1);
+    const stop = false, ring = state === 'cur' ? Math.min(100, Math.round(G.cmin / G.lmin * 100)) : 0;
     return `<div class="mrow" style="--x:${x.toFixed(2)}">
       ${wd ? `<span class="mdeco ${x > 0 ? 'l' : 'r'}" aria-hidden="true"><span class="mdi">${wd.e}</span><small class="en">${wd.w}</small></span>` : ''}
-      <button type="button" class="mnode ${state}" data-stage="${k}" aria-label="שלב ${k + 1}: האות ${U}${state === 'done' ? ', נאספה' : state === 'lock' ? ', נעולה' : ''}${stop ? ', עם גלגל' : ''}">
+      <button type="button" class="mnode ${state}" ${state === 'cur' ? `style="--ring:${ring}%"` : ''} data-stage="${k}" aria-label="שלב ${k + 1}: האות ${U}${state === 'done' ? ', נאספה' : state === 'lock' ? ', נעולה' : ''}${stop ? ', עם גלגל' : ''}">
         <b class="en">${U}<i>${c}</i></b>${stop ? `<span class="mwb ${k < J.n ? 'got' : ''}" aria-hidden="true">${miniWheel((st.prizes || []).length)}</span>` : ''}${state === 'done' ? '<span class="mchk" aria-hidden="true">✓</span>' : ''}
       </button>${state === 'cur' ? '<span class="mhere" aria-hidden="true">🚀</span>' : ''}</div>`;
   }).join('');
@@ -2931,22 +2931,23 @@ function journeyCardHTML(G, st) {
   const J = G.J, nextL = ALPHA[J.n] ? ALPHA[J.n].toUpperCase() : '';
   let action;
   if (G.mega && st.wheel && !G.megaWait) action = `<button class="btn spinbtn megabtn" id="megaspin">👑 אספת את כל 26 האותיות! למגה גלגל</button>`;
-  else if (G.avail && st.wheel) action = `<button class="btn spinbtn" id="spin">🎡 הגלגל נפתח! לסובב${G.avail > 1 ? ` (${G.avail})` : ''}</button>`;
+  else if (G.avail && st.wheel) action = `<button class="btn spinbtn" id="spin">🎡 האות הראשונה של היום! לסובב את הגלגל</button>`;
   else if (G.capped) action = `<div class="jrest">🌙 <b>להיום מספיק, כל הכבוד!</b><span>תרגלת ${G.maxM} דקות היום. המוח צריך גם מנוחה. נמשיך מחר.</span></div>`;
-  else if (J.n < JOUR_N) action = `<button class="btn stagebtn" id="stagego"><span class="stl en">${nextL}${nextL.toLowerCase()}</span><span>שלב ${J.n + 1}: לאסוף את האות ${nextL}</span><span aria-hidden="true">←</span></button>`;
+  else if (J.n < JOUR_N) action = `<button class="btn stagebtn" id="stagego"><span class="stl en">${nextL}${nextL.toLowerCase()}</span><span>שלב ${J.n + 1}: לאסוף את האות ${nextL}<small class="stmin">⏱ ${G.cmin}/${G.lmin} דקות</small></span><span aria-hidden="true">←</span></button>`;
   else if (!G.mega) action = `<div class="jdone"><b>🏆 סיימת את כל המסע! אתה מוכן למבחן.</b><button class="btn" id="jnew">להתחיל מסע חדש</button></div>`;
   else action = '';
   const wait = st.wheel && (G.waiting || G.megaWait)
     ? `<p class="jwait">${G.megaWait ? '👑' : '🎡'} ${G.megaWait ? 'המגה גלגל' : 'הגלגל'} מחכה לך! עוד <b>${G.waiting || G.megaWait} דקות</b> תרגול היום והוא נפתח.</p>`
-    : st.wheel && G.nextDay ? `<p class="jwait">🎡 כבר סובבת היום. הגלגל ששמרת מחכה לך מחר (אחרי ${G.minM} דקות תרגול).</p>` : '';
+    : st.wheel && G.spunToday && J.n < JOUR_N ? `<p class="jwait">🎡 כבר סובבת היום. מחר: אות ראשונה = גלגל!</p>`
+    : st.wheel && !G.todayN && J.n < JOUR_N ? `<p class="jwait">🎡 האות הראשונה של היום פותחת את הגלגל!</p>` : '';
   const T = G.target, tn = Math.min(G.todayN, T || G.todayN), minPct = G.minM ? Math.min(100, Math.round(G.mins / G.minM * 100)) : 100;
   const mission = `<div class="mission">
-      <span>📋 היום: <b>${T ? `${tn}/${T}` : G.todayN}</b> אותיות${T && G.todayN >= T ? ' · <b>בוצעה! 🎉</b>' : T ? ` · בערך ${Math.max(5, (T - tn) * G.lesson)} דקות` : ''}</span>
+      <span>📋 היום: <b>${T ? `${tn}/${T}` : G.todayN}</b> אותיות${T && G.todayN >= T ? ' · <b>בוצעה! 🎉</b>' : ''}</span>
       ${T ? `<span class="mdots" aria-hidden="true">${[...Array(T)].map((_, i) => `<i class="${i < tn ? 'on' : ''}"></i>`).join('')}</span>` : ''}
-      ${st.wheel && G.minM ? `<span class="mtime">⏱ <b>${G.mins}</b>/${G.minM} דקות<span class="mbar"><i style="width:${minPct}%"></i></span></span>` : ''}</div>`;
+      ${G.maxM ? `<span class="mtime">⏱ היום <b>${G.mins}</b>/${G.maxM} דקות<span class="mbar"><i style="width:${Math.min(100, Math.round(G.mins / G.maxM * 100))}%"></i></span></span>` : ''}</div>`;
   return `<section class="goal stk h3 journey">
     <div class="goalhead"><span class="glabel">🔤 מסע 26 האותיות</span><span class="gbig" dir="ltr">${J.n} / ${JOUR_N}</span></div>
-    <p class="gsub">כל שיעור = אות. ${st.wheel ? `אות עם <b>גלגל</b> בפינה = סיבוב (אחד ביום${G.minM ? `, אחרי ${G.minM} דקות תרגול` : ''}). ב־Z: <b>מגה גלגל</b>.` : ''}</p>
+    <p class="gsub">כל אות = <b>${G.lmin} דקות</b> תרגול. ${st.wheel ? 'האות הראשונה של כל יום פותחת את <b>הגלגל</b> (פעם ביום). ב־Z: <b>מגה גלגל</b>.' : ''}</p>
     ${action}
     ${wait}
     ${mission}
@@ -2965,7 +2966,7 @@ function stagePop(el) {
     : state === 'lock'
     ? `<b>שלב ${k + 1} · האות <span class="en">${L}</span></b><span>🔒 עוד נעול. קודם אוספים את <span class="en">${ALPHA[J.n].toUpperCase()}</span>.</span>`
     : `<b>שלב ${k + 1} · האות <span class="en">${L}${L.toLowerCase()}</span></b>
-       <span>${state === 'cur' ? `10 שאלות, ואז כותבים את האות. בערך ${G_.lesson} דקות.` : 'האות כבר שלך ✓. אפשר לתרגל אותה שוב.'}</span>
+       <span>${state === 'cur' ? `${G_.lmin} דקות תרגול בסבבים של כ־10 שאלות (עד עכשיו: ${G_.cmin}), ואז כותבים את האות.` : 'האות כבר שלך ✓. אפשר לתרגל אותה שוב.'}</span>
        <button class="btn ${state === 'cur' ? 'primary' : ''}" data-popgo>${state === 'cur' ? '▶ להתחיל' : '↻ לתרגל שוב'}</button>`;
   card.appendChild(pop);
   const cb = card.getBoundingClientRect(), r = el.getBoundingClientRect();
@@ -3012,7 +3013,9 @@ function stageQuiz(k) {
   if (goalState(load()).capped) { go(home); return; }
   setLvl();
   const L = ALPHA[k];
-  STAGE = { k, t0: Date.now() };
+  STAGE = { k, t0: Date.now() }; inStage = true;
+  { const s0 = load(), J0 = jour(s0); if (J0.ck !== k && J0.n === k) { J0.ck = k; J0.cms = 0; J0.cr = 0; save(s0); } }
+  const round = (jour(load()).cr || 0);
   FOCUS = [L];
   const mine = build([qSound, qCase, qName], 3);
   FOCUS = null;
@@ -3022,7 +3025,7 @@ function stageQuiz(k) {
       ...storyQs(pick(STORIES.filter(st => !st.hard))), ...build([qNumListen, qNumWord, qNumDigit, qNumCount], 3)];
   } else {
     const cover = build([qPic, qCase, qName, qSound], 3);
-    const t = k % 4;
+    const t = (k + round) % 4;
     const topic = t === 0 ? build(SETS.numbers[lvl], 4)
       : t === 1 ? shuffle(SENTENCES).slice(0, 3).map((it, i) => qSentence(it, i % 2 === 1))
       : t === 2 ? storyQs(pick(STORIES.filter(st => lvl === 'hard' ? st.hard : !st.hard))).slice(0, 4)
@@ -3032,7 +3035,11 @@ function stageQuiz(k) {
   runQuiz('stage', `שלב ${k + 1} · האות ${L.toUpperCase()}`, qs, () => stageQuiz(k));
 }
 function stageFinish(k, score, n) {
-  const pct = Math.round((score / n) * 100), L = ALPHA[k].toUpperCase(), pass = pct >= 60;
+  const pct = Math.round((score / n) * 100), L = ALPHA[k].toUpperCase();
+  const s0 = load(), J0 = jour(s0); J0.cr = (J0.cr || 0) + 1; save(s0);
+  const newL = J0.n === k, need = letterMin(s0), have = newL ? curLetterMin(s0) : need;
+  const pass = pct >= 60 && have >= need;
+  if (pct >= 60 && !pass) { sfx('ok'); return stageMore(k, score, n, need, have); }
   sfx(pass ? 'win' : 'ok');
   app.innerHTML = `${top(`שלב ${k + 1} · האות ${L}`)}
     <section class="result stk">
@@ -3041,17 +3048,30 @@ function stageFinish(k, score, n) {
       ${pass
         ? `<h2>עברת את השלב! 🎉</h2><p>${jour(load()).n > k ? `עכשיו כותבים את האות <span class="en">${L}</span>, גדולה וקטנה.` : `נשאר רק לכתוב את האות <span class="en">${L}</span>, גדולה וקטנה, והיא שלך.`}</p>
            <div class="row center"><button class="btn primary" id="stw">✍️ לכתוב את <span class="en">${L}${L.toLowerCase()}</span></button></div>`
-        : `<h2>כמעט!</h2><p>כדי לקבל את האות צריך 6 תשובות נכונות בניסיון הראשון. בוא ננסה שוב, עם שאלות חדשות.</p>
+        : `<h2>כמעט!</h2><p>בסבב הזה היו פחות מ־6 תשובות נכונות בניסיון הראשון. הדקות נספרות בכל מקרה. בוא ננסה שוב, עם שאלות חדשות.</p>
            <div class="row center"><button class="btn primary" id="again">↻ לנסות שוב</button><button class="btn" data-back="home">לדף הבית</button></div>`}
     </section>`;
-  const w = $('#stw'); if (w) w.onclick = () => { WRITE_START = { i: k, cs: 'both', stage: k }; go(writeView); };
+  const w = $('#stw'); if (w) w.onclick = () => { WRITE_START = { i: k, cs: 'both', stage: k }; go(writeView); inStage = true; };
   const a = $('#again'); if (a) a.onclick = () => go(stageQuiz, k);
+}
+function stageMore(k, score, n, need, have) {
+  const L = ALPHA[k].toUpperCase(), rest = restNow();
+  app.innerHTML = `${top(`שלב ${k + 1} · האות ${L}`)}
+    <section class="result stk">
+      <div class="stagebig en">${L}${L.toLowerCase()}</div>
+      <div class="score">${score}/${n}</div>
+      <h2>סבב מצוין! 💪</h2>
+      <div class="ltime"><span>⏱ בדרך לאות <span class="en">${L}</span>: <b>${have}/${need}</b> דקות</span><span class="mbar big"><i style="width:${Math.min(100, Math.round(have / need * 100))}%"></i></span></div>
+      <p>${rest ? 'להיום מספיק. ממשיכים מחר מאותה נקודה, הדקות נשמרות.' : `עוד <b>${need - have}</b> דקות תרגול, והאות שלך. ממשיכים עם שאלות חדשות.`}</p>
+      <div class="row center">${rest ? '' : `<button class="btn primary" id="more">▶ עוד סבב</button>`}<button class="btn" data-back="home">לדף הבית</button></div>
+    </section>`;
+  const m = $('#more'); if (m) m.onclick = () => go(stageQuiz, k);
 }
 function claimLetter(k) {
   const s = load(), J = jour(s), d = day(s);
   if (J.n > k) { go(home); return; } // practising a letter he already has
   if (J.n === k) {
-    J.n = k + 1; d.jl = (d.jl || 0) + 1;
+    J.n = k + 1; d.jl = (d.jl || 0) + 1; J.cms = 0; J.cr = 0; J.ck = k + 1;
     if (STAGE && STAGE.k === k && STAGE.t0) { J.lm = [...(J.lm || []), Math.max(2, Math.min(25, Math.round((Date.now() - STAGE.t0) / 60000)))].slice(-8); }
   }
   save(s); go(letterWon, k);
@@ -3065,7 +3085,6 @@ function letterWon(k) {
       <div class="stagebig en got pop">${L}${L.toLowerCase()}</div>
       <h2>האות <span class="en">${L}</span> שלך! 🎉</h2>
       <p class="hint">${G.J.n}/${JOUR_N} אותיות במסע</p>
-      ${st.wheel && G.nextDay && G.stops.includes(k + 1) ? `<p class="jwait">🎡 עברת אות עם גלגל! כבר סובבת היום, אז הוא שמור לך למחר.</p>` : ''}
       ${wheelWait ? `<p class="jwait">${G.megaWait ? '👑 המגה גלגל' : '🎡 עברת אות עם גלגל! הוא'} נפתח אחרי עוד <b>${G.waiting || G.megaWait} דקות</b> תרגול היום.</p>` : ''}
       ${G.target ? `<p>המשימה של היום: <b>${Math.min(G.todayN, G.target)}/${G.target}</b>${G.todayN >= G.target ? ' · <b>בוצעה! כל הכבוד!</b>' : ''}</p>` : ''}
       <div class="row center">
