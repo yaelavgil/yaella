@@ -1000,7 +1000,7 @@ function countdown() {
 let cleanup = null;
 function go(fn, ...a) {
   if (cleanup) { cleanup(); cleanup = null; }
-  practicing = ![home, wheelView, parentView, parentCloud].includes(fn); lastAct = 0;
+  practicing = ![home, wheelView, parentSettings, parentCloud].includes(fn); lastAct = 0;
   hush();
   fn(...a);
   window.scrollTo(0, 0);
@@ -1084,12 +1084,12 @@ function home() {
   </section>`}
   <button class="btn myprog" id="myprog">📈 ההתקדמות שלי</button>
   <p class="tip">המורה ביקשה: קריאה בקול, חזרה על הצלילים והאותיות, קצת בכל יום.</p>
-  ${KID ? '' : '<div class="parentrow"><button class="link parentlink" id="parent">הגדרות במכשיר הזה</button></div>'}
+  ${KID || CLOUD_OK ? '' : '<div class="parentrow"><button class="link parentlink" id="parent">הגדרות במכשיר הזה</button></div>'}
   <p class="credit">האיורים: <a href="https://openmoji.org" target="_blank" rel="noopener">OpenMoji</a> · רישיון <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a></p>`;
   $$('.tile', app).forEach(b => b.onclick = () => MODS[+b.dataset.m].run());
   const mk = $('#mock'); if (mk) mk.onclick = () => go(quizMock);
   $('#myprog').onclick = () => go(progressView);
-  const pa = $('#parent'); if (pa) pa.onclick = () => go(parentView);
+  const pa = $('#parent'); if (pa) pa.onclick = () => go(parentSettings);
   if (!KID && CLOUD_OK) parentBar();
   $$('[data-lvl]', app).forEach(b => b.onclick = () => { const s = load(); s.level = b.dataset.lvl; save(s); home(); });
   const sp = $('#spin'); if (sp) sp.onclick = () => go(wheelView);
@@ -1293,7 +1293,7 @@ function parentPanel() {
   ov.addEventListener('click', e => { if (e.target === ov) close(); });
   ov.querySelector('#pdx').onclick = close;
   ov.querySelector('#pdall').onclick = () => { close(); go(parentCloud); };
-  ov.querySelector('#pddev').onclick = () => { close(); go(parentView); };
+  ov.querySelector('#pddev').onclick = () => { close(); go(parentSettings); };
   ov.querySelector('#pdadd').onclick = () => { close(); go(parentCloud); };
   ov.querySelector('#pdout').onclick = async () => { close(); try { await PAPI.signOut(); } catch (e) {} };
   ov.querySelectorAll('[data-s]').forEach(b => b.onclick = () => { close(); kidSettings(PAPI, PUSER, PKIDS.find(k => k.id === b.dataset.s)); });
@@ -1865,18 +1865,10 @@ function wheelView(preview) {
   };
 }
 
-/* ---------- parents ---------- */
-function parentView() {
-  const a = rint(6, 9), b = rint(6, 9);
-  app.innerHTML = `${top('להורים')}
-    <section class="stk pbox">
-      <p>כדי להיכנס, פתרו את התרגיל:</p>
-      <form id="gate" class="row"><label for="pg" class="en pq">${a} × ${b} =</label><input id="pg" inputmode="numeric" autocomplete="off" class="pin"><button class="btn primary">כניסה</button></form>
-      <p id="pgerr" class="hint" hidden>לא נכון, נסו שוב.</p>
-    </section>`;
-  $('#gate').onsubmit = e => { e.preventDefault(); if (+$('#pg').value === a * b) parentSettings(); else $('#pgerr').hidden = false; };
-  $('#pg').focus();
-}
+/* ---------- parents ----------
+   אין כאן שער נוסף: הכניסה להורים היא חשבון הגוגל, וההגדרות האלה יושבות
+   מאחוריו (תפריט ההורים ← "הגדרות במכשיר הזה"). הקישור הפתוח בתחתית הדף
+   מופיע רק כשאין ענן בכלל — אחרת היה פתח עוקף שלא דורש התחברות. */
 function parentSettings() {
   const st = load(), G = goalState(st);
   app.innerHTML = `${top('להורים')}
