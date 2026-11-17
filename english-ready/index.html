@@ -678,6 +678,60 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .jpop.lock{background:#8E8A9E}.jpop.lock::before{border-bottom-color:#8E8A9E}
 .jpop .btn{width:100%;background:#fff;color:#2F4FD0;border:0;font-weight:700}
 .jpop.done .btn{color:#7A4F00}
+/* the illustrated letters map */
+.jmapwrap{position:relative;margin-top:12px;border-radius:20px;overflow:hidden;box-shadow:inset 0 0 0 1.5px var(--line)}
+.jmapwrap::before,.jmapwrap::after{content:"";position:absolute;left:0;right:0;height:22px;z-index:3;pointer-events:none}
+.jmapwrap::before{top:0;background:linear-gradient(#DDF0FF,rgba(221,240,255,0))}
+.jmapwrap::after{bottom:0;background:linear-gradient(rgba(214,240,200,0),#D6F0C8)}
+.jmap{position:relative;max-height:min(460px,62vh);overflow-y:auto;overscroll-behavior:contain;padding:14px 0 26px;scroll-behavior:smooth;
+  background:
+    radial-gradient(60px 40px at 12% 18%,rgba(255,255,255,.7),transparent 70%),
+    radial-gradient(70px 44px at 88% 42%,rgba(255,255,255,.6),transparent 70%),
+    radial-gradient(160px 70px at 20% 78%,rgba(126,200,120,.35),transparent 70%),
+    radial-gradient(180px 80px at 85% 92%,rgba(126,200,120,.4),transparent 70%),
+    linear-gradient(#DDF0FF 0%,#EAF6FF 30%,#F3FAE8 65%,#D6F0C8 100%)}
+.jline{position:absolute;left:0;top:0;width:100%;pointer-events:none;overflow:visible;z-index:0}
+.jl-all{fill:none;stroke:#fff;stroke-width:14;stroke-linecap:round;opacity:.85}
+.jl-done{fill:none;stroke:#FFC94D;stroke-width:8;stroke-linecap:round}
+.msky{position:absolute;z-index:0;font-size:30px;opacity:.85;pointer-events:none}
+.msky .ji{height:34px}
+.msky.s1{top:120px;left:6%}.msky.s2{top:640px;right:5%}.msky.s3{top:1180px;left:8%}
+.mstart{position:relative;z-index:1;margin:0 auto 6px;width:max-content;font:700 13px var(--f-display);letter-spacing:1px;color:#2F7A3A;background:#fff;border-radius:999px;padding:4px 12px;box-shadow:0 2px 0 #CFE6C4}
+.mrow{position:relative;z-index:1;height:84px;display:flex;align-items:center;justify-content:center;transform:translateX(calc(var(--x) * 26%))}
+.mnode{position:relative;width:64px;height:64px;border-radius:50%;border:0;padding:0;display:grid;place-items:center;cursor:pointer;
+  background:#ECE6D6;box-shadow:0 6px 0 #CFC5AC,0 8px 14px rgba(60,50,20,.12);color:#A39A86;transition:transform .15s var(--ease)}
+.mnode b{font:700 24px/1 var(--f-en);display:flex;align-items:baseline;gap:1px}
+.mnode b i{font-style:normal;font-size:17px;opacity:.8}
+.mnode:active{transform:translateY(4px);box-shadow:0 2px 0 #CFC5AC}
+.mnode.done{background:linear-gradient(#FFE37A,#FFC93C);box-shadow:0 6px 0 #D89B00,0 8px 14px rgba(160,110,0,.25);color:#6A4400}
+.mnode.cur{background:linear-gradient(#6FA3FF,#3D7BFF);box-shadow:0 6px 0 #2B57C8,0 0 0 8px rgba(77,141,255,.22);color:#fff;width:74px;height:74px;animation:mpulse 1.8s ease-in-out infinite}
+@keyframes mpulse{50%{box-shadow:0 6px 0 #2B57C8,0 0 0 14px rgba(77,141,255,.08)}}
+.mnode.lock b{opacity:.75}
+.mchk{position:absolute;bottom:-4px;left:-4px;width:22px;height:22px;border-radius:50%;background:#2FB36B;color:#fff;font:700 13px/22px var(--f-body);box-shadow:0 2px 0 #1F8A4F}
+.mwb{position:absolute;top:-10px;right:-12px;width:32px;height:32px;border-radius:50%;background:#fff;padding:2px;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.mwb .mw{width:100%;height:100%;display:block}
+.mwb:not(.got) .mw{filter:saturate(.45)}
+.mwb.got{box-shadow:0 0 0 3px #FFD23F,0 2px 8px rgba(255,180,0,.6)}
+.mhere{position:absolute;top:-6px;left:calc(50% + 34px);font-size:22px;animation:pbob 1.6s ease-in-out infinite}
+.mhere .ji{height:24px}
+.mdeco{position:absolute;top:50%;transform:translateY(-50%);display:grid;justify-items:center;gap:0;pointer-events:none;opacity:.95}
+.mdeco.l{right:calc(50% + 56px)}.mdeco.r{left:calc(50% + 56px)}
+.mdi{font-size:34px;line-height:1}
+.mdi .ji{height:38px}
+.mdeco small{font-size:11px;color:#6B7A8C;font-weight:600}
+.mend{height:110px;flex-direction:column;gap:4px}
+.mnode.mega{width:86px;height:86px;background:#fff;box-shadow:0 6px 0 #E0A21B,0 0 0 6px rgba(255,201,77,.35)}
+.mnode.mega .mw{width:92%;height:92%}
+.mnode.mega.lock .mw{filter:saturate(.4) opacity(.8)}
+.mnode.mega.open{animation:pbob 1.3s ease-in-out infinite}
+.mendt{font:700 13px var(--f-display);color:#B5179E}
+.mtime{display:flex;align-items:center;gap:6px;font-size:14px}
+.mbar{display:inline-block;width:64px;height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.mbar i{display:block;height:100%;background:#2FB36B;border-radius:inherit}
+.jwait{margin:8px 0 0;padding:8px 12px;border-radius:12px;background:#FFF4CC;color:#7A5200;font-size:15px}
+.jrest{display:grid;gap:2px;justify-items:center;text-align:center;margin-top:6px;padding:12px;border-radius:16px;background:#EEF0FF;color:#3B3F8C}
+.jpop.rest{background:#5B5FC7}.jpop.rest::before{border-bottom-color:#5B5FC7}
+@media (prefers-reduced-motion:reduce){.mnode.cur,.mhere,.mnode.mega.open{animation:none}.jmap{scroll-behavior:auto}}
 /* letter card */
 .lcov{position:fixed;inset:0;z-index:66;background:rgba(26,20,40,.45);display:grid;place-items:center;padding:16px;animation:fade .2s both}
 .lcard{position:relative;width:min(420px,100%);background:var(--bg);border-radius:22px;padding:18px;display:grid;gap:12px;box-shadow:0 24px 70px rgba(20,10,40,.35);animation:sheetin .25s var(--ease) both}
@@ -1285,8 +1339,11 @@ function letterMapHTML(s, opts = {}) {
    the test (23.11), so each day is about 20-30 minutes (a stage is about 6 minutes). */
 const JOUR_N = 26;
 const jour = s => (s.jour = s.jour || { n: 0, spins: 0, mega: false, round: 1 });
-const jEvery = s => Math.max(3, Math.min(8, +((s.goal || {}).every) || 5));
-function wheelStops(s) { const e = jEvery(s), out = []; for (let k = e; k <= JOUR_N - e; k += e) out.push(k); return out; } // a spin after letter k
+const jEvery = s => Math.max(3, Math.min(8, +((s.goal || {}).every) || 4));
+const wheelMin = s => { const v = (s.goal || {}).wmin; return v == null ? 20 : +v; };   // minutes of practice today before a wheel opens
+const dayMax = s => { const v = (s.goal || {}).max; return v == null ? 45 : +v; };      // after this, no new lessons today (0 = no limit)
+function avgLesson(s) { const l = (jour(s).lm || []).filter(x => x > 0); return l.length ? Math.round(l.reduce((a, b) => a + b, 0) / l.length) : 6; }
+function wheelStops(s) { const e = jEvery(s), out = []; for (let k = e; k < JOUR_N; k += e) out.push(k); return out; } // a spin after letter k (Z has the mega wheel)
 function daysToTest() { const ex = new Date(2026, 10, 23), t = new Date(); t.setHours(0, 0, 0, 0); return Math.round((ex - t) / 864e5); }
 function dailyTarget(s) {
   const J = jour(s), d = day(s), fixed = +((s.goal || {}).perDay) || 0;
@@ -1298,16 +1355,17 @@ function dailyTarget(s) {
 }
 function goalState(s) {
   if ((s.goal || {}).type === 'journey') {
-    const d = day(s), J = jour(s), T = dailyTarget(s), todayN = d.jl || 0;
-    const start = J.n - todayN, end = Math.min(JOUR_N, start + T);
-    const doneToday = T > 0 && J.n >= end;
-    const daily = doneToday && end < JOUR_N && !d.jspun ? 1 : 0;
-    const gift = Math.max(0, (s.giftSpins || 0) - (J.gift || 0));
-    const tomorrow = doneToday && !daily && end < JOUR_N && J.n < JOUR_N;   // today's wheel is spun: show the next stretch
-    const section = tomorrow ? [J.n, Math.min(JOUR_N, J.n + Math.max(3, T))] : [Math.min(start, J.n), Math.max(end, J.n === JOUR_N ? JOUR_N : end)];
-    return { d, g: s.goal, mins: Math.floor((d.ms || 0) / 60000), journey: true, J, value: J.n, earned: daily, avail: daily + gift, daily,
-      mega: J.n >= JOUR_N && !J.mega, target: T, todayN, doneToday, tomorrow, section, stops: section[1] < JOUR_N ? [section[1]] : [],
-      left: Math.max(0, end - J.n), unit: end === JOUR_N ? 'אותיות למגה גלגל' : 'אותיות', pct: Math.min(100, (J.n / JOUR_N) * 100) };
+    const d = day(s), J = jour(s), T = dailyTarget(s), todayN = d.jl || 0, mins = Math.floor((d.ms || 0) / 60000);
+    const stops = wheelStops(s), reached = stops.filter(k => k <= J.n).length;
+    const owed = Math.max(0, reached + (s.giftSpins || 0) - (J.spins || 0));   // wheels he has passed and not spun yet
+    const minM = wheelMin(s), maxM = dayMax(s);
+    const avail = owed && mins >= minM ? owed : 0;
+    const capped = J.n < JOUR_N && ((maxM && mins >= maxM) || (T && todayN >= T + 2));
+    const next = stops.find(k => k > J.n) || JOUR_N;
+    return { d, g: s.goal, mins, journey: true, J, stops, value: J.n, earned: reached, owed, avail, waiting: owed && !avail ? minM - mins : 0,
+      mega: J.n >= JOUR_N && !J.mega, megaWait: J.n >= JOUR_N && !J.mega && mins < minM ? minM - mins : 0,
+      target: T, todayN, capped, minM, maxM, lesson: avgLesson(s),
+      left: next - J.n, unit: next === JOUR_N ? 'אותיות למגה גלגל' : 'אותיות לגלגל', pct: Math.min(100, (J.n / JOUR_N) * 100) };
   }
   const d = day(s), g = s.goal, mins = Math.floor(d.ms / 60000);
   if (g.type === 'lvl' || g.type === 'abc') { // letters that moved up today; after all 26, the review list
@@ -1555,7 +1613,7 @@ function renderParentBar() {
       const d = kidDay(k), mins = Math.floor((d.ms || 0) / 60000);
       const abc = ((k.settings || {}).goal || {}).type !== 'mins' && ((k.settings || {}).goal || {}).type !== 'stars';
       const greens = letterLevels(k.progress || {}).filter(v => v === 2).length;
-      const prog = `${d.stars || 0} כוכבים היום · ${greens}/26 אותיות ירוקות`;
+      const prog = `מסע: ${((k.progress || {}).jour || {}).n || 0}/26 אותיות · היום ${d.jl || 0}`;
       return `<article class="kst" data-k="${k.id}">
         <button class="kstmain" data-open="${k.id}" aria-expanded="false">
           <span class="kstname">${esc(k.name)}</span>
@@ -1718,7 +1776,13 @@ function settingsSheet(kidId, tab) {
           <span class="tryarrow" aria-hidden="true">←</span>
         </button>
         <div class="shgrp"><h3>מסע 26 האותיות</h3>
-          <p class="hint">כל שיעור (כ־10 שאלות וכתיבת האות, בערך 6 דקות) נותן אות. כל יום יש במפה שלב של כמה אותיות; מי שמסיים אותו באותו היום מסובב את הגלגל. אחרי Z מחכה מגה גלגל.</p>
+          <p class="hint">כל שיעור (כ־10 שאלות וכתיבת האות) נותן אות. על המפה מסומן גלגל כל כמה אותיות: כשעוברים אותה, ותרגלו מספיק דקות באותו יום, מסובבים. אחרי Z מחכה מגה גלגל. משך שיעור נמדד בפועל, ולפיו ההערכה בדקות.</p>
+          <label class="shfield">גלגל על כל</label>
+          <div class="seg" role="group" aria-label="גלגל כל כמה אותיות">${segs('ev', String(jEvery(st)), [['3', '3 אותיות'], ['4', '4'], ['5', '5'], ['6', '6']])}</div>
+          <label class="shfield">הגלגל נפתח רק אחרי תרגול של</label>
+          <div class="seg" role="group" aria-label="דקות לפני גלגל">${segs('wm', String(wheelMin(st)), [['0', 'בלי'], ['15', '15 דק׳'], ['20', '20'], ['25', '25']])}</div>
+          <label class="shfield">הגבלה יומית (אחריה אין שיעורים חדשים עד מחר)</label>
+          <div class="seg" role="group" aria-label="הגבלה יומית">${segs('mx', String(dayMax(st)), [['30', '30 דק׳'], ['45', '45'], ['60', '60'], ['0', 'בלי']])}</div>
           <label class="shfield">אותיות ביום</label>
           <div class="seg" role="group" aria-label="אותיות ביום">${segs('pd', String(+st.goal.perDay || 0), [['0', 'אוטומטי'], ['3', '3'], ['4', '4'], ['5', '5'], ['6', '6']])}</div>
           <p class="hint" id="shpdnote"></p></div>
@@ -1731,9 +1795,12 @@ function settingsSheet(kidId, tab) {
           <textarea id="shmz" rows="4" class="en ptext-in">${esc(st.megaPrizes.join('\n'))}</textarea>
           <button type="button" class="btn sm" id="shmtry">👑 לנסות את המגה גלגל</button></div>`;
       const pdNote = () => { const J = (p && p.jour) || { n: 0 }, left = JOUR_N - (J.n || 0), dd = daysToTest(), auto = dd > 0 ? Math.max(3, Math.ceil(left / dd)) : 4;
-        $s('#shpdnote').textContent = +st.goal.perDay ? `${st.goal.perDay} אותיות ≈ ${st.goal.perDay * 6} דקות ביום.` : `אוטומטי: נשארו ${left} אותיות ו־${Math.max(0, dd)} ימים עד המבחן, אז היום ${Math.min(left, auto)} אותיות (≈ ${Math.min(left, auto) * 6} דקות).`; };
+        $s('#shpdnote').textContent = +st.goal.perDay ? `${st.goal.perDay} אותיות ≈ ${st.goal.perDay * avgLesson(p)} דקות ביום.` : `אוטומטי: נשארו ${left} אותיות ו־${Math.max(0, dd)} ימים עד המבחן, אז היום ${Math.min(left, auto)} אותיות (≈ ${Math.min(left, auto) * avgLesson(p)} דקות, לפי ${(((p.jour || {}).lm) || []).length ? 'משך השיעורים שלו' : 'הערכה של 6 דקות לשיעור'}).`; };
       pdNote();
       bindSeg('pd', v => { st.goal.perDay = +v; pdNote(); });
+      bindSeg('ev', v => { st.goal.every = +v; });
+      bindSeg('wm', v => { st.goal.wmin = +v; });
+      bindSeg('mx', v => { st.goal.max = +v; });
       bindSeg('wh', v => { st.wheel = v === '1'; $s('#shprz').hidden = !st.wheel; $s('#shtry').hidden = !st.wheel; });
       $s('#shpz').oninput = e => { const list = e.target.value.split('\n').map(x => x.trim()).filter(Boolean); st.prizes = list.length >= 2 ? list.slice(0, 12) : DEFAULT_PRIZES.slice(); touch(); };
       $s('#shtry').onclick = () => wheelView({ prizes: st.prizes });
@@ -2232,7 +2299,7 @@ function wheelView(preview) {
   const megaList = (st.megaPrizes || []).length >= 2 ? st.megaPrizes : DEFAULT_MEGA;
   const prizes = (preview && preview.prizes && preview.prizes.length >= 2) ? preview.prizes : mega ? megaList : (!preview && st.prizes.length >= 2 ? st.prizes : DEFAULT_PRIZES);
   const G0 = preview ? { avail: 99 } : goalState(st);
-  const G = mega && !preview ? Object.assign({}, G0, { avail: G0.mega ? 1 : 0 }) : G0;
+  const G = mega && !preview ? Object.assign({}, G0, { avail: G0.mega && !G0.megaWait ? 1 : 0 }) : G0;
   const box = `<section class="wstage${mega ? ' mega' : ''}">
       <p class="whead en">${mega ? '👑 MEGA WHEEL! 👑' : G.avail ? 'Spin the wheel!' : 'Surprise Wheel'}</p>
       <div class="wheelwrap"><canvas id="wheel" aria-label="גלגל ההפתעות"></canvas><canvas id="confetti" aria-hidden="true"></canvas></div>
@@ -2417,7 +2484,7 @@ function wheelView(preview) {
   if (!$('#go')) return;
   $('#go').onclick = () => {
     if (spinning) return;
-    if (!preview && (mega ? !goalState(load()).mega : goalState(load()).avail < 1)) return;
+    if (!preview && (mega ? (!goalState(load()).mega || goalState(load()).megaWait) : goalState(load()).avail < 1)) return;
     spinning = true; lastIdx = -1; winIdx = -1; label.style.visibility = 'hidden'; $('#go').disabled = true; $('#prize').innerHTML = '';
     const win = Math.floor(Math.random() * n);
     const start = rot, reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -2431,7 +2498,7 @@ function wheelView(preview) {
       if (k < 1) { requestAnimationFrame(frame); return; }
       spinning = false;
       let g2 = { avail: 1 };
-      if (!preview) { const s2 = load(); day(s2).spins++; const J2 = jour(s2); J2.spins++; if (mega) J2.mega = true; else if (goalState(s2).daily) day(s2).jspun = true; else J2.gift = (J2.gift || 0) + 1; s2.wins.unshift({ date: today(), prize: prizes[win], mega: mega || undefined }); s2.wins = s2.wins.slice(0, 60); save(s2); g2 = goalState(s2); if (mega) g2 = { avail: 0 }; }
+      if (!preview) { const s2 = load(); day(s2).spins++; const J2 = jour(s2); if (mega) J2.mega = true; else J2.spins = (J2.spins || 0) + 1; s2.wins.unshift({ date: today(), prize: prizes[win], mega: mega || undefined }); s2.wins = s2.wins.slice(0, 60); save(s2); g2 = goalState(s2); if (mega) g2 = { avail: 0 }; }
       const pz = prizes[win], he = heOf(pz), who = KID && KID.name ? KID.name : '';
       const msg = `אמא ואבא! ${who ? who + ' כאן. ' : ''}זכיתי בגלגל ההפתעות 🎉\n${emojiOf(pz)} ${textOf(pz)}${he ? `\n(${he})` : ''}\nאתם חייבים לי 😄`;
       const details = `
@@ -2828,68 +2895,99 @@ function layoutGoalPath() {
   const w = $('#pwheel', app); if (w) w.onclick = () => go(wheelView);
 }
 
-function journeySection(G) { return G.section; }
+function journeyMapHTML(G, st) {
+  const J = G.J;
+  const rows = ALPHA.map((c, k) => {
+    const state = k < J.n ? 'done' : k === J.n ? 'cur' : 'lock', U = c.toUpperCase();
+    const x = Math.sin(k * 0.85), wd = WORDS.find(w => w.L.toLowerCase() === c && !w.f) || WORDS.find(w => w.L.toLowerCase() === c);
+    const stop = st.wheel && G.stops.includes(k + 1);
+    return `<div class="mrow" style="--x:${x.toFixed(2)}">
+      ${wd ? `<span class="mdeco ${x > 0 ? 'l' : 'r'}" aria-hidden="true"><span class="mdi">${wd.e}</span><small class="en">${wd.w}</small></span>` : ''}
+      <button type="button" class="mnode ${state}" data-stage="${k}" aria-label="שלב ${k + 1}: האות ${U}${state === 'done' ? ', נאספה' : state === 'lock' ? ', נעולה' : ''}${stop ? ', עם גלגל' : ''}">
+        <b class="en">${U}<i>${c}</i></b>${stop ? `<span class="mwb ${k < J.n ? 'got' : ''}" aria-hidden="true">${miniWheel((st.prizes || []).length)}</span>` : ''}${state === 'done' ? '<span class="mchk" aria-hidden="true">✓</span>' : ''}
+      </button>${state === 'cur' ? '<span class="mhere" aria-hidden="true">🚀</span>' : ''}</div>`;
+  }).join('');
+  const megaOpen = G.mega && !G.megaWait;
+  const end = `<div class="mrow mend" style="--x:0">${st.wheel
+    ? `<button type="button" class="mnode mega ${J.mega || megaOpen ? 'open' : 'lock'}" id="pmegaw" aria-label="מגה גלגל">${miniWheel((st.megaPrizes || []).length)}<span class="pcrown" aria-hidden="true">👑</span></button>`
+    : `<span class="mnode mega" aria-hidden="true">🏆</span>`}<small class="mendt">${st.wheel ? 'מגה גלגל!' : 'סוף המסע'}</small></div>`;
+  return `<div class="jmapwrap"><div class="jmap" id="jmap" role="list" aria-label="מפת האותיות: ${J.n} מתוך ${JOUR_N}">
+    <svg class="jline" aria-hidden="true"><path class="jl-all"/><path class="jl-done"/></svg>
+    <span class="msky s1" aria-hidden="true">☁️</span><span class="msky s2" aria-hidden="true">☁️</span><span class="msky s3" aria-hidden="true">🌈</span>
+    <div class="mstart" aria-hidden="true">🏁 START</div>${rows}${end}</div></div>`;
+}
 function journeyCardHTML(G, st) {
-  const J = G.J, [a, z] = journeySection(G), isEnd = z === JOUR_N;
-  const steps = [];
-  for (let k = a; k < z; k++) {
-    const state = k < J.n ? 'done' : k === J.n ? 'cur' : '';
-    steps.push(`<span class="pn jn ${state}" style="--i:${k - a}" data-stage="${k}" role="button" tabindex="0" aria-label="שלב ${k + 1}: האות ${ALPHA[k].toUpperCase()}"><b class="en">${ALPHA[k].toUpperCase()}</b></span>`);
-  }
-  const open = isEnd ? (G.mega || J.mega) : (!G.tomorrow && G.doneToday);
-  const end = st.wheel
-    ? `<button type="button" class="pend pwheel ${isEnd ? 'pmega' : ''} ${open ? 'open' : 'locked'}" id="${isEnd ? 'pmegaw' : 'pwheel'}" aria-label="${isEnd ? 'מגה גלגל' : 'גלגל ההפתעות'}">${miniWheel(isEnd ? (st.megaPrizes || []).length : (st.prizes || []).length)}${isEnd ? '<span class="pcrown" aria-hidden="true">👑</span>' : ''}${open ? '' : '<span class="plock" aria-hidden="true">🔒</span>'}</button>`
-    : `<span class="pend ptrophy ${open ? 'open' : 'locked'}" aria-hidden="true">🏆</span>`;
-  const path = `<div class="gpath" role="progressbar" aria-valuemin="0" aria-valuemax="${JOUR_N}" aria-valuenow="${J.n}" aria-label="מסע האותיות: ${J.n} מתוך ${JOUR_N}">
-    <svg class="pline" aria-hidden="true"><path class="pl-all"/><path class="pl-done"/></svg>${steps.join('')}${end}<span class="pmark" aria-hidden="true">🚀</span></div>`;
-  const nextL = ALPHA[J.n] ? ALPHA[J.n].toUpperCase() : '';
+  const J = G.J, nextL = ALPHA[J.n] ? ALPHA[J.n].toUpperCase() : '';
   let action;
-  if (G.mega && st.wheel) action = `<button class="btn spinbtn megabtn" id="megaspin">👑 אספת את כל 26 האותיות! למגה גלגל</button>`;
-  else if (G.avail && st.wheel) action = `<button class="btn spinbtn" id="spin">🎡 הגעת לגלגל! לסובב${G.avail > 1 ? ` (${G.avail})` : ''}</button>`;
+  if (G.mega && st.wheel && !G.megaWait) action = `<button class="btn spinbtn megabtn" id="megaspin">👑 אספת את כל 26 האותיות! למגה גלגל</button>`;
+  else if (G.avail && st.wheel) action = `<button class="btn spinbtn" id="spin">🎡 הגלגל נפתח! לסובב${G.avail > 1 ? ` (${G.avail})` : ''}</button>`;
+  else if (G.capped) action = `<div class="jrest">🌙 <b>להיום מספיק, כל הכבוד!</b><span>המוח צריך גם מנוחה. נמשיך מחר.</span></div>`;
   else if (J.n < JOUR_N) action = `<button class="btn stagebtn" id="stagego"><span class="stl en">${nextL}${nextL.toLowerCase()}</span><span>שלב ${J.n + 1}: לאסוף את האות ${nextL}</span><span aria-hidden="true">←</span></button>`;
-  else action = `<div class="jdone"><b>🏆 סיימת את כל המסע! אתה מוכן למבחן.</b><button class="btn" id="jnew">להתחיל מסע חדש</button></div>`;
-  const T = G.target, tn = Math.min(G.todayN, T || G.todayN);
-  const mission = T || G.todayN
-    ? `<div class="mission"><span>📋 היום: <b>${T ? `${tn}/${T}` : G.todayN}</b> אותיות${T && G.todayN >= T ? ' · <b>בוצעה! 🎉</b>' : T ? ` · בערך ${Math.max(5, (T - tn) * 6)} דקות` : ''}</span>
-        ${T ? `<span class="mdots" aria-hidden="true">${[...Array(T)].map((_, i) => `<i class="${i < tn ? 'on' : ''}"></i>`).join('')}</span>` : ''}</div>` : '';
-  const strip = `<div class="jstrip" dir="ltr">${ALPHA.map((c, k) => `<button type="button" class="js ${k < J.n ? 'on' : k === J.n ? 'cur' : ''}" data-stage="${k}" aria-label="שלב ${k + 1}: האות ${c.toUpperCase()}">${c.toUpperCase()}</button>${G.stops.includes(k + 1) ? '<span class="jsw" aria-hidden="true">🎡</span>' : ''}`).join('')}<span class="jsw" aria-hidden="true">👑</span></div>`;
+  else if (!G.mega) action = `<div class="jdone"><b>🏆 סיימת את כל המסע! אתה מוכן למבחן.</b><button class="btn" id="jnew">להתחיל מסע חדש</button></div>`;
+  else action = '';
+  const wait = st.wheel && (G.waiting || G.megaWait)
+    ? `<p class="jwait">${G.megaWait ? '👑' : '🎡'} ${G.megaWait ? 'המגה גלגל' : 'הגלגל'} מחכה לך! עוד <b>${G.waiting || G.megaWait} דקות</b> תרגול היום והוא נפתח.</p>` : '';
+  const T = G.target, tn = Math.min(G.todayN, T || G.todayN), minPct = G.minM ? Math.min(100, Math.round(G.mins / G.minM * 100)) : 100;
+  const mission = `<div class="mission">
+      <span>📋 היום: <b>${T ? `${tn}/${T}` : G.todayN}</b> אותיות${T && G.todayN >= T ? ' · <b>בוצעה! 🎉</b>' : T ? ` · בערך ${Math.max(5, (T - tn) * G.lesson)} דקות` : ''}</span>
+      ${T ? `<span class="mdots" aria-hidden="true">${[...Array(T)].map((_, i) => `<i class="${i < tn ? 'on' : ''}"></i>`).join('')}</span>` : ''}
+      ${st.wheel && G.minM ? `<span class="mtime">⏱ <b>${G.mins}</b>/${G.minM} דקות<span class="mbar"><i style="width:${minPct}%"></i></span></span>` : ''}</div>`;
   return `<section class="goal stk h3 journey">
     <div class="goalhead"><span class="glabel">🔤 מסע 26 האותיות</span><span class="gbig" dir="ltr">${J.n} / ${JOUR_N}</span></div>
-    <p class="gsub">כל שיעור = אות. ${G.tomorrow ? `השלב של היום הושלם ✓ מחר מחכה שלב חדש${st.wheel ? ' וסיבוב חדש בגלגל' : ''}.` : `השלב של היום: <b>${G.target} אותיות</b>.${st.wheel ? ' מסיימים אותו היום ומסובבים את הגלגל!' : ''}`} ${st.wheel ? 'ב־Z: <b>מגה גלגל</b>.' : ''}</p>
-    ${path}
+    <p class="gsub">כל שיעור = אות. ${st.wheel ? `אות עם <b>גלגל</b> בפינה = סיבוב, אחרי ${G.minM ? `${G.minM} דקות תרגול באותו יום` : 'שעוברים אותה'}. ב־Z: <b>מגה גלגל</b>.` : ''}</p>
     ${action}
+    ${wait}
     ${mission}
-    ${strip}
-    ${G.tomorrow ? `<p class="gnow">🎉 סיימת את השלב של היום! אפשר להמשיך לאסוף אותיות. הגלגל הבא: מחר.</p>`
-      : st.wheel && !G.avail && !G.mega && J.n < JOUR_N ? `<p class="gnow">${G.section[1] < JOUR_N ? `עוד <b>${G.left}</b> אותיות היום, והגלגל נפתח` : `עוד <b>${JOUR_N - J.n}</b> אותיות למגה גלגל`}</p>` : ''}
+    ${journeyMapHTML(G, st)}
   </section>`;
 }
 let WHEEL_MEGA = false;
 function stagePop(el) {
   const old = $('.jpop'); const same = old && old.dataset.k === el.dataset.stage; if (old) old.remove(); if (same) return;
-  const k = +el.dataset.stage, J = jour(load()), L = ALPHA[k].toUpperCase(), card = el.closest('.journey');
-  const state = k < J.n ? 'done' : k === J.n ? 'cur' : 'lock';
+  const s_ = load(), G_ = goalState(s_), k = +el.dataset.stage, J = jour(s_), L = ALPHA[k].toUpperCase(), card = el.closest('.jmap') || el.closest('.journey');
+  const state = G_.capped && k <= J.n ? 'rest' : k < J.n ? 'done' : k === J.n ? 'cur' : 'lock';
   const pop = document.createElement('div');
   pop.className = `jpop ${state}`; pop.dataset.k = k; pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', `שלב ${k + 1}`);
-  pop.innerHTML = state === 'lock'
+  pop.innerHTML = state === 'rest'
+    ? `<b>שלב ${k + 1} · האות <span class="en">${L}</span></b><span>🌙 להיום מספיק. נמשיך מחר!</span>`
+    : state === 'lock'
     ? `<b>שלב ${k + 1} · האות <span class="en">${L}</span></b><span>🔒 עוד נעול. קודם אוספים את <span class="en">${ALPHA[J.n].toUpperCase()}</span>.</span>`
     : `<b>שלב ${k + 1} · האות <span class="en">${L}${L.toLowerCase()}</span></b>
-       <span>${state === 'cur' ? '10 שאלות, ואז כותבים את האות. בערך 6 דקות.' : 'האות כבר שלך ✓. אפשר לתרגל אותה שוב.'}</span>
+       <span>${state === 'cur' ? `10 שאלות, ואז כותבים את האות. בערך ${G_.lesson} דקות.` : 'האות כבר שלך ✓. אפשר לתרגל אותה שוב.'}</span>
        <button class="btn ${state === 'cur' ? 'primary' : ''}" data-popgo>${state === 'cur' ? '▶ להתחיל' : '↻ לתרגל שוב'}</button>`;
   card.appendChild(pop);
   const cb = card.getBoundingClientRect(), r = el.getBoundingClientRect();
   const x = Math.max(12, Math.min(cb.width - pop.offsetWidth - 12, r.left + r.width / 2 - cb.left - pop.offsetWidth / 2));
-  pop.style.left = x + 'px'; pop.style.top = (r.bottom - cb.top + 10) + 'px';
+  pop.style.left = x + 'px'; pop.style.top = (r.bottom - cb.top + card.scrollTop + 10) + 'px';
   pop.style.setProperty('--ax', (r.left + r.width / 2 - cb.left - x) + 'px');
   const g = pop.querySelector('[data-popgo]'); if (g) g.onclick = () => go(stageQuiz, k);
   pop.onclick = e => e.stopPropagation();
   setTimeout(() => document.addEventListener('click', function off() { pop.remove(); document.removeEventListener('click', off); }), 0);
   if (g) g.focus();
 }
+function drawJourneyMap() {
+  const m = $('#jmap', app); if (!m) return;
+  const nodes = [...m.querySelectorAll('.mnode')];
+  const mb = m.getBoundingClientRect();
+  const pts = nodes.map(n => { const r = n.getBoundingClientRect(); return [r.left + r.width / 2 - mb.left, r.top + r.height / 2 - mb.top + m.scrollTop]; });
+  const curve = l => l.map((p, i) => i ? (() => { const q = l[i - 1], my = (q[1] + p[1]) / 2; return `C${q[0]},${my} ${p[0]},${my} ${p[0]},${p[1]}`; })() : `M${p[0]},${p[1]}`).join(' ');
+  const svg = m.querySelector('.jline'); svg.setAttribute('width', m.scrollWidth); svg.setAttribute('height', m.scrollHeight);
+  svg.style.height = m.scrollHeight + 'px';
+  m.querySelector('.jl-all').setAttribute('d', curve(pts));
+  const nd = m.querySelectorAll('.mnode.done').length;
+  m.querySelector('.jl-done').setAttribute('d', nd ? curve(pts.slice(0, nd + 1)) : '');
+}
 function wireJourney() {
+  const m = $('#jmap', app);
+  if (m) {
+    drawJourneyMap();
+    try { new ResizeObserver(drawJourneyMap).observe(m); } catch (e) {}
+    const cur = m.querySelector('.mnode.cur') || m.querySelector('.mend');
+    if (cur) requestAnimationFrame(() => { m.style.scrollBehavior = 'auto'; const r = cur.getBoundingClientRect(), mb = m.getBoundingClientRect(); m.scrollTop = Math.max(0, m.scrollTop + r.top - mb.top - m.clientHeight / 2 + r.height / 2); m.style.scrollBehavior = ''; drawJourneyMap(); });
+  }
   const sg = $('#stagego'); if (sg) sg.onclick = () => go(stageQuiz, jour(load()).n);
-  $$('.journey [data-stage]', app).forEach(x => { x.onclick = e => { e.stopPropagation(); stagePop(x); }; x.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); x.click(); } }; });
-  const mw = $('#pmegaw'); if (mw) mw.onclick = () => { WHEEL_MEGA = goalState(load()).mega; go(wheelView); };
+  $$('.journey .mnode[data-stage]', app).forEach(x => { x.onclick = e => { e.stopPropagation(); stagePop(x); }; x.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); x.click(); } }; });
+  const mw = $('#pmegaw'); if (mw) mw.onclick = () => { const g = goalState(load()); WHEEL_MEGA = g.mega && !g.megaWait; go(wheelView); };
   const ms = $('#megaspin'); if (ms) ms.onclick = () => { WHEEL_MEGA = true; go(wheelView); };
   const jn = $('#jnew'); if (jn) jn.onclick = () => { const s = load(); const r = (jour(s).round || 1) + 1; s.jour = { n: 0, spins: 0, mega: false, round: r }; s.giftSpins = 0; save(s); home(); };
 }
@@ -2899,9 +2997,10 @@ function wireJourney() {
    rehearsal of the whole test. */
 let STAGE = null;
 function stageQuiz(k) {
+  if (goalState(load()).capped) { go(home); return; }
   setLvl();
   const L = ALPHA[k];
-  STAGE = { k };
+  STAGE = { k, t0: Date.now() };
   FOCUS = [L];
   const mine = build([qSound, qCase, qName], 3);
   FOCUS = null;
@@ -2939,23 +3038,28 @@ function stageFinish(k, score, n) {
 function claimLetter(k) {
   const s = load(), J = jour(s), d = day(s);
   if (J.n > k) { go(home); return; } // practising a letter he already has
-  if (J.n === k) { J.n = k + 1; d.jl = (d.jl || 0) + 1; }
+  if (J.n === k) {
+    J.n = k + 1; d.jl = (d.jl || 0) + 1;
+    if (STAGE && STAGE.k === k && STAGE.t0) { J.lm = [...(J.lm || []), Math.max(2, Math.min(25, Math.round((Date.now() - STAGE.t0) / 60000)))].slice(-8); }
+  }
   save(s); go(letterWon, k);
 }
 function letterWon(k) {
   const st = load(), G = goalState(st), L = ALPHA[k].toUpperCase();
-  const atStop = !!G.avail, atEnd = k + 1 === JOUR_N;
+  const atStop = !!G.avail, atEnd = k + 1 === JOUR_N, wheelWait = st.wheel && (G.waiting || G.megaWait);
   sfx('win');
   app.innerHTML = `${top('קיבלת אות!')}
     <section class="result stk lwon">
       <div class="stagebig en got pop">${L}${L.toLowerCase()}</div>
       <h2>האות <span class="en">${L}</span> שלך! 🎉</h2>
       <p class="hint">${G.J.n}/${JOUR_N} אותיות במסע</p>
+      ${wheelWait ? `<p class="jwait">${G.megaWait ? '👑 המגה גלגל' : '🎡 עברת אות עם גלגל! הוא'} נפתח אחרי עוד <b>${G.waiting || G.megaWait} דקות</b> תרגול היום.</p>` : ''}
       ${G.target ? `<p>המשימה של היום: <b>${Math.min(G.todayN, G.target)}/${G.target}</b>${G.todayN >= G.target ? ' · <b>בוצעה! כל הכבוד!</b>' : ''}</p>` : ''}
       <div class="row center">
-        ${atEnd && st.wheel ? `<button class="btn spinbtn megabtn" id="megaspin">👑 למגה גלגל!</button>`
-          : atStop && st.wheel ? `<button class="btn spinbtn" id="spin">🎡 הגעת לגלגל! לסובב</button>`
-          : atEnd ? '' : `<button class="btn primary" id="nextst">לשלב הבא: <span class="en">${ALPHA[k + 1].toUpperCase()}</span> ←</button>`}
+        ${atEnd && st.wheel && !G.megaWait ? `<button class="btn spinbtn megabtn" id="megaspin">👑 למגה גלגל!</button>`
+          : atStop && st.wheel ? `<button class="btn spinbtn" id="spin">🎡 הגלגל נפתח! לסובב</button>`
+          : atEnd ? '' : G.capped ? `<p class="jrest">🌙 <b>להיום מספיק, כל הכבוד!</b> נמשיך מחר.</p>`
+          : `<button class="btn primary" id="nextst">לשלב הבא: <span class="en">${ALPHA[k + 1].toUpperCase()}</span> ←</button>`}
         <button class="btn" data-back="home">לדף הבית</button></div>
     </section>`;
   const sp = $('#spin'); if (sp) sp.onclick = () => go(wheelView);
