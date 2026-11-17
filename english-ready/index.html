@@ -257,7 +257,7 @@ a.btn{text-decoration:none}
 .mocklist{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .mocklist li{display:grid;grid-template-columns:4em 3.5em minmax(0,1fr);gap:10px;align-items:center}
 .bests{margin:0;padding-inline-start:20px;display:grid;gap:4px}
-.modal{position:fixed;inset:0;z-index:50;background:rgba(10,14,28,.55);display:grid;place-items:center;padding:16px;overflow-y:auto}
+.modal{position:fixed;inset:0;z-index:75;background:rgba(10,14,28,.55);display:grid;place-items:center;padding:16px;overflow-y:auto}
 .mbox{background:var(--bg);border:2px solid var(--line);border-radius:22px;box-shadow:0 6px 0 var(--shadow);padding:12px;width:min(420px,100%);display:grid;gap:10px}
 .mhead{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .mbox .previewnote{margin:0}
@@ -371,7 +371,7 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .sharenote{margin:0;font-size:13px;color:#5B4A99}
 .prize .hebtn{margin-top:4px}
 .prize .hebubble{background:#F3EEFF;border-color:#D9CCFF;color:#2A0F86}
-.winov{position:fixed;inset:0;z-index:70;display:grid;place-items:center;padding:16px;background:rgba(20,8,60,.55);backdrop-filter:blur(3px);animation:fadein .3s ease both}
+.winov{position:fixed;inset:0;z-index:85;display:grid;place-items:center;padding:16px;background:rgba(20,8,60,.55);backdrop-filter:blur(3px);animation:fadein .3s ease both}
 .winov.out{animation:fadeout .25s ease both}
 @keyframes fadein{from{opacity:0}to{opacity:1}} @keyframes fadeout{to{opacity:0}}
 .winconf{position:fixed;inset:0;pointer-events:none}
