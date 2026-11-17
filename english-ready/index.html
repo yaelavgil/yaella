@@ -1298,12 +1298,16 @@ function dailyTarget(s) {
 }
 function goalState(s) {
   if ((s.goal || {}).type === 'journey') {
-    const d = day(s), J = jour(s), stops = wheelStops(s), reached = stops.filter(k => k <= J.n).length;
-    const avail = Math.max(0, reached + (s.giftSpins || 0) - J.spins);
-    const next = stops.find(k => k > J.n) || JOUR_N;
-    return { d, g: s.goal, mins: Math.floor((d.ms || 0) / 60000), journey: true, J, stops, value: J.n, earned: reached, avail,
-      mega: J.n >= JOUR_N && !J.mega, target: dailyTarget(s), todayN: d.jl || 0,
-      left: next - J.n, unit: next === JOUR_N ? 'אותיות למגה גלגל' : 'אותיות', pct: Math.min(100, (J.n / JOUR_N) * 100) };
+    const d = day(s), J = jour(s), T = dailyTarget(s), todayN = d.jl || 0;
+    const start = J.n - todayN, end = Math.min(JOUR_N, start + T);
+    const doneToday = T > 0 && J.n >= end;
+    const daily = doneToday && end < JOUR_N && !d.jspun ? 1 : 0;
+    const gift = Math.max(0, (s.giftSpins || 0) - (J.gift || 0));
+    const tomorrow = doneToday && !daily && end < JOUR_N && J.n < JOUR_N;   // today's wheel is spun: show the next stretch
+    const section = tomorrow ? [J.n, Math.min(JOUR_N, J.n + Math.max(3, T))] : [Math.min(start, J.n), Math.max(end, J.n === JOUR_N ? JOUR_N : end)];
+    return { d, g: s.goal, mins: Math.floor((d.ms || 0) / 60000), journey: true, J, value: J.n, earned: daily, avail: daily + gift, daily,
+      mega: J.n >= JOUR_N && !J.mega, target: T, todayN, doneToday, tomorrow, section, stops: section[1] < JOUR_N ? [section[1]] : [],
+      left: Math.max(0, end - J.n), unit: end === JOUR_N ? 'אותיות למגה גלגל' : 'אותיות', pct: Math.min(100, (J.n / JOUR_N) * 100) };
   }
   const d = day(s), g = s.goal, mins = Math.floor(d.ms / 60000);
   if (g.type === 'lvl' || g.type === 'abc') { // letters that moved up today; after all 26, the review list
@@ -1714,11 +1718,9 @@ function settingsSheet(kidId, tab) {
           <span class="tryarrow" aria-hidden="true">←</span>
         </button>
         <div class="shgrp"><h3>מסע 26 האותיות</h3>
-          <p class="hint">כל שלב שהילד מסיים (כ־10 שאלות וכתיבת האות, בערך 6 דקות) נותן לו אות. אחרי Z מחכה מגה גלגל.</p>
-          <label class="shfield">סיבוב בגלגל כל</label>
-          <div class="seg" role="group" aria-label="גלגל כל כמה אותיות">${segs('ev', String(jEvery(st)), [['3', '3 אותיות'], ['4', '4'], ['5', '5'], ['6', '6']])}</div>
-          <label class="shfield">שלבים ביום</label>
-          <div class="seg" role="group" aria-label="שלבים ביום">${segs('pd', String(+st.goal.perDay || 0), [['0', 'אוטומטי'], ['3', '3'], ['4', '4'], ['5', '5'], ['6', '6']])}</div>
+          <p class="hint">כל שיעור (כ־10 שאלות וכתיבת האות, בערך 6 דקות) נותן אות. כל יום יש במפה שלב של כמה אותיות; מי שמסיים אותו באותו היום מסובב את הגלגל. אחרי Z מחכה מגה גלגל.</p>
+          <label class="shfield">אותיות ביום</label>
+          <div class="seg" role="group" aria-label="אותיות ביום">${segs('pd', String(+st.goal.perDay || 0), [['0', 'אוטומטי'], ['3', '3'], ['4', '4'], ['5', '5'], ['6', '6']])}</div>
           <p class="hint" id="shpdnote"></p></div>
         <div class="shgrp"><h3>גלגל ההפתעות</h3>
           <div class="seg" role="group" aria-label="גלגל ההפתעות">${segs('wh', st.wheel ? '1' : '0', [['1', 'פעיל'], ['0', 'כבוי: רק המסע']])}</div></div>
@@ -1729,9 +1731,8 @@ function settingsSheet(kidId, tab) {
           <textarea id="shmz" rows="4" class="en ptext-in">${esc(st.megaPrizes.join('\n'))}</textarea>
           <button type="button" class="btn sm" id="shmtry">👑 לנסות את המגה גלגל</button></div>`;
       const pdNote = () => { const J = (p && p.jour) || { n: 0 }, left = JOUR_N - (J.n || 0), dd = daysToTest(), auto = dd > 0 ? Math.max(3, Math.ceil(left / dd)) : 4;
-        $s('#shpdnote').textContent = +st.goal.perDay ? `${st.goal.perDay} שלבים ≈ ${st.goal.perDay * 6} דקות ביום.` : `אוטומטי: נשארו ${left} אותיות ו־${Math.max(0, dd)} ימים עד המבחן, אז היום ${Math.min(left, auto)} שלבים (≈ ${Math.min(left, auto) * 6} דקות).`; };
+        $s('#shpdnote').textContent = +st.goal.perDay ? `${st.goal.perDay} אותיות ≈ ${st.goal.perDay * 6} דקות ביום.` : `אוטומטי: נשארו ${left} אותיות ו־${Math.max(0, dd)} ימים עד המבחן, אז היום ${Math.min(left, auto)} אותיות (≈ ${Math.min(left, auto) * 6} דקות).`; };
       pdNote();
-      bindSeg('ev', v => { st.goal.every = +v; });
       bindSeg('pd', v => { st.goal.perDay = +v; pdNote(); });
       bindSeg('wh', v => { st.wheel = v === '1'; $s('#shprz').hidden = !st.wheel; $s('#shtry').hidden = !st.wheel; });
       $s('#shpz').oninput = e => { const list = e.target.value.split('\n').map(x => x.trim()).filter(Boolean); st.prizes = list.length >= 2 ? list.slice(0, 12) : DEFAULT_PRIZES.slice(); touch(); };
@@ -2430,7 +2431,7 @@ function wheelView(preview) {
       if (k < 1) { requestAnimationFrame(frame); return; }
       spinning = false;
       let g2 = { avail: 1 };
-      if (!preview) { const s2 = load(); day(s2).spins++; if (mega) jour(s2).mega = true; else jour(s2).spins++; s2.wins.unshift({ date: today(), prize: prizes[win], mega: mega || undefined }); s2.wins = s2.wins.slice(0, 60); save(s2); g2 = goalState(s2); if (mega) g2 = { avail: 0 }; }
+      if (!preview) { const s2 = load(); day(s2).spins++; const J2 = jour(s2); J2.spins++; if (mega) J2.mega = true; else if (goalState(s2).daily) day(s2).jspun = true; else J2.gift = (J2.gift || 0) + 1; s2.wins.unshift({ date: today(), prize: prizes[win], mega: mega || undefined }); s2.wins = s2.wins.slice(0, 60); save(s2); g2 = goalState(s2); if (mega) g2 = { avail: 0 }; }
       const pz = prizes[win], he = heOf(pz), who = KID && KID.name ? KID.name : '';
       const msg = `אמא ואבא! ${who ? who + ' כאן. ' : ''}זכיתי בגלגל ההפתעות 🎉\n${emojiOf(pz)} ${textOf(pz)}${he ? `\n(${he})` : ''}\nאתם חייבים לי 😄`;
       const details = `
@@ -2827,14 +2828,7 @@ function layoutGoalPath() {
   const w = $('#pwheel', app); if (w) w.onclick = () => go(wheelView);
 }
 
-function journeySection(G) {
-  // the stretch of the road he is on: from the last wheel stop to the next one (or to Z)
-  const b = [0, ...G.stops, JOUR_N], J = G.J;
-  let k = b.findIndex((x, i) => i && J.n < x); if (k < 0) k = b.length - 1;
-  if (G.mega) k = b.length - 1;
-  else if (G.avail && G.stops.includes(J.n)) k = b.indexOf(J.n); // stop just reached: show the section that led to it
-  return [b[k - 1], b[k]];
-}
+function journeySection(G) { return G.section; }
 function journeyCardHTML(G, st) {
   const J = G.J, [a, z] = journeySection(G), isEnd = z === JOUR_N;
   const steps = [];
@@ -2842,7 +2836,7 @@ function journeyCardHTML(G, st) {
     const state = k < J.n ? 'done' : k === J.n ? 'cur' : '';
     steps.push(`<span class="pn jn ${state}" style="--i:${k - a}" data-stage="${k}" role="button" tabindex="0" aria-label="שלב ${k + 1}: האות ${ALPHA[k].toUpperCase()}"><b class="en">${ALPHA[k].toUpperCase()}</b></span>`);
   }
-  const open = isEnd ? (G.mega || J.mega) : (J.n >= z);
+  const open = isEnd ? (G.mega || J.mega) : (!G.tomorrow && G.doneToday);
   const end = st.wheel
     ? `<button type="button" class="pend pwheel ${isEnd ? 'pmega' : ''} ${open ? 'open' : 'locked'}" id="${isEnd ? 'pmegaw' : 'pwheel'}" aria-label="${isEnd ? 'מגה גלגל' : 'גלגל ההפתעות'}">${miniWheel(isEnd ? (st.megaPrizes || []).length : (st.prizes || []).length)}${isEnd ? '<span class="pcrown" aria-hidden="true">👑</span>' : ''}${open ? '' : '<span class="plock" aria-hidden="true">🔒</span>'}</button>`
     : `<span class="pend ptrophy ${open ? 'open' : 'locked'}" aria-hidden="true">🏆</span>`;
@@ -2856,18 +2850,18 @@ function journeyCardHTML(G, st) {
   else action = `<div class="jdone"><b>🏆 סיימת את כל המסע! אתה מוכן למבחן.</b><button class="btn" id="jnew">להתחיל מסע חדש</button></div>`;
   const T = G.target, tn = Math.min(G.todayN, T || G.todayN);
   const mission = T || G.todayN
-    ? `<div class="mission"><span>📋 המשימה של היום: <b>${T ? `${tn}/${T}` : G.todayN}</b> שלבים${T && G.todayN >= T ? ' · <b>בוצעה! 🎉</b>' : T ? ` · בערך ${Math.max(5, (T - tn) * 6)} דקות` : ''}</span>
+    ? `<div class="mission"><span>📋 היום: <b>${T ? `${tn}/${T}` : G.todayN}</b> אותיות${T && G.todayN >= T ? ' · <b>בוצעה! 🎉</b>' : T ? ` · בערך ${Math.max(5, (T - tn) * 6)} דקות` : ''}</span>
         ${T ? `<span class="mdots" aria-hidden="true">${[...Array(T)].map((_, i) => `<i class="${i < tn ? 'on' : ''}"></i>`).join('')}</span>` : ''}</div>` : '';
   const strip = `<div class="jstrip" dir="ltr">${ALPHA.map((c, k) => `<button type="button" class="js ${k < J.n ? 'on' : k === J.n ? 'cur' : ''}" data-stage="${k}" aria-label="שלב ${k + 1}: האות ${c.toUpperCase()}">${c.toUpperCase()}</button>${G.stops.includes(k + 1) ? '<span class="jsw" aria-hidden="true">🎡</span>' : ''}`).join('')}<span class="jsw" aria-hidden="true">👑</span></div>`;
-  const nextStop = G.stops.find(k => k > J.n);
   return `<section class="goal stk h3 journey">
     <div class="goalhead"><span class="glabel">🔤 מסע 26 האותיות</span><span class="gbig" dir="ltr">${J.n} / ${JOUR_N}</span></div>
-    <p class="gsub">כל שלב שמסיימים = אות. ${st.wheel ? `כל ${jEvery(st)} אותיות: סיבוב בגלגל. ב־Z: <b>מגה גלגל!</b>` : 'ב־Z: סיימת את המסע!'}</p>
+    <p class="gsub">כל שיעור = אות. ${G.tomorrow ? `השלב של היום הושלם ✓ מחר מחכה שלב חדש${st.wheel ? ' וסיבוב חדש בגלגל' : ''}.` : `השלב של היום: <b>${G.target} אותיות</b>.${st.wheel ? ' מסיימים אותו היום ומסובבים את הגלגל!' : ''}`} ${st.wheel ? 'ב־Z: <b>מגה גלגל</b>.' : ''}</p>
     ${path}
     ${action}
     ${mission}
     ${strip}
-    ${st.wheel && !G.avail && !G.mega && J.n < JOUR_N ? `<p class="gnow">${nextStop ? `עוד <b>${nextStop - J.n}</b> אותיות לגלגל` : `עוד <b>${JOUR_N - J.n}</b> אותיות למגה גלגל`}</p>` : ''}
+    ${G.tomorrow ? `<p class="gnow">🎉 סיימת את השלב של היום! אפשר להמשיך לאסוף אותיות. הגלגל הבא: מחר.</p>`
+      : st.wheel && !G.avail && !G.mega && J.n < JOUR_N ? `<p class="gnow">${G.section[1] < JOUR_N ? `עוד <b>${G.left}</b> אותיות היום, והגלגל נפתח` : `עוד <b>${JOUR_N - J.n}</b> אותיות למגה גלגל`}</p>` : ''}
   </section>`;
 }
 let WHEEL_MEGA = false;
@@ -2950,7 +2944,7 @@ function claimLetter(k) {
 }
 function letterWon(k) {
   const st = load(), G = goalState(st), L = ALPHA[k].toUpperCase();
-  const atStop = G.stops.includes(k + 1) && G.avail, atEnd = k + 1 === JOUR_N;
+  const atStop = !!G.avail, atEnd = k + 1 === JOUR_N;
   sfx('win');
   app.innerHTML = `${top('קיבלת אות!')}
     <section class="result stk lwon">
