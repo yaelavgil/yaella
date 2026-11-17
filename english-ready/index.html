@@ -588,6 +588,13 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .lttab td:nth-child(2){font-variant-numeric:tabular-nums;text-align:center;width:4.5em}
 .lttab td:nth-child(3){text-align:center;width:2em;color:var(--good);font-weight:700}
 .ltcard .hint{grid-column:1/-1;margin:0}
+.ltline{display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:100%;text-align:start;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:9px 12px;cursor:pointer;color:var(--ink);font:600 15px var(--f-body)}
+.ltline:hover{border-color:var(--muted)}
+.ltdots{display:grid;grid-template-columns:repeat(13,8px);gap:3px}
+.ltdots i{width:8px;height:8px;border-radius:2px;background:var(--line)}
+.ltdots i.l1{background:#F2C14E}.ltdots i.l2{background:#4FB57E}
+.ltnum{color:var(--muted);font-weight:500;font-size:14px;margin-inline-start:auto}
+.lmtitle{margin:0 0 0 40px;font:700 18px var(--f-display)}
 /* letter card */
 .lcov{position:fixed;inset:0;z-index:66;background:rgba(26,20,40,.45);display:grid;place-items:center;padding:16px;animation:fade .2s both}
 .lcard{position:relative;width:min(420px,100%);background:var(--bg);border-radius:22px;padding:18px;display:grid;gap:12px;box-shadow:0 24px 70px rgba(20,10,40,.35);animation:sheetin .25s var(--ease) both}
@@ -1039,7 +1046,7 @@ function load() {
 // kids set up before the alphabet road carry the old default of 25 stars a day, which was
 // about four minutes of work. Treat that untouched default as the new road; a parent who
 // wants the old counting back can pick it again in the settings.
-function abcMigrate(st) { if (st.goal && st.goal.type === 'stars' && +st.goal.n === 25) st.goal = { type: 'abc', n: ABC_GOAL }; return st; }
+function abcMigrate(st) { if (st.goal && !st.goal.set && st.goal.type === 'stars' && +st.goal.n === 25) st.goal = { type: 'abc', n: ABC_GOAL }; return st; } // .set = a goal a parent chose on purpose
 function save(s) {
   if (KID) {
     const pr = Object.fromEntries(PROGRESS_KEYS.filter(k => k !== 'level' && k !== 'updatedAt' && s[k] !== undefined).map(k => [k, s[k]]));
@@ -1260,6 +1267,7 @@ function home() {
         ? `<p class="gleft">🏆 <b>הגעת ליעד היומי!</b> כל הכבוד!${G.earned > 1 ? ` (${G.earned} פעמים)` : ''}</p>`
         : `<p class="gleft">נשארו עוד <b>${G.left} ${G.unit}</b> ליעד</p>`)}
     <p class="gnow">היום תרגלת: <b>⭐ ${G.d.stars} כוכבים</b> · <b>⏱ ${G.mins} דקות</b>${G.d.spins ? ` · 🎡 ${G.d.spins} סיבובים` : ''}</p>
+    ${G.lvl ? '' : (() => { const lv = letterLevels(st); return `<button class="ltline" id="ltline"><span>🔤 האותיות שלי</span><span class="ltdots" dir="ltr">${lv.map(v => `<i class="l${v}"></i>`).join('')}</span><span class="ltnum">${lv.filter(v => v === 2).length} ירוקות · ${lv.filter(v => v === 1).length} בדרך</span></button>`; })()}
   </section>`}
 
   ${KID && KID.mode === 'learn' ? '' : `<section class="zone test">
@@ -1294,6 +1302,7 @@ function home() {
   $$('[data-lvl]', app).forEach(b => b.onclick = () => { const s = load(); s.level = b.dataset.lvl; save(s); home(); });
   const sp = $('#spin'); if (sp) sp.onclick = () => go(wheelView);
   const fb_ = $('#focus'); if (fb_) fb_.onclick = () => go(focusQuiz);
+  const ll = $('#ltline'); if (ll) ll.onclick = lettersPopup;
   $$('.goal [data-lt]', app).forEach(x => { x.onclick = () => letterCard(x.dataset.lt); x.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); letterCard(x.dataset.lt); } }; });
   if (st.allGreen && !st.allGreenSeen) { const s2 = load(); s2.allGreenSeen = today(); save(s2); celebrateAll(); }
   const pk = $('#peek'); if (pk) pk.onclick = () => go(wheelView);
@@ -1670,6 +1679,7 @@ function settingsSheet(kidId, tab) {
     if (!kid || !dirty) return;
     const b = $s('#shsave'); b.disabled = true;
     try {
+      st.goal = Object.assign({}, st.goal, { set: true });
       await PAPI.saveSettings(kid.id, st, name);
       kid.settings = JSON.parse(JSON.stringify(st)); kid.name = name; dirty = false; delete ov.dataset.confirm;
       $s('#shok').textContent = 'נשמר ✓'; kidsRow();
@@ -2340,7 +2350,7 @@ function parentSettings() {
   $('#psave').onclick = () => {
     const s = load();
     s.wheel = wh; s.level = pl; s.testLevel = tl;
-    s.goal = { type: gt, n: Math.max(1, Math.min(500, parseInt($('#gn').value, 10) || 25)) };
+    s.goal = { type: gt, n: Math.max(1, Math.min(500, parseInt($('#gn').value, 10) || 25)), set: true };
     const list = $('#pz').value.split('\n').map(x => x.trim()).filter(Boolean);
     s.prizes = list.length >= 2 ? list.slice(0, 12) : DEFAULT_PRIZES.slice();
     save(s); $('#pok').hidden = false;
@@ -2626,6 +2636,22 @@ function letterCard(c) {
     go(writeView);
   };
   ov.querySelector('#lcgo').focus();
+}
+function lettersPopup() {
+  const st = load();
+  const ov = document.createElement('div');
+  ov.className = 'lcov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-label', 'מפת האותיות');
+  ov.innerHTML = `<div class="lcard"><button class="shx lcx" aria-label="סגירה">✕</button><h3 class="lmtitle">🔤 מפת האותיות שלי</h3>${letterMapHTML(st, { click: true })}
+    <p class="hint">לחצו על אות כדי לראות מה כבר יודעים בה.</p>
+    <div class="lcbtns"><button class="btn primary" id="lmgo">🎯 להמשיך לצבור אותיות</button></div></div>`;
+  document.body.appendChild(ov);
+  const close = () => { ov.remove(); document.removeEventListener('keydown', esc_); };
+  const esc_ = e => { if (e.key === 'Escape') close(); };
+  document.addEventListener('keydown', esc_);
+  ov.addEventListener('click', e => { if (e.target === ov) close(); });
+  ov.querySelector('.lcx').onclick = close;
+  ov.querySelector('#lmgo').onclick = () => { close(); go(focusQuiz); };
+  ov.querySelectorAll('[data-lt]').forEach(x => x.onclick = () => { close(); letterCard(x.dataset.lt); });
 }
 function letterQuiz(c) {
   setLvl(); FOCUS = [c];
