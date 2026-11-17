@@ -668,6 +668,16 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .wstage.mega{background:linear-gradient(170deg,#E0A21B 0%,#C2410C 55%,#9D174D 100%)!important;border-color:#F5C451}
 .wstage.mega .whead{color:#fff;text-shadow:0 3px 0 rgba(120,30,0,.35)}
 @media (prefers-reduced-motion:reduce){.stagebig.pop{animation:none}}
+.journey{position:relative}
+.js{cursor:pointer;padding:0}
+.js:not(.on):not(.cur){opacity:.7}
+.jpop{position:absolute;z-index:5;width:min(260px,80%);display:grid;gap:8px;justify-items:start;padding:12px 14px;border-radius:16px;background:#3D7BFF;color:#fff;
+  box-shadow:0 10px 24px rgba(30,50,140,.3);animation:pop .25s both;font-size:15px}
+.jpop::before{content:"";position:absolute;top:-8px;left:calc(var(--ax) - 8px);border:8px solid transparent;border-top:0;border-bottom-color:#3D7BFF}
+.jpop.done{background:#E9A900;color:#3A2500}.jpop.done::before{border-bottom-color:#E9A900}
+.jpop.lock{background:#8E8A9E}.jpop.lock::before{border-bottom-color:#8E8A9E}
+.jpop .btn{width:100%;background:#fff;color:#2F4FD0;border:0;font-weight:700}
+.jpop.done .btn{color:#7A4F00}
 /* letter card */
 .lcov{position:fixed;inset:0;z-index:66;background:rgba(26,20,40,.45);display:grid;place-items:center;padding:16px;animation:fade .2s both}
 .lcard{position:relative;width:min(420px,100%);background:var(--bg);border-radius:22px;padding:18px;display:grid;gap:12px;box-shadow:0 24px 70px rgba(20,10,40,.35);animation:sheetin .25s var(--ease) both}
@@ -2830,7 +2840,7 @@ function journeyCardHTML(G, st) {
   const steps = [];
   for (let k = a; k < z; k++) {
     const state = k < J.n ? 'done' : k === J.n ? 'cur' : '';
-    steps.push(`<span class="pn jn ${state}" style="--i:${k - a}" ${state === 'cur' ? `data-stage="${k}" role="button" tabindex="0" aria-label="שלב ${k + 1}: האות ${ALPHA[k].toUpperCase()}"` : 'aria-hidden="true"'}><b class="en">${ALPHA[k].toUpperCase()}</b></span>`);
+    steps.push(`<span class="pn jn ${state}" style="--i:${k - a}" data-stage="${k}" role="button" tabindex="0" aria-label="שלב ${k + 1}: האות ${ALPHA[k].toUpperCase()}"><b class="en">${ALPHA[k].toUpperCase()}</b></span>`);
   }
   const open = isEnd ? (G.mega || J.mega) : (J.n >= z);
   const end = st.wheel
@@ -2848,7 +2858,7 @@ function journeyCardHTML(G, st) {
   const mission = T || G.todayN
     ? `<div class="mission"><span>📋 המשימה של היום: <b>${T ? `${tn}/${T}` : G.todayN}</b> שלבים${T && G.todayN >= T ? ' · <b>בוצעה! 🎉</b>' : T ? ` · בערך ${Math.max(5, (T - tn) * 6)} דקות` : ''}</span>
         ${T ? `<span class="mdots" aria-hidden="true">${[...Array(T)].map((_, i) => `<i class="${i < tn ? 'on' : ''}"></i>`).join('')}</span>` : ''}</div>` : '';
-  const strip = `<div class="jstrip" dir="ltr" aria-hidden="true">${ALPHA.map((c, k) => `<span class="js ${k < J.n ? 'on' : k === J.n ? 'cur' : ''}">${c.toUpperCase()}</span>${G.stops.includes(k + 1) ? '<span class="jsw">🎡</span>' : ''}`).join('')}<span class="jsw">👑</span></div>`;
+  const strip = `<div class="jstrip" dir="ltr">${ALPHA.map((c, k) => `<button type="button" class="js ${k < J.n ? 'on' : k === J.n ? 'cur' : ''}" data-stage="${k}" aria-label="שלב ${k + 1}: האות ${c.toUpperCase()}">${c.toUpperCase()}</button>${G.stops.includes(k + 1) ? '<span class="jsw" aria-hidden="true">🎡</span>' : ''}`).join('')}<span class="jsw" aria-hidden="true">👑</span></div>`;
   const nextStop = G.stops.find(k => k > J.n);
   return `<section class="goal stk h3 journey">
     <div class="goalhead"><span class="glabel">🔤 מסע 26 האותיות</span><span class="gbig" dir="ltr">${J.n} / ${JOUR_N}</span></div>
@@ -2861,9 +2871,30 @@ function journeyCardHTML(G, st) {
   </section>`;
 }
 let WHEEL_MEGA = false;
+function stagePop(el) {
+  const old = $('.jpop'); const same = old && old.dataset.k === el.dataset.stage; if (old) old.remove(); if (same) return;
+  const k = +el.dataset.stage, J = jour(load()), L = ALPHA[k].toUpperCase(), card = el.closest('.journey');
+  const state = k < J.n ? 'done' : k === J.n ? 'cur' : 'lock';
+  const pop = document.createElement('div');
+  pop.className = `jpop ${state}`; pop.dataset.k = k; pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', `שלב ${k + 1}`);
+  pop.innerHTML = state === 'lock'
+    ? `<b>שלב ${k + 1} · האות <span class="en">${L}</span></b><span>🔒 עוד נעול. קודם אוספים את <span class="en">${ALPHA[J.n].toUpperCase()}</span>.</span>`
+    : `<b>שלב ${k + 1} · האות <span class="en">${L}${L.toLowerCase()}</span></b>
+       <span>${state === 'cur' ? '10 שאלות, ואז כותבים את האות. בערך 6 דקות.' : 'האות כבר שלך ✓. אפשר לתרגל אותה שוב.'}</span>
+       <button class="btn ${state === 'cur' ? 'primary' : ''}" data-popgo>${state === 'cur' ? '▶ להתחיל' : '↻ לתרגל שוב'}</button>`;
+  card.appendChild(pop);
+  const cb = card.getBoundingClientRect(), r = el.getBoundingClientRect();
+  const x = Math.max(12, Math.min(cb.width - pop.offsetWidth - 12, r.left + r.width / 2 - cb.left - pop.offsetWidth / 2));
+  pop.style.left = x + 'px'; pop.style.top = (r.bottom - cb.top + 10) + 'px';
+  pop.style.setProperty('--ax', (r.left + r.width / 2 - cb.left - x) + 'px');
+  const g = pop.querySelector('[data-popgo]'); if (g) g.onclick = () => go(stageQuiz, k);
+  pop.onclick = e => e.stopPropagation();
+  setTimeout(() => document.addEventListener('click', function off() { pop.remove(); document.removeEventListener('click', off); }), 0);
+  if (g) g.focus();
+}
 function wireJourney() {
   const sg = $('#stagego'); if (sg) sg.onclick = () => go(stageQuiz, jour(load()).n);
-  $$('.journey [data-stage]', app).forEach(x => { x.onclick = () => go(stageQuiz, +x.dataset.stage); x.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); x.click(); } }; });
+  $$('.journey [data-stage]', app).forEach(x => { x.onclick = e => { e.stopPropagation(); stagePop(x); }; x.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); x.click(); } }; });
   const mw = $('#pmegaw'); if (mw) mw.onclick = () => { WHEEL_MEGA = goalState(load()).mega; go(wheelView); };
   const ms = $('#megaspin'); if (ms) ms.onclick = () => { WHEEL_MEGA = true; go(wheelView); };
   const jn = $('#jnew'); if (jn) jn.onclick = () => { const s = load(); const r = (jour(s).round || 1) + 1; s.jour = { n: 0, spins: 0, mega: false, round: r }; s.giftSpins = 0; save(s); home(); };
@@ -2903,7 +2934,7 @@ function stageFinish(k, score, n) {
       <div class="stagebig en ${pass ? 'got' : ''}">${L}${L.toLowerCase()}</div>
       <div class="score">${score}/${n}</div>
       ${pass
-        ? `<h2>עברת את השלב! 🎉</h2><p>נשאר רק לכתוב את האות <span class="en">${L}</span>, גדולה וקטנה, והיא שלך.</p>
+        ? `<h2>עברת את השלב! 🎉</h2><p>${jour(load()).n > k ? `עכשיו כותבים את האות <span class="en">${L}</span>, גדולה וקטנה.` : `נשאר רק לכתוב את האות <span class="en">${L}</span>, גדולה וקטנה, והיא שלך.`}</p>
            <div class="row center"><button class="btn primary" id="stw">✍️ לכתוב את <span class="en">${L}${L.toLowerCase()}</span></button></div>`
         : `<h2>כמעט!</h2><p>כדי לקבל את האות צריך 6 תשובות נכונות בניסיון הראשון. בוא ננסה שוב, עם שאלות חדשות.</p>
            <div class="row center"><button class="btn primary" id="again">↻ לנסות שוב</button><button class="btn" data-back="home">לדף הבית</button></div>`}
@@ -2913,6 +2944,7 @@ function stageFinish(k, score, n) {
 }
 function claimLetter(k) {
   const s = load(), J = jour(s), d = day(s);
+  if (J.n > k) { go(home); return; } // practising a letter he already has
   if (J.n === k) { J.n = k + 1; d.jl = (d.jl || 0) + 1; }
   save(s); go(letterWon, k);
 }
