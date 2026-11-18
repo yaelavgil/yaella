@@ -1722,6 +1722,7 @@ async function api() {
     signIn: async () => { const pr = new firebase.auth.GoogleAuthProvider(); try { await auth.signInWithPopup(pr); } catch (e) { if (/popup/.test(e.code || '')) await auth.signInWithRedirect(pr); else throw e; } },
     signOut: () => auth.signOut(),
     getKid: async id => { const d = await kids.doc(id).get(); return d.exists ? { id, ...d.data() } : null; },
+    watchKid: (id, cb) => kids.doc(id).onSnapshot(d => { if (d.exists && !d.metadata.hasPendingWrites) cb(d.data()); }, () => {}),
     listKids: async uid => (await kids.where('owner', '==', uid).get()).docs.map(d => ({ id: d.id, ...d.data() })),
     createKid: async (uid, name) => { const id = newId(); await kids.doc(id).set({ owner: uid, name, settings: defaultSettings(), progress: {}, createdAt: Date.now(), updatedAt: Date.now() }); return id; },
     saveSettings: (id, settings, name) => kids.doc(id).update({ settings, name, updatedAt: Date.now() }),
@@ -1742,6 +1743,7 @@ function demoApi() { // local stand-in for Firebase (only with ?demo on this com
     signIn: async () => { user = { uid: 'demo-parent', name: 'הורה לדוגמה', email: 'parent@example.com' }; sessionStorage.setItem(K + ':u', JSON.stringify(user)); subs.forEach(f => f(user)); },
     signOut: async () => { user = null; sessionStorage.removeItem(K + ':u'); subs.forEach(f => f(null)); },
     getKid: async id => db()[id] ? { id, ...db()[id] } : null,
+    watchKid: (id, cb) => { const f = e => { if (e.key === K && db()[id]) cb(db()[id]); }; window.addEventListener('storage', f); return () => window.removeEventListener('storage', f); },
     listKids: async uid => Object.entries(db()).filter(([, v]) => v.owner === uid).map(([id, v]) => ({ id, ...v })),
     createKid: async (uid, name) => { const o = db(), id = newId(); o[id] = { owner: uid, name, settings: defaultSettings(), progress: {}, createdAt: Date.now() }; put(o); return id; },
     saveSettings: async (id, settings, name) => { const o = db(); Object.assign(o[id], { settings, name }); put(o); },
@@ -1789,6 +1791,16 @@ async function bootKid(id, mode) {
     KID = { id, mode: MODES[mode] ? mode : 'all', name: k.name || '', photo: (k.profile || {}).photo || '', settings: Object.assign(defaultSettings(), k.settings || {}), progress };
     if (local === progress) cloudSoon();
     home();
+    // a parent's change in the settings reaches this screen at once (no refresh): settings, name and photo only,
+    // the progress stays what this device has
+    let lastSet = JSON.stringify(k.settings || {}), lastProf = JSON.stringify([k.name, (k.profile || {}).photo]);
+    (await api()).watchKid(id, d => {
+      const ns = JSON.stringify(d.settings || {}), np = JSON.stringify([d.name, (d.profile || {}).photo]);
+      if (ns === lastSet && np === lastProf) return;
+      lastSet = ns; lastProf = np;
+      KID.settings = Object.assign(defaultSettings(), d.settings || {}); KID.name = d.name || ''; KID.photo = (d.profile || {}).photo || '';
+      if ($('.hero', app) && !document.body.classList.contains('mapopen')) home(); // on the home screen: show it now; elsewhere: from the next screen on
+    });
   } catch (e) {
     app.innerHTML = '<section class="stk pbox"><h2>אין חיבור</h2><ul class="pts"><li>לא הצלחנו לטעון את ההגדרות.</li><li>בדקו את החיבור לאינטרנט ונסו שוב.</li></ul><button class="btn primary" onclick="location.reload()">לנסות שוב</button></section>';
   }
