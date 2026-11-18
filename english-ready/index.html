@@ -682,36 +682,42 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .jpop.done .btn{color:#7A4F00}
 /* the illustrated letters map */
 .jmapwrap{position:relative;margin-top:12px;border-radius:20px;overflow:hidden;box-shadow:inset 0 0 0 1.5px var(--line)}
-.mapfullbtn{position:absolute;top:10px;inset-inline-start:10px;z-index:5;border:0;border-radius:999px;padding:8px 14px;font:700 15px var(--f-display);background:rgba(255,255,255,.92);color:#2B3A67;box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer}
+.mapfullbtn{position:absolute;top:10px;inset-inline-start:10px;z-index:5;border:0;border-radius:50%;width:44px;height:44px;display:grid;place-items:center;background:rgba(255,255,255,.92);color:#2B3A67;box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer}
+.mapfullbtn svg{width:22px;height:22px}
 .mapbar,.mapgo{display:none}
-.jmapwrap.full{position:fixed;inset:0;z-index:80;margin:0;border-radius:0;display:flex;flex-direction:column;background:#DDF0FF}
+.jmapwrap.full{position:fixed;inset:0;z-index:80;margin:0;border-radius:0;display:flex;flex-direction:column;background:#CFE6FB;animation:mapin .32s cubic-bezier(.2,.8,.2,1) both}
+@keyframes mapin{from{opacity:0;transform:scale(.94) translateY(16px)}to{opacity:1;transform:none}}
+.jmapwrap:not(.full) .jmap{cursor:zoom-in}
 .jmapwrap.full .mapfullbtn{display:none}
 .jmapwrap.full .mapbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:calc(env(safe-area-inset-top) + 10px) 14px 10px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.08);z-index:6;font:700 18px var(--f-display)}
 .mapx{border:0;border-radius:999px;padding:12px 20px;min-height:48px;font:800 18px var(--f-display);background:#2B3A67;color:#fff;cursor:pointer}
 .jmapwrap.full .jmap{flex:1;max-height:none;padding-bottom:110px}
 .jmapwrap.full::before{top:64px}
 .jmapwrap.full::after{display:none}
-.jmapwrap.full .mapgo{display:block;position:absolute;left:0;right:0;bottom:0;z-index:6;padding:12px 16px calc(env(safe-area-inset-bottom) + 14px);background:linear-gradient(rgba(214,240,200,0),#D6F0C8 40%)}
+.jmapwrap.full .mapgo{display:block;position:absolute;left:0;right:0;bottom:0;z-index:6;padding:12px 16px calc(env(safe-area-inset-bottom) + 14px);background:linear-gradient(rgba(224,240,212,0),#E0F0D4 40%)}
 .mapgo .btn{width:100%;display:flex;flex-wrap:wrap;justify-content:center;gap:8px;font-size:18px}
 .mapgo .steps i{width:20px;height:20px;font-size:11px}
 body.mapopen{overflow:hidden}
 .jmapwrap::before,.jmapwrap::after{content:"";position:absolute;left:0;right:0;height:22px;z-index:3;pointer-events:none}
-.jmapwrap::before{top:0;background:linear-gradient(#DDF0FF,rgba(221,240,255,0))}
-.jmapwrap::after{bottom:0;background:linear-gradient(rgba(214,240,200,0),#D6F0C8)}
+.jmapwrap::before{top:0;background:linear-gradient(#CFE6FB,rgba(207,230,251,0))}
+.jmapwrap::after{bottom:0;background:linear-gradient(rgba(224,240,212,0),#E0F0D4)}
 .jmap{position:relative;max-height:min(460px,62vh);overflow-y:auto;overscroll-behavior:contain;padding:14px 0 26px;scroll-behavior:smooth;
   background:
-    radial-gradient(60px 40px at 12% 18%,rgba(255,255,255,.7),transparent 70%),
-    radial-gradient(70px 44px at 88% 42%,rgba(255,255,255,.6),transparent 70%),
-    radial-gradient(160px 70px at 20% 78%,rgba(126,200,120,.35),transparent 70%),
-    radial-gradient(180px 80px at 85% 92%,rgba(126,200,120,.4),transparent 70%),
-    linear-gradient(#DDF0FF 0%,#EAF6FF 30%,#F3FAE8 65%,#D6F0C8 100%)}
+    radial-gradient(70% 38% at 88% -4%,rgba(255,233,184,.6),transparent 70%),
+    radial-gradient(42% 9% at 24% 16%,rgba(255,255,255,.8),transparent 72%),
+    radial-gradient(34% 7% at 78% 34%,rgba(255,255,255,.6),transparent 72%),
+    radial-gradient(95% 40% at 0% 104%,rgba(176,219,160,.55),transparent 70%),
+    radial-gradient(95% 36% at 100% 100%,rgba(196,229,176,.55),transparent 70%),
+    radial-gradient(140% 30% at 50% 118%,rgba(150,205,140,.5),transparent 70%),
+    linear-gradient(#CFE6FB 0%,#E4F1FC 38%,#F2F8EE 72%,#E0F0D4 100%)}
 .jline{position:absolute;left:0;top:0;width:100%;pointer-events:none;overflow:visible;z-index:0}
-.jl-all{fill:none;stroke:#fff;stroke-width:14;stroke-linecap:round;opacity:.85}
+.jl-all{fill:none;stroke:#FFFDF6;stroke-width:16;stroke-linecap:round;opacity:.95;filter:drop-shadow(0 2px 0 rgba(110,140,100,.16))}
 .jl-done{fill:none;stroke:#FFC94D;stroke-width:8;stroke-linecap:round}
 .msky{position:absolute;z-index:0;font-size:30px;opacity:.85;pointer-events:none}
 .msky .ji{height:34px}
 .msky.s1{top:120px;left:6%}.msky.s2{top:640px;right:5%}.msky.s3{top:1180px;left:8%}
-.mstart{position:relative;z-index:1;margin:0 auto 6px;width:max-content;font:700 13px var(--f-display);letter-spacing:1px;color:#2F7A3A;background:#fff;border-radius:999px;padding:4px 12px;box-shadow:0 2px 0 #CFE6C4}
+.mstart{position:relative;z-index:1;margin:0 auto 2px;width:max-content;display:flex;flex-direction:column;align-items:center;gap:0;pointer-events:none;font:600 11px var(--f-en);letter-spacing:3px;text-transform:uppercase;color:rgba(47,90,60,.55)}
+.mstart .mflag{font-size:22px;line-height:1;letter-spacing:0}
 .mrow{position:relative;z-index:1;height:84px;display:flex;align-items:center;justify-content:center;transform:translateX(calc(var(--x) * 26%))}
 .mnode{position:relative;width:64px;height:64px;border-radius:50%;border:0;padding:0;display:grid;place-items:center;cursor:pointer;
   background:#ECE6D6;box-shadow:0 6px 0 #CFC5AC,0 8px 14px rgba(60,50,20,.12);color:#A39A86;transition:transform .15s var(--ease)}
@@ -3345,13 +3351,12 @@ function journeyMapHTML(G, st) {
     : `<span class="mnode mega" aria-hidden="true">🏆</span>`}<small class="mendt">${st.wheel ? 'מגה גלגל!' : 'סוף המסע'}</small></div>`;
   const nextL = ALPHA[J.n] ? ALPHA[J.n].toUpperCase() : '';
   return `<div class="jmapwrap" id="jmapwrap">
-    <button type="button" class="mapfullbtn" id="mapfull" aria-label="לפתוח את המפה במסך מלא">⛶ מסך מלא</button>
+    <button type="button" class="mapfullbtn" id="mapfull" aria-label="לפתוח את המפה במסך מלא"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
     <div class="mapbar"><b>🗺️ מסע 26 האותיות <span dir="ltr">${J.n}/${JOUR_N}</span></b><button type="button" class="mapx" id="mapx" aria-label="לסגור את המפה">✕ סגירה</button></div>
     ${J.n < JOUR_N && !G.capped ? `<div class="mapgo"><button type="button" class="btn primary" id="mapgo">▶ להמשיך במסע · שלב ${J.n + 1} ${stepsHTML(G.csp, G.steps, false, nextL)}</button></div>` : ''}
     <div class="jmap" id="jmap" role="list" aria-label="מפת האותיות: ${J.n} מתוך ${JOUR_N}">
     <svg class="jline" aria-hidden="true"><path class="jl-all"/><path class="jl-done"/></svg>
-    <span class="msky s1" aria-hidden="true">☁️</span><span class="msky s2" aria-hidden="true">☁️</span><span class="msky s3" aria-hidden="true">🌈</span>
-    <div class="mstart" aria-hidden="true">🏁 START</div>${rows}${end}</div></div>`;
+    <div class="mstart" aria-hidden="true"><span class="mflag">🚩</span>start</div>${rows}${end}</div></div>`;
 }
 function journeyCardHTML(G, st) {
   const J = G.J, nextL = ALPHA[J.n] ? ALPHA[J.n].toUpperCase() : '';
@@ -3434,7 +3439,9 @@ function wireJourney() {
   const fw = $('#jmapwrap', app), fb = $('#mapfull', app);
   if (fw && fb) {
     const home_ = document.createComment('map'), mx = $('#mapx', app), mg = $('#mapgo', app);
+    m.addEventListener('click', e => { if (!fw.classList.contains('full')) { e.preventDefault(); e.stopPropagation(); fb.click(); } }, true);
     fb.onclick = () => { // lifted to the page itself, so nothing on the home screen can box it in
+      if (fw.classList.contains('full')) return;
       fw.replaceWith(home_); document.body.appendChild(fw); fw.classList.add('full'); document.body.classList.add('mapopen');
       try { history.pushState({ mapfull: 1 }, ''); } catch (e) {} centreCur(); mx.focus(); };
     mapClose = fromBack => {
