@@ -112,6 +112,23 @@ h2{font:600 24px/1.2 var(--f-display);margin:0;text-wrap:balance}
 .word{font:700 clamp(40px,11vw,56px)/1.1 var(--f-en);margin:0}
 .digit{font:700 clamp(80px,22vw,110px)/1 var(--f-display);color:var(--c)}
 .count{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;font-size:clamp(34px,9vw,46px);max-width:340px;direction:ltr}
+.wslots{display:flex;gap:6px;justify-content:center;margin-top:6px}
+.wsl{width:clamp(30px,9vw,42px);height:clamp(40px,11vw,52px);border-bottom:4px solid var(--line);display:grid;place-items:center;font:700 clamp(26px,7vw,34px)/1 var(--f-en);color:var(--good)}
+.wsl.cur{border-color:var(--c);animation:wslp 1.2s ease-in-out infinite}
+.wsl.ok{border-color:var(--good)}
+@keyframes wslp{50%{border-color:transparent}}
+.wwbtns{margin-top:10px}
+.cvwrap.wwdone{opacity:.45;pointer-events:none}
+.wwword{font-size:24px}
+.microw{display:flex;flex-direction:column;align-items:center;gap:8px;margin:18px 0 6px}
+.micbtn{width:96px;height:96px;border-radius:50%;border:0;font-size:42px;background:linear-gradient(#FF8FB1,#E8547E);box-shadow:0 6px 0 #B83A60,0 10px 24px rgba(232,84,126,.35);cursor:pointer;color:#fff}
+.micbtn:active{transform:translateY(3px);box-shadow:0 3px 0 #B83A60}
+.micbtn.on{animation:micp 1s ease-in-out infinite;background:linear-gradient(#7BD88F,#2F9E55);box-shadow:0 6px 0 #1F7A3E,0 0 0 10px rgba(47,158,85,.18)}
+@keyframes micp{50%{box-shadow:0 6px 0 #1F7A3E,0 0 0 20px rgba(47,158,85,.08)}}
+.michint{font-size:15px;color:var(--muted)}
+.heard{display:block;font-size:15px;color:var(--muted);margin-top:4px}
+.sgood{color:var(--good)}
+.smiss{color:var(--bad);text-decoration:underline wavy}
 .sayrow{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 .opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
 .opts.wide{grid-template-columns:1fr}
@@ -1608,6 +1625,8 @@ const MODS = [
   { id:'sentences', t:'קריאת משפטים', sub:'Read a sentence', g:'📖', h:5, run:() => go(quizSentences) },
   { id:'stories', t:'הבנת הנקרא', sub:'Read & answer', g:'📚', h:6, run:() => go(quizStories) },
   { id:'numbers', t:'מספרים עד 12', sub:'Numbers 1–12', g:'🔢', h:2, run:() => go(quizNumbers) },
+  { id:'words', t:'כתיבת מילים', sub:'Write words', g:'📝', h:3, run:() => go(wordWriteView) },
+  { id:'speak', t:'אומרים בקול', sub:'Say it', g:'🎤', h:6, run:() => go(speakView) },
 ];
 function home() {
   const st = load(), td = today(), G = goalState(st);
@@ -3588,6 +3607,8 @@ function stageQuiz() {
   if (J0.ck !== J0.n) { J0.ck = J0.n; J0.cms = 0; J0.cr = 0; J0.sp = 0; save(s0); }
   const round = J0.cr || 0;
   STAGE = { k: J0.n };
+  if (round % 4 === 3 && SRec() && !(s0.noMic === today())) { SPEAK_ROUND = true; speakView(); return; } // say it out loud
+  if (lvl !== 'easy' && round % 3 === 2 && Math.floor(round / 3) % 2 === 1) { WORDW_ROUND = true; wordWriteView(); return; } // whole words
   if (lvl !== 'easy' && round % 3 === 2) { // copy 2 letters + write 2 from dictation; letters he hasn't written right yet come first
     const need = [], ok = [];
     ALPHA.forEach((c, i) => { for (const cs of ['up', 'low']) (skRec(s0, c, cs === 'up' ? 'wu' : 'wl')[0] ? ok : need).push([i, cs]); });
@@ -4450,6 +4471,244 @@ window.speechTexts = () => [...new Set([
   ...DEFAULT_PRIZES.map(textOf),
 ])];
 sfxButton();
+/* ---------- whole words: write a word letter by letter (easy: copy it / medium: hear it, with a picture / hard: hear it) ---------- */
+let WORDW_ROUND = false, SPEAK_ROUND = false; // set by the journey: one round, then back to the stage
+const WW_LEN = { easy: [3, 3], medium: [3, 5], hard: [5, 8] };
+function wordPool(lo, hi) { return WORDS.filter(x => /^[a-z]+$/.test(x.w) && x.w.length >= lo && x.w.length <= hi); }
+// small round-end screen shared by the new practice views (the journey goes back to the stage instead)
+function practiceDone(mod, title, score, n, again) {
+  const pct = Math.round(score / n * 100); markDone(mod, pct);
+  let stepNote = '';
+  { const s1 = load(); if ((s1.goal || {}).type === 'journey' && jour(s1).n < JOUR_N && addStep(s1)) { save(s1); if (!stopReached(s1)) stepNote = stepNoteHTML(s1); } }
+  sfx(pct >= 70 ? 'win' : 'ok');
+  app.innerHTML = `${top(title)}
+    <section class="result stk">
+      <div class="score">${score}/${n}</div>
+      <h2>${pct >= 90 ? 'מעולה! 🌟' : pct >= 60 ? 'יפה מאוד! 💪' : 'כל סבב מקדם אותך 💪'}</h2>
+      ${stepNote}
+      <div class="row center"><button class="btn primary" id="again">עוד סבב</button><button class="btn" data-back="home">לדף הבית</button></div>
+    </section>`;
+  $('#again').onclick = () => go(again);
+  journeyBanner($('.result', app));
+  wheelBanner($('.result', app));
+}
+function wordWriteView() {
+  setLvl();
+  const RND = WORDW_ROUND; WORDW_ROUND = false;
+  if (!RND && restNow()) { restView(); return; }
+  const N = RND ? 3 : 5, [lo, hi] = WW_LEN[lvl];
+  const words = shuffle(wordPool(lo, hi)).slice(0, N);
+  const title = RND ? `המסע · שלב ${jour(load()).n + 1}` : 'כתיבת מילים';
+  let k = 0, score = 0, wd, pos, tries, helped, missed, ink = [], drawing = false, idle = 0, W = 0, H = 0, U = 40, box = null;
+  const dpr = Math.min(window.devicePixelRatio || 1, 3);
+  const css = (el, v) => getComputedStyle(el).getPropertyValue(v).trim();
+  function card() {
+    const w = wd.w, slots = [...w].map((c, i) => `<span class="wsl${i < pos ? ' ok' : i === pos ? ' cur' : ''}">${i < pos ? c : ''}</span>`).join('');
+    const sayB = `<div class="sayrow"><button class="btn sm" data-say="${w}">🔊 שמע שוב</button><button class="btn sm" data-say="${w}" data-slow="1">🐢 לאט</button></div>`;
+    return (lvl === 'easy'
+      ? `<div class="pic">${wd.e}</div><p class="word en">${w}</p><p class="ask">כתוב את המילה.<br>אות אחרי אות, בתוך המסגרת.</p>`
+      : `${lvl === 'medium' ? `<div class="pic">${wd.e}</div>` : '<div class="pic" aria-hidden="true">🔊</div>'}<p class="ask">שמע את המילה וכתוב אותה.<br>אות אחרי אות, בתוך המסגרת.</p>${sayB}`)
+      + `<div class="wslots en" dir="ltr" aria-label="${pos} מתוך ${w.length} אותיות">${slots}</div>`;
+  }
+  function render() {
+    app.innerHTML = `${top(title, 'home', `<span class="mtag practice">${RND ? 'שלב' : 'תרגול · ' + LEVELS[lvl]}</span><span class="qnum">${k + 1} / ${words.length}</span>`)}
+      <div class="bar" aria-hidden="true"><i style="width:${(k / words.length) * 100}%"></i></div>
+      <section class="qcard stk h3" id="wwc"></section>
+      <div class="cvwrap stk h3" id="wwv"><canvas id="wwg"></canvas><canvas id="wwd" aria-label="משטח כתיבה: כותבים כאן אות אחת"></canvas></div>
+      <div class="row center wwbtns"><button class="btn sm" id="wwu" aria-label="ביטול הקו האחרון">↶ חזרה</button><button class="btn sm" id="wwx">🧽 ניקוי</button><button class="btn primary" id="wwok">✓ בדיקה</button></div>
+      <div id="wfb" aria-live="polite"></div>`;
+    const d = $('#wwd');
+    d.addEventListener('pointerdown', e => { e.preventDefault(); if (pos >= wd.w.length) return; clearTimeout(idle); drawing = true; try { d.setPointerCapture(e.pointerId); } catch (_) {} ink.push([pt(e)]); paint(); });
+    d.addEventListener('pointermove', e => { if (!drawing) return; ink[ink.length - 1].push(pt(e)); paint(); });
+    ['pointerup', 'pointercancel'].forEach(t => d.addEventListener(t, () => { if (!drawing) return; drawing = false; clearTimeout(idle); idle = setTimeout(() => judge(true), 900); }));
+    $('#wwu').onclick = () => { ink.pop(); paint(); };
+    $('#wwx').onclick = () => { ink = []; paint(); };
+    $('#wwok').onclick = () => judge(false);
+  }
+  const pt = e => { const r = $('#wwd').getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+  function size() {
+    const wrap = $('#wwv'); W = wrap.clientWidth; H = Math.round(Math.min(300, Math.max(220, W * 0.6)));
+    wrap.style.height = H + 'px';
+    for (const c of [$('#wwg'), $('#wwd')]) { c.width = W * dpr; c.height = H * dpr; c.style.width = W + 'px'; c.style.height = H + 'px'; c.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0); }
+    U = H / 3.7; guide();
+  }
+  // the template of letter ch, placed in the middle of the board
+  function tplAt(ch) {
+    const g = layoutGlyphs([ch]); const ox = (W - g.width * U) / 2, oy = (H - 3 * U) / 2;
+    return g.glyphs[0].map(st => st.map(([x, y]) => [ox + x * U, oy + y * U]));
+  }
+  window.__wtpl = () => tplAt(wd.w[pos]); // used by automated checks
+  function guide() {
+    const ctx = $('#wwg').getContext('2d'), col = css($('#wwv'), '--c'); ctx.clearRect(0, 0, W, H);
+    const hw = Math.min(W / 2 - 14, U * 1.5), x0 = W / 2 - hw, y0 = (H - 3 * U) / 2 - U * 0.1, y1 = y0 + 3.2 * U;
+    ctx.save(); ctx.fillStyle = col; ctx.globalAlpha = 0.07; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x0, y0, hw * 2, y1 - y0, 18) : ctx.rect(x0, y0, hw * 2, y1 - y0); ctx.fill();
+    ctx.globalAlpha = 0.55; ctx.strokeStyle = col; ctx.lineWidth = 3; ctx.setLineDash([10, 9]); ctx.stroke(); ctx.restore();
+    if (pos < wd.w.length && (lvl === 'easy' || helped)) { // the letter to copy, faint
+      ctx.save(); ctx.globalAlpha = helped ? 0.35 : 0.2; ctx.strokeStyle = helped ? css(document.body, '--bad') : col; ctx.lineWidth = U * 0.24; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      tplAt(wd.w[pos]).forEach(st => { ctx.beginPath(); ctx.moveTo(st[0][0], st[0][1]); st.forEach(p => ctx.lineTo(p[0], p[1])); ctx.stroke(); }); ctx.restore();
+    }
+  }
+  function paint() {
+    const ctx = $('#wwd').getContext('2d'); ctx.clearRect(0, 0, W, H);
+    ctx.strokeStyle = css(document.body, '--ink'); ctx.lineWidth = Math.max(5, U * 0.09); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    for (const st of ink) { ctx.beginPath(); ctx.moveTo(st[0][0], st[0][1]); st.forEach(p => ctx.lineTo(p[0], p[1])); if (st.length === 1) ctx.lineTo(st[0][0] + 0.1, st[0][1]); ctx.stroke(); }
+  }
+  // the same shape test as letter writing, a little more forgiving: close to the letter AND closer to it than to any other small letter
+  const sub = (a, n = 60) => { const q = Math.max(1, Math.floor(a.length / n)); return a.filter((_, i) => i % q === 0); };
+  const chamfer = (a0, b0) => { const a = sub(a0.flat()), b = sub(b0.flat()); const d1 = a.reduce((t, p) => t + nearest(p, b), 0) / a.length, d2 = b.reduce((t, p) => t + nearest(p, a), 0) / b.length; return Math.max(d1, d2) / U; };
+  function isLetter(ch) {
+    const pts = ink.flat(); if (pts.length < 6) return false;
+    let mine = 9, best = 9;
+    for (const c of ALPHA) { const t = layoutGlyphs([c]).glyphs[0].map(st => st.map(([x, y]) => [x * U, y * U])), sc = chamfer(fitInto(ink, t), t); if (c === ch) mine = sc; else best = Math.min(best, sc); }
+    return mine <= 0.33 && mine <= best * 1.22;
+  }
+  function judge(auto) {
+    clearTimeout(idle); if (pos >= wd.w.length || !ink.length) return;
+    const ch = wd.w[pos], ok = isLetter(ch);
+    if (!ok && auto) return; // still writing, perhaps: only the ✓ button says "not yet"
+    if (ok) {
+      recordLetter(ch, 'wl', !tries); sfx('ok');
+      pos++; tries = 0; helped = false; ink = []; paint();
+      $('#wwc').innerHTML = card(); guide();
+      if (pos >= wd.w.length) return wordDone();
+      $('#wfb').innerHTML = `<div class="fb good"><div class="msg"><b>✓ <span class="en">${ch}</span> נכונה!</b>עכשיו האות הבאה.</div></div>`;
+      return;
+    }
+    tries++; missed = true; sfx('no'); if (tries === 1) recordLetter(ch, 'wl', false);
+    if (tries >= 2) { helped = true; guide(); say(NAME[ch.toUpperCase()]); }
+    $('#wfb').innerHTML = `<div class="fb bad"><div class="msg"><b>עוד לא.</b>${tries >= 2 ? lines('ככה כותבים את האות הזאת: היא מופיעה עכשיו בלוח.', 'כותבים עליה.') : lines('מנקים ומנסים שוב.', 'כותבים אות אחת, גדולה, בתוך המסגרת.')}</div></div>`;
+    ink = []; setTimeout(paint, 350);
+  }
+  function wordDone() {
+    if (!missed) { score++; addStar(); }
+    say(wd.w);
+    $('#wwv').classList.add('wwdone');
+    $('#wfb').innerHTML = `<div class="fb good"><div class="msg"><b><span class="en">${pick(PRAISE)}</span> ✅ כתבת את המילה!</b><span class="en wwword">${wd.e} ${wd.w}</span></div><button class="btn primary" id="wwn">${k + 1 < words.length ? 'מילה הבאה ←' : RND ? 'סיום הסבב ←' : 'לתוצאות ←'}</button></div>`;
+    const b = $('#wwn'); b.focus({ preventScroll: true }); b.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    b.onclick = () => { k++; if (k < words.length) load1(); else if (RND) go(stageFinish, score, words.length); else practiceDone('words', 'כתיבת מילים', score, words.length, wordWriteView); };
+  }
+  function load1() {
+    hush(); wd = words[k]; pos = 0; tries = 0; helped = false; missed = false; ink = [];
+    render(); $('#wwc').innerHTML = card(); size(); paint(); window.scrollTo(0, 0);
+    if (lvl !== 'easy') setTimeout(() => say(wd.w), 350);
+  }
+  const rs = () => { if ($('#wwv')) { size(); paint(); } };
+  window.addEventListener('resize', rs); cleanup = () => { window.removeEventListener('resize', rs); clearTimeout(idle); };
+  load1();
+}
+
+/* ---------- say it out loud: the browser listens and checks the word (easy: hear it first / medium: read it / hard: read a sentence) ---------- */
+const SRec = () => window.SpeechRecognition || window.webkitSpeechRecognition;
+// words a speech engine often writes instead of the one a child said
+const HOMO = { eye: ['i', 'aye', 'hi'], sun: ['son'], ant: ['aunt', 'and', 'end'], nut: ['not', 'knot', 'night'], owl: ['all', 'al', 'oil', 'out'], key: ['ki', 'kee', 'kiki', 'kay'], up: ['op', 'app'], egg: ['ag', 'ec', 'eg', 'act'], van: ['fan', 'ben', 'when'], car: ['far', 'call', 'ca'], cat: ['kat', 'cut', 'cap'], hat: ['hut', 'had', 'hot'], dog: ['dug', 'doug', 'duck'], two: ['to', 'too', '2'], four: ['for', '4'], eight: ['ate', '8'], one: ['won', '1'], bear: ['bare', 'bar', 'bird'], pear: ['pair', 'pare'], see: ['sea', 'c'], milk: ['mic', 'melk'], kite: ['kate', 'cat'], tree: ['three', 'tea'], frog: ['frock', 'fog'] };
+const DIG = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+const sxCode = w => { // soundex, with every vowel start treated alike
+  const m = { b: 1, f: 1, p: 1, v: 1, c: 2, g: 2, j: 2, k: 2, q: 2, s: 2, x: 2, z: 2, d: 3, t: 3, l: 4, m: 5, n: 5, r: 6 };
+  const f = /[aeiouy]/.test(w[0]) ? 'A' : w[0] === 'k' || w[0] === 'q' ? 'C' : w[0].toUpperCase();
+  let out = f, prev = m[w[0]] || 0;
+  for (const c of w.slice(1)) { const v = m[c] || 0; if (v && v !== prev) out += v; if (c !== 'h' && c !== 'w') prev = v; }
+  return (out + '000').slice(0, 4);
+};
+function lev(a, b) { const d = [...Array(b.length + 1).keys()]; for (let i = 1; i <= a.length; i++) { let p = d[0]; d[0] = i; for (let j = 1; j <= b.length; j++) { const t = d[j]; d[j] = Math.min(d[j] + 1, d[j - 1] + 1, p + (a[i - 1] === b[j - 1] ? 0 : 1)); p = t; } } return d[b.length]; }
+const toks = s => String(s).toLowerCase().replace(/(\d+)/g, (_, n) => DIG[+n] || n).replace(/[^a-z' ]+/g, ' ').replace(/'/g, '').split(/\s+/).filter(Boolean);
+function sameWord(target, heard) {
+  if (heard === target || heard === target + 's' || heard + 's' === target) return true;
+  if ((HOMO[target] || []).includes(heard)) return true;
+  if (target.length >= 4 && lev(target, heard) <= (target.length >= 7 ? 2 : 1)) return true;
+  if (target.length >= 3 && heard.length >= 2 && sxCode(target) === sxCode(heard) && Math.abs(target.length - heard.length) <= 2) return true;
+  return false;
+}
+// -> {ok, hit:[bool per target word], heard:'best guess'}
+function judgeSpeech(target, alts) {
+  const tw = toks(target); let best = { ok: false, hit: tw.map(() => false), heard: alts[0] || '', n: -1 };
+  for (const a of alts) {
+    const hw = toks(a), hit = tw.map(t => hw.some(h => sameWord(t, h))), n = hit.filter(Boolean).length;
+    const ok = tw.length === 1 ? hit[0] : n / tw.length >= 0.75;
+    if (ok && !best.ok || n > best.n && ok === best.ok) best = { ok, hit, heard: a, n };
+  }
+  return best;
+}
+function speakView() {
+  setLvl();
+  const RND = SPEAK_ROUND; SPEAK_ROUND = false;
+  if (!RND && restNow()) { restView(); return; }
+  const title = RND ? `המסע · שלב ${jour(load()).n + 1}` : 'אומרים בקול';
+  if (!SRec()) {
+    app.innerHTML = `${top(title)}<section class="qcard stk h6"><div class="pic" aria-hidden="true">🎤</div>${blt(['בדפדפן הזה אין זיהוי דיבור.', 'אפשר לנסות ב־Safari באייפד או באייפון, או ב־Chrome.'])}
+      <div class="row center">${RND ? '<button class="btn primary" id="skip">להמשיך בשלב ←</button>' : '<button class="btn primary" data-back="home">לדף הבית</button>'}</div></section>`;
+    const sk = $('#skip'); if (sk) sk.onclick = () => go(stageQuiz);
+    return;
+  }
+  const N = RND ? 4 : 5;
+  const items = lvl === 'hard'
+    ? shuffle(SENTENCES).slice(0, N).map(it => ({ t: it.s.replace(/[.!?]$/, ''), full: it.s, e: it.p, sent: true }))
+    : shuffle(wordPool(3, lvl === 'easy' ? 5 : 8)).slice(0, N).map(x => ({ t: x.w, full: x.w, e: x.e }));
+  let k = 0, score = 0, tries = 0, rec = null, busy = false, finished = false;
+  function render() {
+    const it = items[k];
+    app.innerHTML = `${top(title, 'home', `<span class="mtag practice">${RND ? 'שלב' : 'תרגול · ' + LEVELS[lvl]}</span><span class="qnum">${k + 1} / ${items.length}</span>`)}
+      <div class="bar" aria-hidden="true"><i style="width:${(k / items.length) * 100}%"></i></div>
+      <section class="qcard stk h6">
+        <div class="pic">${it.e}</div>
+        <p class="${it.sent ? 'sent' : 'word'} en" id="spt">${it.full}</p>
+        <p class="ask">${lvl === 'easy' ? 'שמע, ואז אמור את המילה בקול.' : it.sent ? 'קרא את המשפט בקול.' : 'קרא את המילה בקול.'}</p>
+        <div class="sayrow"><button class="btn sm" data-say="${esc(it.full)}">🔊 ${lvl === 'easy' ? 'שמע שוב' : 'עזרה: הקרא לי'}</button></div>
+      </section>
+      <div class="microw"><button class="micbtn" id="mic" aria-label="לחץ ודבר">🎤</button><span class="michint" id="mich">לוחצים על המיקרופון ומדברים</span></div>
+      <div id="fb" aria-live="polite"></div>`;
+    $('#mic').onclick = listen;
+    if (lvl === 'easy') setTimeout(() => say(it.full), 350);
+  }
+  function setMic(on) { const m = $('#mic'); if (!m) return; m.classList.toggle('on', on); $('#mich').textContent = on ? '👂 מקשיב… מדברים עכשיו' : 'לוחצים על המיקרופון ומדברים'; }
+  function listen() {
+    if (finished) return;
+    if (busy && rec) { try { rec.stop(); } catch (e) {} return; }
+    hush(); const R = SRec(); rec = new R(); busy = true;
+    rec.lang = 'en-US'; rec.interimResults = false; rec.maxAlternatives = 5; rec.continuous = false;
+    let got = false;
+    rec.onresult = e => { got = true; const r = e.results[0], alts = [...Array(r.length).keys()].map(i => r[i].transcript); verdict(alts); };
+    rec.onerror = e => {
+      got = true;
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed' || e.error === 'audio-capture') {
+        { const s1 = load(); s1.noMic = today(); save(s1); } // the journey stops asking for the mic today
+        $('#fb').innerHTML = `<div class="fb bad"><div class="msg"><b>אין גישה למיקרופון.</b>${lines('צריך לאשר לאתר להשתמש במיקרופון.', 'אפשר לדלג בינתיים.')}</div><button class="btn" id="skp">דלג ←</button></div>`;
+        $('#skp').onclick = next;
+      } else if (e.error === 'no-speech') $('#fb').innerHTML = `<div class="fb bad"><div class="msg"><b>לא שמעתי כלום.</b>${lines('לוחצים שוב ומדברים קצת יותר חזק.')}</div></div>`;
+      else if (e.error !== 'aborted') $('#fb').innerHTML = `<div class="fb bad"><div class="msg"><b>משהו לא עבד.</b>${lines('לוחצים שוב על המיקרופון.')}</div></div>`;
+    };
+    rec.onend = () => { busy = false; setMic(false); if (!got && !finished) $('#fb').innerHTML = `<div class="fb bad"><div class="msg"><b>לא שמעתי כלום.</b>${lines('לוחצים שוב ומדברים קצת יותר חזק.')}</div></div>`; };
+    try { rec.start(); setMic(true); $('#fb').innerHTML = ''; } catch (e) { busy = false; setMic(false); }
+  }
+  function verdict(alts) {
+    const it = items[k], v = judgeSpeech(it.t, alts);
+    if (it.sent) { const tw = toks(it.full); $('#spt').innerHTML = it.full.split(' ').map((w, i) => `<span class="${v.hit[i] ? 'sgood' : 'smiss'}">${w}</span>`).join(' '); }
+    if (v.ok) {
+      finished = true; sfx('ok'); if (tries < 2) { score++; addStar(); }
+      $('#fb').innerHTML = `<div class="fb good"><div class="msg"><b><span class="en">${pick(PRAISE)}</span> ✅ אמרת נכון!</b></div><button class="btn primary" id="spn">${k + 1 < items.length ? 'הבא ←' : RND ? 'סיום הסבב ←' : 'לתוצאות ←'}</button></div>`;
+      $('#spn').onclick = next; $('#spn').focus({ preventScroll: true });
+      return;
+    }
+    tries++; sfx('no');
+    const heard = esc(v.heard || '').slice(0, 60);
+    if (tries >= 3) {
+      finished = true;
+      $('#fb').innerHTML = `<div class="fb bad"><div class="msg"><b>לא נורא! ככה אומרים:</b><span class="en">${esc(it.full)}</span>${heard ? `<span class="heard">שמעתי: <span class="en" dir="ltr">${heard}</span></span>` : ''}</div><button class="btn primary" id="spn">${k + 1 < items.length ? 'הבא ←' : RND ? 'סיום הסבב ←' : 'לתוצאות ←'}</button></div>`;
+      $('#spn').onclick = next; say(it.full);
+      return;
+    }
+    $('#fb').innerHTML = `<div class="fb bad"><div class="msg"><b>עוד לא.</b>${heard ? `<span class="heard">שמעתי: <span class="en" dir="ltr">${heard}</span></span>` : ''}${lines(it.sent ? 'המילים באדום עוד לא נשמעו טוב.' : '', tries === 2 ? 'הקשב קודם לדוגמה, ואז נסה שוב.' : 'לוחצים שוב ומדברים לאט וברור.')}</div></div>`;
+    if (tries === 2) say(it.full);
+  }
+  function next() {
+    try { rec && rec.abort(); } catch (e) {}
+    k++; tries = 0; finished = false; busy = false;
+    if (k < items.length) { render(); window.scrollTo(0, 0); return; }
+    if (RND) go(stageFinish, score, items.length); else practiceDone('speak', 'אומרים בקול', score, items.length, speakView);
+  }
+  cleanup = () => { finished = true; try { rec && rec.abort(); } catch (e) {} };
+  render();
+}
+
 const QS = new URLSearchParams(location.search);
 // ?trywheel — opens the wheel straight away in try-it mode, for checking the win card
 // and the sharing without having to earn a spin first. Spins here are not counted and
