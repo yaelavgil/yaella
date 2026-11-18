@@ -1599,14 +1599,32 @@ function demoApi() { // local stand-in for Firebase (only with ?demo on this com
 }
 
 // --- kid side: progress is written to the cloud a moment after each change
-let cloudTimer = 0;
-function cloudSoon() { clearTimeout(cloudTimer); cloudTimer = setTimeout(cloudFlush, 1500); }
+let cloudTimer = 0, cloudDirty = false, cloudBusy = false, cloudFails = 0;
+// Every change is kept on the device straight away (save() above) and pushed to the cloud
+// a moment later. A push that fails (no signal, a hiccup) is retried with a growing pause
+// instead of being forgotten, and anything still unsent is pushed again when the page is
+// opened, brought back to the front, or the network returns. If the tab dies first, the
+// device copy is newer and bootKid() sends it up next time.
+function cloudSoon() { cloudDirty = true; clearTimeout(cloudTimer); cloudTimer = setTimeout(cloudFlush, 1500); }
 async function cloudFlush() {
-  clearTimeout(cloudTimer);
-  if (!KID) return;
-  try { (await api()).saveProgress(KID.id, KID.progress); } catch (e) {}
+  clearTimeout(cloudTimer); cloudTimer = 0;
+  if (!KID || !cloudDirty) return;
+  if (cloudBusy) { cloudTimer = setTimeout(cloudFlush, 800); return; }
+  cloudBusy = true;
+  const snap = KID.progress, stamp = snap.updatedAt;
+  try {
+    await (await api()).saveProgress(KID.id, snap);
+    cloudFails = 0;
+    if (KID.progress.updatedAt === stamp) cloudDirty = false;
+  } catch (e) {
+    cloudFails++;
+  }
+  cloudBusy = false;
+  if (cloudDirty) cloudTimer = setTimeout(cloudFlush, cloudFails ? Math.min(60000, 2000 * 2 ** Math.min(cloudFails, 5)) : 800);
 }
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && KID) cloudFlush(); });
+document.addEventListener('visibilitychange', () => { if (KID) { if (document.visibilityState === 'hidden') cloudFlush(); else if (cloudDirty) cloudFlush(); } });
+window.addEventListener('pagehide', () => { if (KID) cloudFlush(); });
+window.addEventListener('online', () => { if (KID && cloudDirty) { cloudFails = 0; cloudFlush(); } });
 async function bootKid(id, mode) {
   app.innerHTML = '<p class="loading">טוען…</p>';
   try {
@@ -2178,6 +2196,16 @@ const wrapLines = (x, t, max) => {
   return out;
 };
 const roundRect = (x, l, t, w, h, r) => { x.beginPath(); x.moveTo(l + r, t); x.arcTo(l + w, t, l + w, t + h, r); x.arcTo(l + w, t + h, l, t + h, r); x.arcTo(l, t + h, l, t, r); x.arcTo(l, t, l + w, t, r); x.closePath(); };
+// Designed pictures made outside the app (e.g. with ChatGPT) are optional: put them in
+// win-art/ and the card uses them, otherwise it falls back to the illustration it always had.
+//   win-art/bg.png        full card background, 1080x1350
+//   win-art/<prize>.png   the prize picture, named after the English prize text (see prizeSlug)
+const prizeSlug = t => textOf(t).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+const loadArt = name => new Promise(res => {
+  const im = new Image();
+  im.onload = () => res(im); im.onerror = () => res(null);
+  im.src = new URL('win-art/' + name + '.png', location.href).href;
+});
 const loadIll = g => new Promise(res => {
   const u = illUrl(g); if (!u) return res(null);
   const im = new Image(); im.crossOrigin = 'anonymous';
@@ -2198,7 +2226,10 @@ async function winCardBlob(pz, at) {
   const DIS = '700 {s}px "Fredoka","Rubik",sans-serif', BOD = '{w} {s}px "Rubik",sans-serif', EN = '700 {s}px "Andika","Rubik",sans-serif';
   const f = (tpl, s, w) => tpl.replace('{s}', s).replace('{w}', w || 500);
 
-  // backdrop
+  // backdrop (a designed picture if there is one, otherwise the plain gradient, confetti and white card)
+  const artBg = await loadArt('bg');
+  if (artBg) x.drawImage(artBg, 0, 0, W, H);
+  else {
   const bg = x.createLinearGradient(0, 0, W, H);
   bg.addColorStop(0, '#FFF2DC'); bg.addColorStop(1, '#FFE2E9');
   x.fillStyle = bg; x.fillRect(0, 0, W, H);
@@ -2213,6 +2244,7 @@ async function winCardBlob(pz, at) {
   // card
   x.save(); x.shadowColor = 'rgba(80,60,30,.20)'; x.shadowBlur = 48; x.shadowOffsetY = 18;
   x.fillStyle = '#fff'; roundRect(x, 58, 58, W - 116, H - 116, 56); x.fill(); x.restore();
+  }
 
   x.textAlign = 'center'; x.direction = 'rtl';
 
@@ -2230,8 +2262,10 @@ async function winCardBlob(pz, at) {
   x.fillText(who ? `${who} זוכה!` : 'זכייה!', W / 2, 372);
 
   // the prize illustration
-  const im = await loadIll(emojiOf(pz));
-  if (im) x.drawImage(im, W / 2 - 170, 420, 340, 340);
+  const art = await loadArt(prizeSlug(pz));
+  const im = art ? null : await loadIll(emojiOf(pz));
+  if (art) { const k = Math.min(440 / art.width, 400 / art.height); x.drawImage(art, W / 2 - art.width * k / 2, 410 + (400 - art.height * k) / 2, art.width * k, art.height * k); }
+  else if (im) x.drawImage(im, W / 2 - 170, 420, 340, 340);
   else { x.font = f(DIS, 240); x.fillText(emojiOf(pz), W / 2, 700); }
 
   // what was won
