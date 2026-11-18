@@ -1561,7 +1561,8 @@ const jour = s => {
 };
 const jEvery = s => Math.max(3, Math.min(8, +((s.goal || {}).every) || 4));
 const wheelMin = s => { const v = (s.goal || {}).wmn; return v == null ? 20 : +v; }; // minutes of practice that day before the wheel opens (0 = none)
-const wheelInfo = s => `<details class="info"><summary aria-label="איך נפתח הגלגל?">i</summary>${blt(['גלגל ההפתעות נפתח פעם אחת ביום.', 'צריך להשלים את הצעדים של היום (לפתוח אות).', wheelMin(s) ? `וגם לתרגל באותו יום לפחות ${wheelMin(s)} דקות.` : ''])}</details>`;
+const wheelPerDay = s => Math.max(1, +(s.goal || {}).wpd || 1); // wins a day; win k needs k letters opened today and k x the minutes
+const wheelInfo = s => `<details class="info"><summary aria-label="איך נפתח הגלגל?">i</summary>${blt([wheelPerDay(s) > 1 ? `גלגל ההפתעות נפתח עד ${wheelPerDay(s)} פעמים ביום.` : 'גלגל ההפתעות נפתח פעם אחת ביום.', wheelPerDay(s) > 1 ? 'כל פעם צריך להשלים שלב (לפתוח אות).' : 'צריך להשלים את הצעדים של היום (לפתוח אות).', wheelMin(s) ? `וגם לתרגל באותו יום לפחות ${wheelMin(s)} דקות${wheelPerDay(s) > 1 ? ' לכל סיבוב' : ''}.` : ''])}</details>`;
 function wheelBanner(where) { // the wheel just opened: offer it right where he is
   const s = load(), G = goalState(s); if (!where || !G.avail || s.wheel === false || $('#spinnow')) return;
   const b = document.createElement('div'); b.className = 'jbanner';
@@ -1616,13 +1617,15 @@ function xsApply() { // first time this device sees a grant: remember where he s
   if (!KID) return; const s = load(), x = xsGrant(s); if (!x) return; const d = day(s);
   if (d.xsb && d.xsb.at === x.at) return; d.xsb = { at: x.at, ms: d.ms || 0, jw: d.jw || 0 }; save(s);
 }
-function st_wheelToday(s, d) { const X = xsState(s, d); if (X) return X.open; return (d.jl || 0) >= 1 && !(d.jw >= 1) && (jour(s).n < JOUR_N || (d.jl || 0) > 1) && Math.floor((d.ms || 0) / 60000) >= wheelMin(s); }
-const wheelAlmost = (s, d) => !xsState(s, d) && (d.jl || 0) >= 1 && !(d.jw >= 1) && !st_wheelToday(s, d);
+function st_wheelToday(s, d) { const X = xsState(s, d); if (X) return X.open;
+  const k = (d.jw || 0) + 1, jl = d.jl || 0;
+  return k <= wheelPerDay(s) && jl >= k && (jour(s).n < JOUR_N || jl > k) && Math.floor((d.ms || 0) / 60000) >= wheelMin(s) * k; }
+const wheelAlmost = (s, d) => !xsState(s, d) && (d.jw || 0) < wheelPerDay(s) && (d.jl || 0) > (d.jw || 0) && !st_wheelToday(s, d);
 function goalState(s) {
   if ((s.goal || {}).type === 'journey') {
     const d = day(s), J = jour(s), T = dailyTarget(s), todayN = d.jl || 0, mins = Math.floor((d.ms || 0) / 60000);
     const stops = [], reached = 0, owed = 0, minM = 0, maxM = dayMax(s);
-    const XS = xsState(s, d), spunToday = (d.jw || 0) >= 1 && !XS;
+    const XS = xsState(s, d), spunToday = (d.jw || 0) >= wheelPerDay(s) && !XS;
     const avail = st_wheelToday(s, d) ? 1 : 0, almost = wheelAlmost(s, d);
     const capped = J.n < JOUR_N && !!maxM && mins >= maxM;
     return { d, g: s.goal, mins, journey: true, J, stops, value: J.n, earned: reached, owed, avail, waiting: owed && !spunToday && !avail ? minM - mins : 0,
@@ -1862,7 +1865,10 @@ async function bootKid(id, mode) {
     const k = await (await api()).getKid(id);
     if (!k) { app.innerHTML = '<section class="stk pbox"><h2>הקישור לא נמצא</h2><ul class="pts"><li>ייתכן שההורה מחק אותו.</li><li>בקשו מההורה קישור חדש.</li></ul></section>'; return; }
     let local = null; try { local = JSON.parse(localStorage.getItem(KEY + ':' + id)); } catch (e) {}
-    const cp = k.progress || {}, progress = local && (local.updatedAt || 0) > (cp.updatedAt || 0) && (local.resetAt || 0) >= (cp.resetAt || 0) ? local : cp; // a parent's reset beats an older device copy
+    // a parent's reset beats this device's copy only if he hasn't practised on it since the reset (work done after it is never thrown away)
+    const cp = k.progress || {}, resetWins = local && (cp.resetAt || 0) > (local.resetAt || 0) && (cp.resetAt || 0) > (local.updatedAt || 0);
+    const progress = local && !resetWins && (local.updatedAt || 0) > (cp.updatedAt || 0) ? local : cp;
+    const BOOT_T = Date.now(); // only resets made from now on are applied live
     KID = { id, mode: MODES[mode] ? mode : 'all', name: k.name || '', photo: (k.profile || {}).photo || '', settings: Object.assign(defaultSettings(), k.settings || {}), progress };
     if (local === progress) cloudSoon();
     xsApply();
@@ -1872,7 +1878,7 @@ async function bootKid(id, mode) {
     let lastSet = JSON.stringify(k.settings || {}), lastProf = JSON.stringify([k.name, (k.profile || {}).photo]);
     (await api()).watchKid(id, d => {
       const cp = d.progress || {};
-      if ((cp.resetAt || 0) > (KID.progress.resetAt || 0) && (!PENDING_RESET || cp.resetAt > PENDING_RESET.resetAt)) {
+      if ((cp.resetAt || 0) > BOOT_T && (cp.resetAt || 0) > (KID.progress.resetAt || 0) && (!PENDING_RESET || cp.resetAt > PENDING_RESET.resetAt)) {
         PENDING_RESET = cp;
         const onHome = $('.hero', app) && !document.body.classList.contains('mapopen');
         if (cp.resetLive || onHome) go(home);
@@ -2121,6 +2127,9 @@ function settingsSheet(kidId, tab) {
           <label class="shfield">כמה דקות תרגול ביום לפני שהגלגל נפתח</label>
           <div class="seg" role="group" aria-label="דקות לגלגל">${segs('wm', String(wheelMin(st)), [['0', 'בלי'], ['10', '10 דק׳'], ['20', '20'], ['30', '30']])}</div>
           ${blt(['כשנראה שהמשימות לוקחות לו באמת 20 דקות, אפשר להוריד ל"בלי".'], 'hint')}
+          <label class="shfield">כמה זכיות בגלגל ביום</label>
+          <div class="seg" role="group" aria-label="זכיות ביום">${segs('wp', String(wheelPerDay(st)), [['1', '1'], ['2', '2'], ['3', '3']])}</div>
+          ${blt(['כל זכייה נוספת באותו יום: עוד אות שנפתחת, ועוד אותן דקות תרגול.'], 'hint')}
           <label class="shfield">עוד סיבוב היום</label>
           <div class="row" id="shxsrow"></div></div>
         <div class="shgrp"><h3>גלגל ההפתעות</h3>
@@ -2147,6 +2156,7 @@ function settingsSheet(kidId, tab) {
       bindSeg('sp', v => { st.goal.steps = +v; pdNote(); });
       bindSeg('mx', v => { st.goal.max = +v; pdNote(); });
       bindSeg('wm', v => { st.goal.wmn = +v; });
+      bindSeg('wp', v => { st.goal.wpd = +v; });
       const xsRow = () => { const R = $s('#shxsrow'); if (!R) return; const x = xsGrant(st);
         R.innerHTML = x ? `<b class="shdone">🎁 ניתן: עוד סיבוב אחרי ${x.m} דקות תרגול נוספות (היום בלבד)</b><button type="button" class="btn sm" id="shxs0">ביטול</button>`
           : `<button type="button" class="btn sm" id="shxs">🎁 לתת עוד סיבוב היום, אחרי 5 דקות תרגול</button>`;
@@ -3611,6 +3621,7 @@ function journeyCardHTML(G, st) {
     ? `<p class="jwait">${G.megaWait ? '👑' : '🎡'} ${G.megaWait ? 'המגה גלגל' : 'הגלגל'} מחכה לך! עוד <b>${G.waiting || G.megaWait} דקות</b> תרגול היום והוא נפתח.</p>`
     : st.wheel && G.bonusPend ? `<div class="jwait">🎁 מחכה לך עוד סיבוב בגלגל היום!<br>עוד קצת תרגול והוא נפתח.</div>`
     : st.wheel && G.spunToday && J.n < JOUR_N ? `<div class="jwait">🎡 כבר סובבת היום.<br>מחר מחכה גלגל חדש!</div>`
+    : st.wheel && G.d.jw >= 1 && !G.avail && !G.almost && !G.bonusPend && J.n < JOUR_N ? `<div class="jwait">🎡 היום אפשר לזכות שוב!<br>משלימים עוד שלב. ${wheelInfo(st)}</div>`
     : st.wheel && G.almost && J.n < JOUR_N ? `<div class="jwait">🎡 הגלגל של היום כמעט נפתח!<br>עוד קצת תרגול היום. ${wheelInfo(st)}</div>`
     : st.wheel && !G.avail && J.n < JOUR_N ? `<div class="jwait">🎡 כל יום יכול להיפתח גלגל הפתעות.<br>משלימים את הצעדים של היום. ${wheelInfo(st)}</div>` : '';
   const T = G.target, tn = Math.min(G.todayN, T || G.todayN), minPct = G.minM ? Math.min(100, Math.round(G.mins / G.minM * 100)) : 100;
