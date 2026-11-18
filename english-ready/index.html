@@ -728,6 +728,8 @@ body.mapopen{overflow:hidden}
 .mnode.cur{background:linear-gradient(#6FA3FF,#3D7BFF);box-shadow:0 6px 0 #2B57C8,0 0 0 8px rgba(77,141,255,.22);color:#fff;width:74px;height:74px;animation:mpulse 1.8s ease-in-out infinite}
 @keyframes mpulse{50%{box-shadow:0 6px 0 #2B57C8,0 0 0 14px rgba(77,141,255,.08)}}
 .mnode.lock b{opacity:.75}
+.mlock{position:absolute;bottom:-3px;left:-3px;width:22px;height:22px;border-radius:50%;background:#fff;color:#9C97AE;display:grid;place-items:center;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.mlock svg{width:13px;height:13px}
 .mchk{position:absolute;bottom:-4px;left:-4px;width:22px;height:22px;border-radius:50%;background:#2FB36B;color:#fff;font:700 13px/22px var(--f-body);box-shadow:0 2px 0 #1F8A4F}
 .mwb{position:absolute;top:-10px;right:-12px;width:32px;height:32px;border-radius:50%;background:#fff;padding:2px;box-shadow:0 2px 6px rgba(0,0,0,.2)}
 .mwb .mw{width:100%;height:100%;display:block}
@@ -1468,7 +1470,7 @@ function stepsHTML(have, need, fresh, L) {
 }
 function stepNoteHTML(s1) {
   const n = curSteps(s1), need = stageSteps(s1), L = (ALPHA[jour(s1).n] || 'z').toUpperCase();
-  return `<div class="jstep"><b>👣 עוד צעד במסע!</b>${stepsHTML(n, need, true, L)}<span>${need - n === 1 ? 'עוד צעד אחד' : `עוד ${need - n} צעדים`} ומקבלים את האות <b class="en">${L}</b></span></div>`;
+  return `<div class="jstep"><b>👣 עוד צעד במסע!</b>${stepsHTML(n, need, true, L)}<span>${need - n === 1 ? 'עוד צעד אחד' : `עוד ${need - n} צעדים`} ופותחים את האות <b class="en">${L}</b></span></div>`;
 }
 const dayMax = s => { const v = (s.goal || {}).max; return v == null ? 60 : +v; };      // after this many minutes, no more practice today (0 = no limit)
 const restNow = () => { const s = load(), m = dayMax(s); return !!m && Math.floor((day(s).ms || 0) / 60000) >= m; };
@@ -2279,7 +2281,7 @@ function progressView() {
     <section class="stk pbox">
       <h2>היום</h2>
       ${G.journey ? `<p class="bignum">🔤 ${G.J.n} <small>/ 26 אותיות</small> · 👣 ${G.csp} <small>/ ${G.steps} צעדים בשלב</small></p>
-      <p class="gleft">${G.todayN ? `היום קיבלת ${G.todayN === 1 ? 'אות אחת' : `${G.todayN} אותיות`} 🎉` : 'האות הראשונה של היום עוד מחכה לך'}</p>`
+      <p class="gleft">${G.todayN ? `היום פתחת ${G.todayN === 1 ? 'אות אחת' : `${G.todayN} אותיות`} 🔓` : 'האות הראשונה של היום עוד מחכה לך'}</p>`
       : `<p class="bignum">⭐ ${G.d.stars} <small>כוכבים</small></p>`}
       <h2>מפת האותיות שלי</h2>
       ${letterMapHTML(st, { click: true })}
@@ -3336,6 +3338,7 @@ function layoutGoalPath() {
   const w = $('#pwheel', app); if (w) w.onclick = () => go(wheelView);
 }
 
+const LOCK_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5" fill="currentColor"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
 function journeyMapHTML(G, st) {
   const J = G.J;
   const rows = ALPHA.map((c, k) => {
@@ -3344,8 +3347,8 @@ function journeyMapHTML(G, st) {
     const stop = false, ring = state === 'cur' ? Math.min(100, Math.round(G.csp / G.steps * 100)) : 0;
     return `<div class="mrow" style="--x:${x.toFixed(2)}">
       ${wd ? `<span class="mdeco ${x > 0 ? 'l' : 'r'}" aria-hidden="true"><span class="mdi">${wd.e}</span><small class="en">${wd.w}</small></span>` : ''}
-      <button type="button" class="mnode ${state}" ${state === 'cur' ? `style="--ring:${ring}%"` : ''} data-stage="${k}" aria-label="שלב ${k + 1}: האות ${U}${state === 'done' ? ', נאספה' : state === 'lock' ? ', נעולה' : ''}${stop ? ', עם גלגל' : ''}">
-        <b class="en">${U}<i>${c}</i></b>${stop ? `<span class="mwb ${k < J.n ? 'got' : ''}" aria-hidden="true">${miniWheel((st.prizes || []).length)}</span>` : ''}${state === 'done' ? '<span class="mchk" aria-hidden="true">✓</span>' : ''}
+      <button type="button" class="mnode ${state}" ${state === 'cur' ? `style="--ring:${ring}%"` : ''} data-stage="${k}" aria-label="שלב ${k + 1}: האות ${U}${state === 'done' ? ', פתוחה' : state === 'lock' ? ', נעולה' : ''}${stop ? ', עם גלגל' : ''}">
+        <b class="en">${U}<i>${c}</i></b>${stop ? `<span class="mwb ${k < J.n ? 'got' : ''}" aria-hidden="true">${miniWheel((st.prizes || []).length)}</span>` : ''}${state === 'done' ? '<span class="mchk" aria-hidden="true">✓</span>' : state === 'lock' ? `<span class="mlock" aria-hidden="true">${LOCK_SVG}</span>` : ''}
       </button>${state === 'cur' ? '<span class="mhere" aria-hidden="true">🚀</span>' : ''}</div>`;
   }).join('');
   const megaOpen = G.mega && !G.megaWait;
@@ -3364,10 +3367,10 @@ function journeyMapHTML(G, st) {
 function journeyCardHTML(G, st) {
   const J = G.J, nextL = ALPHA[J.n] ? ALPHA[J.n].toUpperCase() : '';
   let action;
-  if (G.mega && st.wheel && !G.megaWait) action = `<button class="btn spinbtn megabtn" id="megaspin">👑 אספת את כל 26 האותיות! למגה גלגל</button>`;
+  if (G.mega && st.wheel && !G.megaWait) action = `<button class="btn spinbtn megabtn" id="megaspin">👑 פתחת את כל 26 האותיות! למגה גלגל</button>`;
   else if (G.avail && st.wheel) action = `<button class="btn spinbtn" id="spin">🎡 האות הראשונה של היום! לסובב את הגלגל</button>`;
   else if (G.capped) action = `<div class="jrest">🌙 <b>להיום מספיק, כל הכבוד!</b><span>תרגלת ${G.maxM} דקות היום. המוח צריך גם מנוחה. נמשיך מחר.</span></div>`;
-  else if (J.n < JOUR_N && G.csp >= G.steps) action = `<button class="btn spinbtn" id="claim">🏁 הגעת לסוף השלב! לקבל את האות <span class="en">${nextL}</span></button>`;
+  else if (J.n < JOUR_N && G.csp >= G.steps) action = `<button class="btn spinbtn" id="claim">🔓 הגעת לסוף השלב! לפתוח את האות <span class="en">${nextL}</span></button>`;
   else if (J.n < JOUR_N) action = `<button class="btn stagebtn" id="stagego"><span class="stl">▶</span><span>להמשיך במסע · שלב ${J.n + 1}<small class="stmin">${stepsHTML(G.csp, G.steps, false, nextL)}</small></span><span aria-hidden="true">←</span></button>`;
   else if (!G.mega) action = `<div class="jdone"><b>🏆 סיימת את כל המסע! אתה מוכן למבחן.</b><button class="btn" id="jnew">להתחיל מסע חדש</button></div>`;
   else action = '';
@@ -3382,7 +3385,7 @@ function journeyCardHTML(G, st) {
 </div>`;
   return `<section class="goal stk h3 journey">
     <div class="goalhead"><span class="glabel">🔤 מסע 26 האותיות</span><span class="gbig" dir="ltr">${J.n} / ${JOUR_N}</span></div>
-    <p class="gsub">כל שלב במפה = <b>${G.steps} צעדים</b> 👣. כל סבב שמסיימים (במסע או בתרגול לפי נושא) = צעד. בסוף השלב מקבלים אות באנגלית. ${st.wheel ? 'השלב הראשון של כל יום פותח את <b>הגלגל</b>. ב־Z: <b>מגה גלגל</b>.' : ''}</p>
+    <p class="gsub">כל שלב במפה = <b>${G.steps} צעדים</b> 👣. כל סבב שמסיימים (במסע או בתרגול לפי נושא) = צעד. בסוף כל שלב <b>פותחים אות</b> 🔓. המטרה: לפתוח את כל 26 האותיות. ${st.wheel ? 'השלב הראשון של כל יום פותח את <b>הגלגל</b>. ב־Z: <b>מגה גלגל</b>.' : ''}</p>
     ${action}
     ${wait}
     ${mission}
@@ -3401,7 +3404,7 @@ function stagePop(el) {
     : state === 'lock'
     ? `<b>שלב ${k + 1} · האות <span class="en">${L}</span></b><span>🔒 עוד נעול. קודם מסיימים את שלב ${J.n + 1}.</span>`
     : `<b>שלב ${k + 1} · האות <span class="en">${L}${L.toLowerCase()}</span></b>
-       <span>${state === 'cur' ? `${stepsHTML(G_.csp, G_.steps, false)}<br>צעד ${G_.csp} מתוך ${G_.steps}. בסוף השלב מקבלים את האות <span class="en">${L}</span>` : `את האות <span class="en">${L}</span> קיבלת בשלב ${k + 1} ✓`}</span>
+       <span>${state === 'cur' ? `${stepsHTML(G_.csp, G_.steps, false)}<br>צעד ${G_.csp} מתוך ${G_.steps}. בסוף השלב פותחים את האות <span class="en">${L}</span> 🔓` : `את האות <span class="en">${L}</span> פתחת בשלב ${k + 1} ✓`}</span>
        ${state === 'cur' ? '<button class="btn primary" data-popgo>▶ להמשיך במסע</button>' : ''}`;
   card.appendChild(pop);
   const cb = card.getBoundingClientRect(), r = el.getBoundingClientRect();
@@ -3505,7 +3508,7 @@ function stageFinish(score, n) {
       <div class="score">${score}/${n}</div>
       <h2>${score / n >= 0.8 ? 'סבב מצוין! 💪' : score / n >= 0.5 ? 'יפה! ממשיכים 💪' : 'כל סבב מקדם אותך 💪'}</h2>
       <div class="jstep"><b>👣 צעד ${have} מתוך ${need}!</b>${stepsHTML(have, need, true, L)}
-        <span>${need - have === 1 ? 'עוד <b>צעד אחד</b>' : `עוד <b>${need - have}</b> צעדים`} ומקבלים את האות <b class="en">${L}</b></span></div>
+        <span>${need - have === 1 ? 'עוד <b>צעד אחד</b>' : `עוד <b>${need - have}</b> צעדים`} ופותחים את האות <b class="en">${L}</b></span></div>
       ${rest ? '<p>להיום מספיק. ממשיכים מחר, הצעדים נשמרים.</p>' : ''}
       <div class="row center">${rest ? '' : `<button class="btn primary" id="more">▶ עוד סבב</button>`}<button class="btn" data-back="home">לדף הבית</button></div>
     </section>`;
@@ -3516,7 +3519,7 @@ function journeyBanner(where) {
   const s = load(); if ((s.goal || {}).type !== 'journey' || !stopReached(s) || !where) return;
   const L = ALPHA[jour(s).n].toUpperCase();
   const b = document.createElement('div'); b.className = 'jbanner';
-  b.innerHTML = `<b>🏁 הגעת לסוף השלב!</b><button class="btn primary">לקבל את האות <span class="en">${L}</span></button>`;
+  b.innerHTML = `<b>🏁 הגעת לסוף השלב!</b><button class="btn primary">🔓 לפתוח את האות <span class="en">${L}</span></button>`;
   b.querySelector('button').onclick = () => claimLetter();
   where.prepend(b);
 }
@@ -3532,13 +3535,13 @@ function letterWon(k) {
   const st = load(), G = goalState(st), L = ALPHA[k].toUpperCase();
   const atStop = !!G.avail, atEnd = k + 1 === JOUR_N;
   sfx('win'); setTimeout(() => say(NAME[L]), 500);
-  app.innerHTML = `${top('קיבלת אות!')}
+  app.innerHTML = `${top('פתחת אות!')}
     <section class="result stk lwon">
       <p class="hint">🏁 סיימת את שלב ${k + 1}</p>
       <div class="stagebig en got pop">${L}${L.toLowerCase()}</div>
-      <h2>האות <span class="en">${L}</span> שלך! 🎉</h2>
+      <h2>🔓 פתחת את האות <span class="en">${L}</span>! 🎉</h2>
       ${k ? `<p class="lorder" dir="ltr"><span class="en">${ALPHA[k - 1].toUpperCase()}</span> → <b class="en">${L}</b>${atEnd ? '' : ` → <span class="en">${ALPHA[k + 1].toUpperCase()}</span>`}</p><p class="hint">אחרי <span class="en">${ALPHA[k - 1].toUpperCase()}</span> באה <span class="en">${L}</span></p>` : ''}
-      <p class="hint">${G.J.n}/${JOUR_N} אותיות במסע</p>
+      <p class="hint">${G.J.n}/${JOUR_N} אותיות פתוחות</p>
       <div class="row center">
         ${atEnd && st.wheel ? `<button class="btn spinbtn megabtn" id="megaspin">👑 למגה גלגל!</button>`
           : atStop && st.wheel ? `<button class="btn spinbtn" id="spin">🎡 הגלגל של היום נפתח! לסובב</button>`
