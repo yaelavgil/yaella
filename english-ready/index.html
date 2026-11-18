@@ -1606,18 +1606,28 @@ function dailyTarget(s) {
   const m = dayMax(s) || 60;
   return Math.min(leftAtStart, Math.max(1, Math.floor(m / (stageSteps(s) * STEP_MIN))));
 }
-function st_wheelToday(s, d) { return (d.jl || 0) >= 1 && !(d.jw >= 1) && (jour(s).n < JOUR_N || (d.jl || 0) > 1) && Math.floor((d.ms || 0) / 60000) >= wheelMin(s); }
-const wheelAlmost = (s, d) => (d.jl || 0) >= 1 && !(d.jw >= 1) && !st_wheelToday(s, d);
+const xsGrant = s => { const x = (s.goal || {}).xs; return x && x.d === today() ? x : null; };
+function xsState(s, d) { // null | {pend, open}
+  const x = xsGrant(s), b = d.xsb; if (!x || !b || b.at !== x.at) return null;
+  if ((d.jw || 0) > b.jw) return null; // used
+  const open = (d.ms || 0) - b.ms >= (x.m || 0) * 60000; return { pend: !open, open };
+}
+function xsApply() { // first time this device sees a grant: remember where he stands
+  if (!KID) return; const s = load(), x = xsGrant(s); if (!x) return; const d = day(s);
+  if (d.xsb && d.xsb.at === x.at) return; d.xsb = { at: x.at, ms: d.ms || 0, jw: d.jw || 0 }; save(s);
+}
+function st_wheelToday(s, d) { const X = xsState(s, d); if (X) return X.open; return (d.jl || 0) >= 1 && !(d.jw >= 1) && (jour(s).n < JOUR_N || (d.jl || 0) > 1) && Math.floor((d.ms || 0) / 60000) >= wheelMin(s); }
+const wheelAlmost = (s, d) => !xsState(s, d) && (d.jl || 0) >= 1 && !(d.jw >= 1) && !st_wheelToday(s, d);
 function goalState(s) {
   if ((s.goal || {}).type === 'journey') {
     const d = day(s), J = jour(s), T = dailyTarget(s), todayN = d.jl || 0, mins = Math.floor((d.ms || 0) / 60000);
     const stops = [], reached = 0, owed = 0, minM = 0, maxM = dayMax(s);
-    const spunToday = (d.jw || 0) >= 1;
+    const XS = xsState(s, d), spunToday = (d.jw || 0) >= 1 && !XS;
     const avail = st_wheelToday(s, d) ? 1 : 0, almost = wheelAlmost(s, d);
     const capped = J.n < JOUR_N && !!maxM && mins >= maxM;
     return { d, g: s.goal, mins, journey: true, J, stops, value: J.n, earned: reached, owed, avail, waiting: owed && !spunToday && !avail ? minM - mins : 0,
       mega: J.n >= JOUR_N && !J.mega, megaWait: 0,
-      target: T, todayN, capped, spunToday, almost, nextDay: 0, lmin: letterMin(s), cmin: curLetterMin(s), steps: stageSteps(s), csp: curSteps(s), minM, maxM, lesson: letterMin(s),
+      target: T, todayN, capped, spunToday, almost, bonusPend: !!(XS && XS.pend), nextDay: 0, lmin: letterMin(s), cmin: curLetterMin(s), steps: stageSteps(s), csp: curSteps(s), minM, maxM, lesson: letterMin(s),
       left: 1, unit: 'אות', pct: Math.min(100, (J.n / JOUR_N) * 100) };
   }
   const d = day(s), g = s.goal, mins = Math.floor(d.ms / 60000);
@@ -1846,6 +1856,7 @@ async function bootKid(id, mode) {
     const progress = local && (local.updatedAt || 0) > ((k.progress || {}).updatedAt || 0) ? local : (k.progress || {});
     KID = { id, mode: MODES[mode] ? mode : 'all', name: k.name || '', photo: (k.profile || {}).photo || '', settings: Object.assign(defaultSettings(), k.settings || {}), progress };
     if (local === progress) cloudSoon();
+    xsApply();
     home();
     // a parent's change in the settings reaches this screen at once (no refresh): settings, name and photo only,
     // the progress stays what this device has
@@ -1855,6 +1866,7 @@ async function bootKid(id, mode) {
       if (ns === lastSet && np === lastProf) return;
       lastSet = ns; lastProf = np;
       KID.settings = Object.assign(defaultSettings(), d.settings || {}); KID.name = d.name || ''; KID.photo = (d.profile || {}).photo || '';
+      xsApply();
       if ($('.hero', app) && !document.body.classList.contains('mapopen')) home(); // on the home screen: show it now; elsewhere: from the next screen on
     });
   } catch (e) {
@@ -2089,7 +2101,9 @@ function settingsSheet(kidId, tab) {
           <div class="hint" id="shpdnote"></div>
           <label class="shfield">כמה דקות תרגול ביום לפני שהגלגל נפתח</label>
           <div class="seg" role="group" aria-label="דקות לגלגל">${segs('wm', String(wheelMin(st)), [['0', 'בלי'], ['10', '10 דק׳'], ['20', '20'], ['30', '30']])}</div>
-          ${blt(['כשנראה שהמשימות לוקחות לו באמת 20 דקות, אפשר להוריד ל"בלי".'], 'hint')}</div>
+          ${blt(['כשנראה שהמשימות לוקחות לו באמת 20 דקות, אפשר להוריד ל"בלי".'], 'hint')}
+          <label class="shfield">עוד סיבוב היום</label>
+          <div class="row" id="shxsrow"></div></div>
         <div class="shgrp"><h3>גלגל ההפתעות</h3>
           <div class="seg" role="group" aria-label="גלגל ההפתעות">${segs('wh', st.wheel ? '1' : '0', [['1', 'פעיל'], ['0', 'כבוי: רק המסע']])}</div></div>
         <div id="shprz" class="shstack" ${st.wheel ? '' : 'hidden'}>
@@ -2114,6 +2128,12 @@ function settingsSheet(kidId, tab) {
       bindSeg('sp', v => { st.goal.steps = +v; pdNote(); });
       bindSeg('mx', v => { st.goal.max = +v; pdNote(); });
       bindSeg('wm', v => { st.goal.wmn = +v; });
+      const xsRow = () => { const R = $s('#shxsrow'); if (!R) return; const x = xsGrant(st);
+        R.innerHTML = x ? `<b class="shdone">🎁 ניתן: עוד סיבוב אחרי ${x.m} דקות תרגול נוספות (היום בלבד)</b><button type="button" class="btn sm" id="shxs0">ביטול</button>`
+          : `<button type="button" class="btn sm" id="shxs">🎁 לתת עוד סיבוב היום, אחרי 5 דקות תרגול</button>`;
+        if ($s('#shxs')) $s('#shxs').onclick = () => { st.goal.xs = { d: today(), at: Date.now(), m: 5 }; touch(); xsRow(); };
+        if ($s('#shxs0')) $s('#shxs0').onclick = () => { delete st.goal.xs; touch(); xsRow(); }; };
+      xsRow();
       bindSeg('wh', v => { st.wheel = v === '1'; $s('#shprz').hidden = !st.wheel; $s('#shtry').hidden = !st.wheel; });
       const PZW = pzWire($s('#shprz'), { lists: st, art: st.prizeArt, defaults: { prizes: DEFAULT_PRIZES, megaPrizes: DEFAULT_MEGA }, min: 2, touch: () => { pzDirty = true; touch(); } });
       PZW.render('prizes'); PZW.render('megaPrizes');
@@ -3570,6 +3590,7 @@ function journeyCardHTML(G, st) {
   else action = '';
   const wait = st.wheel && (G.waiting || G.megaWait)
     ? `<p class="jwait">${G.megaWait ? '👑' : '🎡'} ${G.megaWait ? 'המגה גלגל' : 'הגלגל'} מחכה לך! עוד <b>${G.waiting || G.megaWait} דקות</b> תרגול היום והוא נפתח.</p>`
+    : st.wheel && G.bonusPend ? `<div class="jwait">🎁 מחכה לך עוד סיבוב בגלגל היום!<br>עוד קצת תרגול והוא נפתח.</div>`
     : st.wheel && G.spunToday && J.n < JOUR_N ? `<div class="jwait">🎡 כבר סובבת היום.<br>מחר מחכה גלגל חדש!</div>`
     : st.wheel && G.almost && J.n < JOUR_N ? `<div class="jwait">🎡 הגלגל של היום כמעט נפתח!<br>עוד קצת תרגול היום. ${wheelInfo(st)}</div>`
     : st.wheel && !G.avail && J.n < JOUR_N ? `<div class="jwait">🎡 כל יום יכול להיפתח גלגל הפתעות.<br>משלימים את הצעדים של היום. ${wheelInfo(st)}</div>` : '';
