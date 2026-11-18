@@ -436,6 +436,8 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .strip button{flex:none;width:46px;height:46px;border-radius:11px;border:2px solid var(--line);background:var(--surface);color:var(--c);font:700 22px var(--f-en)}
 .strip button.on{background:var(--c);color:var(--on)}
 .dict{padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--t)}
+.wmodel{font:700 54px/1 var(--f-en);letter-spacing:10px;color:var(--ink)}
+.wround{margin:0 0 8px;font:700 16px var(--f-display);color:var(--muted)}
 .dict p{margin:0;font-size:18px}
 .cvwrap{position:relative;overflow:hidden;touch-action:none;height:260px}
 .cvwrap canvas{position:absolute;inset:0;touch-action:none}
@@ -680,6 +682,19 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .jpop.done .btn{color:#7A4F00}
 /* the illustrated letters map */
 .jmapwrap{position:relative;margin-top:12px;border-radius:20px;overflow:hidden;box-shadow:inset 0 0 0 1.5px var(--line)}
+.mapfullbtn{position:absolute;top:10px;inset-inline-start:10px;z-index:5;border:0;border-radius:999px;padding:8px 14px;font:700 15px var(--f-display);background:rgba(255,255,255,.92);color:#2B3A67;box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer}
+.mapbar,.mapgo{display:none}
+.jmapwrap.full{position:fixed;inset:0;z-index:80;margin:0;border-radius:0;display:flex;flex-direction:column;background:#DDF0FF}
+.jmapwrap.full .mapfullbtn{display:none}
+.jmapwrap.full .mapbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:calc(env(safe-area-inset-top) + 10px) 14px 10px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.08);z-index:6;font:700 18px var(--f-display)}
+.mapx{border:0;border-radius:999px;padding:12px 20px;min-height:48px;font:800 18px var(--f-display);background:#2B3A67;color:#fff;cursor:pointer}
+.jmapwrap.full .jmap{flex:1;max-height:none;padding-bottom:110px}
+.jmapwrap.full::before{top:64px}
+.jmapwrap.full::after{display:none}
+.jmapwrap.full .mapgo{display:block;position:absolute;left:0;right:0;bottom:0;z-index:6;padding:12px 16px calc(env(safe-area-inset-bottom) + 14px);background:linear-gradient(rgba(214,240,200,0),#D6F0C8 40%)}
+.mapgo .btn{width:100%;display:flex;flex-wrap:wrap;justify-content:center;gap:8px;font-size:18px}
+.mapgo .steps i{width:20px;height:20px;font-size:11px}
+body.mapopen{overflow:hidden}
 .jmapwrap::before,.jmapwrap::after{content:"";position:absolute;left:0;right:0;height:22px;z-index:3;pointer-events:none}
 .jmapwrap::before{top:0;background:linear-gradient(#DDF0FF,rgba(221,240,255,0))}
 .jmapwrap::after{bottom:0;background:linear-gradient(rgba(214,240,200,0),#D6F0C8)}
@@ -1512,6 +1527,7 @@ function countdown() {
 let cleanup = null;
 function go(fn, ...a) {
   if (cleanup) { cleanup(); cleanup = null; }
+  mapFullOff();
   practicing = ![home, wheelView, parentSettings, parentCloud].includes(fn); lastAct = 0; inStage = false;
   hush();
   fn(...a);
@@ -3327,7 +3343,12 @@ function journeyMapHTML(G, st) {
   const end = `<div class="mrow mend" style="--x:0">${st.wheel
     ? `<button type="button" class="mnode mega ${J.mega || megaOpen ? 'open' : 'lock'}" id="pmegaw" aria-label="מגה גלגל">${miniWheel((st.megaPrizes || []).length)}<span class="pcrown" aria-hidden="true">👑</span></button>`
     : `<span class="mnode mega" aria-hidden="true">🏆</span>`}<small class="mendt">${st.wheel ? 'מגה גלגל!' : 'סוף המסע'}</small></div>`;
-  return `<div class="jmapwrap"><div class="jmap" id="jmap" role="list" aria-label="מפת האותיות: ${J.n} מתוך ${JOUR_N}">
+  const nextL = ALPHA[J.n] ? ALPHA[J.n].toUpperCase() : '';
+  return `<div class="jmapwrap" id="jmapwrap">
+    <button type="button" class="mapfullbtn" id="mapfull" aria-label="לפתוח את המפה במסך מלא">⛶ מסך מלא</button>
+    <div class="mapbar"><b>🗺️ מסע 26 האותיות <span dir="ltr">${J.n}/${JOUR_N}</span></b><button type="button" class="mapx" id="mapx" aria-label="לסגור את המפה">✕ סגירה</button></div>
+    ${J.n < JOUR_N && !G.capped ? `<div class="mapgo"><button type="button" class="btn primary" id="mapgo">▶ להמשיך במסע · שלב ${J.n + 1} ${stepsHTML(G.csp, G.steps, false, nextL)}</button></div>` : ''}
+    <div class="jmap" id="jmap" role="list" aria-label="מפת האותיות: ${J.n} מתוך ${JOUR_N}">
     <svg class="jline" aria-hidden="true"><path class="jl-all"/><path class="jl-done"/></svg>
     <span class="msky s1" aria-hidden="true">☁️</span><span class="msky s2" aria-hidden="true">☁️</span><span class="msky s3" aria-hidden="true">🌈</span>
     <div class="mstart" aria-hidden="true">🏁 START</div>${rows}${end}</div></div>`;
@@ -3379,13 +3400,13 @@ function stagePop(el) {
   const x = Math.max(12, Math.min(cb.width - pop.offsetWidth - 12, r.left + r.width / 2 - cb.left - pop.offsetWidth / 2));
   pop.style.left = x + 'px'; pop.style.top = (r.bottom - cb.top + card.scrollTop + 10) + 'px';
   pop.style.setProperty('--ax', (r.left + r.width / 2 - cb.left - x) + 'px');
-  const g = pop.querySelector('[data-popgo]'); if (g) g.onclick = () => go(stageQuiz);
+  const g = pop.querySelector('[data-popgo]'); if (g) g.onclick = () => { if (mapClose) mapClose(); go(stageQuiz); };
   pop.onclick = e => e.stopPropagation();
   setTimeout(() => document.addEventListener('click', function off() { pop.remove(); document.removeEventListener('click', off); }), 0);
   if (g) g.focus();
 }
 function drawJourneyMap() {
-  const m = $('#jmap', app); if (!m) return;
+  const m = $('#jmap'); if (!m) return;
   const nodes = [...m.querySelectorAll('.mnode')];
   const mb = m.getBoundingClientRect();
   const pts = nodes.map(n => { const r = n.getBoundingClientRect(); return [r.left + r.width / 2 - mb.left, r.top + r.height / 2 - mb.top + m.scrollTop]; });
@@ -3396,13 +3417,35 @@ function drawJourneyMap() {
   const nd = m.querySelectorAll('.mnode.done').length;
   m.querySelector('.jl-done').setAttribute('d', nd ? curve(pts.slice(0, nd + 1)) : '');
 }
+// full-screen map (like Duolingo): ✕, Esc and the phone's Back button all close it
+let mapClose = null;
+function mapFullOff() { document.body.classList.remove('mapopen'); const w = document.querySelector('body > #jmapwrap'); if (w) w.remove(); } // leaving home while it is open
+window.addEventListener('popstate', () => { if (mapClose) mapClose(true); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && mapClose && document.body.classList.contains('mapopen')) mapClose(); });
 function wireJourney() {
   const m = $('#jmap', app);
+  const centreCur = () => { if (!m) return; const cur = m.querySelector('.mnode.cur') || m.querySelector('.mend');
+    requestAnimationFrame(() => { drawJourneyMap(); if (cur) { m.style.scrollBehavior = 'auto'; const r = cur.getBoundingClientRect(), mb = m.getBoundingClientRect(); m.scrollTop = Math.max(0, m.scrollTop + r.top - mb.top - m.clientHeight / 2 + r.height / 2); m.style.scrollBehavior = ''; } drawJourneyMap(); }); };
   if (m) {
     drawJourneyMap();
     try { new ResizeObserver(drawJourneyMap).observe(m); } catch (e) {}
-    const cur = m.querySelector('.mnode.cur') || m.querySelector('.mend');
-    if (cur) requestAnimationFrame(() => { m.style.scrollBehavior = 'auto'; const r = cur.getBoundingClientRect(), mb = m.getBoundingClientRect(); m.scrollTop = Math.max(0, m.scrollTop + r.top - mb.top - m.clientHeight / 2 + r.height / 2); m.style.scrollBehavior = ''; drawJourneyMap(); });
+    centreCur();
+  }
+  const fw = $('#jmapwrap', app), fb = $('#mapfull', app);
+  if (fw && fb) {
+    const home_ = document.createComment('map'), mx = $('#mapx', app), mg = $('#mapgo', app);
+    fb.onclick = () => { // lifted to the page itself, so nothing on the home screen can box it in
+      fw.replaceWith(home_); document.body.appendChild(fw); fw.classList.add('full'); document.body.classList.add('mapopen');
+      try { history.pushState({ mapfull: 1 }, ''); } catch (e) {} centreCur(); mx.focus(); };
+    mapClose = fromBack => {
+      if (!fw.classList.contains('full')) return;
+      const p = $('.jpop'); if (p) p.remove();
+      fw.classList.remove('full'); document.body.classList.remove('mapopen'); if (home_.parentNode) home_.replaceWith(fw); else fw.remove();
+      if (!fromBack && history.state && history.state.mapfull) { try { history.back(); } catch (e) {} }
+      centreCur(); fb.focus();
+    };
+    mx.onclick = () => mapClose();
+    if (mg) mg.onclick = () => { mapClose(); go(stageQuiz); };
   }
   const sg = $('#stagego'); if (sg) sg.onclick = () => go(stageQuiz);
   const cl = $('#claim'); if (cl) cl.onclick = () => claimLetter();
@@ -3426,6 +3469,13 @@ function stageQuiz() {
   if (J0.ck !== J0.n) { J0.ck = J0.n; J0.cms = 0; J0.cr = 0; J0.sp = 0; save(s0); }
   const round = J0.cr || 0;
   STAGE = { k: J0.n };
+  if (lvl !== 'easy' && round % 3 === 2) { // copy 2 letters + write 2 from dictation; letters he hasn't written right yet come first
+    const need = [], ok = [];
+    ALPHA.forEach((c, i) => { for (const cs of ['up', 'low']) (skRec(s0, c, cs === 'up' ? 'wu' : 'wl')[0] ? ok : need).push([i, cs]); });
+    const pool = shuffle(need).concat(shuffle(ok)).slice(0, 4);
+    WRITE_ROUND = { items: pool.map(([i, cs], k) => ({ m: k < 2 ? 'trace' : 'dict', i, cs })) };
+    writeView(); return;
+  }
   const base = build([qSound, qCase, qPic, qName, qSeq], 5);
   const t = round % 5;
   const block = t === 0 ? build(SETS.numbers[lvl], 4)
@@ -3778,12 +3828,17 @@ function fitInto(inkStrokes, tplStrokes) {
 }
 
 let WRITE_START = null; // {i, cs} when opened from a letter card
+let WRITE_ROUND = null;  // {items:[{m:'trace'|'dict', i, cs}], title} for a journey writing round
 function writeView() {
   let mode = 'trace', idx = WRITE_START ? WRITE_START.i : 0, cs = WRITE_START ? WRITE_START.cs : 'both';
   const STG = WRITE_START && WRITE_START.stage != null ? WRITE_START.stage : null;
   WRITE_START = null;
   if (STG == null && restNow()) { restView(); return; }
-  let ghost = true, dict = null, state = 'draw', won = false;
+  setLvl();
+  // medium / hard: no guide letter and no ruled lines, only a frame that shows where to write; checked by shape
+  const FREE = lvl !== 'easy';
+  const RND = WRITE_ROUND; WRITE_ROUND = null; // a writing round on the journey: a few letters, copy + dictation
+  let ghost = !FREE, dict = null, state = 'draw', won = false;
   app.innerHTML = `${top('כתיבת אותיות')}
     <div class="wctl"><div class="seg" role="group" aria-label="סוג תרגול"><button data-mode="trace" class="on">העתקה</button><button data-mode="dict">הכתבה</button></div></div>
     <div id="wtop"></div>
@@ -3845,8 +3900,17 @@ function writeView() {
     wrap.className = `cvwrap stk h${hueOf(curI())}`;
     const oy = geometry(), muted = css(document.body, '--muted'), col = css(wrap, '--c');
     const line = (y, w, dash, a) => { ctx.save(); ctx.globalAlpha = a; ctx.strokeStyle = muted; ctx.lineWidth = w; ctx.setLineDash(dash); ctx.beginPath(); ctx.moveTo(10, y); ctx.lineTo(W - 10, y); ctx.stroke(); ctx.restore(); };
-    line(oy, 1.5, [], 0.5); line(oy + U, 1.5, [8, 8], 0.5); line(oy + 2 * U, 2.5, [], 0.85); line(oy + 3 * U, 1.5, [], 0.35);
-    if (!ghost && !partial) return;
+    if (FREE) {
+      if (!ghost && !partial) { // just mark where to write
+        strokesPx.forEach(gl => { const b = centre(gl.flat()), mid = (b.x0 + b.x1) / 2, mids = strokesPx.map(q => { const c = centre(q.flat()); return (c.x0 + c.x1) / 2; }), gap = mids.length > 1 ? Math.abs(mids[1] - mids[0]) : W, hw = Math.min(gap / 2 - 7, W / 2 - 14, Math.max((b.x1 - b.x0) / 2 + U * 0.45, U * 1.15)), x0 = mid - hw, x1 = mid + hw, y0 = oy - U * 0.1, y1 = oy + 3.1 * U;
+          ctx.save(); ctx.fillStyle = col; ctx.globalAlpha = 0.07; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x0, y0, x1 - x0, y1 - y0, 18) : ctx.rect(x0, y0, x1 - x0, y1 - y0); ctx.fill();
+          ctx.globalAlpha = 0.55; ctx.strokeStyle = col; ctx.lineWidth = 3; ctx.setLineDash([10, 9]); ctx.stroke(); ctx.restore(); });
+        return;
+      }
+    } else {
+      line(oy, 1.5, [], 0.5); line(oy + U, 1.5, [8, 8], 0.5); line(oy + 2 * U, 2.5, [], 0.85); line(oy + 3 * U, 1.5, [], 0.35);
+      if (!ghost && !partial) return;
+    }
     ctx.save(); ctx.globalAlpha = 0.25; ctx.strokeStyle = col; ctx.lineWidth = U * 0.26; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
     strokesPx.flat().forEach(st => { path(ctx, st); ctx.stroke(); }); ctx.restore();
     if (partial) { // demo: draw strokes progressively
@@ -4015,9 +4079,11 @@ function writeView() {
     recW(chars(), chars().map(() => true));
     if (won) return;
     won = true; addStar(); markDone('write'); writeRun(); sfx('ok');
+    if (RND && !RND.miss) RND.score++;
     $('#wfb').innerHTML = `<div class="fb good"><div class="msg"><b><span class="en">${pick(PRAISE)}</span> ✅ כתבת נכון!</b>${tip ? `<span>${tip}</span>` : ''}</div><button class="btn primary" id="wnext">אות הבאה ←</button></div>`;
     $('#wnext').onclick = nextTrace;
-    { const s1 = load(), J1 = jour(s1); if ((s1.goal || {}).type === 'journey' && J1.n < JOUR_N) { J1.wl = (J1.wl || 0) + 1; if (J1.wl % 5 === 0 && addStep(s1) && !stopReached(s1)) $('#wfb').insertAdjacentHTML('afterbegin', stepNoteHTML(s1)); save(s1); } }
+    if (RND) { $('#wnext').innerHTML = RND.k + 1 < RND.items.length ? 'הבא ←' : 'סיום הסבב ←'; $('#wnext').onclick = rndNext; }
+    if (!RND) { const s1 = load(), J1 = jour(s1); if ((s1.goal || {}).type === 'journey' && J1.n < JOUR_N) { J1.wl = (J1.wl || 0) + 1; if (J1.wl % 5 === 0 && addStep(s1) && !stopReached(s1)) $('#wfb').insertAdjacentHTML('afterbegin', stepNoteHTML(s1)); save(s1); } }
     journeyBanner($('#wfb'));
     say(NAME[LETTERS[idx][0]]);
   }
@@ -4040,7 +4106,7 @@ function writeView() {
   ['pointerup', 'pointercancel'].forEach(t => d.addEventListener(t, () => {
     if (!drawing) return; drawing = false;
     if (eraser) { refreshUndo(); return; }
-    if (mode === 'trace') {
+    if (mode === 'trace' && !FREE) {
       const st = ink[ink.length - 1];
       if (!liveMatch(st)) { clearTimeout(idle); idle = setTimeout(() => check(true), 800); }
     }
@@ -4092,6 +4158,19 @@ function writeView() {
     });
   }
   function check(auto) {
+    if (mode === 'trace' && FREE) {
+      if (won || auto) return;
+      const letters = chars(), boxes = strokesPx.map(gl => centre(gl.flat())), groups = letters.map(() => []);
+      for (const st of ink) { const c = centre(st), cx = (c.x0 + c.x1) / 2; let b = 0; boxes.forEach((x, g) => { if (Math.abs((x.x0 + x.x1) / 2 - cx) < Math.abs((boxes[b].x0 + boxes[b].x1) / 2 - cx)) b = g; }); groups[b].push(st); }
+      const r = letters.map((ch, g) => recognise(groups[g], ch));
+      if (r.every(Boolean)) { success(''); return; }
+      sfx('no'); recW(letters, r); if (RND) RND.miss = true;
+      ghost = true; drawGuide();
+      const chips = letters.length > 1 ? `<span class="wfrow">${letters.map((l, i) => `<span class="wfl ${r[i] ? 'ok' : 'bad'}"><b>${l}</b>${r[i] ? '✓ נכונה' : '✗ עוד לא'}</span>`).join('')}</span>` : '';
+      $('#wfb').innerHTML = `<div class="fb bad"><div class="msg"><b>עוד לא.</b>${chips}<span>כך כותבים את האות, היא מופיעה עכשיו בלוח. אפשר לנסות שוב.</span></div><button class="btn" id="wagain">↻ לנסות שוב</button></div>`;
+      $('#wagain').onclick = () => { clear(); won = false; ghost = false; drawGuide(); };
+      return;
+    }
     if (mode === 'trace') {
       if (won) return;
       const r = judgeLetters(), letters = chars();
@@ -4118,11 +4197,24 @@ function writeView() {
     const ok = recognise(ink, chars()[0]);
     recordLetter(chars()[0], chars()[0] === chars()[0].toUpperCase() ? 'wu' : 'wl', ok);
     if (ok) { addStar(); markDone('write'); writeRun(); }
+    if (RND && !RND.tried) { RND.tried = true; if (ok) RND.score++; }
     sfx(ok ? 'ok' : 'no');
     $('#wfb').innerHTML = ok
       ? `<div class="fb good"><div class="msg"><b><span class="en">${pick(PRAISE)}</span> ✅ נכון!</b> השווה לאות שעל המסך.</div></div>`
       : `<div class="fb bad"><div class="msg"><b>עוד לא.</b> כך כותבים את האות. אפשר לנסות שוב.</div></div>`;
     renderButtons(ok);
+  }
+  function rndLoad() {
+    const it = RND.items[RND.k]; RND.miss = false; RND.tried = false;
+    mode = it.m; won = false; eraser = false; d.classList.remove('erase');
+    if (mode === 'trace') { idx = it.i; cs = it.cs; ghost = !FREE; } else { dict = { i: it.i, cs: it.cs }; ghost = false; }
+    state = 'draw'; clear(); render(); size();
+    if (mode === 'dict') say(NAME[LETTERS[dict.i][0]]);
+  }
+  function rndNext() {
+    RND.k++;
+    if (RND.k >= RND.items.length) { go(stageFinish, RND.score, RND.items.length); return; }
+    rndLoad();
   }
   function nextTrace() {
     const s = load(), need = i => !skRec(s, ALPHA[i], 'wu')[0] || !skRec(s, ALPHA[i], 'wl')[0];
@@ -4150,6 +4242,8 @@ function writeView() {
       $('#demo').onclick = demo;
       $('#chk').onclick = () => check(false);
       $('#nxt').onclick = nextTrace;
+      if (FREE) $('#gh').remove();
+      if (RND) { $('#nxt').innerHTML = 'דלג ←'; $('#nxt').onclick = rndNext; }
       if (STG != null) { $('#nxt').innerHTML = `סיימתי ←`; $('#nxt').onclick = () => claimLetter(STG); }
     } else if (state === 'draw') {
       wb.innerHTML = `<button class="btn" id="und">↶ אחורה</button><button class="btn" id="clr">🧽 נקה</button><button class="btn primary" id="chk">✓ בדוק אותי</button>`;
@@ -4159,6 +4253,7 @@ function writeView() {
       $('#retry').onclick = () => { state = 'draw'; ghost = false; clear(); drawGuide(); renderButtons(); };
       $('#demo').onclick = demo;
       $('#nx').onclick = () => { newDict(); clear(); render(); say(NAME[LETTERS[dict.i][0]]); };
+      if (RND) { $('#nx').innerHTML = RND.k + 1 < RND.items.length ? 'הבא ←' : 'סיום הסבב ←'; $('#nx').onclick = rndNext; }
     }
     const c = $('#clr'); if (c) c.onclick = () => { clear(); won = false; };
     const u = $('#und'); if (u) { u.onclick = () => { undo(); won = false; }; u.disabled = !hist.length; }
@@ -4166,7 +4261,20 @@ function writeView() {
   function render() {
     $$('.seg [data-mode]', app).forEach(b => b.classList.toggle('on', b.dataset.mode === mode));
     const wt = $('#wtop');
-    if (mode === 'trace' && STG != null) {
+    const rhead = RND ? `<p class="wround">✏️ סבב כתיבה · ${RND.k + 1}/${RND.items.length}</p>` : '';
+    if (mode === 'trace' && (FREE || RND)) {
+      const L = chars();
+      wt.innerHTML = `${rhead}<div class="dict stk h${hueOf(idx)} wcopy"><p>${FREE ? 'כתוב את האות בתוך המסגרת' : 'כתוב את האות לפי המספרים והחצים'}</p>
+          <span class="wmodel en" dir="ltr">${L.join(' ')}</span>
+          <div class="sayrow"><button class="btn sm" data-say="${NAME[LETTERS[idx][0]]}">🔊 שם האות</button></div></div>
+        ${FREE ? '<p class="hint">לא צריך לדייק בקווים: כותבים את הצורה של האות, בגודל שנוח לך.</p>' : ''}`;
+      if (!RND) wt.insertAdjacentHTML('afterbegin', `<div class="strip" id="strip">${LETTERS.map((L_, i) => `<button class="h${hueOf(i)}${i === idx ? ' on' : ''}" data-i="${i}" aria-label="${L_[0]}">${L_[0]}</button>`).join('')}</div>
+        <div class="wctl"><div class="seg" role="group" aria-label="גודל אות">
+          <button data-cs="up" class="${cs === 'up' ? 'on' : ''}">גדולה</button><button data-cs="low" class="${cs === 'low' ? 'on' : ''}">קטנה</button><button data-cs="both" class="${cs === 'both' ? 'on' : ''}">שתיהן</button></div></div>`);
+      $$('#strip button').forEach(b => b.onclick = () => { idx = +b.dataset.i; won = false; clear(); render(); });
+      $$('[data-cs]', wt).forEach(b => b.onclick = () => { cs = b.dataset.cs; won = false; clear(); render(); });
+      const on = $('#strip .on'); if (on) on.scrollIntoView({ block: 'nearest', inline: 'center' });
+    } else if (mode === 'trace' && STG != null) {
       const U_ = LETTERS[idx][0];
       wt.innerHTML = `<div class="dict stk h${hueOf(idx)}"><p>שלב ${STG + 1}: כתוב את האות <span class="en">${U_}</span>, גדולה וקטנה</p>
           <div class="sayrow"><button class="btn sm" data-say="${NAME[U_]}">🔊 שם האות</button></div></div>
@@ -4182,7 +4290,7 @@ function writeView() {
       const on = $('#strip .on'); if (on) on.scrollIntoView({ block: 'nearest', inline: 'center' });
     } else {
       const U_ = LETTERS[dict.i][0], up = dict.cs === 'up';
-      wt.innerHTML = `<div class="dict stk h${hueOf(dict.i)}">
+      wt.innerHTML = `${rhead}<div class="dict stk h${hueOf(dict.i)}">
           <p>שמע את שם האות וכתוב אותה בתור</p>
           <span class="casebadge ${up ? 'up' : 'low'}">${up ? 'אות גדולה' : 'אות קטנה'} <span class="en">${up ? 'ABC' : 'abc'}</span></span>
           <div class="sayrow"><button class="btn sm" data-say="${NAME[U_]}">🔊 שמע שוב</button><button class="btn sm" data-say="${NAME[U_]}" data-slow="1">🐢 לאט</button></div>
@@ -4195,14 +4303,14 @@ function writeView() {
     if (b.dataset.mode === mode) return;
     mode = b.dataset.mode; won = false; clear();
     if (mode === 'dict') { newDict(); render(); say(NAME[LETTERS[dict.i][0]]); }
-    else { ghost = true; state = 'draw'; render(); }
+    else { ghost = !FREE; state = 'draw'; render(); }
   });
   let lastW = -1;
   const ro = new ResizeObserver(() => { if (wrap.clientWidth !== lastW) { lastW = wrap.clientWidth; size(); } });
   ro.observe(wrap);
   cleanup = () => { ro.disconnect(); cancelAnimationFrame(anim); clearTimeout(idle); };
-  if (STG != null) { const sg = $('.wctl', app); if (sg) sg.hidden = true; }
-  render(); size();
+  if (STG != null || RND) { const sg = $('.wctl', app); if (sg) sg.hidden = true; }
+  if (RND) { RND.k = 0; RND.score = 0; rndLoad(); } else { render(); size(); }
   if (document.fonts) document.fonts.ready.then(() => drawGuide());
 }
 
