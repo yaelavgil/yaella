@@ -2072,7 +2072,7 @@ function settingsSheet(kidId, tab) {
       B.innerHTML = `
         <div class="shgrp"><h3>${esc(kid.name)}</h3>
           <div class="kphoto">
-            <button type="button" class="kph" id="shphoto" aria-label="תמונה של הילד">${prof.photo ? `<img src="${prof.photo}" alt="">` : '<span aria-hidden="true">📷</span>'}</button>
+            <button type="button" class="kph" id="shphoto" aria-label="${prof.photo ? 'עריכת מיקום וזום של התמונה' : 'הוספת תמונה של הילד'}" title="${prof.photo ? 'לחצו כדי להזיז ולהגדיל' : ''}">${prof.photo ? `<img src="${prof.photo}" alt="">` : '<span aria-hidden="true">📷</span>'}</button>
             <div class="kphtx">
               <label class="shfield">שם <input id="shname" class="pin" maxlength="20" value="${esc(name)}" aria-label="שם הילד"></label>
               <div class="row"><button type="button" class="btn sm" id="shphotob">${prof.photo ? 'החלפת תמונה' : 'הוספת תמונה'}</button>${prof.photo ? '<button type="button" class="btn sm" id="shphotoe">🔍 מיקום וזום</button><button type="button" class="btn sm" id="shphotor">הסרה</button>' : ''}</div>
@@ -2100,9 +2100,10 @@ function settingsSheet(kidId, tab) {
       bindSeg('kl', v => { prof.lvl = v; });
       const pf = document.createElement('input'); pf.type = 'file'; pf.accept = 'image/*,.heic,.heif,.avif,.webp'; pf.hidden = true; B.appendChild(pf);
       const pick = () => { pf.value = ''; pf.click(); };
-      $s('#shphoto').onclick = pick; $s('#shphotob').onclick = pick;
+      const editPhoto = async () => { const u = await cropCircle(prof.photo); if (u) { prof.photo = u; touch(); body(); } };
+      $s('#shphoto').onclick = () => prof.photo ? editPhoto() : pick(); $s('#shphotob').onclick = pick;
       if ($s('#shphotor')) $s('#shphotor').onclick = () => { delete prof.photo; touch(); body(); };
-      if ($s('#shphotoe')) $s('#shphotoe').onclick = async () => { const u = await cropCircle(prof.photo); if (u) { prof.photo = u; touch(); body(); } };
+      if ($s('#shphotoe')) $s('#shphotoe').onclick = editPhoto;
       pf.onchange = async () => {
         const f = pf.files && pf.files[0]; if (!f) return;
         $s('#shphnote').textContent = 'מעבד את התמונה…';
