@@ -889,6 +889,14 @@ html.noscroll{overflow:hidden}
 .kphoto{display:flex;gap:14px;align-items:center}
 .kph{flex:none;width:84px;height:84px;border-radius:50%;border:2px dashed var(--line);background:var(--bg);overflow:hidden;font-size:30px;cursor:pointer;display:grid;place-items:center;padding:0}
 .kph img{width:100%;height:100%;object-fit:cover}
+.crov{position:fixed;inset:0;z-index:95;background:rgba(26,20,40,.55);display:grid;place-items:center;padding:16px}
+.crbox{width:min(380px,100%);background:var(--bg);border-radius:22px;padding:16px 18px;display:grid;gap:10px;box-shadow:0 24px 70px rgba(20,10,40,.35)}
+.crbox h3{margin:0;text-align:center}
+.crview{width:min(280px,72vw);aspect-ratio:1;margin:4px auto;border-radius:50%;overflow:hidden;box-shadow:0 0 0 4px #fff,0 6px 20px rgba(0,0,0,.2);background:#fff}
+.crview canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.crview canvas:active{cursor:grabbing}
+.crzoom{display:flex;align-items:center;gap:8px;justify-content:center}
+.crzoom input{flex:1;max-width:240px}
 .kphtx{display:grid;gap:8px;min-width:0;flex:1}
 .kin{font:500 16px var(--f-body);width:100%;min-height:40px;padding:6px 10px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);resize:vertical}
 .kgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -2067,7 +2075,7 @@ function settingsSheet(kidId, tab) {
             <button type="button" class="kph" id="shphoto" aria-label="תמונה של הילד">${prof.photo ? `<img src="${prof.photo}" alt="">` : '<span aria-hidden="true">📷</span>'}</button>
             <div class="kphtx">
               <label class="shfield">שם <input id="shname" class="pin" maxlength="20" value="${esc(name)}" aria-label="שם הילד"></label>
-              <div class="row"><button type="button" class="btn sm" id="shphotob">${prof.photo ? 'החלפת תמונה' : 'הוספת תמונה'}</button>${prof.photo ? '<button type="button" class="btn sm" id="shphotor">הסרה</button>' : ''}</div>
+              <div class="row"><button type="button" class="btn sm" id="shphotob">${prof.photo ? 'החלפת תמונה' : 'הוספת תמונה'}</button>${prof.photo ? '<button type="button" class="btn sm" id="shphotoe">🔍 מיקום וזום</button><button type="button" class="btn sm" id="shphotor">הסרה</button>' : ''}</div>
               <small class="hint" id="shphnote">התמונה מופיעה בברכה שלו ובכרטיס הזכייה.<br>אפשר מכל מכשיר (גם HEIC מהאייפון).</small>
             </div>
           </div></div>
@@ -2094,10 +2102,14 @@ function settingsSheet(kidId, tab) {
       const pick = () => { pf.value = ''; pf.click(); };
       $s('#shphoto').onclick = pick; $s('#shphotob').onclick = pick;
       if ($s('#shphotor')) $s('#shphotor').onclick = () => { delete prof.photo; touch(); body(); };
+      if ($s('#shphotoe')) $s('#shphotoe').onclick = async () => { const u = await cropCircle(prof.photo); if (u) { prof.photo = u; touch(); body(); } };
       pf.onchange = async () => {
         const f = pf.files && pf.files[0]; if (!f) return;
         $s('#shphnote').textContent = 'מעבד את התמונה…';
-        try { prof.photo = await fileToDataURL(f, 256, 22000); touch(); body(); }
+        try {
+          const big = await fileToDataURL(f, 1100, 600000); $s('#shphnote').innerHTML = '';
+          const u = await cropCircle(big); if (u) { prof.photo = u; touch(); } body();
+        }
         catch (err) { $s('#shphnote').textContent = 'לא הצלחנו לקרוא את הקובץ. נסו תמונה אחרת.'; }
       };
       $s('#shdel').onclick = () => {
@@ -2420,6 +2432,51 @@ async function decodeImg(file) {
     return await tryDecode(out);
   }
   throw new Error('decode');
+}
+// place a photo in the round frame: drag to move, slider / pinch / mouse wheel to zoom. -> small JPEG, or null
+function cropCircle(src) {
+  return new Promise(async res => {
+    const img = new Image(); img.src = src; try { await img.decode(); } catch (e) {}
+    if (!img.width) { res(null); return; }
+    const ov = document.createElement('div'); ov.className = 'crov';
+    ov.innerHTML = `<div class="crbox" role="dialog" aria-label="מיקום התמונה בעיגול"><h3>מיקום התמונה</h3>
+      <div class="crview"><canvas width="560" height="560" aria-label="התמונה. גוררים כדי להזיז"></canvas></div>
+      <label class="crzoom"><span aria-hidden="true">➖</span><input type="range" min="1" max="4" step="0.01" value="1" aria-label="זום"><span aria-hidden="true">➕</span></label>
+      ${blt(['גוררים את התמונה כדי להזיז אותה.', 'הפס מגדיל ומקטין (בטלפון: גם בשתי אצבעות).'], 'hint')}
+      <div class="row center"><button type="button" class="btn primary" data-ok>שמירה</button><button type="button" class="btn" data-no>ביטול</button></div></div>`;
+    document.body.appendChild(ov);
+    const cv = ov.querySelector('canvas'), cx = cv.getContext('2d'), S = 560, rng = ov.querySelector('input');
+    const base = S / Math.min(img.width, img.height); let z = 1, ox = 0, oy = 0;
+    const draw = () => {
+      const w = img.width * base * z, h = img.height * base * z, mx = (w - S) / 2, my = (h - S) / 2;
+      ox = Math.max(-mx, Math.min(mx, ox)); oy = Math.max(-my, Math.min(my, oy));
+      cx.fillStyle = '#fff'; cx.fillRect(0, 0, S, S); cx.drawImage(img, S / 2 + ox - w / 2, S / 2 + oy - h / 2, w, h);
+    };
+    draw();
+    const ptrs = new Map(); let pinch0 = 0, z0 = 1;
+    const two = () => { const [a, b] = [...ptrs.values()]; return Math.hypot(a[0] - b[0], a[1] - b[1]); };
+    cv.onpointerdown = e => { e.preventDefault(); try { cv.setPointerCapture(e.pointerId); } catch (_) {} ptrs.set(e.pointerId, [e.clientX, e.clientY]); if (ptrs.size === 2) { pinch0 = two(); z0 = z; } };
+    cv.onpointermove = e => {
+      if (!ptrs.has(e.pointerId)) return;
+      const p0 = ptrs.get(e.pointerId), k = S / cv.getBoundingClientRect().width;
+      ptrs.set(e.pointerId, [e.clientX, e.clientY]);
+      if (ptrs.size === 1) { ox += (e.clientX - p0[0]) * k; oy += (e.clientY - p0[1]) * k; }
+      else if (ptrs.size === 2 && pinch0) { z = Math.max(1, Math.min(4, z0 * two() / pinch0)); rng.value = z; }
+      draw();
+    };
+    cv.onpointerup = cv.onpointercancel = e => { ptrs.delete(e.pointerId); };
+    cv.addEventListener('wheel', e => { e.preventDefault(); z = Math.max(1, Math.min(4, z * (e.deltaY < 0 ? 1.08 : 1 / 1.08))); rng.value = z; draw(); }, { passive: false });
+    rng.oninput = () => { z = +rng.value; draw(); };
+    const end = v => { document.removeEventListener('keydown', key); ov.remove(); res(v); };
+    const key = e => { if (e.key === 'Escape') end(null); };
+    document.addEventListener('keydown', key);
+    ov.querySelector('[data-no]').onclick = () => end(null);
+    ov.querySelector('[data-ok]').onclick = () => {
+      const o = document.createElement('canvas'); o.width = o.height = 256; o.getContext('2d').drawImage(cv, 0, 0, 256, 256);
+      let q = .86, u = o.toDataURL('image/jpeg', q); while (u.length > 22000 && q > .5) { q -= .07; u = o.toDataURL('image/jpeg', q); }
+      end(u);
+    };
+  });
 }
 async function fileToDataURL(file, side, cap) {
   const bm = await decodeImg(file), w0 = bm.width || bm.naturalWidth, h0 = bm.height || bm.naturalHeight;
