@@ -394,6 +394,11 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .ss{cursor:pointer;border-radius:6px;padding:0 2px}
 .ss:hover{background:var(--t3)}
 .hint{font-size:14px;color:var(--muted);margin:6px 0 0}
+.pts{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:5px;text-align:start}
+.pts li{position:relative;padding-inline-start:18px;line-height:1.45}
+.pts li::before{content:"";position:absolute;inset-inline-start:3px;top:.6em;width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.4}
+.pts.hint{font-size:14px}
+.jrest .pts,.giftbox .pts,.fb .pts{margin-top:4px}
 
 /* results */
 .result{padding:26px 18px;text-align:center;display:grid;gap:12px;justify-items:center}
@@ -735,6 +740,10 @@ body.mapopen{overflow:hidden}
 .mwb .mw{width:100%;height:100%;display:block}
 .mwb:not(.got) .mw{filter:saturate(.45)}
 .mwb.got{box-shadow:0 0 0 3px #FFD23F,0 2px 8px rgba(255,180,0,.6)}
+.mrow.mcur{height:104px;align-items:flex-start;padding-top:10px}
+.msteps{position:absolute;top:80px;left:50%;transform:translateX(-50%);display:flex;gap:3px;direction:ltr;padding:3px 6px;border-radius:999px;background:rgba(255,255,255,.92);box-shadow:0 1px 4px rgba(0,0,0,.12);z-index:2}
+.msteps i{width:14px;height:14px;border-radius:50%;background:#E6E3EE;display:grid;place-items:center;font-style:normal;font-size:9px}
+.msteps i.on{background:#FFD45C}
 .mhere{position:absolute;top:-6px;left:calc(50% + 34px);font-size:22px;animation:pbob 1.6s ease-in-out infinite}
 .mhere .ji{height:24px}
 .mdeco{position:absolute;top:50%;transform:translateY(-50%);display:grid;justify-items:center;gap:0;pointer-events:none;opacity:.95}
@@ -751,6 +760,11 @@ body.mapopen{overflow:hidden}
 .mtime{display:flex;align-items:center;gap:6px;font-size:14px}
 .mbar{display:inline-block;width:64px;height:8px;border-radius:99px;background:var(--line);overflow:hidden}
 .mbar i{display:block;height:100%;background:#2FB36B;border-radius:inherit}
+details.info{display:inline-block;vertical-align:middle}
+details.info summary{list-style:none;display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;border:1.5px solid currentColor;font:700 12px/1 Georgia,serif;font-style:italic;cursor:pointer;opacity:.75}
+details.info summary::-webkit-details-marker{display:none}
+details.info[open]{display:block}
+details.info .pts{background:#fff;border-radius:12px;padding:8px 10px;margin-top:6px;color:#5A4300;font-size:14px}
 .jwait{margin:8px 0 0;padding:8px 12px;border-radius:12px;background:#FFF4CC;color:#7A5200;font-size:15px}
 .jrest{display:grid;gap:2px;justify-items:center;text-align:center;margin-top:6px;padding:12px;border-radius:16px;background:#EEF0FF;color:#3B3F8C}
 .jpop.rest{background:#5B5FC7}.jpop.rest::before{border-bottom-color:#5B5FC7}
@@ -1447,13 +1461,24 @@ function letterMapHTML(s, opts = {}) {
    wheel stop; after Z the mega wheel. The daily mission spreads what is left over the days until
    the test (23.11), so each day is about 20-30 minutes (a stage is about 6 minutes). */
 const JOUR_N = 26;
+// every explanation is a short list: one idea per line
+const blt = (items, cls = '') => `<ul class="pts${cls ? ' ' + cls : ''}">${items.filter(Boolean).map(x => `<li>${x}</li>`).join('')}</ul>`;
+const lines = (...a) => a.filter(Boolean).join('<br>');
 const jour = s => {
   const J = (s.jour = s.jour || { n: 0, spins: 0, mega: false, round: 1 });
   if (J.sv !== 2) { J.sv = 2; if (J.ck === J.n) J.sp = Math.min(5, Math.max(J.cr || 0, Math.floor((J.cms || 0) / 300000))); } // minutes → steps, once
   return J;
 };
 const jEvery = s => Math.max(3, Math.min(8, +((s.goal || {}).every) || 4));
-const wheelMin = () => 0; // (retired) the wheel now opens with the day's first letter
+const wheelMin = s => { const v = (s.goal || {}).wmn; return v == null ? 20 : +v; }; // minutes of practice that day before the wheel opens (0 = none)
+const wheelInfo = s => `<details class="info"><summary aria-label="איך נפתח הגלגל?">i</summary>${blt(['גלגל ההפתעות נפתח פעם אחת ביום.', 'צריך להשלים את הצעדים של היום (לפתוח אות).', wheelMin(s) ? `וגם לתרגל באותו יום לפחות ${wheelMin(s)} דקות.` : ''])}</details>`;
+function wheelBanner(where) { // the wheel just opened: offer it right where he is
+  const s = load(), G = goalState(s); if (!where || !G.avail || s.wheel === false || $('#spinnow')) return;
+  const b = document.createElement('div'); b.className = 'jbanner';
+  b.innerHTML = '<b>🎡 גלגל ההפתעות של היום נפתח!</b><button class="btn spinbtn" id="spinnow">לסובב עכשיו</button>';
+  b.querySelector('button').onclick = () => go(wheelView);
+  where.prepend(b);
+}
 const letterMin = s => { const v = (s.goal || {}).lmin; return v == null ? 30 : Math.max(5, +v); }; // minutes of practice that earn a letter
 const curLetterMin = s => { const J = jour(s); return J.ck === J.n ? Math.floor((J.cms || 0) / 60000) : 0; };
 const STEP_MIN = 5; // a round takes about 5 minutes
@@ -1479,7 +1504,7 @@ function restView() {
   app.innerHTML = `${top('להיום מספיק')}
     <section class="result stk"><div class="stagebig" aria-hidden="true">🌙</div>
       <h2>תרגלת היום ${m >= 60 && m % 60 === 0 ? (m === 60 ? 'שעה שלמה' : `${m / 60} שעות`) : `${m} דקות`}. כל הכבוד!</h2>
-      <p>המוח צריך גם מנוחה כדי לזכור. נמשיך מחר.</p>
+      ${blt(['המוח צריך מנוחה כדי לזכור.', 'נמשיך מחר!'])}
       <div class="row center"><button class="btn primary" data-back="home">לדף הבית</button></div></section>`;
 }
 function avgLesson(s) { const l = (jour(s).lm || []).filter(x => x > 0); return l.length ? Math.round(l.reduce((a, b) => a + b, 0) / l.length) : 6; }
@@ -1491,17 +1516,18 @@ function dailyTarget(s) {
   const m = dayMax(s) || 60;
   return Math.min(leftAtStart, Math.max(1, Math.floor(m / (stageSteps(s) * STEP_MIN))));
 }
-function st_wheelToday(s, d) { return (d.jl || 0) >= 1 && !(d.jw >= 1) && (jour(s).n < JOUR_N || (d.jl || 0) > 1); }
+function st_wheelToday(s, d) { return (d.jl || 0) >= 1 && !(d.jw >= 1) && (jour(s).n < JOUR_N || (d.jl || 0) > 1) && Math.floor((d.ms || 0) / 60000) >= wheelMin(s); }
+const wheelAlmost = (s, d) => (d.jl || 0) >= 1 && !(d.jw >= 1) && !st_wheelToday(s, d);
 function goalState(s) {
   if ((s.goal || {}).type === 'journey') {
     const d = day(s), J = jour(s), T = dailyTarget(s), todayN = d.jl || 0, mins = Math.floor((d.ms || 0) / 60000);
     const stops = [], reached = 0, owed = 0, minM = 0, maxM = dayMax(s);
     const spunToday = (d.jw || 0) >= 1;
-    const avail = st_wheelToday(s, d) ? 1 : 0;
+    const avail = st_wheelToday(s, d) ? 1 : 0, almost = wheelAlmost(s, d);
     const capped = J.n < JOUR_N && !!maxM && mins >= maxM;
     return { d, g: s.goal, mins, journey: true, J, stops, value: J.n, earned: reached, owed, avail, waiting: owed && !spunToday && !avail ? minM - mins : 0,
       mega: J.n >= JOUR_N && !J.mega, megaWait: 0,
-      target: T, todayN, capped, spunToday, nextDay: 0, lmin: letterMin(s), cmin: curLetterMin(s), steps: stageSteps(s), csp: curSteps(s), minM, maxM, lesson: letterMin(s),
+      target: T, todayN, capped, spunToday, almost, nextDay: 0, lmin: letterMin(s), cmin: curLetterMin(s), steps: stageSteps(s), csp: curSteps(s), minM, maxM, lesson: letterMin(s),
       left: 1, unit: 'אות', pct: Math.min(100, (J.n / JOUR_N) * 100) };
   }
   const d = day(s), g = s.goal, mins = Math.floor(d.ms / 60000);
@@ -1572,14 +1598,14 @@ function home() {
   const weak = m ? Object.keys(SECS).filter(k => m.secs[k] && m.secs[k][0] < m.secs[k][1]) : [];
   const mockLine = m
     ? `<p class="last">המבחן האחרון (${m.date.split('-').slice(1).reverse().join('.')}): <b>${m.score}/${m.n}</b>${weak.length ? ` · כדאי לחזק: ${weak.map(k => SECS[k]).join(', ')}` : ' · הכול נכון!'}</p>`
-    : '<p class="last">עוד לא עשית מבחן ניסיון. כדאי להתחיל בו: הוא יראה מה כבר יודעים ומה צריך לחזק.</p>';
+    : blt(['עוד לא עשית מבחן ניסיון.', 'כדאי להתחיל בו.', 'הוא מראה מה כבר יודעים ומה צריך לחזק.'], 'last');
   app.innerHTML = `
   ${KID ? '' : '<div id="pbar" class="pbar"></div>'}
   <header class="hero">
     <div class="heroart" aria-hidden="true"><span class="ha a1">📚</span><span class="ha a2">🚀</span><span class="ha a3">✨</span><span class="ha a4">⭐</span></div>
     <div class="blocks" aria-hidden="true"><span class="blk h1">A</span><span class="blk h2">B</span><span class="blk h4">C</span></div>
     <h1>${KID ? `${KID.photo ? `<img class="kavatar" src="${KID.photo}" alt="">` : ''}שלום ${esc(KID.name)}!` : 'מוכן לאנגלית'}</h1>
-    ${KID ? `<p class="sub">${KID.mode === 'test' ? 'כאן עושים מבחן ניסיון.' : KID.mode === 'learn' ? 'כאן מתרגלים אנגלית. בהצלחה!' : 'מתכוננים למבחן באנגלית.'}</p>` : ''}
+    ${KID ? `<p class="sub">${KID.mode === 'test' ? 'כאן עושים מבחן ניסיון.' : KID.mode === 'learn' ? 'כאן מתרגלים אנגלית.<br>בהצלחה!' : 'מתכוננים למבחן באנגלית.'}</p>` : ''}
     <div class="pills"><span class="pill due">${countdown()}</span><span class="pill">🔤 ${jour(st).n}/26 אותיות</span></div>
   </header>
 
@@ -1587,15 +1613,15 @@ function home() {
 
   ${KID && KID.mode === 'learn' ? '' : `<section class="zone test">
     <div class="zhead"><span class="zico" aria-hidden="true">🏆</span><span class="ztag">מבחן</span><h2>מבחן ניסיון</h2></div>
-    <p class="zdesc">כמו במבחן האמיתי: כ־20 שאלות מכל החומר, <b>בלי רמזים ובלי ניסיון נוסף</b>. בסוף רואים כמה הצלחת בכל נושא.</p>
+    ${blt(['בדיוק כמו המבחן האמיתי.', 'כ־20 שאלות מכל החומר.', '<b>אין רמזים ואין ניסיון נוסף.</b>', 'בסוף רואים כמה הצלחת בכל נושא.'], 'zdesc')}
     ${mockLine}
     <button class="btn testbtn" id="mock">להתחיל מבחן ניסיון ←</button>
   </section>`}
 
-  ${restNow() ? `<p class="jrest">🌙 <b>תרגלת היום ${dayMax(st)} דקות. להיום מספיק!</b><span>נמשיך מחר.</span></p>` : ''}
+  ${restNow() ? `<div class="jrest">🌙 <b>תרגלת היום ${dayMax(st)} דקות.</b><span>להיום מספיק.<br>נמשיך מחר!</span></div>` : ''}
   ${KID && KID.mode === 'test' ? '' : `<section class="zone practice">
     <div class="zhead"><span class="zico" aria-hidden="true">🎒</span><span class="ztag">תרגול</span><h2>תרגול לפי נושא</h2></div>
-    <p class="zdesc">כאן לומדים: אפשר לנסות שוב, לבקש רמז ולראות את התשובה. כל סבב שמסיימים כאן = צעד 👣 במסע, בדיוק כמו במפה.</p>
+    ${blt(['כאן לומדים, אז מותר לטעות.', 'אפשר לנסות שוב, לבקש רמז ולראות את התשובה.', 'כל סבב שמסיימים כאן = צעד 👣 במסע.'], 'zdesc')}
     ${KID && !KID.settings.allowLevelUp
       ? `<div class="lvlrow"><span>רמה: <b>${LEVELS[st.level] || 'בינוני'}</b></span></div>`
       : `<div class="lvlrow"><span>רמה:</span><div class="seg" role="group" aria-label="רמה">${Object.keys(LEVELS).map(k => `<button data-lvl="${k}" class="${(st.level || 'medium') === k ? 'on' : ''}">${LEVELS[k]}</button>`).join('')}</div></div>`}
@@ -1607,7 +1633,7 @@ function home() {
     }).join('')}</nav>
   </section>`}
   <button class="btn myprog" id="myprog">📈 ההתקדמות שלי</button>
-  <p class="tip">המורה ביקשה: קריאה בקול, חזרה על הצלילים והאותיות, קצת בכל יום.</p>
+  <div class="tip"><b>המורה ביקשה:</b>${blt(['לקרוא בקול.', 'לחזור על הצלילים והאותיות.', 'לתרגל קצת בכל יום.'])}</div>
   ${KID || CLOUD_OK ? '' : '<div class="parentrow"><button class="link parentlink" id="parent">הגדרות במכשיר הזה</button></div>'}
   <p class="credit">האיורים: <a href="https://openmoji.org" target="_blank" rel="noopener">OpenMoji</a> · רישיון <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a></p>`;
   $$('.tile', app).forEach(b => b.onclick = () => MODS[+b.dataset.m].run());
@@ -1721,14 +1747,14 @@ async function bootKid(id, mode) {
   app.innerHTML = '<p class="loading">טוען…</p>';
   try {
     const k = await (await api()).getKid(id);
-    if (!k) { app.innerHTML = '<section class="stk pbox"><h2>הקישור לא נמצא</h2><p>אולי ההורה מחק אותו. בקשו מההורה קישור חדש.</p></section>'; return; }
+    if (!k) { app.innerHTML = '<section class="stk pbox"><h2>הקישור לא נמצא</h2><ul class="pts"><li>ייתכן שההורה מחק אותו.</li><li>בקשו מההורה קישור חדש.</li></ul></section>'; return; }
     let local = null; try { local = JSON.parse(localStorage.getItem(KEY + ':' + id)); } catch (e) {}
     const progress = local && (local.updatedAt || 0) > ((k.progress || {}).updatedAt || 0) ? local : (k.progress || {});
     KID = { id, mode: MODES[mode] ? mode : 'all', name: k.name || '', photo: (k.profile || {}).photo || '', settings: Object.assign(defaultSettings(), k.settings || {}), progress };
     if (local === progress) cloudSoon();
     home();
   } catch (e) {
-    app.innerHTML = '<section class="stk pbox"><h2>אין חיבור</h2><p>לא הצלחנו לטעון את ההגדרות. בדקו את האינטרנט ונסו שוב.</p><button class="btn primary" onclick="location.reload()">לנסות שוב</button></section>';
+    app.innerHTML = '<section class="stk pbox"><h2>אין חיבור</h2><ul class="pts"><li>לא הצלחנו לטעון את ההגדרות.</li><li>בדקו את החיבור לאינטרנט ונסו שוב.</li></ul><button class="btn primary" onclick="location.reload()">לנסות שוב</button></section>';
   }
 }
 
@@ -1828,9 +1854,9 @@ function sendKidLink(btn, k) {
 /* ---------- settings: one window with tabs, opened from the gear ---------- */
 const GEAR_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>';
 const GOAL_NOTE = {
-  lvl: 'אות "מתקדמת" כשהיא עוברת מלבן לצהוב (צדק בה פעם ראשונה) או מצהוב לירוק (צדק בצליל, בגדולה↔קטנה ובשם האות ב־80% לפחות, וכתב אותה גדולה וקטנה). התרגול מכוון לאותיות שעוד לא ירוקות. כשכל 26 ירוקות הוא מקבל סיבוב בונוס, ומשם היעד הופך לחזרה יומית על אותיות שלא תרגל מזמן או שהדיוק בהן ירד. אות שלא תורגלה שבוע חוזרת לצהוב.',
-  stars: 'כוכב = תשובה נכונה בניסיון הראשון, או אות שנכתבה נכון. בכל הגעה ליעד הוא מקבל סיבוב בגלגל.',
-  mins: 'דקות פעילות במסכי התרגול. בכל הגעה ליעד הוא מקבל סיבוב בגלגל.',
+  lvl: blt(['אות "מתקדמת" כשהיא עוברת מלבן לצהוב (צדק בה פעם ראשונה).', 'או מצהוב לירוק: 80% לפחות בצליל, בגדולה↔קטנה ובשם האות, וכתב אותה גדולה וקטנה.', 'התרגול מכוון לאותיות שעוד לא ירוקות.', 'כשכל 26 ירוקות הוא מקבל סיבוב בונוס.', 'משם היעד הופך לחזרה יומית על אותיות שלא תרגל מזמן או שהדיוק בהן ירד.', 'אות שלא תורגלה שבוע חוזרת לצהוב.']),
+  stars: blt(['כוכב = תשובה נכונה בניסיון הראשון, או אות שנכתבה נכון.', 'בכל הגעה ליעד הוא מקבל סיבוב בגלגל.']),
+  mins: blt(['דקות פעילות במסכי התרגול.', 'בכל הגעה ליעד הוא מקבל סיבוב בגלגל.']),
 };
 const winRowsHTML = wins => wins.length ? `<ul class="winrows">${wins.map(w => { const he = heOf(w.prize);
   return `<li><span class="wrill" aria-hidden="true">${emojiOf(w.prize)}</span><span class="wrtx"><span class="en">${esc(textOf(w.prize))}</span>${he ? `<small>${esc(he)}</small>` : ''}</span><span class="wrdate">${w.date.split('-').slice(1).reverse().join('.')}</span></li>`; }).join('')}</ul>` : '<p class="hint">עוד אין.</p>';
@@ -1920,7 +1946,7 @@ function settingsSheet(kidId, tab) {
       B.innerHTML = `<form class="shform" id="shaddf">
         <h3>הוספת ילד</h3>
         <label class="shfield">שם פרטי <input id="shkn" class="pin wide" maxlength="20" required autocomplete="off"></label>
-        <p class="hint">השם יופיע לילד ("שלום גור!"). מי שיש לו את הקישור יכול לראות אותו, אז שם פרטי בלבד.</p>
+        ${blt(['השם יופיע לילד ("שלום גור!").', 'כל מי שיש לו את הקישור יכול לראות אותו.', 'לכן: שם פרטי בלבד.'], 'hint')}
         <button class="btn primary">הוספה</button></form>`;
       $s('#shaddf').onsubmit = async e => {
         e.preventDefault(); const n = $s('#shkn').value.trim(); if (!n) return;
@@ -1947,21 +1973,24 @@ function settingsSheet(kidId, tab) {
       B.innerHTML = `
         <button type="button" class="trycard" id="shtry" ${st.wheel ? '' : 'hidden'} aria-label="נסו את גלגל ההפתעות בעצמכם">
           <span class="trywheel">${miniWheel(st.prizes.length)}</span>
-          <span class="trytx"><b>נסו בעצמכם</b><small>כך ${esc(kid.name)} רואה את גלגל ההפתעות. הסיבובים כאן לא נספרים.</small></span>
+          <span class="trytx"><b>נסו בעצמכם</b><small>כך ${esc(kid.name)} רואה את גלגל ההפתעות.<br>הסיבובים כאן לא נספרים.</small></span>
           <span class="tryarrow" aria-hidden="true">←</span>
         </button>
         <div class="shgrp"><h3>מסע 26 האותיות</h3>
-          <p class="hint">כל שלב במפה בנוי מצעדים: כל סבב תרגול שהוא מסיים (במסע, בתרגול לפי נושא, או 5 אותיות בכתיבה) = צעד. בסוף השלב הוא מקבל את האות הבאה, לפי הסדר A→Z. השלב הראשון של כל יום פותח סיבוב בגלגל, פעם ביום. הילד לא רואה שעון; הדקות נספרות ברקע להגבלה היומית ומוצגות רק לכם.</p>
+          ${blt(['כל שלב במפה בנוי מצעדים.', 'צעד = סבב תרגול שהוא מסיים (במסע, בתרגול לפי נושא, או 5 אותיות בכתיבה).', 'בסוף כל שלב נפתחת האות הבאה, לפי הסדר A→Z.', 'גלגל ההפתעות נפתח פעם ביום: אחרי שנפתחה אות באותו יום, וגם תורגלו מספיק דקות.', 'לילד כתוב רק "משלימים את הצעדים של היום", והדקות מופיעות רק בהסבר הקטן (i).', 'הילד לא רואה שעון.', 'הדקות נספרות ברקע, להגבלה היומית, ומוצגות רק לכם.'], 'hint')}
           <label class="shfield">כמה צעדים בשלב (סבב ≈ 5 דקות)</label>
           <div class="seg" role="group" aria-label="צעדים בשלב">${segs('sp', String(stageSteps(st)), [['4', '4 (≈20 דק׳)'], ['5', '5'], ['6', '6 (≈30)'], ['8', '8']])}</div>
           <label class="shfield">הגבלה יומית לכל התרגול (שיעור שהתחיל אפשר לסיים)</label>
           <div class="seg" role="group" aria-label="הגבלה יומית">${segs('mx', String(dayMax(st)), [['45', '45 דק׳'], ['60', 'שעה'], ['90', 'שעה וחצי'], ['0', 'בלי']])}</div>
-          <p class="hint" id="shpdnote"></p></div>
+          <div class="hint" id="shpdnote"></div>
+          <label class="shfield">כמה דקות תרגול ביום לפני שהגלגל נפתח</label>
+          <div class="seg" role="group" aria-label="דקות לגלגל">${segs('wm', String(wheelMin(st)), [['0', 'בלי'], ['10', '10 דק׳'], ['20', '20'], ['30', '30']])}</div>
+          ${blt(['כשנראה שהמשימות לוקחות לו באמת 20 דקות, אפשר להוריד ל"בלי".'], 'hint')}</div>
         <div class="shgrp"><h3>גלגל ההפתעות</h3>
           <div class="seg" role="group" aria-label="גלגל ההפתעות">${segs('wh', st.wheel ? '1' : '0', [['1', 'פעיל'], ['0', 'כבוי: רק המסע']])}</div></div>
         <div id="shprz" class="shstack" ${st.wheel ? '' : 'hidden'}>
           <div class="shgrp"><h3>ההפתעות בגלגל</h3>
-            <p class="hint">לחצו על שם כדי לערוך ועל התמונה כדי להחליף אותה (מהמחשב, מהגלריה או מהמצלמה). אפשר להוסיף הפתעה בעברית ונציע תרגום לאנגלית. שניהם נשארים ניתנים לעריכה.</p>
+            ${blt(['לחיצה על שם: עריכה.', 'לחיצה על התמונה: החלפה (מהמחשב, מהגלריה או מהמצלמה).', 'אפשר לכתוב הפתעה בעברית, ונציע תרגום לאנגלית.', 'את שניהם אפשר לערוך.'], 'hint')}
             <ul class="pzlist" id="pzl-prizes"></ul>
             <div class="pzfoot"><button type="button" class="btn sm" data-pzadd="prizes">＋ הוספת הפתעה</button><button type="button" class="pzlink" data-pzreset="prizes">שחזור הרשימה המקורית</button></div>
             <div class="pzkid" id="pzkid"></div></div>
@@ -1971,13 +2000,16 @@ function settingsSheet(kidId, tab) {
             <button type="button" class="btn sm" id="shmtry">👑 לנסות את המגה גלגל</button></div>
           <div class="shgrp"><h3>הפתעה משלו</h3>
             <div class="seg" role="group" aria-label="הפתעה אישית">${segs('kp', st.kidPrize ? '1' : '0', [['0', 'כבוי'], ['1', 'מותר']])}</div>
-            <p class="hint">כשמותר, ${esc(kid.name)} יכול להוסיף לגלגל הפתעה אחת משלו (עם תרגום ותמונה), לערוך אותה ולהסיר אותה. כאן תראו מה בחר ותוכלו להסיר.</p></div>
+            ${blt([`כשמותר, ${esc(kid.name)} יכול להוסיף לגלגל הפתעה אחת משלו (עם תרגום ותמונה).`, 'הוא יכול לערוך אותה ולהסיר אותה.', 'כאן תראו מה בחר, ותוכלו להסיר.'], 'hint')}</div>
         </div>`;
       const pdNote = () => { const J = (p && p.jour) || { n: 0 }, left = JOUR_N - (J.n || 0), real = (J.lm || []).filter(x => x > 0), lm = real.length ? Math.round(real.reduce((a, b) => a + b, 0) / real.length) : stageSteps(st) * STEP_MIN, mx = dayMax(st) || 60, per = Math.max(1, Math.floor(mx / lm)), days = Math.ceil(left / per), dd = daysToTest();
-        $s('#shpdnote').textContent = `${real.length ? `שלב לוקח לו בפועל בערך ${lm} דקות. ` : ''}${per} אותיות ביום לכל היותר. נשארו ${left} אותיות: בערך ${days} ימי תרגול${dd > 0 && days > dd ? ` (עד המבחן נשארו ${dd} ימים, אז הוא יגיע בערך לאות ${ALPHA[Math.min(25, (J.n || 0) + dd * per - 1)].toUpperCase()}. כל סבב מתרגל את כל נושאי המבחן, כך שגם בלי לסיים את המסע הוא מתכונן לכולם)` : ''}.`; };
+        $s('#shpdnote').innerHTML = blt([real.length ? `שלב לוקח לו בפועל בערך ${lm} דקות.` : '', `לכל היותר ${per} אותיות ביום.`, `נשארו ${left} אותיות: בערך ${days} ימי תרגול.`,
+          dd > 0 && days > dd ? `עד המבחן נשארו ${dd} ימים, אז הוא יגיע בערך לאות ${ALPHA[Math.min(25, (J.n || 0) + dd * per - 1)].toUpperCase()}.` : '',
+          dd > 0 && days > dd ? 'כל סבב מתרגל את כל נושאי המבחן, כך שגם בלי לסיים את המסע הוא מתכונן לכולם.' : '']); };
       pdNote();
       bindSeg('sp', v => { st.goal.steps = +v; pdNote(); });
       bindSeg('mx', v => { st.goal.max = +v; pdNote(); });
+      bindSeg('wm', v => { st.goal.wmn = +v; });
       bindSeg('wh', v => { st.wheel = v === '1'; $s('#shprz').hidden = !st.wheel; $s('#shtry').hidden = !st.wheel; });
       const PZW = pzWire($s('#shprz'), { lists: st, art: st.prizeArt, defaults: { prizes: DEFAULT_PRIZES, megaPrizes: DEFAULT_MEGA }, min: 2, touch: () => { pzDirty = true; touch(); } });
       PZW.render('prizes'); PZW.render('megaPrizes');
@@ -2004,7 +2036,7 @@ function settingsSheet(kidId, tab) {
           ${m ? `<p>${m.date.split('-').slice(1).reverse().join('.')}: <b>${m.score}/${m.n}</b></p>${secTable(m.secs).replace(/<button[^>]*>לתרגל<\/button>/g, '')}` : '<p class="hint">עוד לא עשה מבחן ניסיון.</p>'}</div>
         <div class="shgrp"><h3>זכיות בגלגל</h3>${winRowsHTML((p.wins || []).slice(0, 12))}</div>
         <div class="shgrp"><h3>איפוס ההתקדמות</h3>
-          <p class="hint">מתחיל מאפס: כוכבים, אותיות היום, דקות, ימי תרגול, תוצאות מבחנים וזכיות בגלגל. ההגדרות, הפרטים והקישור נשארים.</p>
+          ${blt(['מתאפס: תשובות נכונות, אותיות, דקות, ימי תרגול, תוצאות מבחנים וזכיות בגלגל.', 'נשארים: ההגדרות, הפרטים והקישור.'], 'hint')}
           <div class="row" id="shresrow"><button class="btn" id="shres">איפוס ההתקדמות</button></div></div>`;
       const showLt = c => {
         const r = (p.lt || {})[c] || {}, lv = letterLevel(r);
@@ -2023,7 +2055,7 @@ function settingsSheet(kidId, tab) {
         <div class="shgrp"><h3>הקישור של ${esc(kid.name)}</h3>
           <input class="lurl" id="shurl" readonly value="${url}" aria-label="הקישור">
           <div class="row"><button class="btn" id="shcopy">העתקה</button><button class="btn primary" id="shsend">שליחה לילד</button></div>
-          <p class="hint">הקישור פתוח לכל מי שמקבל אותו, בלי חשבון. ההתקדמות שלו נשמרת ומדווחת לכם.</p></div>`;
+          ${blt(['הקישור פתוח לכל מי שמקבל אותו, בלי חשבון.', 'ההתקדמות שלו נשמרת ומדווחת לכם.'], 'hint')}</div>`;
       bindSeg('lm', v => { st.linkMode = v; $s('#shurl').value = kidLink(kid.id, v); });
       $s('#shcopy').onclick = async e => { try { await navigator.clipboard.writeText($s('#shurl').value); e.target.textContent = 'הועתק ✓'; } catch (er) { $s('#shurl').select(); e.target.textContent = 'סמנו והעתיקו'; } };
       $s('#shsend').onclick = e => sendKidLink(e.target, Object.assign({}, kid, { settings: st }));
@@ -2036,11 +2068,11 @@ function settingsSheet(kidId, tab) {
             <div class="kphtx">
               <label class="shfield">שם <input id="shname" class="pin" maxlength="20" value="${esc(name)}" aria-label="שם הילד"></label>
               <div class="row"><button type="button" class="btn sm" id="shphotob">${prof.photo ? 'החלפת תמונה' : 'הוספת תמונה'}</button>${prof.photo ? '<button type="button" class="btn sm" id="shphotor">הסרה</button>' : ''}</div>
-              <small class="hint" id="shphnote">התמונה מופיעה בברכה שלו ובכרטיס הזכייה. מכל מכשיר (גם HEIC מהאייפון).</small>
+              <small class="hint" id="shphnote">התמונה מופיעה בברכה שלו ובכרטיס הזכייה.<br>אפשר מכל מכשיר (גם HEIC מהאייפון).</small>
             </div>
           </div></div>
         <div class="shgrp"><h3>עוד עליו</h3>
-          <p class="hint">הפרטים עוזרים לי לכתוב שאלות שמתאימות לו ולהבין את התוצאות. הכל אופציונלי.</p>
+          ${blt(['הפרטים עוזרים להתאים לו שאלות ולהבין את התוצאות.', 'הכול אופציונלי.'], 'hint')}
           <div class="kgrid">
             <label>גיל <input id="kage" class="kin" type="number" inputmode="numeric" min="5" max="16" value="${pv('age')}"></label>
             <label>כיתה <input id="kgrade" class="kin" maxlength="12" value="${pv('grade')}" placeholder="למשל ד׳"></label>
@@ -2051,7 +2083,7 @@ function settingsSheet(kidId, tab) {
           <label class="kfield">מה כיף לו באנגלית<input id="klike" class="kin" maxlength="120" value="${pv('likes')}" placeholder="שירים, משחקים, סרטונים..."></label>
           <label class="kfield">מה קשה לו באנגלית<input id="khard" class="kin" maxlength="120" value="${pv('hard')}" placeholder="קריאה, איות, אוצר מילים..."></label>
           <label class="kfield">הערות להתאמת שאלות<textarea id="knote" class="kin" rows="2" maxlength="300">${pv('notes')}</textarea></label>
-          <p class="hint">בלי אבחנות רפואיות, שם משפחה או כתובת. כל מי שיש לו את הקישור של ${esc(kid.name)} יכול טכנית לקרוא גם את הפרטים האלה.</p></div>
+          ${blt(['בלי אבחנות רפואיות, שם משפחה או כתובת.', `כל מי שיש לו את הקישור של ${esc(kid.name)} יכול טכנית לקרוא גם את הפרטים האלה.`], 'hint')}</div>
         <div class="shgrp danger"><h3>מחיקת ${esc(kid.name)}</h3>
           <p class="hint">הקישור שלו יפסיק לעבוד וההתקדמות תימחק.</p>
           <div class="row" id="shdelrow"><button class="btn" id="shdel">מחיקה</button></div></div>`;
@@ -2188,7 +2220,7 @@ async function parentDash(A, u) {
       <form class="stk pbox" id="addkid">
         <h2>הוספת ילד</h2>
         <label class="pfield" for="kname">שם פרטי <input id="kname" class="pin wide" maxlength="20" required autocomplete="off"></label>
-        <p class="hint">השם יופיע לילד ("שלום גור!"). מי שיש לו את הקישור יכול לראות אותו, אז שם פרטי בלבד.</p>
+        ${blt(['השם יופיע לילד ("שלום גור!").', 'כל מי שיש לו את הקישור יכול לראות אותו.', 'לכן: שם פרטי בלבד.'], 'hint')}
         <button class="btn primary">הוספה</button>
       </form>
     </section>`;
@@ -2229,7 +2261,7 @@ function kidSettingsOld(A, u, k) {
       </div>
       <h2>גלגל ההפתעות</h2>
       <div class="seg" role="group" aria-label="גלגל ההפתעות"><button type="button" data-wh="1" class="${st.wheel ? 'on' : ''}">🎡 פעיל</button><button type="button" data-wh="0" class="${st.wheel ? '' : 'on'}">כבוי: רק כוכבים</button></div>
-      <p class="hint">הפתעה אחת בכל שורה, באנגלית. בכל הגעה ליעד הוא מקבל סיבוב. אפשר להוסיף תרגום לעברית אחרי קו: <span class="en" dir="ltr">A pizza night 🍕 | ערב פיצה</span></p>
+      ${blt(['הפתעה אחת בכל שורה, באנגלית.', 'תרגום לעברית אחרי קו: <span class="en" dir="ltr">A pizza night 🍕 | ערב פיצה</span>'], 'hint')}
       <textarea id="pz" rows="7" class="en ptext-in">${esc(st.prizes.join('\n'))}</textarea>
       <button type="button" class="btn wtrybtn" id="wtry"><span class="wtmini"></span>נסו את הגלגל</button>
       <h2>שם</h2>
@@ -2712,7 +2744,7 @@ function myPrizeSheet(done) {
   const ov = document.createElement('div'); ov.className = 'sheetov';
   ov.innerHTML = `<div class="sheet mypsheet" role="dialog" aria-modal="true" aria-label="ההפתעה שלי">
     <header class="shhead"><b class="shtitle">✨ ההפתעה שלי</b><button class="shx" id="mpx" aria-label="סגירה">✕</button></header>
-    <section class="shbody"><p class="hint">אפשר להוסיף לגלגל הפתעה אחת שאתה בוחר. כתוב בעברית או באנגלית ונציע לך תרגום. אפשר גם להוסיף תמונה.</p>
+    <section class="shbody">${blt(['אפשר להוסיף לגלגל הפתעה אחת שאתה בוחר.', 'כותבים בעברית או באנגלית, ואנחנו מציעים תרגום.', 'אפשר גם להוסיף תמונה.'], 'hint')}
       <ul class="pzlist" id="pzl-my"></ul></section>
     <footer class="shfoot"><button class="btn primary" id="mpsave">שמירה</button><button type="button" class="pzlink" id="mpdel" ${mp0.en || mp0.he ? '' : 'hidden'}>הסרת ההפתעה שלי</button><span class="shok" id="mpok"></span></footer></div>`;
   document.body.appendChild(ov); document.documentElement.classList.add('noscroll');
@@ -2749,7 +2781,7 @@ function wheelView(preview) {
         <div class="lockrow"><span class="lockico">🔒</span><span>הגלגל עוד נעול</span></div>
         <p class="lockbig">עוד <b>${G.left}</b> ${G.unit} והגלגל נפתח!</p>
         <div class="lockmeter"><i style="width:${Math.round(G.pct)}%"></i></div>
-        <p class="locknote">${G.journey ? 'כל שלב שמסיימים מקרב אותך. בהצלחה! 💪' : 'כל תשובה נכונה מקרבת אותך. בהצלחה! 💪'}</p>
+        <p class="locknote">${G.journey ? 'כל שלב שמסיימים מקרב אותך.<br>בהצלחה! 💪' : 'כל תשובה נכונה מקרבת אותך.<br>בהצלחה! 💪'}</p>
       </div>
       <button class="spinbig gohome" id="gohome">חזרה לתרגול ←</button>`}
       <div id="prize" aria-live="polite"></div>
@@ -2947,7 +2979,7 @@ function wheelView(preview) {
       const details = `
         ${he ? `<button class="hebtn" data-he aria-expanded="false"><span class="heicon" aria-hidden="true">א</span><span class="helab">מה זה בעברית?</span></button><p class="hebubble" hidden>${esc(he)}</p>` : ''}
         <button type="button" class="btn sharebtn" data-share disabled>מכין את התמונה…</button>
-        <p class="sharenote">נשלחת תמונה מעוצבת של הזכייה. בחר וואטסאפ, ואז את הצ׳אט.</p>`;
+        <p class="sharenote">נשלחת תמונה מעוצבת של הזכייה.<br>בוחרים וואטסאפ, ואז את הצ׳אט.</p>`;
       // small summary that stays under the wheel
       $('#prize').innerHTML = '';
       winIdx = win; draw(performance.now());
@@ -2970,21 +3002,21 @@ function parentSettings() {
   app.innerHTML = `${top('להורים')}
     <section class="stk pbox">
       <h2>היעד היומי</h2>
-      <p class="hint">בכל פעם שהוא מגיע ליעד הוא מקבל סיבוב אחד בגלגל. אם היעד הוא 25 כוכבים, אז ב־25 כוכבים הוא מקבל סיבוב, ב־50 עוד סיבוב, וכן הלאה. הספירה מתאפסת כל בוקר.</p>
+      ${blt(['בכל הגעה ליעד הוא מקבל סיבוב אחד בגלגל.', 'לדוגמה, יעד של 25: סיבוב ב־25, עוד סיבוב ב־50, וכן הלאה.', 'הספירה מתאפסת כל בוקר.'], 'hint')}
       <div class="row">
         <div class="seg" role="group" aria-label="סוג יעד"><button type="button" data-gt="stars" class="${st.goal.type === 'stars' ? 'on' : ''}">⭐ כוכבים</button><button type="button" data-gt="mins" class="${st.goal.type === 'mins' ? 'on' : ''}">⏱ דקות</button></div>
         <label class="pfield">כמה? <input id="gn" type="number" min="1" max="500" value="${st.goal.n}" class="pin"></label>
       </div>
-      <p class="hint">כוכב = תשובה נכונה בניסיון הראשון, או אות שנכתבה נכון. דקות = זמן פעיל במסכי התרגול.</p>
+      ${blt(['כוכב = תשובה נכונה בניסיון הראשון, או אות שנכתבה נכון.', 'דקות = זמן פעיל במסכי התרגול.'], 'hint')}
       <h2>גלגל ההפתעות</h2>
       <div class="seg" role="group" aria-label="גלגל ההפתעות"><button type="button" data-wh="1" class="${st.wheel ? 'on' : ''}">🎡 פעיל</button><button type="button" data-wh="0" class="${st.wheel ? '' : 'on'}">כבוי: רק כוכבים</button></div>
       <h2>רמת התרגול</h2>
       <div class="seg" role="group" aria-label="רמה">${Object.keys(LEVELS).map(k => `<button type="button" data-pl="${k}" class="${(st.level || 'medium') === k ? 'on' : ''}">${LEVELS[k]}</button>`).join('')}</div>
       <h3>רמת מבחן הניסיון</h3>
       <div class="seg" role="group" aria-label="רמת מבחן">${Object.keys(LEVELS).map(k => `<button type="button" data-tl="${k}" class="${(st.testLevel || 'medium') === k ? 'on' : ''}">${LEVELS[k]}</button>`).join('')}</div>
-      <p class="hint">קל: 3 תשובות לבחירה ותרגום לעברית בסיפורים. בינוני: כמו במבחן. קשה: איות מילים, אות חסרה במילה, "מה בא אחרי" וסיפורים ארוכים יותר. אחרי סבב של 90% ומעלה הוא יכול לעלות רמה בעצמו.</p>
+      ${blt(['<b>קל:</b> 3 תשובות לבחירה, ותרגום לעברית בסיפורים.', '<b>בינוני:</b> כמו במבחן.', '<b>קשה:</b> איות מילים, אות חסרה, "מה בא אחרי" וסיפורים ארוכים יותר.', 'אחרי סבב של 90% ומעלה הוא יכול לעלות רמה בעצמו.'], 'hint')}
       <h3>ההפתעות בגלגל</h3>
-      <p class="hint">הפתעה אחת בכל שורה, באנגלית. אפשר להוסיף אימוג׳י, ותרגום לעברית אחרי קו: <span class="en" dir="ltr">A pizza night 🍕 | ערב פיצה</span></p>
+      ${blt(['הפתעה אחת בכל שורה, באנגלית.', 'אפשר להוסיף אימוג׳י.', 'תרגום לעברית אחרי קו: <span class="en" dir="ltr">A pizza night 🍕 | ערב פיצה</span>'], 'hint')}
       <textarea id="pz" rows="8" class="en ptext-in">${esc(st.prizes.join('\n'))}</textarea>
       <button type="button" class="btn wtrybtn" id="wtry"><span class="wtmini"></span>נסו את הגלגל</button>
       <div class="row"><button class="btn primary" id="psave">שמירה</button><span id="pok" class="chip" hidden>נשמר ✓</span></div>
@@ -3235,7 +3267,7 @@ function storyHTML(st) {
   return `<section class="story stk">
     <div class="sthead"><b class="en">${st.t}</b><button class="btn sm" data-say="${esc(st.x.join('|'))}">🔊 הקרא לי</button></div>
     <p class="stx">${st.x.map(s => `<span class="ss" data-say="${esc(s)}">${s}</span>`).join(' ')}</p>
-    <p class="hint">קרא בעצמך קודם. אפשר ללחוץ על משפט כדי לשמוע אותו.</p>
+    ${blt(['קרא בעצמך קודם.', 'לחיצה על משפט משמיעה אותו.'], 'hint')}
   </section>`;
 }
 
@@ -3275,7 +3307,7 @@ function letterCard(c) {
       <button class="btn sm" data-say="${NAME[U]}">🔊 שם האות</button></div></div>
     <table class="lttab"><tbody>${LT_SKILLS.map(([k, t]) => { const v = r[k] || [0, 0];
       return `<tr><td>${t}</td><td dir="ltr">${v[1] ? `${v[0]}/${v[1]}` : '—'}</td><td>${v[1] && v[0] / v[1] >= .8 ? '✓' : ''}</td></tr>`; }).join('')}</tbody></table>
-    <p class="lcnote">${lv === 2 ? 'כל הכבוד! האות הזאת ירוקה. כדאי לחזור עליה מדי פעם.' : stale ? 'הייתה ירוקה, אבל לא תרגלת אותה שבוע. תרגול אחד מחזיר אותה לירוק.' : `כדי שתהיה ירוקה חסר: <b>${miss.join(' · ')}</b>`}</p>
+    <p class="lcnote">${lv === 2 ? 'כל הכבוד! האות הזאת ירוקה.<br>כדאי לחזור עליה מדי פעם.' : stale ? 'האות הייתה ירוקה, אבל לא תרגלת אותה שבוע.<br>תרגול אחד מחזיר אותה לירוק.' : `כדי שתהיה ירוקה חסר: <b>${miss.join(' · ')}</b>`}</p>
     <div class="lcbtns"><button class="btn primary" id="lcgo">🎯 להמשיך לצבור אותיות</button><button class="btn" id="lcwr">✍️ לכתוב את ${U}</button></div>
   </div>`;
   document.body.appendChild(ov);
@@ -3345,11 +3377,11 @@ function journeyMapHTML(G, st) {
     const state = k < J.n ? 'done' : k === J.n ? 'cur' : 'lock', U = c.toUpperCase();
     const x = Math.sin(k * 0.85), wd = WORDS.find(w => w.L.toLowerCase() === c && !w.f) || WORDS.find(w => w.L.toLowerCase() === c);
     const stop = false, ring = state === 'cur' ? Math.min(100, Math.round(G.csp / G.steps * 100)) : 0;
-    return `<div class="mrow" style="--x:${x.toFixed(2)}">
+    return `<div class="mrow${state === 'cur' ? ' mcur' : ''}" style="--x:${x.toFixed(2)}">
       ${wd ? `<span class="mdeco ${x > 0 ? 'l' : 'r'}" aria-hidden="true"><span class="mdi">${wd.e}</span><small class="en">${wd.w}</small></span>` : ''}
       <button type="button" class="mnode ${state}" ${state === 'cur' ? `style="--ring:${ring}%"` : ''} data-stage="${k}" aria-label="שלב ${k + 1}: האות ${U}${state === 'done' ? ', פתוחה' : state === 'lock' ? ', נעולה' : ''}${stop ? ', עם גלגל' : ''}">
         <b class="en">${U}<i>${c}</i></b>${stop ? `<span class="mwb ${k < J.n ? 'got' : ''}" aria-hidden="true">${miniWheel((st.prizes || []).length)}</span>` : ''}${state === 'done' ? '<span class="mchk" aria-hidden="true">✓</span>' : state === 'lock' ? `<span class="mlock" aria-hidden="true">${LOCK_SVG}</span>` : ''}
-      </button>${state === 'cur' ? '<span class="mhere" aria-hidden="true">🚀</span>' : ''}</div>`;
+      </button>${state === 'cur' ? `<span class="mhere" aria-hidden="true">🚀</span><span class="msteps" aria-label="צעד ${G.csp} מתוך ${G.steps}">${[...Array(G.steps)].map((_, i) => `<i class="${i < G.csp ? 'on' : ''}">${i < G.csp ? '👣' : ''}</i>`).join('')}</span>` : ''}</div>`;
   }).join('');
   const megaOpen = G.mega && !G.megaWait;
   const end = `<div class="mrow mend" style="--x:0">${st.wheel
@@ -3368,16 +3400,17 @@ function journeyCardHTML(G, st) {
   const J = G.J, nextL = ALPHA[J.n] ? ALPHA[J.n].toUpperCase() : '';
   let action;
   if (G.mega && st.wheel && !G.megaWait) action = `<button class="btn spinbtn megabtn" id="megaspin">👑 פתחת את כל 26 האותיות! למגה גלגל</button>`;
-  else if (G.avail && st.wheel) action = `<button class="btn spinbtn" id="spin">🎡 האות הראשונה של היום! לסובב את הגלגל</button>`;
-  else if (G.capped) action = `<div class="jrest">🌙 <b>להיום מספיק, כל הכבוד!</b><span>תרגלת ${G.maxM} דקות היום. המוח צריך גם מנוחה. נמשיך מחר.</span></div>`;
+  else if (G.avail && st.wheel) action = `<button class="btn spinbtn" id="spin">🎡 גלגל ההפתעות של היום נפתח! לסובב</button>`;
+  else if (G.capped) action = `<div class="jrest">🌙 <b>להיום מספיק, כל הכבוד!</b><span>${lines(`תרגלת היום ${G.maxM} דקות.`, 'המוח צריך מנוחה כדי לזכור.', 'נמשיך מחר.')}</span></div>`;
   else if (J.n < JOUR_N && G.csp >= G.steps) action = `<button class="btn spinbtn" id="claim">🔓 הגעת לסוף השלב! לפתוח את האות <span class="en">${nextL}</span></button>`;
   else if (J.n < JOUR_N) action = `<button class="btn stagebtn" id="stagego"><span class="stl">▶</span><span>להמשיך במסע · שלב ${J.n + 1}<small class="stmin">${stepsHTML(G.csp, G.steps, false, nextL)}</small></span><span aria-hidden="true">←</span></button>`;
   else if (!G.mega) action = `<div class="jdone"><b>🏆 סיימת את כל המסע! אתה מוכן למבחן.</b><button class="btn" id="jnew">להתחיל מסע חדש</button></div>`;
   else action = '';
   const wait = st.wheel && (G.waiting || G.megaWait)
     ? `<p class="jwait">${G.megaWait ? '👑' : '🎡'} ${G.megaWait ? 'המגה גלגל' : 'הגלגל'} מחכה לך! עוד <b>${G.waiting || G.megaWait} דקות</b> תרגול היום והוא נפתח.</p>`
-    : st.wheel && G.spunToday && J.n < JOUR_N ? `<p class="jwait">🎡 כבר סובבת היום. מחר: אות ראשונה = גלגל!</p>`
-    : st.wheel && !G.todayN && J.n < JOUR_N ? `<p class="jwait">🎡 האות הראשונה של היום פותחת את הגלגל!</p>` : '';
+    : st.wheel && G.spunToday && J.n < JOUR_N ? `<div class="jwait">🎡 כבר סובבת היום.<br>מחר מחכה גלגל חדש!</div>`
+    : st.wheel && G.almost && J.n < JOUR_N ? `<div class="jwait">🎡 הגלגל של היום כמעט נפתח!<br>עוד קצת תרגול היום. ${wheelInfo(st)}</div>`
+    : st.wheel && !G.avail && J.n < JOUR_N ? `<div class="jwait">🎡 כל יום יכול להיפתח גלגל הפתעות.<br>משלימים את הצעדים של היום. ${wheelInfo(st)}</div>` : '';
   const T = G.target, tn = Math.min(G.todayN, T || G.todayN), minPct = G.minM ? Math.min(100, Math.round(G.mins / G.minM * 100)) : 100;
   const mission = `<div class="mission">
       <span>📋 היום: <b>${T ? `${tn}/${T}` : G.todayN}</b> אותיות${T && G.todayN >= T ? ' · <b>בוצעה! 🎉</b>' : ''}</span>
@@ -3385,7 +3418,13 @@ function journeyCardHTML(G, st) {
 </div>`;
   return `<section class="goal stk h3 journey">
     <div class="goalhead"><span class="glabel">🔤 מסע 26 האותיות</span><span class="gbig" dir="ltr">${J.n} / ${JOUR_N}</span></div>
-    <p class="gsub">כל שלב במפה = <b>${G.steps} צעדים</b> 👣. כל סבב שמסיימים (במסע או בתרגול לפי נושא) = צעד. בסוף כל שלב <b>פותחים אות</b> 🔓. המטרה: לפתוח את כל 26 האותיות. ${st.wheel ? 'השלב הראשון של כל יום פותח את <b>הגלגל</b>. ב־Z: <b>מגה גלגל</b>.' : ''}</p>
+    ${blt([
+      '<b>המטרה:</b> לפתוח את כל 26 האותיות 🔓',
+      `כל שלב במפה = <b>${G.steps} צעדים</b> 👣`,
+      'כל סבב שמסיימים = צעד אחד (במסע או בתרגול לפי נושא).',
+      'בסוף כל שלב נפתחת אות חדשה.',
+      st.wheel ? 'כל יום יכול להיפתח <b>גלגל הפתעות</b> 🎡' : '',
+      st.wheel ? 'אחרי Z מחכה <b>מגה גלגל</b> 👑' : ''], 'gsub')}
     ${action}
     ${wait}
     ${mission}
@@ -3400,11 +3439,11 @@ function stagePop(el) {
   const pop = document.createElement('div');
   pop.className = `jpop ${state}`; pop.dataset.k = k; pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', `שלב ${k + 1}`);
   pop.innerHTML = state === 'rest'
-    ? `<b>שלב ${k + 1} · האות <span class="en">${L}</span></b><span>🌙 להיום מספיק. נמשיך מחר!</span>`
+    ? `<b>שלב ${k + 1} · האות <span class="en">${L}</span></b><span>🌙 להיום מספיק.<br>נמשיך מחר!</span>`
     : state === 'lock'
-    ? `<b>שלב ${k + 1} · האות <span class="en">${L}</span></b><span>🔒 עוד נעול. קודם מסיימים את שלב ${J.n + 1}.</span>`
+    ? `<b>שלב ${k + 1} · האות <span class="en">${L}</span></b><span>🔒 האות הזאת עוד נעולה.<br>קודם מסיימים את שלב ${J.n + 1}.</span>`
     : `<b>שלב ${k + 1} · האות <span class="en">${L}${L.toLowerCase()}</span></b>
-       <span>${state === 'cur' ? `${stepsHTML(G_.csp, G_.steps, false)}<br>צעד ${G_.csp} מתוך ${G_.steps}. בסוף השלב פותחים את האות <span class="en">${L}</span> 🔓` : `את האות <span class="en">${L}</span> פתחת בשלב ${k + 1} ✓`}</span>
+       <span>${state === 'cur' ? `${stepsHTML(G_.csp, G_.steps, false)}<br>צעד ${G_.csp} מתוך ${G_.steps}.<br>בסוף השלב נפתחת האות <span class="en">${L}</span> 🔓` : `את האות <span class="en">${L}</span> פתחת בשלב ${k + 1} ✓`}</span>
        ${state === 'cur' ? '<button class="btn primary" data-popgo>▶ להמשיך במסע</button>' : ''}`;
   card.appendChild(pop);
   const cb = card.getBoundingClientRect(), r = el.getBoundingClientRect();
@@ -3509,10 +3548,11 @@ function stageFinish(score, n) {
       <h2>${score / n >= 0.8 ? 'סבב מצוין! 💪' : score / n >= 0.5 ? 'יפה! ממשיכים 💪' : 'כל סבב מקדם אותך 💪'}</h2>
       <div class="jstep"><b>👣 צעד ${have} מתוך ${need}!</b>${stepsHTML(have, need, true, L)}
         <span>${need - have === 1 ? 'עוד <b>צעד אחד</b>' : `עוד <b>${need - have}</b> צעדים`} ופותחים את האות <b class="en">${L}</b></span></div>
-      ${rest ? '<p>להיום מספיק. ממשיכים מחר, הצעדים נשמרים.</p>' : ''}
+      ${rest ? blt(['להיום מספיק.', 'הצעדים שלך שמורים.', 'ממשיכים מחר!']) : ''}
       <div class="row center">${rest ? '' : `<button class="btn primary" id="more">▶ עוד סבב</button>`}<button class="btn" data-back="home">לדף הבית</button></div>
     </section>`;
   const m = $('#more'); if (m) m.onclick = () => go(stageQuiz);
+  wheelBanner($('.result', app));
 }
 // any practice screen can end a stop: offer the letter there
 function journeyBanner(where) {
@@ -3545,6 +3585,7 @@ function letterWon(k) {
       <div class="row center">
         ${atEnd && st.wheel ? `<button class="btn spinbtn megabtn" id="megaspin">👑 למגה גלגל!</button>`
           : atStop && st.wheel ? `<button class="btn spinbtn" id="spin">🎡 הגלגל של היום נפתח! לסובב</button>`
+          : G.almost && st.wheel && !G.capped ? `<div class="jwait">🎡 הגלגל של היום כמעט נפתח!<br>עוד קצת תרגול היום. ${wheelInfo(st)}</div><button class="btn primary" id="nextst">להמשיך במסע ←</button>`
           : atEnd ? '' : G.capped ? `<p class="jrest">🌙 <b>להיום מספיק, כל הכבוד!</b> נמשיך מחר.</p>`
           : `<button class="btn primary" id="nextst">להמשיך במסע ←</button>`}
         <button class="btn" data-back="home">לדף הבית</button></div>
@@ -3587,7 +3628,7 @@ function focusQuiz() {
 function celebrateAll() {
   const ov = document.createElement('div');
   ov.className = 'winov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true');
-  ov.innerHTML = `<div class="wincard"><p class="wtitle">🏆</p><p class="wtext">כל 26 האותיות ירוקות!</p><p>קיבלת סיבוב בונוס בגלגל. מעכשיו כל יום חוזרים על כמה אותיות, כדי שלא ישכחו עד המבחן.</p><div class="wdetails" style="opacity:1;transform:none;pointer-events:auto"><button class="btn primary" id="agok">איזה כיף!</button></div></div>`;
+  ov.innerHTML = `<div class="wincard"><p class="wtitle">🏆</p><p class="wtext">כל 26 האותיות ירוקות!</p>${blt(['קיבלת סיבוב בונוס בגלגל!', 'מעכשיו חוזרים כל יום על כמה אותיות.', 'כך הן לא נשכחות עד המבחן.'])}<div class="wdetails" style="opacity:1;transform:none;pointer-events:auto"><button class="btn primary" id="agok">איזה כיף!</button></div></div>`;
   document.body.appendChild(ov);
   sfx('win');
   ov.querySelector('#agok').onclick = () => { ov.remove(); home(); };
@@ -3650,7 +3691,7 @@ function runQuiz(mod, title, qs, again) {
     if (mod === 'mock') {
       tally(ok);
       if (!ok) $(`.opt[data-k="${k}"]`, app).classList.add('no');
-      close(ok ? `<span class="en">${pick(PRAISE)}</span> ✅` : 'לא נכון. התשובה הנכונה בירוק.', ok);
+      close(ok ? `<span class="en">${pick(PRAISE)}</span> ✅` : 'לא נכון.<br>התשובה הנכונה בירוק.', ok);
       return;
     }
     if (ok) {
@@ -3697,14 +3738,14 @@ function runQuiz(mod, title, qs, again) {
     { const s0 = load(); if (!s0.firstGift && s0.wheel !== false) { s0.firstGift = today(); s0.giftSpins = (s0.giftSpins || 0) + 1; save(s0); firstGift = true; } }
     let stepNote = '';
     { const s1 = load(); if ((s1.goal || {}).type === 'journey' && jour(s1).n < JOUR_N && addStep(s1)) { save(s1); if (!stopReached(s1)) stepNote = stepNoteHTML(s1); } }
-    const msg = pct >= 90 ? 'מעולה! אתה מוכן!' : pct >= 70 ? 'יפה מאוד! עוד קצת תרגול ואתה שם.' : 'כל סיבוב מקדם אותך. ננסה שוב?';
+    const msg = pct >= 90 ? 'מעולה! אתה מוכן!' : pct >= 70 ? 'יפה מאוד!<br>עוד קצת תרגול ואתה שם.' : 'כל סבב מקדם אותך.<br>ננסה שוב?';
     app.innerHTML = `${top(title)}
       <section class="result stk">
         <div class="score">${score}/${qs.length}</div>
         <p class="hint">תשובות נכונות בניסיון הראשון</p>
         <h2>${msg}</h2>
         ${stepNote}
-        ${firstGift ? `<div class="giftbox"><b>🎉 סיבוב פתיחה עלינו!</b><span>לכבוד האימון הראשון שלך מגיע לך סיבוב בגלגל ההפתעות, מתנה. הצעד במסע נשאר שלך.</span><button class="btn spinbtn" id="giftspin">🎡 לסובב עכשיו</button></div>` : ''}
+        ${firstGift ? `<div class="giftbox"><b>🎉 סיבוב פתיחה עלינו!</b><span>${lines('זה האימון הראשון שלך!', 'מגיע לך סיבוב בגלגל ההפתעות, במתנה.', 'הצעד במסע נשאר שלך.')}</span><button class="btn spinbtn" id="giftspin">🎡 לסובב עכשיו</button></div>` : ''}
         ${isMock ? secTable(secs) : ''}
         ${wrong.length ? `<div class="review"><b>כדאי לחזור על:</b><ul>${wrong.map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>` : ''}
         ${!isMock && pct >= 90 && lvl !== 'hard' && load().allowLevelUp !== false ? `<div class="lvlup"><b>עברת את זה בקלות! 🚀</b><button class="btn primary" id="lvlup">⬆ לעלות לרמה ${LEVELS[lvl === 'easy' ? 'medium' : 'hard']}</button></div>` : ''}
@@ -3712,6 +3753,7 @@ function runQuiz(mod, title, qs, again) {
       </section>`;
     $('#again').onclick = () => go(again);
     journeyBanner($('.result', app));
+    wheelBanner($('.result', app));
     const gs = $('#giftspin'); if (gs) { gs.onclick = () => go(wheelView); sfx('win'); }
     const lu = $('#lvlup'); if (lu) lu.onclick = () => { const s = load(); s.level = lvl === 'easy' ? 'medium' : 'hard'; save(s); go(again); };
     $$('[data-practice]', app).forEach(b => b.onclick = () => MODS.find(m => m.id === b.dataset.practice).run());
@@ -3725,7 +3767,7 @@ function secTable(secs) {
     return `<div class="secrow ${state}"><span class="sname">${SECS[k]}</span><span class="smeter"><i style="width:${pct}%"></i></span><span class="sval">${ok}/${n}</span>
       ${pct < 100 ? `<button class="btn sm" data-practice="${k}">לתרגל</button>` : '<span class="sok">✓</span>'}</div>`;
   }).join('');
-  return `<div class="sectable"><b>לפי נושא</b>${rows}<p class="hint">כתיבת אותיות לא נבדקת כאן. מתרגלים אותה ב"כתיבת אותיות".</p></div>`;
+  return `<div class="sectable"><b>לפי נושא</b>${rows}${blt(['כתיבת אותיות לא נבדקת כאן.', 'מתרגלים אותה ב"כתיבת אותיות".'], 'hint')}</div>`;
 }
 
 /* ---------- writing ---------- */
@@ -4186,7 +4228,7 @@ function writeView() {
       sfx('no'); recW(letters, r); if (RND) RND.miss = true;
       ghost = true; drawGuide();
       const chips = letters.length > 1 ? `<span class="wfrow">${letters.map((l, i) => `<span class="wfl ${r[i] ? 'ok' : 'bad'}"><b>${l}</b>${r[i] ? '✓ נכונה' : '✗ עוד לא'}</span>`).join('')}</span>` : '';
-      $('#wfb').innerHTML = `<div class="fb bad"><div class="msg"><b>עוד לא.</b>${chips}<span>כך כותבים את האות, היא מופיעה עכשיו בלוח. אפשר לנסות שוב.</span></div><button class="btn" id="wagain">↻ לנסות שוב</button></div>`;
+      $('#wfb').innerHTML = `<div class="fb bad"><div class="msg"><b>עוד לא.</b>${chips}<span>${lines('ככה כותבים את האות: היא מופיעה עכשיו בלוח.', 'אפשר לנסות שוב.')}</span></div><button class="btn" id="wagain">↻ לנסות שוב</button></div>`;
       $('#wagain').onclick = () => { clear(); won = false; ghost = false; drawGuide(); };
       return;
     }
@@ -4205,7 +4247,7 @@ function writeView() {
           ? `<span class="wfrow">${letters.map((l, i) => `<span class="wfl ${r[i] === 'no' ? 'bad' : 'ok'}"><b>${l}</b>${r[i] === 'no' ? '✗ עוד לא' : '✓ נכונה'}</span>`).join('')}</span>` : '';
         hinting = true; drawGuide(); // put the arrow on the board, over the line that is missing
         const nMiss = missing.reduce((a, ss) => a + ss.length, 0);
-        $('#wfb').innerHTML = `<div class="fb bad"><div class="msg"><b>כמעט!</b>${chips}<span>${nMiss === 1 ? 'נשאר קו אחד — הוא מסומן באדום על הלוח. מתחילים בנקודה ומושכים לכיוון החץ.' : 'הקווים שחסרים מסומנים באדום על הלוח. מתחילים בנקודה ומושכים לכיוון החץ.'}</span></div><button class="btn" id="wagain">🧽 למחוק הכל</button></div>`;
+        $('#wfb').innerHTML = `<div class="fb bad"><div class="msg"><b>כמעט!</b>${chips}<span>${nMiss === 1 ? lines('נשאר קו אחד.', 'הוא מסומן באדום על הלוח.', 'מתחילים בנקודה ומושכים לכיוון החץ.') : lines('הקווים שחסרים מסומנים באדום על הלוח.', 'מתחילים בנקודה ומושכים לכיוון החץ.')}</span></div><button class="btn" id="wagain">🧽 למחוק הכל</button></div>`;
         // everything already drawn stays; only a deliberate tap wipes the lot
         $('#wagain').onclick = () => { clear(); won = false; render(); };
       }
@@ -4219,8 +4261,8 @@ function writeView() {
     if (RND && !RND.tried) { RND.tried = true; if (ok) RND.score++; }
     sfx(ok ? 'ok' : 'no');
     $('#wfb').innerHTML = ok
-      ? `<div class="fb good"><div class="msg"><b><span class="en">${pick(PRAISE)}</span> ✅ נכון!</b> השווה לאות שעל המסך.</div></div>`
-      : `<div class="fb bad"><div class="msg"><b>עוד לא.</b> כך כותבים את האות. אפשר לנסות שוב.</div></div>`;
+      ? `<div class="fb good"><div class="msg"><b><span class="en">${pick(PRAISE)}</span> ✅ נכון!</b> <br>השווה לאות שעל המסך.</div></div>`
+      : `<div class="fb bad"><div class="msg"><b>עוד לא.</b><br>ככה כותבים את האות.<br>אפשר לנסות שוב.</div></div>`;
     renderButtons(ok);
   }
   function rndLoad() {
@@ -4286,7 +4328,7 @@ function writeView() {
       wt.innerHTML = `${rhead}<div class="dict stk h${hueOf(idx)} wcopy"><p>${FREE ? 'כתוב את האות בתוך המסגרת' : 'כתוב את האות לפי המספרים והחצים'}</p>
           <span class="wmodel en" dir="ltr">${L.join(' ')}</span>
           <div class="sayrow"><button class="btn sm" data-say="${NAME[LETTERS[idx][0]]}">🔊 שם האות</button></div></div>
-        ${FREE ? '<p class="hint">לא צריך לדייק בקווים: כותבים את הצורה של האות, בגודל שנוח לך.</p>' : ''}`;
+        ${FREE ? blt(['לא צריך לדייק בקווים.', 'כותבים את הצורה של האות, בגודל שנוח לך.'], 'hint') : ''}`;
       if (!RND) wt.insertAdjacentHTML('afterbegin', `<div class="strip" id="strip">${LETTERS.map((L_, i) => `<button class="h${hueOf(i)}${i === idx ? ' on' : ''}" data-i="${i}" aria-label="${L_[0]}">${L_[0]}</button>`).join('')}</div>
         <div class="wctl"><div class="seg" role="group" aria-label="גודל אות">
           <button data-cs="up" class="${cs === 'up' ? 'on' : ''}">גדולה</button><button data-cs="low" class="${cs === 'low' ? 'on' : ''}">קטנה</button><button data-cs="both" class="${cs === 'both' ? 'on' : ''}">שתיהן</button></div></div>`);
@@ -4297,13 +4339,13 @@ function writeView() {
       const U_ = LETTERS[idx][0];
       wt.innerHTML = `<div class="dict stk h${hueOf(idx)}"><p>שלב ${STG + 1}: כתוב את האות <span class="en">${U_}</span>, גדולה וקטנה</p>
           <div class="sayrow"><button class="btn sm" data-say="${NAME[U_]}">🔊 שם האות</button></div></div>
-        <p class="hint">כותבים לפי המספרים והחצים: מתחילים בעיגול 1.</p>`;
+        ${blt(['כותבים לפי המספרים והחצים.', 'מתחילים בעיגול 1.'], 'hint')}`;
     } else if (mode === 'trace') {
       wt.innerHTML = `<div class="strip" id="strip">${LETTERS.map((L, i) => `<button class="h${hueOf(i)}${i === idx ? ' on' : ''}" data-i="${i}" aria-label="${L[0]}">${L[0]}</button>`).join('')}</div>
         <div class="wctl"><div class="seg" role="group" aria-label="גודל אות">
           <button data-cs="up" class="${cs === 'up' ? 'on' : ''}">גדולה</button><button data-cs="low" class="${cs === 'low' ? 'on' : ''}">קטנה</button><button data-cs="both" class="${cs === 'both' ? 'on' : ''}">שתיהן</button></div>
           <button class="btn sm" data-say="${NAME[LETTERS[idx][0]]}">🔊 שם האות</button></div>
-        <p class="hint">כותבים לפי המספרים והחצים: מתחילים בעיגול 1. כל 5 אותיות שנכתבות נכון = צעד 👣 במסע.</p>`;
+        ${blt(['כותבים לפי המספרים והחצים.', 'מתחילים בעיגול 1.', 'כל 5 אותיות נכונות = צעד 👣 במסע.'], 'hint')}`;
       $$('#strip button').forEach(b => b.onclick = () => { idx = +b.dataset.i; won = false; clear(); render(); });
       $$('[data-cs]', wt).forEach(b => b.onclick = () => { cs = b.dataset.cs; won = false; clear(); render(); });
       const on = $('#strip .on'); if (on) on.scrollIntoView({ block: 'nearest', inline: 'center' });
