@@ -584,6 +584,14 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .kstlink{flex:none}
 .kstmore{flex:1 1 100%;border-top:1px solid var(--line);margin-top:6px;padding-top:8px;display:grid;gap:7px}
 .kstline{margin:0;font-size:14px;color:var(--muted)}
+.kstbits b{color:var(--ink,#2A2340)}
+.kstph{width:30px;height:30px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-inline-end:8px}
+.kstago{font-size:12px;color:var(--muted)}
+.pdtitle{margin:14px 4px 0;font:700 20px var(--f-display)}
+body.pdash #app > :not(#pbar){display:none}
+body.pdash .pbar{margin-bottom:12px}
+.ownbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:0 auto 10px;max-width:640px;background:#EEF4FF;border:1.5px solid #CFE0FF;border-radius:14px;padding:7px 12px;font-size:14px}
+.ownbar a{font-weight:700}
 
 .giftbox{display:grid;gap:8px;justify-items:center;text-align:center;background:#FFF3C4;border:2px solid #FFD23F;border-radius:18px;padding:14px 16px;width:100%;animation:pop .5s both}
 .giftbox b{font:700 20px var(--f-display)}
@@ -1873,6 +1881,10 @@ async function bootKid(id, mode) {
     if (local === progress) cloudSoon();
     xsApply();
     home();
+    try { (await api()).onUser(u => { if (!u || u.uid !== k.owner || $('.ownbar')) return;
+      const b = document.createElement('div'); b.className = 'ownbar';
+      b.innerHTML = `<span>👀 זה המסך של <b>${esc(k.name)}</b>, כמו שהוא רואה אותו.</span><a href="${location.pathname}${DEMO ? '?demo' : ''}">לאזור ההורים ←</a>`;
+      app.parentNode.insertBefore(b, app); }); } catch (e) {}
     // a parent's change in the settings reaches this screen at once (no refresh): settings, name and photo only,
     // the progress stays what this device has
     let lastSet = JSON.stringify(k.settings || {}), lastProf = JSON.stringify([k.name, (k.profile || {}).photo]);
@@ -1916,15 +1928,24 @@ async function parentBar() {
     if (!u) { // signed out: just the way in
       $('#pbar').innerHTML = `<div class="pbrow"><span class="pbwho">אזור ההורים</span><button class="gearbtn" id="pgo" aria-label="הגדרות וכניסת הורים" title="הגדרות">${GEAR_SVG}</button></div>`;
       const b = $('#pgo'); if (b) b.onclick = () => settingsSheet();
+      document.body.classList.remove('pdash'); PWATCH.forEach(f => { try { f(); } catch (e) {} }); PWATCH = [];
       return;
     }
     try { PKIDS = await A.listKids(u.uid); } catch (e) { PKIDS = []; }
     PKIDS.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
     PKIDS_LOADED = u.uid;
     renderParentBar();
+    watchParentKids(A);
   });
 }
 
+const agoTxt = t => { if (!t) return 'עוד לא תרגל'; const m = Math.round((Date.now() - t) / 60000);
+  return 'פעיל לאחרונה: ' + (m < 2 ? 'עכשיו' : m < 60 ? `לפני ${m} דק׳` : m < 1440 ? `לפני ${Math.round(m / 60)} שע׳` : `לפני ${Math.round(m / 1440)} ימים`); };
+let PWATCH = [];
+function watchParentKids(A) { // each kid's card follows his progress live
+  PWATCH.forEach(f => { try { f(); } catch (e) {} }); PWATCH = [];
+  PKIDS.forEach(k => { try { const f = A.watchKid(k.id, d => { const i = PKIDS.findIndex(x => x.id === k.id); if (i < 0) return; PKIDS[i] = Object.assign({ id: k.id }, d); if (!$('.kstmore')) renderParentBar(); }); if (typeof f === 'function') PWATCH.push(f); } catch (e) {} });
+}
 function renderParentBar() {
   const bar = $('#pbar'); if (!bar || !PUSER) return;
   const who = esc((PUSER.name || PUSER.email || '').split(' ')[0] || 'הורה');
@@ -1933,19 +1954,22 @@ function renderParentBar() {
       <span class="pbwho">שלום ${who}</span>
       <button class="gearbtn" id="popen" aria-haspopup="dialog" aria-label="הגדרות" title="הגדרות">${GEAR_SVG}</button>
     </div>
-    ${PKIDS.length ? `<div class="kstrip">${PKIDS.map(k => {
+    ${PKIDS.length ? `<h2 class="pdtitle">הילדים שלי</h2><div class="kstrip">${PKIDS.map(k => {
       const d = kidDay(k), mins = Math.floor((d.ms || 0) / 60000);
       const abc = ((k.settings || {}).goal || {}).type !== 'mins' && ((k.settings || {}).goal || {}).type !== 'stars';
       const greens = letterLevels(k.progress || {}).filter(v => v === 2).length;
-      const prog = `מסע: ${((k.progress || {}).jour || {}).n || 0}/26 אותיות · היום ${d.jl || 0}`;
+      const p = k.progress || {}, J = p.jour || {}, ph = (k.profile || {}).photo;
       return `<article class="kst" data-k="${k.id}">
         <button class="kstmain" data-open="${k.id}" aria-expanded="false">
-          <span class="kstname">${esc(k.name)}</span>
-          <span class="kstbits"><span>${prog}</span><span>${mins} דק׳</span>${d.spins ? '<span>סובב היום</span>' : ''}</span>
+          <span class="kstname">${ph ? `<img class="kstph" src="${ph}" alt="">` : ''}${esc(k.name)}</span>
+          <span class="kstbits"><span>🔤 <b>${J.n || 0}/26</b> אותיות</span>${p.mock ? `<span>🏆 מבחן אחרון <b>${p.mock.score}/${p.mock.n}</b></span>` : ''}</span>
+          <span class="kstbits"><span>היום:</span><span><b>${d.jl || 0}</b> שלבים</span><span><b>${mins}</b> דק׳</span><span>🎡 <b>${d.spins || 0}</b></span></span>
+          <span class="kstago">${agoTxt(p.updatedAt)}</span>
         </button>
         <button class="btn sm kstlink" data-link="${k.id}">שליחת קישור</button>
       </article>`;
     }).join('')}</div>` : '<p class="hint pbhint">עוד אין ילדים. לחצו על גלגל השיניים כדי להוסיף.</p>'}`;
+  document.body.classList.toggle('pdash', !!PKIDS.length);
   $('#popen').onclick = () => settingsSheet();
   $$('[data-link]', bar).forEach(b => b.onclick = () => sendKidLink(b, PKIDS.find(k => k.id === b.dataset.link)));
   $$('[data-open]', bar).forEach(b => b.onclick = () => {
