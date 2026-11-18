@@ -760,7 +760,8 @@ body.mapopen{overflow:hidden}
 .steps i{width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.08);border:2px dashed rgba(0,0,0,.18);display:grid;place-items:center;font-style:normal;font-size:13px}
 .steps i.on{background:#FFE07A;border:2px solid #E3A800}
 .steps i.new{animation:pop .5s .25s both}
-.sgift{display:inline-flex;align-items:center;gap:2px;margin-inline-start:4px;font-size:16px}
+.sgoal{display:inline-grid;place-items:center;width:28px;height:28px;margin-inline-start:4px;border-radius:50%;background:#fff;color:#C98A00;border:2.5px solid #FFC94D;font:800 15px/1 var(--f-en)}
+.stagebtn .sgoal,.mapgo .sgoal{width:24px;height:24px;font-size:13px}
 .stagebtn .steps{flex-wrap:nowrap;gap:4px}
 .stagebtn .steps i{width:20px;height:20px;font-size:11px;background:rgba(255,255,255,.25);border-color:rgba(255,255,255,.6)}
 .stagebtn .steps i.on{background:#FFE07A;border-color:#FFE07A}
@@ -1463,7 +1464,7 @@ function addStep(s) {
 }
 // little footprints: the steps of the current stage, ending in the gift
 function stepsHTML(have, need, fresh, L) {
-  return `<span class="steps" aria-label="צעד ${have} מתוך ${need}">${[...Array(need)].map((_, i) => `<i class="${i < have ? 'on' : ''}${fresh && i === have - 1 ? ' new' : ''}">${i < have ? '👣' : ''}</i>`).join('')}${L ? `<b class="sgift">🎁<span class="en">${L}</span></b>` : ''}</span>`;
+  return `<span class="steps" aria-label="צעד ${have} מתוך ${need}">${[...Array(need)].map((_, i) => `<i class="${i < have ? 'on' : ''}${fresh && i === have - 1 ? ' new' : ''}">${i < have ? '👣' : ''}</i>`).join('')}${L ? `<b class="sgoal en" aria-label="בסוף: האות ${L}">${L}</b>` : ''}</span>`;
 }
 function stepNoteHTML(s1) {
   const n = curSteps(s1), need = stageSteps(s1), L = (ALPHA[jour(s1).n] || 'z').toUpperCase();
@@ -3366,7 +3367,7 @@ function journeyCardHTML(G, st) {
   if (G.mega && st.wheel && !G.megaWait) action = `<button class="btn spinbtn megabtn" id="megaspin">👑 אספת את כל 26 האותיות! למגה גלגל</button>`;
   else if (G.avail && st.wheel) action = `<button class="btn spinbtn" id="spin">🎡 האות הראשונה של היום! לסובב את הגלגל</button>`;
   else if (G.capped) action = `<div class="jrest">🌙 <b>להיום מספיק, כל הכבוד!</b><span>תרגלת ${G.maxM} דקות היום. המוח צריך גם מנוחה. נמשיך מחר.</span></div>`;
-  else if (J.n < JOUR_N && G.csp >= G.steps) action = `<button class="btn spinbtn" id="claim">🎁 הגעת לסוף השלב! לקבל את האות <span class="en">${nextL}</span></button>`;
+  else if (J.n < JOUR_N && G.csp >= G.steps) action = `<button class="btn spinbtn" id="claim">🏁 הגעת לסוף השלב! לקבל את האות <span class="en">${nextL}</span></button>`;
   else if (J.n < JOUR_N) action = `<button class="btn stagebtn" id="stagego"><span class="stl">▶</span><span>להמשיך במסע · שלב ${J.n + 1}<small class="stmin">${stepsHTML(G.csp, G.steps, false, nextL)}</small></span><span aria-hidden="true">←</span></button>`;
   else if (!G.mega) action = `<div class="jdone"><b>🏆 סיימת את כל המסע! אתה מוכן למבחן.</b><button class="btn" id="jnew">להתחיל מסע חדש</button></div>`;
   else action = '';
@@ -3381,7 +3382,7 @@ function journeyCardHTML(G, st) {
 </div>`;
   return `<section class="goal stk h3 journey">
     <div class="goalhead"><span class="glabel">🔤 מסע 26 האותיות</span><span class="gbig" dir="ltr">${J.n} / ${JOUR_N}</span></div>
-    <p class="gsub">כל שלב במפה = <b>${G.steps} צעדים</b> 👣. כל סבב שמסיימים (במסע או בתרגול לפי נושא) = צעד. בסוף השלב מקבלים אות באנגלית 🎁. ${st.wheel ? 'השלב הראשון של כל יום פותח את <b>הגלגל</b>. ב־Z: <b>מגה גלגל</b>.' : ''}</p>
+    <p class="gsub">כל שלב במפה = <b>${G.steps} צעדים</b> 👣. כל סבב שמסיימים (במסע או בתרגול לפי נושא) = צעד. בסוף השלב מקבלים אות באנגלית. ${st.wheel ? 'השלב הראשון של כל יום פותח את <b>הגלגל</b>. ב־Z: <b>מגה גלגל</b>.' : ''}</p>
     ${action}
     ${wait}
     ${mission}
@@ -3398,9 +3399,9 @@ function stagePop(el) {
   pop.innerHTML = state === 'rest'
     ? `<b>שלב ${k + 1} · האות <span class="en">${L}</span></b><span>🌙 להיום מספיק. נמשיך מחר!</span>`
     : state === 'lock'
-    ? `<b>שלב ${k + 1} · 🎁 האות <span class="en">${L}</span></b><span>🔒 עוד נעול. קודם מסיימים את שלב ${J.n + 1}.</span>`
-    : `<b>שלב ${k + 1} · 🎁 האות <span class="en">${L}${L.toLowerCase()}</span></b>
-       <span>${state === 'cur' ? `${stepsHTML(G_.csp, G_.steps, false)}<br>צעד ${G_.csp} מתוך ${G_.steps}. בסוף השלב מקבלים את האות <span class="en">${L}</span> 🎁` : `את האות <span class="en">${L}</span> קיבלת בשלב ${k + 1} ✓`}</span>
+    ? `<b>שלב ${k + 1} · האות <span class="en">${L}</span></b><span>🔒 עוד נעול. קודם מסיימים את שלב ${J.n + 1}.</span>`
+    : `<b>שלב ${k + 1} · האות <span class="en">${L}${L.toLowerCase()}</span></b>
+       <span>${state === 'cur' ? `${stepsHTML(G_.csp, G_.steps, false)}<br>צעד ${G_.csp} מתוך ${G_.steps}. בסוף השלב מקבלים את האות <span class="en">${L}</span>` : `את האות <span class="en">${L}</span> קיבלת בשלב ${k + 1} ✓`}</span>
        ${state === 'cur' ? '<button class="btn primary" data-popgo>▶ להמשיך במסע</button>' : ''}`;
   card.appendChild(pop);
   const cb = card.getBoundingClientRect(), r = el.getBoundingClientRect();
@@ -3504,7 +3505,7 @@ function stageFinish(score, n) {
       <div class="score">${score}/${n}</div>
       <h2>${score / n >= 0.8 ? 'סבב מצוין! 💪' : score / n >= 0.5 ? 'יפה! ממשיכים 💪' : 'כל סבב מקדם אותך 💪'}</h2>
       <div class="jstep"><b>👣 צעד ${have} מתוך ${need}!</b>${stepsHTML(have, need, true, L)}
-        <span>${need - have === 1 ? 'עוד <b>צעד אחד</b>' : `עוד <b>${need - have}</b> צעדים`} ומקבלים את האות <b class="en">${L}</b> 🎁</span></div>
+        <span>${need - have === 1 ? 'עוד <b>צעד אחד</b>' : `עוד <b>${need - have}</b> צעדים`} ומקבלים את האות <b class="en">${L}</b></span></div>
       ${rest ? '<p>להיום מספיק. ממשיכים מחר, הצעדים נשמרים.</p>' : ''}
       <div class="row center">${rest ? '' : `<button class="btn primary" id="more">▶ עוד סבב</button>`}<button class="btn" data-back="home">לדף הבית</button></div>
     </section>`;
@@ -3515,7 +3516,7 @@ function journeyBanner(where) {
   const s = load(); if ((s.goal || {}).type !== 'journey' || !stopReached(s) || !where) return;
   const L = ALPHA[jour(s).n].toUpperCase();
   const b = document.createElement('div'); b.className = 'jbanner';
-  b.innerHTML = `<b>🎁 הגעת לסוף השלב!</b><button class="btn primary">לקבל את האות <span class="en">${L}</span></button>`;
+  b.innerHTML = `<b>🏁 הגעת לסוף השלב!</b><button class="btn primary">לקבל את האות <span class="en">${L}</span></button>`;
   b.querySelector('button').onclick = () => claimLetter();
   where.prepend(b);
 }
