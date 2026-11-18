@@ -1387,7 +1387,7 @@ const DEFAULT_MEGA = [
   'A family movie night with pizza 🍕 | ערב סרט משפחתי עם פיצה',
 ];
 const fresh = () => ({ stars: 0, days: [], done: {}, best: {}, td: null, goal: { type: 'journey', every: 5, perDay: 0 }, prizes: DEFAULT_PRIZES.slice(), megaPrizes: DEFAULT_MEGA.slice(), wins: [], wheel: true, level: 'medium', testLevel: 'medium', allowLevelUp: true, pack: 'g4-mapping', prizeArt: {}, kidPrize: false });
-const PROGRESS_KEYS = ['stars', 'days', 'done', 'best', 'td', 'mock', 'mocks', 'wins', 'level', 'lt', 'allGreen', 'allGreenSeen', 'firstGift', 'jour', 'giftSpins', 'myPrize', 'updatedAt'];
+const PROGRESS_KEYS = ['stars', 'days', 'done', 'best', 'td', 'mock', 'mocks', 'wins', 'level', 'lt', 'allGreen', 'allGreenSeen', 'firstGift', 'jour', 'giftSpins', 'myPrize', 'resetAt', 'updatedAt'];
 const SETTING_KEYS = ['goal', 'prizes', 'megaPrizes', 'wheel', 'level', 'testLevel', 'allowLevelUp', 'pack', 'prizeArt', 'kidPrize'];
 const defaultSettings = () => { const f = fresh(); return Object.fromEntries(SETTING_KEYS.map(k => [k, f[k]])); };
 // KID is set when the app is opened from a parent's link: settings come from the parent, progress is saved to the cloud
@@ -1694,7 +1694,16 @@ const MODS = [
   { id:'words', t:'כתיבת מילים', sub:'Write words', g:'📝', h:3, run:() => go(wordWriteView) },
   { id:'speak', t:'אומרים בקול', sub:'Say it', g:'🎤', h:6, run:() => go(speakView) },
 ];
+let PENDING_RESET = null;
+function applyReset() {
+  const r = PENDING_RESET; if (!r || !KID) return false; PENDING_RESET = null;
+  KID.progress = Object.assign({}, r, { updatedAt: Date.now() }); delete KID.progress.resetLive;
+  try { localStorage.setItem(KEY + ':' + KID.id, JSON.stringify(KID.progress)); } catch (e) {}
+  cloudDirty = false; clearTimeout(cloudTimer);
+  return true;
+}
 function home() {
+  if (PENDING_RESET) applyReset();
   const st = load(), td = today(), G = goalState(st);
   const m = st.mock;
   const weak = m ? Object.keys(SECS).filter(k => m.secs[k] && m.secs[k][0] < m.secs[k][1]) : [];
@@ -1830,7 +1839,7 @@ let cloudTimer = 0, cloudDirty = false, cloudBusy = false, cloudFails = 0;
 function cloudSoon() { cloudDirty = true; clearTimeout(cloudTimer); cloudTimer = setTimeout(cloudFlush, 1500); }
 async function cloudFlush() {
   clearTimeout(cloudTimer); cloudTimer = 0;
-  if (!KID || !cloudDirty) return;
+  if (!KID || !cloudDirty || PENDING_RESET) return; // a reset is waiting: never send the old progress over it
   if (cloudBusy) { cloudTimer = setTimeout(cloudFlush, 800); return; }
   cloudBusy = true;
   const snap = KID.progress, stamp = snap.updatedAt;
@@ -1853,7 +1862,7 @@ async function bootKid(id, mode) {
     const k = await (await api()).getKid(id);
     if (!k) { app.innerHTML = '<section class="stk pbox"><h2>הקישור לא נמצא</h2><ul class="pts"><li>ייתכן שההורה מחק אותו.</li><li>בקשו מההורה קישור חדש.</li></ul></section>'; return; }
     let local = null; try { local = JSON.parse(localStorage.getItem(KEY + ':' + id)); } catch (e) {}
-    const progress = local && (local.updatedAt || 0) > ((k.progress || {}).updatedAt || 0) ? local : (k.progress || {});
+    const cp = k.progress || {}, progress = local && (local.updatedAt || 0) > (cp.updatedAt || 0) && (local.resetAt || 0) >= (cp.resetAt || 0) ? local : cp; // a parent's reset beats an older device copy
     KID = { id, mode: MODES[mode] ? mode : 'all', name: k.name || '', photo: (k.profile || {}).photo || '', settings: Object.assign(defaultSettings(), k.settings || {}), progress };
     if (local === progress) cloudSoon();
     xsApply();
@@ -1862,6 +1871,12 @@ async function bootKid(id, mode) {
     // the progress stays what this device has
     let lastSet = JSON.stringify(k.settings || {}), lastProf = JSON.stringify([k.name, (k.profile || {}).photo]);
     (await api()).watchKid(id, d => {
+      const cp = d.progress || {};
+      if ((cp.resetAt || 0) > (KID.progress.resetAt || 0) && (!PENDING_RESET || cp.resetAt > PENDING_RESET.resetAt)) {
+        PENDING_RESET = cp;
+        const onHome = $('.hero', app) && !document.body.classList.contains('mapopen');
+        if (cp.resetLive || onHome) go(home);
+      }
       const ns = JSON.stringify(d.settings || {}), np = JSON.stringify([d.name, (d.profile || {}).photo]);
       if (ns === lastSet && np === lastProf) return;
       lastSet = ns; lastProf = np;
@@ -2047,11 +2062,15 @@ function settingsSheet(kidId, tab) {
   function bindReset() {
     const R = $s('#shres'); if (!R) return;
     R.onclick = () => {
-      $s('#shresrow').innerHTML = `<b>לאפס את כל ההתקדמות של ${esc(kid.name)}? אי אפשר לבטל.</b><button class="btn" id="shres2">כן, לאפס</button><button class="btn" id="shres0">ביטול</button>`;
+      $s('#shresrow').innerHTML = `<div class="shstack"><b>לאפס את כל ההתקדמות של ${esc(kid.name)}? אי אפשר לבטל.</b>
+        ${blt(['אם הוא מתרגל עכשיו, האיפוס מגיע למכשיר שלו מיד.', 'אפשר לבחור: לאפס עכשיו גם באמצע תרגיל, או לחכות שיחזור למסך הבית.'], 'hint')}
+        <div class="row"><button class="btn" id="shres2" data-live="1">לאפס עכשיו, גם באמצע</button><button class="btn" id="shres3">לאפס כשיחזור למסך הבית</button><button class="btn" id="shres0">ביטול</button></div></div>`;
       $s('#shres0').onclick = body;
-      $s('#shres2').onclick = async () => {
-        const fresh_ = { updatedAt: Date.now(), resetAt: Date.now() }; // newer than any copy on his device, so the reset wins
-        try { await PAPI.saveProgress(kid.id, fresh_); kid.progress = fresh_; body(); $s('#shresrow').innerHTML = '<b class="shdone">אופס ✓ אם הקישור שלו פתוח עכשיו, רעננו אותו.</b>'; }
+      $s('#shres2').onclick = $s('#shres3').onclick = async e => {
+        const live = !!e.currentTarget.dataset.live;
+        const fresh_ = { updatedAt: Date.now(), resetAt: Date.now(), resetLive: live || undefined }; // newer than any copy on his device, so the reset wins
+        if (!live) delete fresh_.resetLive;
+        try { await PAPI.saveProgress(kid.id, fresh_); kid.progress = fresh_; body(); $s('#shresrow').innerHTML = `<b class="shdone">אופס ✓ ${live ? 'אם הוא מחובר, זה כבר אצלו.' : 'זה יקרה אצלו כשיחזור למסך הבית.'}</b>`; }
         catch (e) { $s('#shresrow').innerHTML = '<b>האיפוס נכשל. נסו שוב.</b>'; }
       };
     };
