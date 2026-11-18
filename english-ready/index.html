@@ -819,6 +819,42 @@ html.noscroll{overflow:hidden}
 .shlogin p{margin:0}
 #shout[hidden]{display:none}
 #shsave:disabled{opacity:.45;cursor:default;box-shadow:none}
+.shstack{display:grid;gap:14px}
+.pzlist{list-style:none;margin:0;padding:0;display:grid}
+.pzrow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;padding:8px 2px;border-bottom:1px solid var(--line)}
+.pzrow:last-child{border-bottom:0}
+.pzth{position:relative;width:56px;height:56px;border-radius:16px;border:1.5px solid var(--line);background:var(--bg);display:grid;place-items:center;padding:0;cursor:pointer;overflow:hidden;font-size:30px}
+.pzth img{width:100%;height:100%;object-fit:cover}
+.pzth .ji{height:36px}
+.pzedit{position:absolute;inset-inline-end:2px;bottom:2px;width:19px;height:19px;border-radius:50%;background:var(--ink);color:var(--on);font:600 11px/19px var(--f-body);text-align:center;font-style:normal}
+.pztx{display:grid;min-width:0}
+.pzin{font:inherit;color:var(--ink);background:transparent;border:0;border-bottom:1.5px solid transparent;border-radius:6px;padding:3px 4px;min-height:32px;width:100%;min-width:0}
+.pzin:hover{background:var(--bg)}
+.pzin:focus{outline:0;background:var(--bg);border-bottom-color:var(--c2)}
+.pzen{font:700 17px var(--f-en);text-align:left}
+.pzhe{font-size:14px;color:var(--muted)}
+.pzin.auto{border-bottom:1.5px dashed var(--c2)}
+.pzin::placeholder{color:#A8A39A;font-weight:400}
+.pzsug{font-size:13px;color:var(--muted);padding:0 4px}
+.pzmenu{display:flex;gap:8px;flex-wrap:wrap;padding-top:6px}
+.pzdel{border:0;background:none;color:var(--muted);font-size:18px;width:36px;height:36px;border-radius:50%;cursor:pointer}
+.pzdel:hover{background:var(--bg);color:#C0392B}
+.pzfoot{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.pzlink{border:0;background:none;color:var(--muted);text-decoration:underline;font:600 14px var(--f-body);cursor:pointer;padding:6px 0}
+.pzkid{font-size:15px}
+.pzimg{width:100%;height:100%;object-fit:contain;border-radius:20px}
+.wemoji .pzimg{width:150px;height:150px;filter:drop-shadow(0 10px 14px rgba(40,30,80,.25))}
+.pemoji .pzimg{width:72px;height:72px}
+.kavatar{width:46px;height:46px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-inline-start:10px;border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.15)}
+.kphoto{display:flex;gap:14px;align-items:center}
+.kph{flex:none;width:84px;height:84px;border-radius:50%;border:2px dashed var(--line);background:var(--bg);overflow:hidden;font-size:30px;cursor:pointer;display:grid;place-items:center;padding:0}
+.kph img{width:100%;height:100%;object-fit:cover}
+.kphtx{display:grid;gap:8px;min-width:0;flex:1}
+.kin{font:500 16px var(--f-body);width:100%;min-height:40px;padding:6px 10px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);resize:vertical}
+.kgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kgrid label,.kfield{display:grid;gap:4px;font-weight:600;font-size:14px}
+.mypz{justify-self:center}
+.mypsheet{max-height:min(86dvh,640px)}
 .sheet .packs{gap:6px}
 .sheet .pack{padding:8px 12px}
 @media (max-width:600px){
@@ -1195,9 +1231,9 @@ const DEFAULT_MEGA = [
   'A trip to the toy store 🧸 | ביקור בחנות צעצועים',
   'A family movie night with pizza 🍕 | ערב סרט משפחתי עם פיצה',
 ];
-const fresh = () => ({ stars: 0, days: [], done: {}, best: {}, td: null, goal: { type: 'journey', every: 5, perDay: 0 }, prizes: DEFAULT_PRIZES.slice(), megaPrizes: DEFAULT_MEGA.slice(), wins: [], wheel: true, level: 'medium', testLevel: 'medium', allowLevelUp: true, pack: 'g4-mapping' });
-const PROGRESS_KEYS = ['stars', 'days', 'done', 'best', 'td', 'mock', 'mocks', 'wins', 'level', 'lt', 'allGreen', 'allGreenSeen', 'firstGift', 'jour', 'giftSpins', 'updatedAt'];
-const SETTING_KEYS = ['goal', 'prizes', 'megaPrizes', 'wheel', 'level', 'testLevel', 'allowLevelUp', 'pack'];
+const fresh = () => ({ stars: 0, days: [], done: {}, best: {}, td: null, goal: { type: 'journey', every: 5, perDay: 0 }, prizes: DEFAULT_PRIZES.slice(), megaPrizes: DEFAULT_MEGA.slice(), wins: [], wheel: true, level: 'medium', testLevel: 'medium', allowLevelUp: true, pack: 'g4-mapping', prizeArt: {}, kidPrize: false });
+const PROGRESS_KEYS = ['stars', 'days', 'done', 'best', 'td', 'mock', 'mocks', 'wins', 'level', 'lt', 'allGreen', 'allGreenSeen', 'firstGift', 'jour', 'giftSpins', 'myPrize', 'updatedAt'];
+const SETTING_KEYS = ['goal', 'prizes', 'megaPrizes', 'wheel', 'level', 'testLevel', 'allowLevelUp', 'pack', 'prizeArt', 'kidPrize'];
 const defaultSettings = () => { const f = fresh(); return Object.fromEntries(SETTING_KEYS.map(k => [k, f[k]])); };
 // KID is set when the app is opened from a parent's link: settings come from the parent, progress is saved to the cloud
 let KID = null;
@@ -1490,7 +1526,7 @@ function home() {
   <header class="hero">
     <div class="heroart" aria-hidden="true"><span class="ha a1">📚</span><span class="ha a2">🚀</span><span class="ha a3">✨</span><span class="ha a4">⭐</span></div>
     <div class="blocks" aria-hidden="true"><span class="blk h1">A</span><span class="blk h2">B</span><span class="blk h4">C</span></div>
-    <h1>${KID ? `שלום ${esc(KID.name)}!` : 'מוכן לאנגלית'}</h1>
+    <h1>${KID ? `${KID.photo ? `<img class="kavatar" src="${KID.photo}" alt="">` : ''}שלום ${esc(KID.name)}!` : 'מוכן לאנגלית'}</h1>
     ${KID ? `<p class="sub">${KID.mode === 'test' ? 'כאן עושים מבחן ניסיון.' : KID.mode === 'learn' ? 'כאן מתרגלים אנגלית. בהצלחה!' : 'מתכוננים למבחן באנגלית.'}</p>` : ''}
     <div class="pills"><span class="pill due">${countdown()}</span><span class="pill">🔤 ${jour(st).n}/26 אותיות</span></div>
   </header>
@@ -1576,6 +1612,8 @@ async function api() {
     createKid: async (uid, name) => { const id = newId(); await kids.doc(id).set({ owner: uid, name, settings: defaultSettings(), progress: {}, createdAt: Date.now(), updatedAt: Date.now() }); return id; },
     saveSettings: (id, settings, name) => kids.doc(id).update({ settings, name, updatedAt: Date.now() }),
     saveProgress: (id, progress) => kids.doc(id).update({ progress, updatedAt: Date.now() }),
+    saveProfile: (id, profile) => kids.doc(id).update({ profile }),
+    clearMyPrize: id => kids.doc(id).update({ 'progress.myPrize': firebase.firestore.FieldValue.delete(), 'progress.updatedAt': Date.now(), updatedAt: Date.now() }),
     deleteKid: id => kids.doc(id).delete(),
   };
   return API;
@@ -1594,6 +1632,8 @@ function demoApi() { // local stand-in for Firebase (only with ?demo on this com
     createKid: async (uid, name) => { const o = db(), id = newId(); o[id] = { owner: uid, name, settings: defaultSettings(), progress: {}, createdAt: Date.now() }; put(o); return id; },
     saveSettings: async (id, settings, name) => { const o = db(); Object.assign(o[id], { settings, name }); put(o); },
     saveProgress: async (id, progress) => { const o = db(); if (o[id]) { o[id].progress = progress; put(o); } },
+    saveProfile: async (id, profile) => { const o = db(); if (o[id]) { o[id].profile = profile; put(o); } },
+    clearMyPrize: async id => { const o = db(); if (o[id] && o[id].progress) { delete o[id].progress.myPrize; o[id].progress.updatedAt = Date.now(); put(o); } },
     deleteKid: async id => { const o = db(); delete o[id]; put(o); },
   };
 }
@@ -1632,7 +1672,7 @@ async function bootKid(id, mode) {
     if (!k) { app.innerHTML = '<section class="stk pbox"><h2>הקישור לא נמצא</h2><p>אולי ההורה מחק אותו. בקשו מההורה קישור חדש.</p></section>'; return; }
     let local = null; try { local = JSON.parse(localStorage.getItem(KEY + ':' + id)); } catch (e) {}
     const progress = local && (local.updatedAt || 0) > ((k.progress || {}).updatedAt || 0) ? local : (k.progress || {});
-    KID = { id, mode: MODES[mode] ? mode : 'all', name: k.name || '', settings: Object.assign(defaultSettings(), k.settings || {}), progress };
+    KID = { id, mode: MODES[mode] ? mode : 'all', name: k.name || '', photo: (k.profile || {}).photo || '', settings: Object.assign(defaultSettings(), k.settings || {}), progress };
     if (local === progress) cloudSoon();
     home();
   } catch (e) {
@@ -1742,11 +1782,11 @@ const GOAL_NOTE = {
 };
 const winRowsHTML = wins => wins.length ? `<ul class="winrows">${wins.map(w => { const he = heOf(w.prize);
   return `<li><span class="wrill" aria-hidden="true">${emojiOf(w.prize)}</span><span class="wrtx"><span class="en">${esc(textOf(w.prize))}</span>${he ? `<small>${esc(he)}</small>` : ''}</span><span class="wrdate">${w.date.split('-').slice(1).reverse().join('.')}</span></li>`; }).join('')}</ul>` : '<p class="hint">עוד אין.</p>';
-const SHEET_TABS = [['learn', 'לימוד'], ['goal', 'יעד והפתעות'], ['prog', 'התקדמות'], ['link', 'קישור'], ['kid', 'פרטים']];
+const SHEET_TABS = [['kid', 'פרטים'], ['learn', 'לימוד'], ['goal', 'יעד והפתעות'], ['prog', 'התקדמות'], ['link', 'קישור']];
 function settingsSheet(kidId, tab) {
   const old = document.querySelector('.sheetov'); if (old) old.remove();
   let kid = PKIDS.find(k => k.id === kidId) || PKIDS[0] || null;
-  let cur = tab || 'learn', st = null, name = '', dirty = false;
+  let cur = tab || 'kid', st = null, name = '', dirty = false, prof = {}, pzDirty = false;
   const ov = document.createElement('div');
   ov.className = 'sheetov';
   ov.innerHTML = `<div class="sheet" role="dialog" aria-modal="true" aria-label="הגדרות">
@@ -1780,6 +1820,8 @@ function settingsSheet(kidId, tab) {
   function loadKid() {
     st = kid ? Object.assign(defaultSettings(), JSON.parse(JSON.stringify(kid.settings || {}))) : null;
     if (st && !st.linkMode) st.linkMode = 'learn';
+    if (st && !st.prizeArt) st.prizeArt = {};
+    prof = kid ? JSON.parse(JSON.stringify(kid.profile || {})) : {}; pzDirty = false;
     name = kid ? kid.name : ''; dirty = false; delete ov.dataset.confirm;
     $s('#shsave').disabled = true; $s('#shok').textContent = '';
   }
@@ -1808,6 +1850,18 @@ function settingsSheet(kidId, tab) {
   const segs = (attr, curV, opts) => opts.map(([v, t]) => `<button type="button" data-${attr}="${v}" class="${curV === v ? 'on' : ''}">${t}</button>`).join('');
   const bindSeg = (attr, set) => $$s(`[data-${attr}]`).forEach(b => b.onclick = () => { set(b.dataset[attr]); $$s(`[data-${attr}]`).forEach(x => x.classList.toggle('on', x === b)); touch(); });
 
+  function bindReset() {
+    const R = $s('#shres'); if (!R) return;
+    R.onclick = () => {
+      $s('#shresrow').innerHTML = `<b>לאפס את כל ההתקדמות של ${esc(kid.name)}? אי אפשר לבטל.</b><button class="btn" id="shres2">כן, לאפס</button><button class="btn" id="shres0">ביטול</button>`;
+      $s('#shres0').onclick = body;
+      $s('#shres2').onclick = async () => {
+        const fresh_ = { updatedAt: Date.now(), resetAt: Date.now() }; // newer than any copy on his device, so the reset wins
+        try { await PAPI.saveProgress(kid.id, fresh_); kid.progress = fresh_; body(); $s('#shresrow').innerHTML = '<b class="shdone">אופס ✓ אם הקישור שלו פתוח עכשיו, רעננו אותו.</b>'; }
+        catch (e) { $s('#shresrow').innerHTML = '<b>האיפוס נכשל. נסו שוב.</b>'; }
+      };
+    };
+  }
   function body() {
     const B = $s('#shbody');
     if (cur === 'add' || !kid) {
@@ -1853,22 +1907,36 @@ function settingsSheet(kidId, tab) {
           <p class="hint" id="shpdnote"></p></div>
         <div class="shgrp"><h3>גלגל ההפתעות</h3>
           <div class="seg" role="group" aria-label="גלגל ההפתעות">${segs('wh', st.wheel ? '1' : '0', [['1', 'פעיל'], ['0', 'כבוי: רק המסע']])}</div></div>
-        <div class="shgrp" id="shprz" ${st.wheel ? '' : 'hidden'}><h3>ההפתעות</h3>
-          <p class="hint">אחת בכל שורה, באנגלית. תרגום לעברית אחרי קו: <span class="en" dir="ltr">A pizza night 🍕 | ערב פיצה</span></p>
-          <textarea id="shpz" rows="6" class="en ptext-in">${esc(st.prizes.join('\n'))}</textarea>
-          <h3>👑 פרסי המגה גלגל (אחרי Z)</h3>
-          <textarea id="shmz" rows="4" class="en ptext-in">${esc(st.megaPrizes.join('\n'))}</textarea>
-          <button type="button" class="btn sm" id="shmtry">👑 לנסות את המגה גלגל</button></div>`;
+        <div id="shprz" class="shstack" ${st.wheel ? '' : 'hidden'}>
+          <div class="shgrp"><h3>ההפתעות בגלגל</h3>
+            <p class="hint">לחצו על שם כדי לערוך ועל התמונה כדי להחליף אותה (מהמחשב, מהגלריה או מהמצלמה). אפשר להוסיף הפתעה בעברית ונציע תרגום לאנגלית. שניהם נשארים ניתנים לעריכה.</p>
+            <ul class="pzlist" id="pzl-prizes"></ul>
+            <div class="pzfoot"><button type="button" class="btn sm" data-pzadd="prizes">＋ הוספת הפתעה</button><button type="button" class="pzlink" data-pzreset="prizes">שחזור הרשימה המקורית</button></div>
+            <div class="pzkid" id="pzkid"></div></div>
+          <div class="shgrp"><h3>👑 פרסי המגה גלגל (אחרי Z)</h3>
+            <ul class="pzlist" id="pzl-megaPrizes"></ul>
+            <div class="pzfoot"><button type="button" class="btn sm" data-pzadd="megaPrizes">＋ הוספת פרס</button><button type="button" class="pzlink" data-pzreset="megaPrizes">שחזור הרשימה המקורית</button></div>
+            <button type="button" class="btn sm" id="shmtry">👑 לנסות את המגה גלגל</button></div>
+          <div class="shgrp"><h3>הפתעה משלו</h3>
+            <div class="seg" role="group" aria-label="הפתעה אישית">${segs('kp', st.kidPrize ? '1' : '0', [['0', 'כבוי'], ['1', 'מותר']])}</div>
+            <p class="hint">כשמותר, ${esc(kid.name)} יכול להוסיף לגלגל הפתעה אחת משלו (עם תרגום ותמונה), לערוך אותה ולהסיר אותה. כאן תראו מה בחר ותוכלו להסיר.</p></div>
+        </div>`;
       const pdNote = () => { const J = (p && p.jour) || { n: 0 }, left = JOUR_N - (J.n || 0), real = (J.lm || []).filter(x => x > 0), lm = real.length ? Math.round(real.reduce((a, b) => a + b, 0) / real.length) : stageSteps(st) * STEP_MIN, mx = dayMax(st) || 60, per = Math.max(1, Math.floor(mx / lm)), days = Math.ceil(left / per), dd = daysToTest();
         $s('#shpdnote').textContent = `${real.length ? `שלב לוקח לו בפועל בערך ${lm} דקות. ` : ''}${per} אותיות ביום לכל היותר. נשארו ${left} אותיות: בערך ${days} ימי תרגול${dd > 0 && days > dd ? ` (עד המבחן נשארו ${dd} ימים, אז הוא יגיע בערך לאות ${ALPHA[Math.min(25, (J.n || 0) + dd * per - 1)].toUpperCase()}. כל סבב מתרגל את כל נושאי המבחן, כך שגם בלי לסיים את המסע הוא מתכונן לכולם)` : ''}.`; };
       pdNote();
       bindSeg('sp', v => { st.goal.steps = +v; pdNote(); });
       bindSeg('mx', v => { st.goal.max = +v; pdNote(); });
       bindSeg('wh', v => { st.wheel = v === '1'; $s('#shprz').hidden = !st.wheel; $s('#shtry').hidden = !st.wheel; });
-      $s('#shpz').oninput = e => { const list = e.target.value.split('\n').map(x => x.trim()).filter(Boolean); st.prizes = list.length >= 2 ? list.slice(0, 12) : DEFAULT_PRIZES.slice(); touch(); };
-      $s('#shtry').onclick = () => wheelView({ prizes: st.prizes });
-      $s('#shmz').oninput = e => { const list = e.target.value.split('\n').map(x => x.trim()).filter(Boolean); st.megaPrizes = list.length >= 2 ? list.slice(0, 12) : DEFAULT_MEGA.slice(); touch(); };
-      $s('#shmtry').onclick = () => wheelView({ prizes: st.megaPrizes, mega: true });
+      const PZW = pzWire($s('#shprz'), { lists: st, art: st.prizeArt, defaults: { prizes: DEFAULT_PRIZES, megaPrizes: DEFAULT_MEGA }, min: 2, touch: () => { pzDirty = true; touch(); } });
+      PZW.render('prizes'); PZW.render('megaPrizes');
+      const mpz = (kid.progress || {}).myPrize;
+      if (mpz && (mpz.en || mpz.he)) {
+        $s('#pzkid').innerHTML = `✨ ההפתעה ש${esc(kid.name)} בחר: <b class="en" dir="ltr">${esc(mpz.en || mpz.he)}</b>${mpz.he && mpz.en ? ` <span>(${esc(mpz.he)})</span>` : ''} <button type="button" class="pzlink" id="pzkidrm">הסרה</button>`;
+        $s('#pzkidrm').onclick = async () => { try { await PAPI.clearMyPrize(kid.id); delete kid.progress.myPrize; $s('#pzkid').textContent = 'ההפתעה שלו הוסרה.'; } catch (e) { $s('#pzkid').textContent = 'ההסרה נכשלה. נסו שוב.'; } };
+      }
+      bindSeg('kp', v => { st.kidPrize = v === '1'; });
+      $s('#shtry').onclick = () => wheelView({ prizes: pzCleanList(st.prizes), art: st.prizeArt });
+      $s('#shmtry').onclick = () => wheelView({ prizes: pzCleanList(st.megaPrizes), mega: true, art: st.prizeArt });
     } else if (cur === 'prog') {
       const d = kidDay(kid), m = p.mock;
       B.innerHTML = `
@@ -1882,7 +1950,10 @@ function settingsSheet(kidId, tab) {
           <div id="shlt"><p class="hint">לחצו על אות כדי לראות מה הוא כבר יודע בה.</p></div></div>
         <div class="shgrp"><h3>מבחן ניסיון אחרון</h3>
           ${m ? `<p>${m.date.split('-').slice(1).reverse().join('.')}: <b>${m.score}/${m.n}</b></p>${secTable(m.secs).replace(/<button[^>]*>לתרגל<\/button>/g, '')}` : '<p class="hint">עוד לא עשה מבחן ניסיון.</p>'}</div>
-        <div class="shgrp"><h3>זכיות בגלגל</h3>${winRowsHTML((p.wins || []).slice(0, 12))}</div>`;
+        <div class="shgrp"><h3>זכיות בגלגל</h3>${winRowsHTML((p.wins || []).slice(0, 12))}</div>
+        <div class="shgrp"><h3>איפוס ההתקדמות</h3>
+          <p class="hint">מתחיל מאפס: כוכבים, אותיות היום, דקות, ימי תרגול, תוצאות מבחנים וזכיות בגלגל. ההגדרות, הפרטים והקישור נשארים.</p>
+          <div class="row" id="shresrow"><button class="btn" id="shres">איפוס ההתקדמות</button></div></div>`;
       const showLt = c => {
         const r = (p.lt || {})[c] || {}, lv = letterLevel(r);
         $s('#shlt').innerHTML = `<div class="ltcard"><b class="ltbig en">${c.toUpperCase()}${c}</b><span class="ltst l${lv}">${['עוד לא', 'בדרך', 'שולט'][lv]}</span>
@@ -1891,6 +1962,7 @@ function settingsSheet(kidId, tab) {
         $$s('.lm').forEach(x => x.classList.toggle('sel', x.dataset.lt === c));
       };
       $$s('[data-lt]').forEach(x => { x.onclick = () => showLt(x.dataset.lt); x.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showLt(x.dataset.lt); } }; });
+      bindReset();
     } else if (cur === 'link') {
       const url = kidLink(kid.id, st.linkMode);
       B.innerHTML = `
@@ -1904,30 +1976,52 @@ function settingsSheet(kidId, tab) {
       $s('#shcopy').onclick = async e => { try { await navigator.clipboard.writeText($s('#shurl').value); e.target.textContent = 'הועתק ✓'; } catch (er) { $s('#shurl').select(); e.target.textContent = 'סמנו והעתיקו'; } };
       $s('#shsend').onclick = e => sendKidLink(e.target, Object.assign({}, kid, { settings: st }));
     } else if (cur === 'kid') {
+      const pv = k => esc(prof[k] || '');
       B.innerHTML = `
-        <div class="shgrp"><h3>שם</h3><input id="shname" class="pin wide" maxlength="20" value="${esc(name)}" aria-label="שם הילד"></div>
-        <div class="shgrp"><h3>איפוס ההתקדמות</h3>
-          <p class="hint">מתחיל מאפס: כוכבים, אותיות היום, דקות, ימי תרגול, תוצאות מבחנים וזכיות בגלגל. ההגדרות והקישור נשארים.</p>
-          <div class="row" id="shresrow"><button class="btn" id="shres">איפוס ההתקדמות</button></div></div>
+        <div class="shgrp"><h3>${esc(kid.name)}</h3>
+          <div class="kphoto">
+            <button type="button" class="kph" id="shphoto" aria-label="תמונה של הילד">${prof.photo ? `<img src="${prof.photo}" alt="">` : '<span aria-hidden="true">📷</span>'}</button>
+            <div class="kphtx">
+              <label class="shfield">שם <input id="shname" class="pin" maxlength="20" value="${esc(name)}" aria-label="שם הילד"></label>
+              <div class="row"><button type="button" class="btn sm" id="shphotob">${prof.photo ? 'החלפת תמונה' : 'הוספת תמונה'}</button>${prof.photo ? '<button type="button" class="btn sm" id="shphotor">הסרה</button>' : ''}</div>
+              <small class="hint" id="shphnote">התמונה מופיעה בברכה שלו ובכרטיס הזכייה. מכל מכשיר (גם HEIC מהאייפון).</small>
+            </div>
+          </div></div>
+        <div class="shgrp"><h3>עוד עליו</h3>
+          <p class="hint">הפרטים עוזרים לי לכתוב שאלות שמתאימות לו ולהבין את התוצאות. הכל אופציונלי.</p>
+          <div class="kgrid">
+            <label>גיל <input id="kage" class="kin" type="number" inputmode="numeric" min="5" max="16" value="${pv('age')}"></label>
+            <label>כיתה <input id="kgrade" class="kin" maxlength="12" value="${pv('grade')}" placeholder="למשל ד׳"></label>
+          </div>
+          <label class="shfield">האנגלית שלו לדעתכם</label>
+          <div class="seg" role="group" aria-label="רמת אנגלית">${segs('kl', String(prof.lvl || ''), [['1', 'בתחילת הדרך'], ['2', 'בינונית'], ['3', 'טובה']])}</div>
+          <label class="kfield">במה הוא מתעניין (כדי שהשאלות יהיו על דברים שהוא אוהב)<input id="kint" class="kin" maxlength="120" value="${pv('interests')}" placeholder="כדורגל, מיינקראפט, חיות..."></label>
+          <label class="kfield">מה כיף לו באנגלית<input id="klike" class="kin" maxlength="120" value="${pv('likes')}" placeholder="שירים, משחקים, סרטונים..."></label>
+          <label class="kfield">מה קשה לו באנגלית<input id="khard" class="kin" maxlength="120" value="${pv('hard')}" placeholder="קריאה, איות, אוצר מילים..."></label>
+          <label class="kfield">הערות להתאמת שאלות<textarea id="knote" class="kin" rows="2" maxlength="300">${pv('notes')}</textarea></label>
+          <p class="hint">בלי אבחנות רפואיות, שם משפחה או כתובת. כל מי שיש לו את הקישור של ${esc(kid.name)} יכול טכנית לקרוא גם את הפרטים האלה.</p></div>
         <div class="shgrp danger"><h3>מחיקת ${esc(kid.name)}</h3>
           <p class="hint">הקישור שלו יפסיק לעבוד וההתקדמות תימחק.</p>
           <div class="row" id="shdelrow"><button class="btn" id="shdel">מחיקה</button></div></div>`;
       $s('#shname').oninput = e => { name = e.target.value.trim() || kid.name; touch(); };
-      $s('#shres').onclick = () => {
-        $s('#shresrow').innerHTML = `<b>לאפס את כל ההתקדמות של ${esc(kid.name)}? אי אפשר לבטל.</b><button class="btn" id="shres2">כן, לאפס</button><button class="btn" id="shres0">ביטול</button>`;
-        $s('#shres0').onclick = body;
-        $s('#shres2').onclick = async () => {
-          const fresh_ = { updatedAt: Date.now(), resetAt: Date.now() }; // newer than any copy on his device, so the reset wins
-          try { await PAPI.saveProgress(kid.id, fresh_); kid.progress = fresh_; $s('#shresrow').innerHTML = '<b class="shdone">אופס ✓ אם הקישור שלו פתוח עכשיו, רעננו אותו.</b>'; }
-          catch (e) { $s('#shresrow').innerHTML = '<b>האיפוס נכשל. נסו שוב.</b>'; }
-        };
+      [['#kage', 'age'], ['#kgrade', 'grade'], ['#kint', 'interests'], ['#klike', 'likes'], ['#khard', 'hard'], ['#knote', 'notes']].forEach(([sel, k]) => { $s(sel).oninput = e => { prof[k] = e.target.value.trim(); touch(); }; });
+      bindSeg('kl', v => { prof.lvl = v; });
+      const pf = document.createElement('input'); pf.type = 'file'; pf.accept = 'image/*,.heic,.heif,.avif,.webp'; pf.hidden = true; B.appendChild(pf);
+      const pick = () => { pf.value = ''; pf.click(); };
+      $s('#shphoto').onclick = pick; $s('#shphotob').onclick = pick;
+      if ($s('#shphotor')) $s('#shphotor').onclick = () => { delete prof.photo; touch(); body(); };
+      pf.onchange = async () => {
+        const f = pf.files && pf.files[0]; if (!f) return;
+        $s('#shphnote').textContent = 'מעבד את התמונה…';
+        try { prof.photo = await fileToDataURL(f, 256, 22000); touch(); body(); }
+        catch (err) { $s('#shphnote').textContent = 'לא הצלחנו לקרוא את הקובץ. נסו תמונה אחרת.'; }
       };
       $s('#shdel').onclick = () => {
         $s('#shdelrow').innerHTML = `<b>למחוק את ${esc(kid.name)}?</b><button class="btn" id="shdel2">כן, למחוק</button><button class="btn" id="shdel0">ביטול</button>`;
         $s('#shdel0').onclick = body;
         $s('#shdel2').onclick = async () => {
           try { await PAPI.deleteKid(kid.id); } catch (e) {}
-          PKIDS = PKIDS.filter(k => k.id !== kid.id); kid = PKIDS[0] || null; cur = kid ? 'learn' : 'add'; loadKid(); kidsRow(); tabs(); body();
+          PKIDS = PKIDS.filter(k => k.id !== kid.id); kid = PKIDS[0] || null; cur = kid ? 'kid' : 'add'; loadKid(); kidsRow(); tabs(); body();
         };
       };
     }
@@ -1935,10 +2029,18 @@ function settingsSheet(kidId, tab) {
   }
   $s('#shsave').onclick = async () => {
     if (!kid || !dirty) return;
+    if (pzDirty) {
+      const a = pzCleanList(st.prizes), m = pzCleanList(st.megaPrizes);
+      if (a.length < 2 || m.length < 2) { $s('#shok').textContent = 'צריך לפחות 2 הפתעות בגלגל ובמגה גלגל.'; return; }
+      st.prizes = a; st.megaPrizes = m;
+      const keep = new Set([...a, ...m].map(t => textOf(t)));
+      for (const k of Object.keys(st.prizeArt || {})) if (!keep.has(k)) delete st.prizeArt[k];
+    }
     const b = $s('#shsave'); b.disabled = true;
     try {
       st.goal = Object.assign({}, st.goal, { set: true });
       await PAPI.saveSettings(kid.id, st, name);
+      await PAPI.saveProfile(kid.id, prof); kid.profile = JSON.parse(JSON.stringify(prof)); pzDirty = false;
       kid.settings = JSON.parse(JSON.stringify(st)); kid.name = name; dirty = false; delete ov.dataset.confirm;
       $s('#shok').textContent = 'נשמר ✓'; kidsRow();
     } catch (e) { b.disabled = false; $s('#shok').textContent = 'השמירה נכשלה. נסו שוב.'; }
@@ -2176,6 +2278,169 @@ const emojiOf = t => (enPart(t).match(/\p{Extended_Pictographic}\uFE0F?/gu) || [
 const textOf = t => enPart(t).replace(/\p{Extended_Pictographic}\uFE0F?/gu, '').trim();
 const heOf = t => (String(t).split('|')[1] || '').trim() || PRIZE_HE[textOf(t)] || '';
 
+/* ---------- prize pictures, edited prizes, photos (parent area and the kid's own prize) ---------- */
+const guessEmoji = t => {
+  const m = [[/pizza|פיצה/i, '🍕'], [/ice ?cream|גלידה/i, '🍦'], [/cake|עוגה/i, '🍰'], [/candy|sweet|ממתק|סוכרי/i, '🍬'], [/movie|film|סרט|קולנוע/i, '🎬'],
+    [/lego|לגו/i, '🧱'], [/game|משחק|play/i, '🎮'], [/toy|צעצוע/i, '🧸'], [/park|פארק|water|מים/i, '🎢'], [/pool|בריכה|swim|שחי/i, '🏊'],
+    [/beach|sea|ים|חוף/i, '🏖️'], [/ball|football|soccer|כדור/i, '⚽'], [/bike|אופני/i, '🚲'], [/book|ספר/i, '📚'], [/screen|tablet|phone|מסך|טלפון|טאבלט/i, '📱'],
+    [/snack|popcorn|חטיף|פופקורן/i, '🍿'], [/money|כסף|shekel|שקל/i, '💰'], [/trip|טיול|travel/i, '🚗'], [/pet|dog|cat|כלב|חתול/i, '🐶'], [/music|song|שיר|מוזיקה/i, '🎵']];
+  for (const [re, e] of m) if (re.test(t)) return e;
+  return '🎁';
+};
+// a prize is the text "English 🍕 | עברית"; the picture a parent or kid chose lives next to it, keyed by the English text
+const pzParse = t => ({ en: textOf(t), he: heOf(t), em: emojiOf(t) });
+const pzBuild = r => { const en = String(r.en || '').trim(), he = String(r.he || '').trim(); return `${en} ${r.em || '🎁'}${he ? ' | ' + he : ''}`; };
+const pzCleanList = arr => (arr || []).map(t => { const r = pzParse(t); if (!r.en.trim() && !r.he.trim()) return null; if (!r.en.trim()) r.en = r.he; return pzBuild(r); }).filter(Boolean);
+const artMap = () => {
+  const s = KID ? Object.assign({}, KID.settings, { myPrize: KID.progress && KID.progress.myPrize }) : load();
+  const m = Object.assign({}, (s && s.prizeArt) || {}), mp = s && s.myPrize;
+  if (mp && mp.img && mp.en) m[mp.en] = mp.img;
+  return m;
+};
+const artImgs = {};
+function artImage(url) { if (!url) return null; if (!artImgs[url]) { const im = new Image(); im.src = url; artImgs[url] = im; } return artImgs[url]; }
+const prizeFace = (pz, am) => { const u = (am || artMap())[textOf(pz)]; return u ? `<img class="pzimg" src="${u}" alt="">` : emojiOf(pz); };
+const loadUrl = u => new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = u; });
+
+const fixCase = (t, to) => to === 'en' ? t.charAt(0).toUpperCase() + t.slice(1) : t;
+// A suggestion only, always editable. Chrome translates on the device when it can; otherwise the short prize text goes to a free translation service.
+async function suggestText(text, from, to) {
+  text = String(text || '').trim(); if (!text) return '';
+  const clean = t => new DOMParser().parseFromString(String(t || ''), 'text/html').body.textContent.trim().replace(/^["“”]+|["“”]+$/g, '');
+  try {
+    if (self.Translator && Translator.create) {
+      const av = await Translator.availability({ sourceLanguage: from, targetLanguage: to });
+      if (av === 'available') { const tr = await Translator.create({ sourceLanguage: from, targetLanguage: to }); const out = clean(await tr.translate(text)); if (out) return fixCase(out, to); }
+    }
+  } catch (e) {}
+  try {
+    const r = await fetch('https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text) + '&langpair=' + from + '|' + to, { cache: 'no-store' });
+    const j = await r.json(), out = clean(j && j.responseData && j.responseData.translatedText);
+    if (out && !/MYMEMORY|INVALID|QUERY LENGTH/i.test(out) && out.toLowerCase() !== text.toLowerCase()) return fixCase(out, to);
+  } catch (e) {}
+  return '';
+}
+
+// Any picture a phone or computer can hand over (HEIC from an iPhone included) becomes a small JPEG that is stored with the kid's settings.
+let heicLib = null;
+async function decodeImg(file) {
+  const tryDecode = async blob => {
+    try { if (self.createImageBitmap) return await createImageBitmap(blob); } catch (e) {}
+    return await new Promise((res, rej) => { const u = URL.createObjectURL(blob), im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error('decode')); im.src = u; });
+  };
+  try { return await tryDecode(file); } catch (e) {}
+  if (/hei[cf]/i.test((file.type || '') + ' ' + (file.name || '')) || !file.type) {
+    heicLib = heicLib || loadScript('https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js');
+    await heicLib;
+    let out = await heic2any({ blob: file, toType: 'image/jpeg', quality: .9 }); if (Array.isArray(out)) out = out[0];
+    return await tryDecode(out);
+  }
+  throw new Error('decode');
+}
+async function fileToDataURL(file, side, cap) {
+  const bm = await decodeImg(file), w0 = bm.width || bm.naturalWidth, h0 = bm.height || bm.naturalHeight;
+  if (!w0 || !h0) throw new Error('size');
+  let q = .86, sd = side, url = '';
+  for (let t = 0; t < 7; t++) {
+    const k = Math.min(1, sd / Math.max(w0, h0)), w = Math.max(1, Math.round(w0 * k)), h = Math.max(1, Math.round(h0 * k));
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, w, h); x.drawImage(bm, 0, 0, w, h);
+    url = c.toDataURL('image/jpeg', q); if (url.length <= cap) break;
+    q = Math.max(.5, q - .07); sd = Math.round(sd * .85);
+  }
+  if (bm.close) try { bm.close(); } catch (e) {}
+  return url;
+}
+
+// The prize list editor, shared by the parent's settings and the kid's own prize.
+// lists: {key: ['English 🍕 | עברית', ...]}, art: {englishText: dataURL}; every <ul id="pzl-KEY"> inside root is one list.
+function pzWire(root, ctx) {
+  const fi = document.createElement('input'); fi.type = 'file'; fi.accept = 'image/*,.heic,.heif,.avif,.webp'; fi.hidden = true; root.appendChild(fi);
+  let target = null;
+  const pos = el => { const li = el.closest('li.pzrow'); return li ? { li, key: li.parentElement.dataset.key, i: +li.dataset.i } : null; };
+  const say = (li, t) => { const n = li && li.querySelector('.pzsug'); if (n) { n.hidden = !t; n.textContent = t || ''; } };
+  const used = () => Object.values(ctx.art).reduce((n, u) => n + u.length, 0);
+  const moveArt = (a, b) => { if (a && b && a !== b && ctx.art[a] && !ctx.art[b]) { ctx.art[b] = ctx.art[a]; delete ctx.art[a]; } };
+  function render(key) {
+    const ul = root.querySelector('#pzl-' + key); if (!ul) return;
+    ul.dataset.key = key;
+    ul.innerHTML = ctx.lists[key].map((t, i) => {
+      const r = pzParse(t), u = ctx.art[r.en.trim()];
+      return `<li class="pzrow" data-i="${i}">
+        <button type="button" class="pzth" data-act="pic" aria-label="תמונה להפתעה">${u ? `<img src="${u}" alt="">` : `<span class="pzem">${r.em}</span>`}<i class="pzedit" aria-hidden="true">✎</i></button>
+        <div class="pztx">
+          <input class="pzin pzen en" data-f="en" dir="ltr" lang="en" value="${esc(r.en)}" placeholder="English" aria-label="שם ההפתעה באנגלית" autocomplete="off">
+          <input class="pzin pzhe" data-f="he" value="${esc(r.he)}" placeholder="בעברית" aria-label="שם ההפתעה בעברית" autocomplete="off">
+          <small class="pzsug" hidden></small>
+          <div class="pzmenu" hidden><button type="button" class="btn sm" data-act="file">📷 בחירת תמונה</button>${u ? '<button type="button" class="btn sm" data-act="unpic">הסרת התמונה</button>' : ''}</div>
+        </div>
+        ${ctx.nodel ? '<span></span>' : '<button type="button" class="pzdel" data-act="del" aria-label="הסרת ההפתעה">✕</button>'}
+      </li>`;
+    }).join('');
+    const add = root.querySelector(`[data-pzadd="${key}"]`); if (add) add.disabled = ctx.lists[key].length >= 12;
+  }
+  root.addEventListener('input', e => {
+    const inp = e.target.closest('.pzin'), p = inp && pos(inp); if (!p) return;
+    const r = pzParse(ctx.lists[p.key][p.i]), old = r.en.trim();
+    r[inp.dataset.f] = inp.value; inp.dataset.auto = ''; inp.classList.remove('auto');
+    if (inp.dataset.f === 'en') moveArt(old, r.en.trim());
+    ctx.lists[p.key][p.i] = pzBuild(r); ctx.touch();
+  });
+  root.addEventListener('focusout', async e => {
+    const inp = e.target.closest('.pzin'), p = inp && pos(inp); if (!p) return;
+    const f = inp.dataset.f, other = f === 'he' ? 'en' : 'he', src = inp.value.trim();
+    const oi = p.li.querySelector(`[data-f="${other}"]`);
+    if (!src || (oi.value.trim() && oi.dataset.auto !== '1')) return;
+    say(p.li, 'מציע תרגום…');
+    const t = await suggestText(src, f, other);
+    if (!t) { say(p.li, other === 'en' ? 'לא הצלחנו להציע תרגום. אפשר לכתוב באנגלית.' : 'לא הצלחנו להציע תרגום לעברית.'); return; }
+    if (oi.value.trim() && oi.dataset.auto !== '1') { say(p.li, ''); return; } // typed something in the meantime
+    if (!document.contains(p.li)) return;
+    oi.value = t; oi.dataset.auto = '1'; oi.classList.add('auto');
+    const r = pzParse(ctx.lists[p.key][p.i]), old = r.en.trim();
+    r[other] = t; if (other === 'en') moveArt(old, t.trim());
+    if (r.em === '🎁') { r.em = guessEmoji(r.en + ' ' + r.he); const em = p.li.querySelector('.pzem'); if (em) em.textContent = r.em; }
+    ctx.lists[p.key][p.i] = pzBuild(r); ctx.touch();
+    say(p.li, 'הצעת תרגום. אפשר לערוך.');
+  });
+  root.addEventListener('click', e => {
+    const b = e.target.closest('[data-act],[data-pzadd],[data-pzreset]'); if (!b || !root.contains(b)) return;
+    if (b.dataset.pzadd) {
+      const key = b.dataset.pzadd, L = ctx.lists[key]; if (L.length >= 12) return;
+      L.push(pzBuild({ en: '', he: '', em: '🎁' })); render(key); ctx.touch();
+      const last = root.querySelector('#pzl-' + key + ' li:last-child .pzhe'); if (last) last.focus();
+      return;
+    }
+    if (b.dataset.pzreset) {
+      if (b.dataset.sure !== '1') { b.dataset.sure = '1'; b.dataset.t = b.textContent; b.textContent = 'בטוחים? לחיצה נוספת תחזיר את הרשימה המקורית'; setTimeout(() => { b.dataset.sure = ''; b.textContent = b.dataset.t; }, 4000); return; }
+      b.dataset.sure = ''; b.textContent = b.dataset.t;
+      const key = b.dataset.pzreset; ctx.lists[key] = ctx.defaults[key].slice(); render(key); ctx.touch(); return;
+    }
+    const p = pos(b); if (!p) return;
+    const act = b.dataset.act;
+    if (act === 'pic') { const m = p.li.querySelector('.pzmenu'); m.hidden = !m.hidden; }
+    else if (act === 'file') { target = p; fi.value = ''; fi.click(); }
+    else if (act === 'unpic') { delete ctx.art[pzParse(ctx.lists[p.key][p.i]).en.trim()]; render(p.key); ctx.touch(); }
+    else if (act === 'del') {
+      if (ctx.lists[p.key].length <= (ctx.min || 0)) { say(p.li, `צריך לפחות ${ctx.min} הפתעות`); return; }
+      ctx.lists[p.key].splice(p.i, 1); render(p.key); ctx.touch();
+    }
+  });
+  fi.onchange = async () => {
+    const f = fi.files && fi.files[0]; if (!f || !target) return;
+    const { li, key, i } = target, en = pzParse(ctx.lists[key][i]).en.trim();
+    if (!en) { say(li, 'כתבו קודם שם להפתעה, ואז בחרו תמונה.'); return; }
+    say(li, 'מעבד את התמונה…');
+    try {
+      const url = await fileToDataURL(f, 440, 36000), old = ctx.art[en];
+      ctx.art[en] = url;
+      if (used() > 720000) { if (old) ctx.art[en] = old; else delete ctx.art[en]; say(li, 'יש יותר מדי תמונות שמורות. הסירו תמונה אחרת קודם.'); return; }
+      render(key); ctx.touch();
+    } catch (err) { say(li, 'לא הצלחנו לקרוא את הקובץ. נסו תמונה אחרת.'); }
+  };
+  return { render };
+}
+
 /* ---------- the win card: a designed picture to send to Mom and Dad ---------- */
 // "זוכה" is spelled the same for a boy and a girl without vowels, so the card fits any kid.
 const WIT = [
@@ -2253,6 +2518,17 @@ async function winCardBlob(pz, at) {
   x.fillStyle = '#A8740C'; x.font = f(BOD, 34, 700);
   x.fillText('מוכן לאנגלית', W / 2, 157);
 
+  // the kid's own photo, in a ring in the corner of the card
+  if (KID && KID.photo) {
+    const ph = await loadUrl(KID.photo);
+    if (ph) {
+      const R = 78, cx = 176, cy = 176, k = Math.max(2 * R / ph.width, 2 * R / ph.height);
+      x.save(); x.shadowColor = 'rgba(80,60,30,.25)'; x.shadowBlur = 18; x.shadowOffsetY = 6;
+      x.beginPath(); x.arc(cx, cy, R + 8, 0, Math.PI * 2); x.fillStyle = '#FFD23F'; x.fill(); x.restore();
+      x.save(); x.beginPath(); x.arc(cx, cy, R, 0, Math.PI * 2); x.clip();
+      x.drawImage(ph, cx - ph.width * k / 2, cy - ph.height * k / 2, ph.width * k, ph.height * k); x.restore();
+    }
+  }
   // headline
   x.fillStyle = '#5E6680'; x.font = f(BOD, 38, 500);
   x.fillText('אחרי אימונים קשים באנגלית', W / 2, 268);
@@ -2262,7 +2538,8 @@ async function winCardBlob(pz, at) {
   x.fillText(who ? `${who} זוכה!` : 'זכייה!', W / 2, 372);
 
   // the prize illustration
-  const art = await loadArt(prizeSlug(pz));
+  const parentUrl = artMap()[textOf(pz)];
+  const art = parentUrl ? await loadUrl(parentUrl) : await loadArt(prizeSlug(pz));
   const im = art ? null : await loadIll(emojiOf(pz));
   if (art) { const k = Math.min(440 / art.width, 400 / art.height); x.drawImage(art, W / 2 - art.width * k / 2, 410 + (400 - art.height * k) / 2, art.width * k, art.height * k); }
   else if (im) x.drawImage(im, W / 2 - 170, 420, 340, 340);
@@ -2374,16 +2651,47 @@ function tick() { // tiny click as a slice passes the pointer
     o.connect(g).connect(actx.destination); o.start(t); o.stop(t + 0.04);
   } catch (e) {}
 }
+
+// The kid's own prize, when the parent allows it: one prize he chose, saved in his progress and added to the wheel.
+function myPrizeSheet(done) {
+  const s0 = load(), mp0 = s0.myPrize || {};
+  const lists = { my: [pzBuild({ en: mp0.en || '', he: mp0.he || '', em: mp0.em || '🎁' })] };
+  const art = mp0.img && mp0.en ? { [mp0.en]: mp0.img } : {};
+  const ov = document.createElement('div'); ov.className = 'sheetov';
+  ov.innerHTML = `<div class="sheet mypsheet" role="dialog" aria-modal="true" aria-label="ההפתעה שלי">
+    <header class="shhead"><b class="shtitle">✨ ההפתעה שלי</b><button class="shx" id="mpx" aria-label="סגירה">✕</button></header>
+    <section class="shbody"><p class="hint">אפשר להוסיף לגלגל הפתעה אחת שאתה בוחר. כתוב בעברית או באנגלית ונציע לך תרגום. אפשר גם להוסיף תמונה.</p>
+      <ul class="pzlist" id="pzl-my"></ul></section>
+    <footer class="shfoot"><button class="btn primary" id="mpsave">שמירה</button><button type="button" class="pzlink" id="mpdel" ${mp0.en || mp0.he ? '' : 'hidden'}>הסרת ההפתעה שלי</button><span class="shok" id="mpok"></span></footer></div>`;
+  document.body.appendChild(ov); document.documentElement.classList.add('noscroll');
+  const W = pzWire(ov, { lists, art, nodel: true, min: 0, touch() {} });
+  W.render('my');
+  const close = () => { ov.remove(); document.documentElement.classList.remove('noscroll'); };
+  ov.querySelector('#mpx').onclick = close;
+  ov.addEventListener('click', e => { if (e.target === ov) close(); });
+  ov.querySelector('#mpsave').onclick = () => {
+    const r = pzParse(lists.my[0]), en = (r.en.trim() || r.he.trim());
+    if (!en) { ov.querySelector('#mpok').textContent = 'כתוב קודם מה ההפתעה.'; return; }
+    const s = load(); s.myPrize = { en, he: r.he.trim(), em: r.em, img: art[r.en.trim()] || art[en] || '' };
+    save(s); close(); if (done) done();
+  };
+  ov.querySelector('#mpdel').onclick = () => { const s = load(); delete s.myPrize; save(s); close(); if (done) done(); };
+  const first = ov.querySelector('.pzhe'); if (first) first.focus();
+}
 function wheelView(preview) {
   const st = load(), mega = preview ? !!preview.mega : WHEEL_MEGA; WHEEL_MEGA = false;
   const megaList = (st.megaPrizes || []).length >= 2 ? st.megaPrizes : DEFAULT_MEGA;
-  const prizes = (preview && preview.prizes && preview.prizes.length >= 2) ? preview.prizes : mega ? megaList : (!preview && st.prizes.length >= 2 ? st.prizes : DEFAULT_PRIZES);
+  const basePrizes = (preview && preview.prizes && preview.prizes.length >= 2) ? preview.prizes : mega ? megaList : (!preview && st.prizes.length >= 2 ? st.prizes : DEFAULT_PRIZES);
+  const myP = !preview && !mega && st.kidPrize && st.myPrize && (st.myPrize.en || st.myPrize.he) ? pzBuild({ en: st.myPrize.en || st.myPrize.he, he: st.myPrize.he, em: st.myPrize.em }) : '';
+  const prizes = myP ? basePrizes.concat(myP) : basePrizes;
+  const ART = Object.assign({}, preview && preview.art ? preview.art : artMap());
   const G0 = preview ? { avail: 99 } : goalState(st);
   const G = mega && !preview ? Object.assign({}, G0, { avail: G0.mega && !G0.megaWait ? 1 : 0 }) : G0;
   const box = `<section class="wstage${mega ? ' mega' : ''}">
       <p class="whead en">${mega ? '👑 MEGA WHEEL! 👑' : G.avail ? 'Spin the wheel!' : 'Surprise Wheel'}</p>
       <div class="wheelwrap"><canvas id="wheel" aria-label="גלגל ההפתעות"></canvas><canvas id="confetti" aria-hidden="true"></canvas></div>
       <div class="wlabel en" id="wlabel" aria-live="off"></div>
+      ${!preview && !mega && st.kidPrize ? '<button type="button" class="btn sm mypz" id="mypz">✨ ההפתעה שלי</button>' : ''}
       ${G.avail ? `<button class="spinbig" dir="ltr" id="go">SPIN!${!preview && G.avail > 1 ? ` <small>×${G.avail}</small>` : ''}</button>` : `
       <div class="locked">
         <div class="lockrow"><span class="lockico">🔒</span><span>הגלגל עוד נעול</span></div>
@@ -2419,6 +2727,7 @@ function wheelView(preview) {
   const R = C - size * 0.075;            // slices
   const RIM = C - size * 0.02;           // outer edge of the gold rim
   const label = $('#wlabel');
+  const mpb = $('#mypz'); if (mpb) mpb.onclick = () => myPrizeSheet(() => wheelView());
   label.textContent = G.avail ? 'לחץ על SPIN וגלה מה תזכה! ✨' : '';
   label.classList.toggle('hint', true);
   if (!G.avail) label.hidden = true;
@@ -2447,7 +2756,7 @@ function wheelView(preview) {
       ctx.font = `${Math.round(fs)}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.shadowColor = 'rgba(0,0,0,.18)'; ctx.shadowBlur = 4; ctx.shadowOffsetY = 2;
-      const im = illImage(emojiOf(prizes[k])), ex = C + Math.cos(mid) * er, ey = C + Math.sin(mid) * er;
+      const im = artImage(ART[textOf(prizes[k])]) || illImage(emojiOf(prizes[k])), ex = C + Math.cos(mid) * er, ey = C + Math.sin(mid) * er;
       if (im && im.complete && im.naturalWidth) { const d = fs * 1.25; ctx.drawImage(im, ex - d / 2, ey - d / 2, d, d); }
       else ctx.fillText(emojiOf(prizes[k]), ex, ey);
       ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
@@ -2528,7 +2837,7 @@ function wheelView(preview) {
     ov.innerHTML = `<canvas class="winconf" aria-hidden="true"></canvas>
       <div class="wincard">
         <p class="en wtitle">You won!</p>
-        <div class="wemoji">${emojiOf(pz)}</div>
+        <div class="wemoji">${prizeFace(pz, ART)}</div>
         <p class="en wtext">${esc(textOf(pz))}</p>
         <div class="wdetails">${details}<button class="btn wclose" id="wclose">סגירה</button></div>
       </div>`;
@@ -2586,7 +2895,7 @@ function wheelView(preview) {
         <button type="button" class="btn sharebtn" data-share disabled>מכין את התמונה…</button>
         <p class="sharenote">נשלחת תמונה מעוצבת של הזכייה. בחר וואטסאפ, ואז את הצ׳אט.</p>`;
       // small summary that stays under the wheel
-      $('#prize').innerHTML = `<div class="prize"><p class="en pwin">You won!</p><p class="pemoji">${emojiOf(pz)}</p><p class="en ptext">${esc(textOf(pz))}</p>${details}</div>`;
+      $('#prize').innerHTML = `<div class="prize"><p class="en pwin">You won!</p><p class="pemoji">${prizeFace(pz, ART)}</p><p class="en ptext">${esc(textOf(pz))}</p>${details}</div>`;
       winIdx = win; draw(performance.now());
       label.classList.remove('hint'); label.textContent = textOf(pz) + ' ' + emojiOf(pz); label.style.visibility = 'visible';
       setTimeout(() => { if (document.body.contains(cv)) showWin(pz, details); }, 1300);
