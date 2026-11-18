@@ -767,6 +767,8 @@ body.mapopen{overflow:hidden}
 .jstep{display:grid;gap:8px;justify-items:center;padding:12px;margin:8px 0;border-radius:16px;background:#FFF6D6;color:#5A3A00;text-align:center}
 .jstep .steps i{width:30px;height:30px;font-size:16px}
 .mbar.big{width:200px;height:12px}
+.btn.saywait{opacity:.55;cursor:wait}
+.btn.saywait::before{content:"🔊 ";}
 .jbanner{display:grid;gap:8px;justify-items:center;padding:12px;margin-bottom:10px;border-radius:16px;background:linear-gradient(135deg,#FFF1B8,#FFD9A0);color:#5A3A00;text-align:center;animation:pop .4s both}
 .lorder{font:700 28px var(--f-en);letter-spacing:2px;margin:0;color:var(--muted)}
 .lorder b{color:#E39B00;font-size:36px}
@@ -3592,6 +3594,7 @@ function runQuiz(mod, title, qs, again) {
   let i = 0, score = 0; const wrong = [], secs = {};
   let tries = 0, hintUsed = false, closed = false;
   function step() {
+    clearTimeout(sayT); hush(); // nothing from the card before carries on over this one
     const q = qs[i]; tries = 0; hintUsed = false; closed = false;
     const sayBtns = q.speak
       ? `<div class="sayrow"><button class="btn sm" data-say="${esc(q.speak)}">🔊 שמע שוב</button><button class="btn sm" data-say="${esc(q.speak)}" data-slow="1">🐢 לאט</button></div>`
@@ -3614,6 +3617,7 @@ function runQuiz(mod, title, qs, again) {
     if (q.lt) recordLetter(q.lt, q.sk, ok);
     if (q.sec) { secs[q.sec] = secs[q.sec] || [0, 0]; secs[q.sec][1]++; if (ok) secs[q.sec][0]++; }
   }
+  let sayT = 0;
   function close(msgHTML, good) {
     const q = qs[i]; closed = true;
     $$('.opt', app).forEach((b, j) => {
@@ -3625,9 +3629,13 @@ function runQuiz(mod, title, qs, again) {
     $('#fb').innerHTML = `<div class="fb ${good ? 'good' : 'bad'} h${q.hue || 2}">
       <div class="msg"><b>${msgHTML}</b>${q.reveal || ''}</div>
       <button class="btn primary" id="next">${i + 1 < qs.length ? 'המשך ←' : 'לתוצאות ←'}</button></div>`;
-    if (q.sayAfter) setTimeout(() => say(q.sayAfter), 250);
     const nx = $('#next'); nx.onclick = () => { i++; i < qs.length ? (window.scrollTo(0, 0), step()) : finish(); };
-    nx.focus({ preventScroll: true });
+    if (q.sayAfter) { // stay on this card until the right answer has been said out loud
+      nx.disabled = true; nx.classList.add('saywait');
+      const done = () => { clearTimeout(cap); if (nx.isConnected && nx.disabled) { nx.disabled = false; nx.classList.remove('saywait'); nx.focus({ preventScroll: true }); } };
+      const cap = setTimeout(done, 7000); // never stuck if the sound fails
+      sayT = setTimeout(() => say(q.sayAfter).then(done, done), 250);
+    } else nx.focus({ preventScroll: true });
     nx.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }
   function answer(k) {
