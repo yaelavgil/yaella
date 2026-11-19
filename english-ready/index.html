@@ -771,6 +771,7 @@ body.pdash .pbar{margin-bottom:12px}
 .partynext b{font-size:18px;color:#FFE27A}
 .partygo{font-size:20px;min-height:56px;padding:10px 26px}
 @media (prefers-reduced-motion: reduce){.partycard,.partytrophy{animation:none}}
+.whero{display:block;width:min(200px,52vw);height:auto;margin:0 auto 6px}
 /* the illustrated letters map */
 .jmapwrap{position:relative;margin-top:12px;border-radius:20px;overflow:hidden;box-shadow:inset 0 0 0 1.5px var(--line)}
 .mapfullbtn{position:absolute;top:10px;inset-inline-start:10px;z-index:5;border:0;border-radius:50%;width:44px;height:44px;display:grid;place-items:center;background:rgba(255,255,255,.92);color:#2B3A67;box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer}
@@ -2657,7 +2658,18 @@ const artMap = () => {
 };
 const artImgs = {};
 function artImage(url) { if (!url) return null; if (!artImgs[url]) { const im = new Image(); im.src = url; artImgs[url] = im; } return artImgs[url]; }
-const prizeFace = (pz, am) => { const u = (am || artMap())[textOf(pz)]; return u ? `<img class="pzimg" src="${u}" alt="">` : emojiOf(pz); };
+// our own drawings for the usual prizes (art/i-*.webp on the wheel, art/c-*.webp on the win card); a parent's uploaded picture still wins
+const has = (t, re) => re.test(t);
+const BUILTIN_ART = [
+  ['next-star', t => has(t, /next star|הכוכב הבא/i)], ['masked', t => has(t, /masked|מסכה/i)], ['cards', t => has(t, /card|קלפים/i)],
+  ['pingpong', t => has(t, /ping.?pong|table tennis|פינג/i)], ['snack', t => has(t, /snack|popcorn|חטיף|פופקורן/i)],
+  ['screen', t => has(t, /screen|מסך|tablet|טאבלט/i)], ['movie', t => has(t, /movie|סרט/i)], ['toys', t => has(t, /toy|צעצוע/i)],
+  ['candy', t => has(t, /candy|sweet|lollipop|ממתק|סוכרי|מתנה לבחיר|gift of your choice/i)],
+  ['day-mom', t => has(t, /day|יום/i) && has(t, /mom|mum|אמא/i)], ['day-dad', t => has(t, /day|יום/i) && has(t, /dad|אבא/i)]];
+const builtinKey = pz => { const t = String(pz || ''); const r = BUILTIN_ART.find(([, f]) => f(t)); return r ? r[0] : null; };
+const bIcon = pz => { const k = builtinKey(pz); return k ? `art/i-${k}.webp` : null; };
+const bCard = pz => { const k = builtinKey(pz); return k ? `art/c-${k}.webp` : null; };
+const prizeFace = (pz, am) => { const u = (am || artMap())[textOf(pz)] || bCard(pz); return u ? `<img class="pzimg" src="${u}" alt="">` : emojiOf(pz); };
 const loadUrl = u => new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = u; });
 
 const fixCase = (t, to) => to === 'en' ? t.charAt(0).toUpperCase() + t.slice(1) : t;
@@ -2941,7 +2953,7 @@ async function winCardBlob(pz, at, artM) {
   x.fillText(who ? `${who} זוכה!` : 'זכייה!', W / 2, 372);
 
   // the prize illustration
-  const parentUrl = (artM || artMap())[textOf(pz)] || artMap()[textOf(pz)]; // the wheel's own pictures (a parent's preview has them before they are saved)
+  const parentUrl = (artM || artMap())[textOf(pz)] || artMap()[textOf(pz)] || bCard(pz); // the wheel's own pictures (a parent's preview has them before they are saved)
   const art = parentUrl ? await loadUrl(parentUrl) : await loadArt(prizeSlug(pz));
   const im = art ? null : await loadIll(emojiOf(pz));
   if (art) { const k = Math.min(440 / art.width, 400 / art.height); x.drawImage(art, W / 2 - art.width * k / 2, 410 + (400 - art.height * k) / 2, art.width * k, art.height * k); }
@@ -3097,6 +3109,7 @@ function wheelView(preview) {
       ${!preview && !mega && st.kidPrize ? '<button type="button" class="btn sm mypz" id="mypz">✨ ההפתעה שלי</button>' : ''}
       ${G.avail ? `<button class="spinbig" dir="ltr" id="go">SPIN!${!preview && G.avail > 1 ? ` <small>×${G.avail}</small>` : ''}</button>` : `
       <div class="locked">
+        <img class="whero" src="art/hero.webp" alt="" aria-hidden="true">
         <div class="lockrow"><span class="lockico">🔒</span><span>הגלגל עוד נעול</span></div>
         <p class="lockbig">עוד <b>${G.left}</b> ${G.unit} והגלגל נפתח!</p>
         <div class="lockmeter"><i style="width:${Math.round(G.pct)}%"></i></div>
@@ -3161,7 +3174,7 @@ function wheelView(preview) {
       ctx.font = `${Math.round(fs)}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.shadowColor = 'rgba(0,0,0,.18)'; ctx.shadowBlur = 4; ctx.shadowOffsetY = 2;
-      const im = artImage(ART[textOf(prizes[k])]) || illImage(emojiOf(prizes[k])), ex = C + Math.cos(mid) * er, ey = C + Math.sin(mid) * er;
+      const im = artImage(ART[textOf(prizes[k])]) || artImage(bIcon(prizes[k])) || illImage(emojiOf(prizes[k])), ex = C + Math.cos(mid) * er, ey = C + Math.sin(mid) * er;
       if (im && im.complete && im.naturalWidth) { const d = fs * 1.25; ctx.drawImage(im, ex - d / 2, ey - d / 2, d, d); }
       else ctx.fillText(emojiOf(prizes[k]), ex, ey);
       ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
