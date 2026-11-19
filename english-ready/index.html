@@ -2815,7 +2815,7 @@ const winStamp = at => {
   return { when: `${p(d.getDate())}.${p(d.getMonth() + 1)}.${d.getFullYear()} · ${p(d.getHours())}:${p(d.getMinutes())}`, code: at.toString(36).slice(-4).toUpperCase() };
 };
 
-async function winCardBlob(pz, at) {
+async function winCardBlob(pz, at, artM) {
   const W = 1080, H = 1350, c = document.createElement('canvas');
   c.width = W; c.height = H;
   const x = c.getContext('2d');
@@ -2870,7 +2870,7 @@ async function winCardBlob(pz, at) {
   x.fillText(who ? `${who} זוכה!` : 'זכייה!', W / 2, 372);
 
   // the prize illustration
-  const parentUrl = artMap()[textOf(pz)];
+  const parentUrl = (artM || artMap())[textOf(pz)] || artMap()[textOf(pz)]; // the wheel's own pictures (a parent's preview has them before they are saved)
   const art = parentUrl ? await loadUrl(parentUrl) : await loadArt(prizeSlug(pz));
   const im = art ? null : await loadIll(emojiOf(pz));
   if (art) { const k = Math.min(440 / art.width, 400 / art.height); x.drawImage(art, W / 2 - art.width * k / 2, 410 + (400 - art.height * k) / 2, art.width * k, art.height * k); }
@@ -2920,10 +2920,10 @@ const WINS_DB = 'https://home-picks-47450-default-rtdb.europe-west1.firebasedata
 const winCode = () => (Date.now().toString(36) + Math.random().toString(36).slice(2, 6)).toUpperCase();
 function winPage(code) { return location.origin + location.pathname.replace(/[^/]*$/, '') + 'w.html?i=' + code; }
 
-function prepWin(pz, msg, at) {
+function prepWin(pz, msg, at, art) {
   const mine = lastWin = { pz, msg, at, blob: null, link: '', name: `win-${winStamp(at).code}.png` };
   const ready = () => { for (const el of shareButtons()) { el.disabled = false; el.innerHTML = SHARE_LABEL; } };
-  winCardBlob(pz, at).then(b => {
+  winCardBlob(pz, at, art).then(b => {
     if (lastWin !== mine) return;
     mine.blob = b; ready();
     // park a copy behind a link as well, for anywhere the picture itself cannot travel
@@ -3233,7 +3233,7 @@ function wheelView(preview) {
       winIdx = win; draw(performance.now());
       label.classList.remove('hint'); label.textContent = textOf(pz) + ' ' + emojiOf(pz); label.style.visibility = 'visible';
       setTimeout(() => { if (document.body.contains(cv)) showWin(pz, details); }, 1300);
-      prepWin(pz, msg, Date.now()); // after the buttons exist, so they can be switched on when the picture is ready
+      prepWin(pz, msg, Date.now(), ART); // after the buttons exist, so they can be switched on when the picture is ready
       sfx('win'); setTimeout(() => say(textOf(prizes[win])), 600);
       const b = $('#go'); b.disabled = g2.avail < 1; b.innerHTML = preview ? 'AGAIN!' : g2.avail ? `AGAIN! <small>×${g2.avail}</small>` : 'SPIN!';
     }
