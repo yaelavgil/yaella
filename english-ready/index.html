@@ -4714,6 +4714,7 @@ function writeView() {
   }
   // free writing: where the letter starts (a numbered dot and a short arrow), but not the letter itself
   function startDots(ctx, col) {
+    if (!(U > 0)) return; // the board isn't laid out yet
     strokesPx.forEach(gl => { const st = gl[0]; if (!st || st.length < 3) return;
       const a = st[0]; let b = st[1]; for (const q of st) { b = q; if (Math.hypot(q[0] - a[0], q[1] - a[1]) > U * 0.55) break; }
       const an = Math.atan2(b[1] - a[1], b[0] - a[0]), r = U * 0.17, e = [a[0] + Math.cos(an) * U * 0.62, a[1] + Math.sin(an) * U * 0.62], h = U * 0.17;
@@ -4743,6 +4744,7 @@ function writeView() {
     if ($('#wfb') && !won) $('#wfb').innerHTML = `<div class="fb"><div class="msg"><b>👉 רמז:</b> הקו יצא מהדרך. החץ מראה לאן ממשיכים.<br>אפשר למחוק את מה שיצא עקום (↶) ולהמשיך.</div></div>`;
   }
   function drawLive(ctx, col) {
+    if (!(U > 0)) return;
     const { a, b } = liveHint, an = Math.atan2(b[1] - a[1], b[0] - a[0]), h = U * 0.2;
     ctx.save(); ctx.globalAlpha = 0.95; ctx.strokeStyle = '#F59E0B'; ctx.fillStyle = '#F59E0B'; ctx.lineWidth = U * 0.09; ctx.lineCap = 'round';
     ctx.beginPath(); ctx.arc(a[0], a[1], U * 0.1, 0, 7); ctx.fill();
