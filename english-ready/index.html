@@ -126,6 +126,8 @@ h2{font:600 24px/1.2 var(--f-display);margin:0;text-wrap:balance}
 .micbtn.on{animation:micp 1s ease-in-out infinite;background:linear-gradient(#7BD88F,#2F9E55);box-shadow:0 6px 0 #1F7A3E,0 0 0 10px rgba(47,158,85,.18)}
 @keyframes micp{50%{box-shadow:0 6px 0 #1F7A3E,0 0 0 20px rgba(47,158,85,.08)}}
 .michint{font-size:15px;color:var(--muted)}
+#hushbtn{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translate(-50%,140%);z-index:90;border:0;border-radius:999px;padding:10px 18px;font:700 16px var(--f-display,inherit);background:#2A2340;color:#fff;box-shadow:0 8px 24px rgba(20,10,40,.3);cursor:pointer;opacity:0;pointer-events:none;transition:transform .2s,opacity .2s}
+#hushbtn.on{transform:translate(-50%,0);opacity:.92;pointer-events:auto}
 .micguide{background:#fff;border-radius:14px;padding:10px 12px;margin-top:8px;color:var(--ink);text-align:start}
 .micguide ol{margin:6px 0 0;padding-inline-start:22px;display:grid;gap:6px;font-size:16px;line-height:1.45}
 .mgk{display:inline-block;background:#F1EDFF;border:1.5px solid #D9D0FF;border-radius:8px;padding:0 6px;margin:0 1px}
@@ -1273,9 +1275,18 @@ function clip(text, slow) {
   });
 }
 // text can be one string, or several joined with "|" (played one after another)
+// while she speaks, a small button stops it (just this time; nothing is turned off)
+function hushBtn(on) {
+  let b = document.getElementById('hushbtn');
+  if (!b) { b = document.createElement('button'); b.id = 'hushbtn'; b.type = 'button'; b.innerHTML = '🔇 להשתיק'; b.setAttribute('aria-label', 'להפסיק את ההקראה עכשיו'); b.onclick = () => hush(); document.body.appendChild(b); }
+  b.classList.toggle('on', !!on);
+}
 async function say(text, slow = false) {
   if (!text) return;
-  const my = ++token;
+  const my = ++token; hushBtn(true);
+  try { await sayRun(text, slow, my); } finally { if (my === token) hushBtn(false); }
+}
+async function sayRun(text, slow, my) {
   try { player.pause(); } catch (e) {}
   if (canTTS) speechSynthesis.cancel();
   const parts = String(text).split('|').filter(Boolean);
@@ -1287,7 +1298,7 @@ async function say(text, slow = false) {
     if (i < parts.length - 1) await new Promise(r => setTimeout(r, 250));
   }
 }
-function hush() { token++; try { player.pause(); } catch (e) {} if (canTTS) speechSynthesis.cancel(); }
+function hush() { token++; try { player.pause(); } catch (e) {} if (canTTS) speechSynthesis.cancel(); hushBtn(false); }
 // soft feedback sounds (made in the browser, no files); the 🔔 button mutes them on this device
 let sfxOn = true; try { sfxOn = localStorage.getItem('english-ready-sfx') !== 'off'; } catch (e) {}
 let actx = null;
