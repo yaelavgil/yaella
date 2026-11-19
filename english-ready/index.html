@@ -126,6 +126,11 @@ h2{font:600 24px/1.2 var(--f-display);margin:0;text-wrap:balance}
 .micbtn.on{animation:micp 1s ease-in-out infinite;background:linear-gradient(#7BD88F,#2F9E55);box-shadow:0 6px 0 #1F7A3E,0 0 0 10px rgba(47,158,85,.18)}
 @keyframes micp{50%{box-shadow:0 6px 0 #1F7A3E,0 0 0 20px rgba(47,158,85,.08)}}
 .michint{font-size:15px;color:var(--muted)}
+.micguide{background:#fff;border-radius:14px;padding:10px 12px;margin-top:8px;color:var(--ink);text-align:start}
+.micguide ol{margin:6px 0 0;padding-inline-start:22px;display:grid;gap:6px;font-size:16px;line-height:1.45}
+.mgk{display:inline-block;background:#F1EDFF;border:1.5px solid #D9D0FF;border-radius:8px;padding:0 6px;margin:0 1px}
+.mgmore{margin-top:8px;font-size:14px}
+.mgmore summary{cursor:pointer;font-weight:700}
 .heard{display:block;font-size:15px;color:var(--muted);margin-top:4px}
 .sgood{color:var(--good)}
 .smiss{color:var(--bad);text-decoration:underline wavy}
@@ -4779,6 +4784,27 @@ function judgeSpeech(target, alts) {
   }
   return best;
 }
+// a web page can't open the browser's settings, so: say exactly where to tap, for this device
+const MIC_OK = 'english-ready-micok';
+function micDevice() {
+  const u = navigator.userAgent, ios = /iPad|iPhone|iPod/.test(u) || (/Macintosh/.test(u) && navigator.maxTouchPoints > 1);
+  if (ios) return /CriOS|FxiOS|EdgiOS/.test(u) ? 'ios-other' : 'ios-safari';
+  if (/Android/.test(u)) return 'android';
+  if (/Safari/.test(u) && !/Chrome|Chromium|Edg/.test(u)) return 'mac-safari';
+  return 'desktop';
+}
+function micGuide() {
+  const D = micDevice(), b = t => `<b class="mgk">${t}</b>`;
+  const steps = {
+    'ios-safari': [`למעלה, בשורת הכתובת, לוחצים על ${b('aA')} (או על ${b('☰')} ליד הכתובת).`, `בוחרים ${b('הגדרות אתר')} (Website Settings).`, `לוחצים ${b('מיקרופון')} ובוחרים ${b('אפשר')} (Allow).`, `לוחצים ${b('סיום')}, ואז כאן על ${b('לנסות שוב')}.`],
+    'ios-other': [`יוצאים לאפליקציית ${b('הגדרות')} של האייפד.`, `גוללים למטה ולוחצים על הדפדפן (למשל ${b('Chrome')}).`, `מדליקים את ${b('מיקרופון')}.`, `חוזרים לכאן ולוחצים ${b('לנסות שוב')}.`],
+    'android': [`לוחצים על הסמל ${b('⚙︎')} או ${b('🔒')} משמאל לכתובת האתר.`, `בוחרים ${b('הרשאות')}, ואז ${b('מיקרופון')}.`, `בוחרים ${b('אפשר')}.`, `חוזרים לכאן ולוחצים ${b('לנסות שוב')}.`],
+    'mac-safari': [`בתפריט למעלה לוחצים ${b('Safari')}, ואז ${b('הגדרות לאתר הזה')}.`, `ליד ${b('מיקרופון')} בוחרים ${b('אפשר')}.`, `לוחצים כאן ${b('לנסות שוב')}.`],
+    'desktop': [`לוחצים על הסמל ${b('⚙︎')} או ${b('🔒')} משמאל לכתובת האתר.`, `ליד ${b('מיקרופון')} בוחרים ${b('אפשר')} (או מדליקים את המתג).`, `לוחצים כאן ${b('לנסות שוב')}.`]
+  }[D];
+  const more = D === 'ios-safari' ? `<details class="mgmore"><summary>עדיין לא עובד?</summary>${blt([`ב${b('הגדרות')} של האייפד: ${b('Safari')} → ${b('מיקרופון')} → ${b('אפשר')}.`, `ב${b('הגדרות')} → ${b('כללי')} → ${b('מקלדת')}: להדליק ${b('הכתבה')}.`, 'כדאי לבקש עזרה מאמא או אבא 🙂'])}</details>` : '';
+  return `<div class="micguide"><b>איך פותחים את המיקרופון:</b><ol>${steps.map(t => `<li>${t}</li>`).join('')}</ol>${more}</div>`;
+}
 function speakView() {
   setLvl();
   const RND = SPEAK_ROUND; SPEAK_ROUND = false;
@@ -4807,7 +4833,10 @@ function speakView() {
       </section>
       <div class="microw"><button class="micbtn" id="mic" aria-label="לחץ ודבר">🎤</button><span class="michint" id="mich">לוחצים על המיקרופון ומדברים</span></div>
       <div id="fb" aria-live="polite"></div>`;
-    $('#mic').onclick = listen;
+    $('#mic').onclick = () => { let ok = null; try { ok = localStorage.getItem(MIC_OK); } catch (e) {}
+      if (ok) { listen(); return; }
+      $('#fb').innerHTML = `<div class="fb"><div class="msg"><b>🎤 עוד רגע יופיע חלון ששואל על המיקרופון.</b>${lines('לוחצים בו על <b>אפשר</b> (Allow) ✅', micDevice() === 'ios-safari' ? 'כדי שלא ישאל בכל כניסה: אחר כך אפשר לסמן "אפשר" קבוע (aA ← הגדרות אתר ← מיקרופון).' : '')}</div><button class="btn primary" id="micgo">הבנתי, להתחיל</button></div>`;
+      $('#micgo').onclick = () => { try { localStorage.setItem(MIC_OK, '1'); } catch (e) {} listen(); }; };
     if (lvl === 'easy') setTimeout(() => say(it.full), 350);
   }
   function setMic(on) { const m = $('#mic'); if (!m) return; m.classList.toggle('on', on); $('#mich').textContent = on ? '👂 מקשיב… מדברים עכשיו' : 'לוחצים על המיקרופון ומדברים'; }
@@ -4821,9 +4850,9 @@ function speakView() {
     rec.onerror = e => {
       got = true;
       if (e.error === 'not-allowed' || e.error === 'service-not-allowed' || e.error === 'audio-capture') {
-        { const s1 = load(); s1.noMic = today(); save(s1); } // the journey stops asking for the mic today
-        $('#fb').innerHTML = `<div class="fb bad"><div class="msg"><b>אין גישה למיקרופון.</b>${lines('צריך לאשר לאתר להשתמש במיקרופון.', 'אפשר לדלג בינתיים.')}</div><button class="btn" id="skp">דלג ←</button></div>`;
-        $('#skp').onclick = next;
+        $('#fb').innerHTML = `<div class="fb bad"><div class="msg"><b>🎤 המיקרופון סגור לאתר הזה.</b>${micGuide()}</div><div class="row center"><button class="btn primary" id="mretry">🔄 לנסות שוב</button><button class="btn" id="skp">לדלג בינתיים ←</button></div></div>`;
+        $('#mretry').onclick = () => { $('#fb').innerHTML = ''; listen(); };
+        $('#skp').onclick = () => { const s1 = load(); s1.noMic = today(); save(s1); next(); }; // skipping: the journey stops asking for the mic today
       } else if (e.error === 'no-speech') $('#fb').innerHTML = `<div class="fb bad"><div class="msg"><b>לא שמעתי כלום.</b>${lines('לוחצים שוב ומדברים קצת יותר חזק.')}</div></div>`;
       else if (e.error !== 'aborted') $('#fb').innerHTML = `<div class="fb bad"><div class="msg"><b>משהו לא עבד.</b>${lines('לוחצים שוב על המיקרופון.')}</div></div>`;
     };
