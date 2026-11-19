@@ -299,6 +299,17 @@ a.btn{text-decoration:none}
 #root{padding-bottom:calc(72px + env(safe-area-inset-bottom, 0px))}
 /* ===== design layer: illustrations, softer surfaces, motion ===== */
 body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -5%,var(--t3),transparent 60%),radial-gradient(600px 360px at -10% 30%,var(--t2),transparent 60%);background-attachment:fixed}
+/* sentence scenes: two pictures placed so the picture says in / on / under / next to / big / small */
+.scn{position:relative;display:inline-block;vertical-align:middle;width:1.6em;height:1.3em;line-height:0}
+.scn>span{position:absolute;left:50%;transform:translateX(-50%);font-size:var(--h);height:1em;line-height:1;white-space:nowrap}
+.scn>span .ji,.pic .scn>span .ji,.opts.emoji .opt .scn .ji{height:1em;width:auto;animation:none;vertical-align:top;display:block}
+.sin .s2{--h:1.3em;bottom:0}.sin .s1{--h:.42em;bottom:24%;z-index:1;filter:drop-shadow(0 0 2px #fff) drop-shadow(0 0 1px #fff)}
+.son{height:1.6em}.son .s2{--h:.95em;bottom:0}.son .s1{--h:.62em;bottom:56%;z-index:1}
+.sunder{height:1.55em}.sunder .s2{--h:1.05em;top:0}.sunder .s1{--h:.55em;bottom:0;z-index:1}
+.snext{width:2.1em}.snext .s1{--h:.78em;left:0;transform:none;bottom:2%}.snext .s2{--h:1.05em;left:auto;right:0;transform:none;bottom:0}
+.sbig,.ssmall{width:1.9em}.scn .sref{left:auto;right:0;transform:none;bottom:0}
+.sbig .s1{--h:1.3em;left:0;transform:none;bottom:0}.sbig .sref{--h:.42em}
+.ssmall .s1{--h:.38em;left:0;transform:none;bottom:0}.ssmall .sref{--h:1.05em}
 .ji{height:1.25em;width:auto;vertical-align:-.28em;display:inline-block;user-select:none;-webkit-user-drag:none}
 .pic .ji{height:1.05em;animation:floaty 3.4s ease-in-out infinite;filter:drop-shadow(0 8px 10px rgba(40,30,80,.18))}
 .pic .ji + .ji{animation-delay:.4s}
@@ -719,6 +730,47 @@ body.pdash .pbar{margin-bottom:12px}
 .jpop.lock{background:#8E8A9E}.jpop.lock::before{border-bottom-color:#8E8A9E}
 .jpop .btn{width:100%;background:#fff;color:#2F4FD0;border:0;font-weight:700}
 .jpop.done .btn{color:#7A4F00}
+/* the stars journey: a night sky, harder road */
+.journey.stars .goalhead .glabel{color:#5B3FD0}
+.journey.stars .jmapwrap::before{background:linear-gradient(#0E1033,rgba(14,16,51,0))}
+.journey.stars .jmapwrap::after{background:linear-gradient(rgba(36,22,84,0),#241654)}
+.journey.stars .jmapwrap.full{background:#0E1033}
+.journey.stars .jmapwrap.full .mapgo{background:linear-gradient(rgba(36,22,84,0),#241654 40%)}
+.journey.stars .jmap{background:
+  radial-gradient(1.5px 1.5px at 12% 8%,#fff,transparent),radial-gradient(1px 1px at 30% 22%,#fff,transparent),radial-gradient(2px 2px at 78% 14%,#FFF4C2,transparent),
+  radial-gradient(1px 1px at 60% 40%,#fff,transparent),radial-gradient(1.5px 1.5px at 88% 55%,#fff,transparent),radial-gradient(1px 1px at 18% 63%,#fff,transparent),
+  radial-gradient(2px 2px at 45% 78%,#FFF4C2,transparent),radial-gradient(1px 1px at 72% 90%,#fff,transparent),
+  radial-gradient(60% 30% at 80% 20%,rgba(140,90,255,.35),transparent 70%),radial-gradient(70% 30% at 10% 70%,rgba(60,140,255,.28),transparent 70%),
+  linear-gradient(#0E1033 0%,#1B1650 50%,#241654 100%);background-size:220px 260px,180px 240px,260px 300px,200px 220px,240px 260px,190px 230px,230px 280px,210px 250px,100% 100%,100% 100%,100% 100%}
+.journey.stars .jl-all{stroke:rgba(255,255,255,.22);stroke-width:10;stroke-dasharray:2 14;filter:none}
+.journey.stars .jl-done{stroke:#FFD23F;filter:drop-shadow(0 0 6px rgba(255,210,63,.8))}
+.journey.stars .mstart{color:rgba(255,255,255,.6)}
+.journey.stars .mdeco small{display:none}
+.journey.stars .mdeco{opacity:.85}
+.journey.stars .mnode{border-radius:16px;transform:rotate(45deg);background:#2D2A5C;box-shadow:0 6px 0 #17153A,0 0 0 2px rgba(255,255,255,.08);color:#8C88C0}
+.journey.stars .mnode>*{transform:rotate(-45deg)}
+.journey.stars .mnode .snum{font:800 22px/1 var(--f-display)}
+.journey.stars .mnode.done{background:radial-gradient(circle at 35% 30%,#FFF3B0,#FFC93C 60%,#E59A00);box-shadow:0 6px 0 #B57700,0 0 18px rgba(255,210,63,.75);color:#5A3A00}
+.journey.stars .mnode.cur{background:linear-gradient(#B98CFF,#7A4DFF);box-shadow:0 6px 0 #4E2DB8,0 0 0 8px rgba(185,140,255,.25);color:#fff;animation:spulse 1.6s ease-in-out infinite}
+@keyframes spulse{50%{box-shadow:0 6px 0 #4E2DB8,0 0 0 16px rgba(185,140,255,.06),0 0 24px rgba(185,140,255,.6)}}
+.journey.stars .mchk,.journey.stars .mlock{transform:rotate(-45deg)}
+.journey.stars .msteps{top:84px}
+.journey.stars .mend .mendt{color:#FFE9A8}
+.journey.stars .msky{display:none}
+.partyov{position:fixed;inset:0;z-index:120;display:grid;place-items:center;padding:16px;background:radial-gradient(circle at 50% 40%,#3C1E8C,#0A0828);animation:fade .3s both}
+.partycv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.partycard{position:relative;z-index:1;width:min(420px,100%);text-align:center;color:#fff;display:grid;gap:10px;justify-items:center;animation:partyin .8s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes partyin{from{opacity:0;transform:scale(.4) rotate(-8deg)}to{opacity:1;transform:none}}
+.partytrophy{font-size:96px;line-height:1;animation:trophy 1.6s ease-in-out infinite;filter:drop-shadow(0 0 24px rgba(255,210,63,.8))}
+.partytrophy .ji{height:110px}
+@keyframes trophy{50%{transform:translateY(-10px) scale(1.06) rotate(4deg)}}
+.partyen{font:900 clamp(36px,11vw,56px)/1 var(--f-en);letter-spacing:2px;background:linear-gradient(#FFF6C8,#FFC93C);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 #B57700)}
+.partyh{font:800 clamp(28px,8vw,40px)/1.15 var(--f-display);margin:0}
+.partysub{font-size:20px;line-height:1.4;margin:0}
+.partynext{display:grid;gap:4px;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.3);border-radius:18px;padding:12px 14px;font-size:16px}
+.partynext b{font-size:18px;color:#FFE27A}
+.partygo{font-size:20px;min-height:56px;padding:10px 26px}
+@media (prefers-reduced-motion: reduce){.partycard,.partytrophy{animation:none}}
 /* the illustrated letters map */
 .jmapwrap{position:relative;margin-top:12px;border-radius:20px;overflow:hidden;box-shadow:inset 0 0 0 1.5px var(--line)}
 .mapfullbtn{position:absolute;top:10px;inset-inline-start:10px;z-index:5;border:0;border-radius:50%;width:44px;height:44px;display:grid;place-items:center;background:rgba(255,255,255,.92);color:#2B3A67;box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer}
@@ -1102,11 +1154,11 @@ const NAMECONF = {a:'eh',b:'dpv',c:'sz',d:'bt',e:'ia',f:'sv',g:'jz',h:'ak',i:'ey
 
 const SENTENCES = [
  {s:'I see a cat.', p:'🐱', wp:['🐶','🎩'], ws:['I see a hat.','I see a car.']},
- {s:'The dog is big.', p:'🐶', wp:['🐱','🐟'], ws:['The pig is big.','The frog is big.']},
+ {s:'The dog is big.', p:'@big:🐶', wp:['@small:🐶','@big:🐷'], ws:['The dog is small.','The pig is big.']},
  {s:'I have a red apple.', p:'🍎', wp:['🍌','🍋'], ws:['I have a red car.','I have a red hat.']},
  {s:'The sun is hot.', p:'☀️', wp:['🌙','⭐'], ws:['The cup is hot.','The pot is hot.']},
  {s:'I like pizza.', p:'🍕', wp:['🎂','🍦'], ws:['I like cake.','I like milk.']},
- {s:'The fish can swim.', p:'🐟', wp:['🐸','🦆'], ws:['The frog can swim.','The duck can swim.']},
+ {s:'The fish can swim.', p:'🐟🌊', wp:['🐸🌊','🦆🌊'], ws:['The frog can swim.','The duck can swim.']},
  {s:'A frog can jump.', p:'🐸', wp:['🐰','🐟'], ws:['A dog can jump.','A cat can jump.']},
  {s:'The moon is up.', p:'🌙', wp:['☀️','⭐'], ws:['The sun is up.','The kite is up.']},
  {s:'Look at the lion!', p:'🦁', wp:['🐯','🐵'], ws:['Look at the tiger!','Look at the lemon!']},
@@ -1117,18 +1169,18 @@ const SENTENCES = [
  {s:'The boy has a hat.', p:'👦🎩', wp:['👧🎩','👦🐱'], ws:['The girl has a hat.','The boy has a cat.']},
  {s:'The monkey eats a banana.', p:'🐵🍌', wp:['🐵🍎','🐻🍌'], ws:['The monkey eats an apple.','The bear eats a banana.']},
  {s:'I have a pencil and a notebook.', p:'✏️📓', wp:['✏️🍎','🔑📓'], ws:['I have a pencil and an apple.','I have a key and a notebook.']},
- {s:'The bear is in the house.', p:'🐻🏠', wp:['🐻🚗','🐶🏠'], ws:['The bear is in the car.','The dog is in the house.']},
- {s:'I see a big elephant.', p:'🐘', wp:['🐜','🦒'], ws:['I see a big ant.','I see a big giraffe.']},
- {s:'The owl is in the tree.', p:'🦉', wp:['🐵','🐍'], ws:['The monkey is in the tree.','The snake is in the tree.']},
+ {s:'The bear is in the house.', p:'@in:🐻:🏠', wp:['@next:🐻:🏠','@in:🐶:🏠'], ws:['The bear is next to the house.','The dog is in the house.']},
+ {s:'I see a big elephant.', p:'@big:🐘', wp:['@small:🐘','@big:🦒'], ws:['I see a small elephant.','I see a big giraffe.']},
+ {s:'The owl is in the tree.', p:'@in:🦉:🌳', wp:['@next:🦉:🌳','@in:🐵:🌳'], ws:['The owl is next to the tree.','The monkey is in the tree.']},
  {s:'I like ice cream.', p:'🍦', wp:['🍕','🎂'], ws:['I like juice.','I like cake.']},
  {s:'The car is red.', p:'🚗', wp:['🚂','🚐'], ws:['The train is red.','The van is red.']},
  {s:'I have a gift.', p:'🎁', wp:['🔑','🪁'], ws:['I have a key.','I have a kite.']},
  {s:'The horse can run.', p:'🐴', wp:['🐶','🐰'], ws:['The dog can run.','The rabbit can run.']},
  {s:'I drink milk.', p:'🥛', wp:['🧃','🍉'], ws:['I drink juice.','I drink tea.']},
- {s:'The tiger is big.', p:'🐯', wp:['🐱','🦓'], ws:['The cat is big.','The zebra is big.']},
+ {s:'The tiger is big.', p:'@big:🐯', wp:['@small:🐯','@big:🐱'], ws:['The tiger is small.','The cat is big.']},
  {s:'I eat a banana.', p:'🍌', wp:['🍋','🍇'], ws:['I eat a lemon.','I eat grapes.']},
  {s:'Look at the rainbow!', p:'🌈', wp:['🌙','🌋'], ws:['Look at the moon!','Look at the volcano!']},
- {s:'The penguin is cold.', p:'🐧', wp:['🐳','🦉'], ws:['The whale is cold.','The owl is cold.']},
+ {s:'The penguin is cold.', p:'🐧❄️', wp:['🐳','🦉'], ws:['The whale is cold.','The owl is cold.']},
  {s:'I have a new jacket.', p:'🧥', wp:['👖','🎩'], ws:['I have new jeans.','I have a new hat.']},
  {s:'The robot can dance.', p:'🤖', wp:['🐵','🐻'], ws:['The monkey can dance.','The bear can dance.']},
  {s:'The snake is long.', p:'🐍', wp:['🐜','🐟'], ws:['The fish is long.','The ant is long.']},
@@ -1144,7 +1196,22 @@ const SENTENCES = [
  {s:'I have an umbrella.', p:'☂️', wp:['🎩','🪁'], ws:['I have a hat.','I have a kite.']},
  {s:'The train is fast.', p:'🚂', wp:['✈️','🚗'], ws:['The airplane is fast.','The car is fast.']},
  {s:'The egg is white.', p:'🥚', wp:['🥛','⭐'], ws:['The milk is white.','The star is white.']},
+ {s:'The cat is under the chair.', p:'@under:🐱:🪑', wp:['@on:🐱:🪑','@under:🐶:🪑'], ws:['The cat is on the chair.','The dog is under the chair.']},
+ {s:'The book is on the chair.', p:'@on:📕:🪑', wp:['@under:📕:🪑','@on:🍎:🪑'], ws:['The book is under the chair.','The apple is on the chair.']},
+ {s:'The bird is in the box.', p:'@in:🐦:📦', wp:['@on:🐦:📦','@in:🐱:📦'], ws:['The bird is on the box.','The cat is in the box.']},
+ {s:'The dog is small.', p:'@small:🐶', wp:['@big:🐶','@small:🐴'], ws:['The dog is big.','The horse is small.']},
+ {s:'The ball is under the bed.', p:'@under:⚽:🛏️', wp:['@on:⚽:🛏️','@under:👟:🛏️'], ws:['The ball is on the bed.','The shoe is under the bed.']},
+ {s:'The car is next to the tree.', p:'@next:🚗:🌳', wp:['@next:🚌:🌳','@next:🚗:🏠'], ws:['The bus is next to the tree.','The car is next to the house.']},
+ {s:'The fish is in the bowl.', p:'@in:🐟:🥣', wp:['@next:🐟:🥣','@in:🍎:🥣'], ws:['The fish is next to the bowl.','The apple is in the bowl.']},
+ {s:'The mouse is under the table.', p:'@under:🐭:🪑', wp:['@on:🐭:🪑','@under:🐱:🪑'], ws:['The mouse is on the table.','The cat is under the table.']},
 ];
+// a sentence picture that shows what the sentence says: '@in:🐻:🏠' = a bear inside a house, '@big:🐶' = a big dog next to a child
+function scn(x) {
+  if (typeof x !== 'string' || x[0] !== '@') return x;
+  const [k, a, b] = x.slice(1).split(':'), e = (c, cl) => `<span class="${cl}">${c}</span>`;
+  if (k === 'big' || k === 'small') return `<span class="scn s${k}">${e(a, 's1')}${e('🧒', 'sref')}</span>`;
+  return `<span class="scn s${k}">${e(b, 's2')}${e(a, 's1')}</span>`;
+}
 
 const STORIES = [
  {t:'My Cat', x:['I have a cat.','Her name is Mimi.','Mimi is small and white.','She likes milk.','She sleeps on my bed.'], q:[
@@ -1579,6 +1646,9 @@ function letterMapHTML(s, opts = {}) {
    wheel stop; after Z the mega wheel. The daily mission spreads what is left over the days until
    the test (23.11), so each day is about 20-30 minutes (a stage is about 6 minutes). */
 const JOUR_N = 26;
+// after Z: the stars journey. Same 26 stages, but much harder questions, and a round counts only when it is good enough
+const isStars = s => (jour(s).lv || 1) >= 2;
+const STAR_PASS = 0.7;
 // every explanation is a short list: one idea per line
 const blt = (items, cls = '') => `<ul class="pts${cls ? ' ' + cls : ''}">${items.filter(Boolean).map(x => `<li>${x}</li>`).join('')}</ul>`;
 const lines = (...a) => a.filter(Boolean).join('<br>');
@@ -1614,6 +1684,7 @@ function stepsHTML(have, need, fresh, L) {
 }
 function stepNoteHTML(s1) {
   const n = curSteps(s1), need = stageSteps(s1), L = (ALPHA[jour(s1).n] || 'z').toUpperCase();
+  if (isStars(s1)) return `<div class="jstep"><b>👣 עוד צעד במסע הכוכבים!</b>${stepsHTML(n, need, true, '⭐')}<span>${need - n === 1 ? 'עוד צעד אחד' : `עוד ${need - n} צעדים`} ואוספים כוכב</span></div>`;
   return `<div class="jstep"><b>👣 עוד צעד במסע!</b>${stepsHTML(n, need, true, L)}<span>${need - n === 1 ? 'עוד צעד אחד' : `עוד ${need - n} צעדים`} ופותחים את האות <b class="en">${L}</b></span></div>`;
 }
 const dayMax = s => { const v = (s.goal || {}).max; return v == null ? 60 : +v; };      // after this many minutes, no more practice today (0 = no limit)
@@ -1749,7 +1820,7 @@ function home() {
     <div class="blocks" aria-hidden="true"><span class="blk h1">A</span><span class="blk h2">B</span><span class="blk h4">C</span></div>
     <h1>${KID ? `${KID.photo ? `<img class="kavatar" src="${KID.photo}" alt="">` : ''}שלום ${esc(KID.name)}!` : 'מוכן לאנגלית'}</h1>
     ${KID ? `<p class="sub">${KID.mode === 'test' ? 'כאן עושים מבחן ניסיון.' : KID.mode === 'learn' ? 'כאן מתרגלים אנגלית.<br>בהצלחה!' : 'מתכוננים למבחן באנגלית.'}</p>` : ''}
-    <div class="pills"><span class="pill due">${countdown()}</span><span class="pill">🔤 ${jour(st).n}/26 אותיות</span></div>
+    <div class="pills"><span class="pill due">${countdown()}</span><span class="pill">${isStars(st) ? `⭐ ${jour(st).n}/26 כוכבים` : `🔤 ${jour(st).n}/26 אותיות`}</span></div>
   </header>
 
   ${KID && KID.mode === 'test' ? '' : journeyCardHTML(G, st)}
@@ -1983,7 +2054,7 @@ function renderParentBar() {
       return `<article class="kst" data-k="${k.id}">
         <button class="kstmain" data-open="${k.id}" aria-expanded="false">
           <span class="kstname">${ph ? `<img class="kstph" src="${ph}" alt="">` : ''}${esc(k.name)}</span>
-          <span class="kstbits"><span>🔤 <b>${J.n || 0}/26</b> אותיות</span>${p.mock ? `<span>🏆 מבחן אחרון <b>${p.mock.score}/${p.mock.n}</b></span>` : ''}</span>
+          <span class="kstbits"><span>${(J.lv || 1) >= 2 ? `🔤 26/26 · ⭐ <b>${J.n || 0}/26</b> כוכבים` : `🔤 <b>${J.n || 0}/26</b> אותיות`}</span>${p.mock ? `<span>🏆 מבחן אחרון <b>${p.mock.score}/${p.mock.n}</b></span>` : ''}</span>
           <span class="kstbits"><span>היום:</span><span><b>${d.jl || 0}</b> שלבים</span><span><b>${mins}</b> דק׳</span><span>🎡 <b>${d.spins || 0}</b></span></span>
           <span class="kstago">${agoTxt(p.updatedAt)}</span>
         </button>
@@ -2003,7 +2074,7 @@ function renderParentBar() {
     div.className = 'kstmore';
     div.innerHTML = `
       <p class="kstline">סך הכול <b>${p.stars || 0}</b> כוכבים · ימי תרגול <b>${(p.days || []).length}</b>${p.mock ? ` · מבחן אחרון <b>${p.mock.score}/${p.mock.n}</b>` : ''}</p>
-      <p class="kstline">מסע: <b>${(p.jour || {}).n || 0}/26</b> אותיות · היום <b>${d.jl || 0}</b> שלבים · <b>${Math.floor((d.ms || 0) / 60000)}</b> דקות · <b>${d.spins || 0}</b> סיבובים</p>
+      <p class="kstline">${((p.jour || {}).lv || 1) >= 2 ? 'מסע הכוכבים' : 'מסע'}: <b>${(p.jour || {}).n || 0}/26</b> ${((p.jour || {}).lv || 1) >= 2 ? 'כוכבים' : 'אותיות'} · היום <b>${d.jl || 0}</b> שלבים · <b>${Math.floor((d.ms || 0) / 60000)}</b> דקות · <b>${d.spins || 0}</b> סיבובים</p>
       <div class="row">
         <button class="btn sm" data-copy="${kidLink(k.id, kidMode(k))}">העתקת הקישור</button>
         <button class="btn sm" data-set="${k.id}">הגדרות הילד</button>
@@ -3416,6 +3487,8 @@ function qNumCount() {
 
 /* ---------- grade 4 (Israeli curriculum, Foundation / Band I): decoding, sight words, vocabulary, grammar, numbers to 100, longer stories ---------- */
 const G4 = {"decode":[{"w":"bed","opts":["bed","bad","bud"],"kind":"cvc"},{"w":"pin","opts":["pin","pen","pan"],"kind":"cvc"},{"w":"hot","opts":["hot","hut","hat"],"kind":"cvc"},{"w":"bug","opts":["bug","big","bag"],"kind":"cvc"},{"w":"net","opts":["net","nut","not"],"kind":"cvc"},{"w":"fox","opts":["fox","fix","fax"],"kind":"cvc"},{"w":"sun","opts":["sun","sin","fun"],"kind":"cvc"},{"w":"cup","opts":["cup","cap","cop"],"kind":"cvc"},{"w":"lid","opts":["lid","led","lad"],"kind":"cvc"},{"w":"mud","opts":["mud","mad","mid"],"kind":"cvc"},{"w":"ship","opts":["ship","chip","shop"],"kind":"digraph"},{"w":"chin","opts":["chin","shin","thin"],"kind":"digraph"},{"w":"thick","opts":["thick","chick","think"],"kind":"digraph"},{"w":"when","opts":["when","wet","then"],"kind":"digraph"},{"w":"duck","opts":["duck","dock","dusk"],"kind":"digraph"},{"w":"fish","opts":["fish","fist","dish"],"kind":"digraph"},{"w":"much","opts":["much","mush","munch"],"kind":"digraph"},{"w":"path","opts":["path","pass","patch"],"kind":"digraph"},{"w":"whip","opts":["whip","ship","chip"],"kind":"digraph"},{"w":"lock","opts":["lock","luck","look"],"kind":"digraph"},{"w":"shell","opts":["shell","spell","smell"],"kind":"digraph"},{"w":"check","opts":["check","chick","neck"],"kind":"digraph"},{"w":"moth","opts":["moth","mouth","math"],"kind":"digraph"},{"w":"lunch","opts":["lunch","punch","launch"],"kind":"digraph"},{"w":"stop","opts":["stop","step","spot"],"kind":"blend"},{"w":"flag","opts":["flag","flat","flap"],"kind":"blend"},{"w":"tree","opts":["tree","three","free"],"kind":"blend"},{"w":"grass","opts":["grass","glass","gross"],"kind":"blend"},{"w":"drum","opts":["drum","drip","rum"],"kind":"blend"},{"w":"crab","opts":["crab","grab","cab"],"kind":"blend"},{"w":"swim","opts":["swim","slim","skim"],"kind":"blend"},{"w":"plant","opts":["plant","plan","slant"],"kind":"blend"},{"w":"brush","opts":["brush","blush","crush"],"kind":"blend"},{"w":"clap","opts":["clap","clip","slap"],"kind":"blend"},{"w":"frog","opts":["frog","from","fog"],"kind":"blend"},{"w":"skip","opts":["skip","slip","ship"],"kind":"blend"},{"w":"desk","opts":["desk","disk","dusk"],"kind":"blend"},{"w":"best","opts":["best","belt","bent"],"kind":"blend"},{"w":"jump","opts":["jump","bump","jam"],"kind":"blend"},{"w":"cape","opts":["cape","cap","cope"],"kind":"magic-e"},{"w":"kite","opts":["kite","kit","cute"],"kind":"magic-e"},{"w":"hope","opts":["hope","hop","hip"],"kind":"magic-e"},{"w":"cute","opts":["cute","cut","cat"],"kind":"magic-e"},{"w":"tube","opts":["tube","tub","tab"],"kind":"magic-e"},{"w":"pine","opts":["pine","pin","pen"],"kind":"magic-e"},{"w":"made","opts":["made","mad","mud"],"kind":"magic-e"},{"w":"note","opts":["note","not","nut"],"kind":"magic-e"},{"w":"bike","opts":["bike","bake","back"],"kind":"magic-e"},{"w":"rope","opts":["rope","ripe","rap"],"kind":"magic-e"},{"w":"plane","opts":["plane","plan","plant"],"kind":"magic-e"},{"w":"smile","opts":["smile","smell","mile"],"kind":"magic-e"},{"w":"home","opts":["home","hum","him"],"kind":"magic-e"},{"w":"feet","opts":["feet","fat","fit"],"kind":"vowel-team"},{"w":"seat","opts":["seat","set","sit"],"kind":"vowel-team"},{"w":"boot","opts":["boot","boat","beat"],"kind":"vowel-team"},{"w":"rain","opts":["rain","ran","run"],"kind":"vowel-team"},{"w":"boat","opts":["boat","bat","but"],"kind":"vowel-team"},{"w":"play","opts":["play","plan","pay"],"kind":"vowel-team"},{"w":"moon","opts":["moon","man","mean"],"kind":"vowel-team"},{"w":"sheep","opts":["sheep","ship","shop"],"kind":"vowel-team"},{"w":"train","opts":["train","trim","rain"],"kind":"vowel-team"},{"w":"road","opts":["road","rod","red"],"kind":"vowel-team"},{"w":"tail","opts":["tail","tell","tall"],"kind":"vowel-team"},{"w":"green","opts":["green","grin","grain"],"kind":"vowel-team"},{"w":"beach","opts":["beach","bench","batch"],"kind":"vowel-team"},{"w":"book","opts":["book","back","bake"],"kind":"vowel-team"},{"w":"day","opts":["day","dry","dad"],"kind":"vowel-team"},{"w":"coat","opts":["coat","cot","cat"],"kind":"vowel-team"},{"w":"soap","opts":["soap","sap","soup"],"kind":"vowel-team"},{"w":"paint","opts":["paint","pant","pint"],"kind":"vowel-team"},{"w":"food","opts":["food","fed","feed"],"kind":"vowel-team"},{"w":"stay","opts":["stay","star","stair"],"kind":"vowel-team"}],"sight":[{"w":"they","opts":["they","then","the"]},{"w":"was","opts":["was","saw","has"]},{"w":"where","opts":["where","were","here"]},{"w":"were","opts":["were","where","we"]},{"w":"said","opts":["said","sad","sand"]},{"w":"could","opts":["could","cloud","cold"]},{"w":"because","opts":["because","became","before"]},{"w":"there","opts":["there","three","these"]},{"w":"what","opts":["what","that","want"]},{"w":"want","opts":["want","went","what"]},{"w":"went","opts":["went","want","wet"]},{"w":"come","opts":["come","came","some"]},{"w":"some","opts":["some","same","come"]},{"w":"does","opts":["does","goes","dogs"]},{"w":"goes","opts":["goes","does","gets"]},{"w":"who","opts":["who","how","why"]},{"w":"how","opts":["how","who","now"]},{"w":"why","opts":["why","way","who"]},{"w":"from","opts":["from","form","for"]},{"w":"of","opts":["of","off","on"]},{"w":"your","opts":["your","you","our"]},{"w":"know","opts":["know","now","own"]},{"w":"again","opts":["again","against","gain"]},{"w":"other","opts":["other","mother","over"]},{"w":"very","opts":["very","every","ever"]},{"w":"many","opts":["many","money","any"]},{"w":"thought","opts":["thought","though","through"]},{"w":"would","opts":["would","world","could"]},{"w":"friend","opts":["friend","fried","find"]},{"w":"people","opts":["people","purple","pupil"]},{"w":"once","opts":["once","one","ones"]},{"w":"these","opts":["these","those","there"]}],"vocab":[{"en":"mother","he":"אמא","topic":"family","opts":["mother","father","brother"]},{"en":"father","he":"אבא","topic":"family","opts":["father","mother","farmer"]},{"en":"brother","he":"אח","topic":"family","opts":["brother","sister","mother"]},{"en":"sister","he":"אחות","topic":"family","opts":["sister","brother","teacher"]},{"en":"grandmother","he":"סבתא","topic":"family","opts":["grandmother","grandfather","mother"]},{"en":"grandfather","he":"סבא","topic":"family","opts":["grandfather","grandmother","father"]},{"en":"uncle","he":"דוד","topic":"family","opts":["uncle","aunt","cousin"]},{"en":"aunt","he":"דודה","topic":"family","opts":["aunt","uncle","ant"]},{"en":"cousin","he":"בן דוד","topic":"family","opts":["cousin","uncle","brother"]},{"en":"parents","he":"הורים","topic":"family","opts":["parents","people","children"]},{"en":"daughter","he":"בת","topic":"family","opts":["daughter","son","doctor"]},{"en":"head","he":"ראש","topic":"body","opts":["head","hand","hair"]},{"en":"eyes","he":"עיניים","topic":"body","opts":["eyes","ears","eggs"]},{"en":"ears","he":"אוזניים","topic":"body","opts":["ears","eyes","arms"]},{"en":"nose","he":"אף","topic":"body","opts":["nose","mouth","knee"]},{"en":"mouth","he":"פה","topic":"body","opts":["mouth","month","nose"]},{"en":"leg","he":"רגל","topic":"body","opts":["leg","arm","egg"]},{"en":"teeth","he":"שיניים","topic":"body","opts":["teeth","feet","tooth"]},{"en":"hair","he":"שיער","topic":"body","opts":["hair","head","chair"]},{"en":"shoulder","he":"כתף","topic":"body","opts":["shoulder","finger","knee"]},{"en":"knee","he":"ברך","topic":"body","opts":["knee","nose","foot"]},{"en":"finger","he":"אצבע","topic":"body","opts":["finger","foot","shoulder"]},{"en":"arm","he":"זרוע","topic":"body","opts":["arm","leg","hand"]},{"en":"shirt","he":"חולצה","topic":"clothes","opts":["shirt","skirt","shoe"]},{"en":"skirt","he":"חצאית","topic":"clothes","opts":["skirt","shirt","dress"]},{"en":"dress","he":"שמלה","topic":"clothes","opts":["dress","skirt","desk"]},{"en":"pants","he":"מכנסיים","topic":"clothes","opts":["pants","socks","plants"]},{"en":"shoes","he":"נעליים","topic":"clothes","opts":["shoes","socks","shirts"]},{"en":"socks","he":"גרביים","topic":"clothes","opts":["socks","shoes","box"]},{"en":"hat","he":"כובע","topic":"clothes","opts":["hat","coat","cat"]},{"en":"coat","he":"מעיל","topic":"clothes","opts":["coat","hat","boat"]},{"en":"sweater","he":"סוודר","topic":"clothes","opts":["sweater","sweet","dress"]},{"en":"bread","he":"לחם","topic":"food","opts":["bread","bed","breakfast"]},{"en":"cheese","he":"גבינה","topic":"food","opts":["cheese","chicken","chips"]},{"en":"milk","he":"חלב","topic":"food","opts":["milk","meat","juice"]},{"en":"chicken","he":"עוף","topic":"food","opts":["chicken","kitchen","cheese"]},{"en":"rice","he":"אורז","topic":"food","opts":["rice","nice","juice"]},{"en":"soup","he":"מרק","topic":"food","opts":["soup","soap","salad"]},{"en":"water","he":"מים","topic":"food","opts":["water","winter","milk"]},{"en":"juice","he":"מיץ","topic":"food","opts":["juice","rice","cheese"]},{"en":"carrot","he":"גזר","topic":"food","opts":["carrot","parrot","potato"]},{"en":"potato","he":"תפוח אדמה","topic":"food","opts":["potato","tomato","carrot"]},{"en":"tomato","he":"עגבנייה","topic":"food","opts":["tomato","potato","cucumber"]},{"en":"cucumber","he":"מלפפון","topic":"food","opts":["cucumber","tomato","number"]},{"en":"sandwich","he":"כריך","topic":"food","opts":["sandwich","salad","sandal"]},{"en":"breakfast","he":"ארוחת בוקר","topic":"food","opts":["breakfast","lunch","dinner"]},{"en":"lunch","he":"ארוחת צהריים","topic":"food","opts":["lunch","breakfast","dinner"]},{"en":"dinner","he":"ארוחת ערב","topic":"food","opts":["dinner","winner","lunch"]},{"en":"horse","he":"סוס","topic":"animals","opts":["horse","house","cow"]},{"en":"cow","he":"פרה","topic":"animals","opts":["cow","horse","goat"]},{"en":"sheep","he":"כבשה","topic":"animals","opts":["sheep","ship","goat"]},{"en":"monkey","he":"קוף","topic":"animals","opts":["monkey","money","donkey"]},{"en":"lion","he":"אריה","topic":"animals","opts":["lion","tiger","line"]},{"en":"tiger","he":"נמר","topic":"animals","opts":["tiger","lion","turtle"]},{"en":"bird","he":"ציפור","topic":"animals","opts":["bird","bear","bread"]},{"en":"rabbit","he":"ארנב","topic":"animals","opts":["rabbit","robot","mouse"]},{"en":"snake","he":"נחש","topic":"animals","opts":["snake","snack","turtle"]},{"en":"mouse","he":"עכבר","topic":"animals","opts":["mouse","house","horse"]},{"en":"turtle","he":"צב","topic":"animals","opts":["turtle","rabbit","tiger"]},{"en":"goat","he":"עז","topic":"animals","opts":["goat","coat","cow"]},{"en":"teacher","he":"מורה","topic":"school","opts":["teacher","pupil","father"]},{"en":"pupil","he":"תלמיד","topic":"school","opts":["pupil","teacher","pencil"]},{"en":"pencil","he":"עיפרון","topic":"school","opts":["pencil","pupil","ruler"]},{"en":"ruler","he":"סרגל","topic":"school","opts":["ruler","eraser","pencil"]},{"en":"eraser","he":"מחק","topic":"school","opts":["eraser","ruler","paper"]},{"en":"notebook","he":"מחברת","topic":"school","opts":["notebook","book","school bag"]},{"en":"classroom","he":"כיתה","topic":"school","opts":["classroom","bathroom","bedroom"]},{"en":"lesson","he":"שיעור","topic":"school","opts":["lesson","lemon","homework"]},{"en":"homework","he":"שיעורי בית","topic":"school","opts":["homework","housework","lesson"]},{"en":"scissors","he":"מספריים","topic":"school","opts":["scissors","glue","sisters"]},{"en":"glue","he":"דבק","topic":"school","opts":["glue","blue","scissors"]},{"en":"kitchen","he":"מטבח","topic":"house","opts":["kitchen","chicken","bedroom"]},{"en":"bedroom","he":"חדר שינה","topic":"house","opts":["bedroom","bathroom","kitchen"]},{"en":"bathroom","he":"חדר אמבטיה","topic":"house","opts":["bathroom","bedroom","living room"]},{"en":"living room","he":"סלון","topic":"house","opts":["living room","bedroom","classroom"]},{"en":"window","he":"חלון","topic":"house","opts":["window","winter","door"]},{"en":"bed","he":"מיטה","topic":"house","opts":["bed","bad","table"]},{"en":"chair","he":"כיסא","topic":"house","opts":["chair","hair","table"]},{"en":"table","he":"שולחן","topic":"house","opts":["table","chair","tablet"]},{"en":"sofa","he":"ספה","topic":"house","opts":["sofa","soap","chair"]},{"en":"garden","he":"גינה","topic":"house","opts":["garden","kitchen","garage"]},{"en":"stairs","he":"מדרגות","topic":"house","opts":["stairs","stars","chairs"]},{"en":"roof","he":"גג","topic":"house","opts":["roof","room","floor"]},{"en":"rain","he":"גשם","topic":"weather","opts":["rain","snow","train"]},{"en":"wind","he":"רוח","topic":"weather","opts":["wind","window","rain"]},{"en":"cloud","he":"ענן","topic":"weather","opts":["cloud","could","snow"]},{"en":"snow","he":"שלג","topic":"weather","opts":["snow","rain","slow"]},{"en":"hot","he":"חם","topic":"weather","opts":["hot","cold","hat"]},{"en":"cold","he":"קר","topic":"weather","opts":["cold","hot","could"]},{"en":"sunny","he":"שמשי","topic":"weather","opts":["sunny","rainy","funny"]},{"en":"summer","he":"קיץ","topic":"seasons","opts":["summer","winter","spring"]},{"en":"winter","he":"חורף","topic":"seasons","opts":["winter","summer","water"]},{"en":"spring","he":"אביב","topic":"seasons","opts":["spring","autumn","string"]},{"en":"autumn","he":"סתיו","topic":"seasons","opts":["autumn","spring","winter"]},{"en":"Sunday","he":"יום ראשון","topic":"days","opts":["Sunday","Monday","Saturday"]},{"en":"Monday","he":"יום שני","topic":"days","opts":["Monday","Sunday","Tuesday"]},{"en":"Tuesday","he":"יום שלישי","topic":"days","opts":["Tuesday","Thursday","Wednesday"]},{"en":"Wednesday","he":"יום רביעי","topic":"days","opts":["Wednesday","Tuesday","Thursday"]},{"en":"Thursday","he":"יום חמישי","topic":"days","opts":["Thursday","Tuesday","Friday"]},{"en":"Friday","he":"יום שישי","topic":"days","opts":["Friday","Monday","Thursday"]},{"en":"Saturday","he":"שבת","topic":"days","opts":["Saturday","Sunday","Friday"]},{"en":"January","he":"ינואר","topic":"months","opts":["January","June","July"]},{"en":"March","he":"מרץ","topic":"months","opts":["March","May","April"]},{"en":"June","he":"יוני","topic":"months","opts":["June","July","January"]},{"en":"July","he":"יולי","topic":"months","opts":["July","June","January"]},{"en":"September","he":"ספטמבר","topic":"months","opts":["September","November","December"]},{"en":"December","he":"דצמבר","topic":"months","opts":["December","November","September"]},{"en":"sad","he":"עצוב","topic":"feelings","opts":["sad","happy","bad"]},{"en":"angry","he":"כועס","topic":"feelings","opts":["angry","hungry","sad"]},{"en":"tired","he":"עייף","topic":"feelings","opts":["tired","tried","bored"]},{"en":"hungry","he":"רעב","topic":"feelings","opts":["hungry","angry","thirsty"]},{"en":"thirsty","he":"צמא","topic":"feelings","opts":["thirsty","thirty","hungry"]},{"en":"scared","he":"מפחד","topic":"feelings","opts":["scared","sacred","angry"]},{"en":"bored","he":"משועמם","topic":"feelings","opts":["bored","board","tired"]},{"en":"excited","he":"נרגש","topic":"feelings","opts":["excited","exciting","scared"]},{"en":"sick","he":"חולה","topic":"feelings","opts":["sick","six","sad"]},{"en":"run","he":"לרוץ","topic":"verbs","opts":["run","ran","sun"]},{"en":"swim","he":"לשחות","topic":"verbs","opts":["swim","sing","slim"]},{"en":"read","he":"לקרוא","topic":"verbs","opts":["read","write","ride"]},{"en":"write","he":"לכתוב","topic":"verbs","opts":["write","read","white"]},{"en":"sing","he":"לשיר","topic":"verbs","opts":["sing","swing","dance"]},{"en":"dance","he":"לרקוד","topic":"verbs","opts":["dance","sing","dress"]},{"en":"drink","he":"לשתות","topic":"verbs","opts":["drink","eat","drive"]},{"en":"sleep","he":"לישון","topic":"verbs","opts":["sleep","sheep","eat"]},{"en":"walk","he":"ללכת","topic":"verbs","opts":["walk","talk","run"]},{"en":"open","he":"לפתוח","topic":"verbs","opts":["open","close","oven"]},{"en":"close","he":"לסגור","topic":"verbs","opts":["close","open","clothes"]},{"en":"wash","he":"לשטוף","topic":"verbs","opts":["wash","watch","cook"]},{"en":"cook","he":"לבשל","topic":"verbs","opts":["cook","book","look"]},{"en":"draw","he":"לצייר","topic":"verbs","opts":["draw","drink","write"]},{"en":"listen","he":"להקשיב","topic":"verbs","opts":["listen","look","lesson"]},{"en":"buy","he":"לקנות","topic":"verbs","opts":["buy","bring","sell"]},{"en":"help","he":"לעזור","topic":"verbs","opts":["help","hold","play"]},{"en":"climb","he":"לטפס","topic":"verbs","opts":["climb","jump","clean"]},{"en":"park","he":"פארק","topic":"places","opts":["park","pool","shop"]},{"en":"beach","he":"חוף ים","topic":"places","opts":["beach","bench","pool"]},{"en":"zoo","he":"גן חיות","topic":"places","opts":["zoo","park","shoe"]},{"en":"shop","he":"חנות","topic":"places","opts":["shop","ship","street"]},{"en":"hospital","he":"בית חולים","topic":"places","opts":["hospital","library","school"]},{"en":"library","he":"ספרייה","topic":"places","opts":["library","hospital","kitchen"]},{"en":"city","he":"עיר","topic":"places","opts":["city","street","kitty"]},{"en":"street","he":"רחוב","topic":"places","opts":["street","city","sweet"]},{"en":"pool","he":"בריכה","topic":"places","opts":["pool","park","school"]},{"en":"black","he":"שחור","topic":"colors","opts":["black","white","blue"]},{"en":"white","he":"לבן","topic":"colors","opts":["white","black","write"]},{"en":"purple","he":"סגול","topic":"colors","opts":["purple","people","pink"]},{"en":"brown","he":"חום","topic":"colors","opts":["brown","green","crown"]},{"en":"pink","he":"ורוד","topic":"colors","opts":["pink","purple","sink"]},{"en":"grey","he":"אפור","topic":"colors","opts":["grey","green","grape"]},{"en":"today","he":"היום","topic":"time","opts":["today","tomorrow","yesterday"]},{"en":"tomorrow","he":"מחר","topic":"time","opts":["tomorrow","today","yesterday"]},{"en":"yesterday","he":"אתמול","topic":"time","opts":["yesterday","today","tomorrow"]},{"en":"morning","he":"בוקר","topic":"time","opts":["morning","evening","night"]},{"en":"evening","he":"ערב","topic":"time","opts":["evening","morning","night"]},{"en":"night","he":"לילה","topic":"time","opts":["night","day","light"]},{"en":"week","he":"שבוע","topic":"time","opts":["week","month","year"]},{"en":"month","he":"חודש","topic":"time","opts":["month","mouth","week"]},{"en":"year","he":"שנה","topic":"time","opts":["year","week","ear"]},{"en":"always","he":"תמיד","topic":"time","opts":["always","never","sometimes"]},{"en":"never","he":"אף פעם","topic":"time","opts":["never","always","ever"]},{"en":"sometimes","he":"לפעמים","topic":"time","opts":["sometimes","always","summer"]},{"en":"hour","he":"שעה","topic":"time","opts":["hour","our","minute"]}],"grammar":[{"s":"I ___ ten years old.","a":"am","opts":["am","is","are"],"full":"I am ten years old.","he":"אני בן עשר."},{"s":"My sisters ___ at school.","a":"are","opts":["are","is","am"],"full":"My sisters are at school.","he":"האחיות שלי בבית הספר."},{"s":"The cat ___ on the sofa.","a":"is","opts":["is","are","am"],"full":"The cat is on the sofa.","he":"החתול על הספה."},{"s":"We ___ hungry.","a":"are","opts":["are","is","am"],"full":"We are hungry.","he":"אנחנו רעבים."},{"s":"___ you happy today?","a":"Are","opts":["Are","Is","Am"],"full":"Are you happy today?","he":"אתה שמח היום?"},{"s":"Dan and Noa ___ friends.","a":"are","opts":["are","is","am"],"full":"Dan and Noa are friends.","he":"דן ונועה חברים."},{"s":"She ___ a red bike.","a":"has","opts":["has","have","is"],"full":"She has a red bike.","he":"יש לה אופניים אדומים."},{"s":"I ___ two brothers.","a":"have","opts":["have","has","am"],"full":"I have two brothers.","he":"יש לי שני אחים."},{"s":"My dog ___ a long tail.","a":"has","opts":["has","have","are"],"full":"My dog has a long tail.","he":"לכלב שלי יש זנב ארוך."},{"s":"They ___ a big garden.","a":"have","opts":["have","has","is"],"full":"They have a big garden.","he":"יש להם גינה גדולה."},{"s":"A fish can swim, but it ___ walk.","a":"can't","opts":["can't","can","is"],"full":"A fish can swim, but it can't walk.","he":"דג יכול לשחות, אבל הוא לא יכול ללכת."},{"s":"Birds ___ fly.","a":"can","opts":["can","can't","is"],"full":"Birds can fly.","he":"ציפורים יכולות לעוף."},{"s":"A baby ___ read a book.","a":"can't","opts":["can't","can","are"],"full":"A baby can't read a book.","he":"תינוק לא יכול לקרוא ספר."},{"s":"___ you ride a horse?","a":"Can","opts":["Can","Are","Does"],"full":"Can you ride a horse?","he":"אתה יודע לרכוב על סוס?"},{"s":"There ___ a ball under the bed.","a":"is","opts":["is","are","have"],"full":"There is a ball under the bed.","he":"יש כדור מתחת למיטה."},{"s":"There ___ three apples on the table.","a":"are","opts":["are","is","has"],"full":"There are three apples on the table.","he":"יש שלושה תפוחים על השולחן."},{"s":"There ___ many children in the park.","a":"are","opts":["are","is","am"],"full":"There are many children in the park.","he":"יש הרבה ילדים בפארק."},{"s":"___ there a cat in the garden?","a":"Is","opts":["Is","Are","Am"],"full":"Is there a cat in the garden?","he":"יש חתול בגינה?"},{"s":"I have two ___.","a":"boxes","opts":["boxes","box","boxs"],"full":"I have two boxes.","he":"יש לי שתי קופסאות."},{"s":"There are five ___ in the class.","a":"children","opts":["children","child","childs"],"full":"There are five children in the class.","he":"יש חמישה ילדים בכיתה."},{"s":"My ___ are cold.","a":"feet","opts":["feet","foot","foots"],"full":"My feet are cold.","he":"הרגליים שלי קרות."},{"s":"Look at the three little ___!","a":"mice","opts":["mice","mouse","mouses"],"full":"Look at the three little mice!","he":"תראו את שלושת העכברים הקטנים!"},{"s":"We eat two ___ every day.","a":"apples","opts":["apples","apple","an apple"],"full":"We eat two apples every day.","he":"אנחנו אוכלים שני תפוחים כל יום."},{"s":"Noa ___ to school every day.","a":"goes","opts":["goes","go","going"],"full":"Noa goes to school every day.","he":"נועה הולכת לבית הספר כל יום."},{"s":"My father ___ coffee in the morning.","a":"drinks","opts":["drinks","drink","drinking"],"full":"My father drinks coffee in the morning.","he":"אבא שלי שותה קפה בבוקר."},{"s":"Itai and Yoni ___ football after school.","a":"play","opts":["play","plays","playing"],"full":"Itai and Yoni play football after school.","he":"איתי ויוני משחקים כדורגל אחרי בית הספר."},{"s":"The baby ___ a lot.","a":"sleeps","opts":["sleeps","sleep","sleeping"],"full":"The baby sleeps a lot.","he":"התינוק ישן הרבה."},{"s":"___ Maya like ice cream?","a":"Does","opts":["Does","Do","Is"],"full":"Does Maya like ice cream?","he":"מאיה אוהבת גלידה?"},{"s":"He ___ not like milk.","a":"does","opts":["does","do","is"],"full":"He does not like milk.","he":"הוא לא אוהב חלב."},{"s":"I ___ my teeth every night.","a":"brush","opts":["brush","brushes","am"],"full":"I brush my teeth every night.","he":"אני מצחצח שיניים כל לילה."},{"s":"The cat is ___ the box. I can't see it!","a":"in","opts":["in","on","next to"],"full":"The cat is in the box. I can't see it!","he":"החתול בתוך הקופסה. אני לא רואה אותו!"},{"s":"The book is ___ the table, near the cup.","a":"on","opts":["on","under","in"],"full":"The book is on the table, near the cup.","he":"הספר על השולחן, ליד הכוס."},{"s":"The shoes are ___ the bed, on the floor.","a":"under","opts":["under","on","in"],"full":"The shoes are under the bed, on the floor.","he":"הנעליים מתחת למיטה, על הרצפה."},{"s":"I sit ___ my friend in class.","a":"next to","opts":["next to","under","in"],"full":"I sit next to my friend in class.","he":"אני יושב ליד החבר שלי בכיתה."},{"s":"___ is my bag.","a":"This","opts":["This","These","They"],"full":"This is my bag.","he":"זה התיק שלי."},{"s":"___ are my new shoes.","a":"These","opts":["These","This","It"],"full":"These are my new shoes.","he":"אלה הנעליים החדשות שלי."},{"s":"Look at ___ birds in the tree!","a":"these","opts":["these","this","is"],"full":"Look at these birds in the tree!","he":"תראו את הציפורים האלה על העץ!"},{"s":"___ is your name?","a":"What","opts":["What","Where","Who"],"full":"What is your name?","he":"מה השם שלך?"},{"s":"___ do you live? In Haifa.","a":"Where","opts":["Where","What","Who"],"full":"Where do you live? In Haifa.","he":"איפה אתה גר? בחיפה."},{"s":"___ is your teacher? Mrs. Cohen.","a":"Who","opts":["Who","What","Where"],"full":"Who is your teacher? Mrs. Cohen.","he":"מי המורה שלך? הגברת כהן."},{"s":"___ cats do you have? Two.","a":"How many","opts":["How many","What","Where"],"full":"How many cats do you have? Two.","he":"כמה חתולים יש לך? שניים."},{"s":"___ old are you? I am ten.","a":"How","opts":["How","What","Who"],"full":"How old are you? I am ten.","he":"בן כמה אתה? אני בן עשר."},{"s":"Dan has a dog. ___ dog is black.","a":"His","opts":["His","Her","My"],"full":"Dan has a dog. His dog is black.","he":"לדן יש כלב. הכלב שלו שחור."},{"s":"Shira loves ___ cat.","a":"her","opts":["her","his","their"],"full":"Shira loves her cat.","he":"שירה אוהבת את החתולה שלה."},{"s":"The children open ___ bags.","a":"their","opts":["their","his","her"],"full":"The children open their bags.","he":"הילדים פותחים את התיקים שלהם."},{"s":"I love ___ grandmother.","a":"my","opts":["my","his","their"],"full":"I love my grandmother.","he":"אני אוהב את סבתא שלי."},{"s":"We play in ___ garden.","a":"our","opts":["our","their","his"],"full":"We play in our garden.","he":"אנחנו משחקים בגינה שלנו."}],"stories":[{"t":"Noa's Family","x":["Noa is ten years old.","She lives in Haifa with her family.","Her mother is a doctor and her father is a cook.","Noa has one brother and one sister.","Her brother Yoni is six, and her sister is a baby.","On Friday, the family visits Grandma.","Grandma makes soup for everyone."],"q":[["Where does Noa live?","איפה נועה גרה?",["In Haifa.","In Eilat.","In a big city in America."]],["What is Noa's mother's job?","מה העבודה של אמא של נועה?",["She is a doctor.","She is a cook.","She is a teacher."]],["How old is Yoni?","בן כמה יוני?",["He is six.","He is ten.","He is a baby."]],["What does Grandma make?","מה סבתא מכינה?",["Soup.","A cake.","Salad."]]],"hint":{"Where does Noa live?":1,"What is Noa's mother's job?":2,"How old is Yoni?":4,"What does Grandma make?":6},"hard":true},{"t":"A Day at School","x":["Itai gets up at seven o'clock.","He eats bread and cheese for breakfast.","He walks to school with his friend Dan.","The first lesson is English.","Itai likes English, but he doesn't like math.","At ten o'clock, the children play in the yard.","After school, Itai does his homework."],"q":[["What does Itai eat for breakfast?","מה איתי אוכל לארוחת בוקר?",["Bread and cheese.","Eggs and salad.","Rice and chicken."]],["Who does Itai walk to school with?","עם מי איתי הולך לבית הספר?",["With his friend Dan.","With his mother.","With his sister."]],["Does Itai like math?","איתי אוהב מתמטיקה?",["No, he doesn't.","Yes, he does.","Yes, it is his first lesson."]],["What do the children do at ten o'clock?","מה הילדים עושים בשעה עשר?",["They play in the yard.","They eat lunch.","They go home."]]],"hint":{"What does Itai eat for breakfast?":1,"Who does Itai walk to school with?":2,"Does Itai like math?":4,"What do the children do at ten o'clock?":5},"hard":true},{"t":"Shira's Pets","x":["Shira has two pets.","She has a white cat and a small brown dog.","The cat's name is Snow.","Snow sleeps on Shira's bed all day.","The dog's name is Choco.","Choco can run fast, but he can't swim.","Every evening, Shira takes Choco to the park."],"q":[["What color is the cat?","באיזה צבע החתול?",["White.","Brown.","Black."]],["Where does Snow sleep?","איפה סנואו ישן?",["On Shira's bed.","Under the table.","In the garden."]],["What can't Choco do?","מה צ'וקו לא יכול לעשות?",["He can't swim.","He can't run.","He can't eat."]],["When does Shira take Choco to the park?","מתי שירה לוקחת את צ'וקו לפארק?",["Every evening.","Every morning.","On Saturday."]]],"hint":{"What color is the cat?":1,"Where does Snow sleep?":3,"What can't Choco do?":5,"When does Shira take Choco to the park?":6},"hard":true},{"t":"Maya's Birthday","x":["Today is Maya's birthday.","She is eleven years old.","Her friends come to her house at four o'clock.","Maya's mother makes a big chocolate cake.","There are eleven candles on the cake.","Her friends give her a book and a blue bag.","Maya is very happy."],"q":[["How old is Maya today?","בת כמה מאיה היום?",["Eleven.","Ten.","Twelve."]],["When do Maya's friends come?","מתי החברים של מאיה מגיעים?",["At four o'clock.","At eleven o'clock.","In the morning."]],["How many candles are on the cake?","כמה נרות יש על העוגה?",["Eleven.","Four.","Ten."]],["What color is Maya's new bag?","באיזה צבע התיק החדש של מאיה?",["Blue.","Red.","Brown."]]],"hint":{"How old is Maya today?":1,"When do Maya's friends come?":2,"How many candles are on the cake?":4,"What color is Maya's new bag?":5},"hard":true},{"t":"Winter in the North","x":["It is winter.","It is cold and rainy in the north.","Dan wears a warm coat and boots.","He doesn't go to the park today.","He stays at home with his sister.","They play a game and drink hot chocolate.","In the evening, the rain stops."],"q":[["What season is it?","איזו עונה עכשיו?",["Winter.","Summer.","Spring."]],["What does Dan wear?","מה דן לובש?",["A warm coat and boots.","A T-shirt and shorts.","A hat and sandals."]],["Is Dan in the park today?","דן בפארק היום?",["No, he is at home.","Yes, he is.","No, he is at school."]],["What do Dan and his sister drink?","מה דן ואחותו שותים?",["Hot chocolate.","Cold water.","Orange juice."]]],"hint":{"What season is it?":0,"What does Dan wear?":2,"Is Dan in the park today?":4,"What do Dan and his sister drink?":5},"hard":true},{"t":"A Trip to the Zoo","x":["On Tuesday, Yoni's class goes to the zoo.","They go by bus.","First, they see the monkeys.","The monkeys eat bananas and jump in the trees.","Then they see a big lion.","The lion is sleeping under a tree.","Yoni's favorite animal is the giraffe, because it is very tall."],"q":[["When does Yoni's class go to the zoo?","מתי הכיתה של יוני נוסעת לגן החיות?",["On Tuesday.","On Sunday.","On Friday."]],["How do they go to the zoo?","איך הם נוסעים לגן החיות?",["By bus.","By car.","On foot."]],["Where is the lion sleeping?","איפה האריה ישן?",["Under a tree.","In the water.","Next to the monkeys."]],["Why does Yoni like the giraffe?","למה יוני אוהב את הג'ירפה?",["Because it is very tall.","Because it eats bananas.","Because it can swim."]]],"hint":{"When does Yoni's class go to the zoo?":0,"How do they go to the zoo?":1,"Where is the lion sleeping?":5,"Why does Yoni like the giraffe?":6},"hard":true},{"t":"The Weekend","x":["On Saturday, Itai's family goes to the beach.","The sun is hot and the sea is blue.","Itai and his father swim in the sea.","His mother reads a book under an umbrella.","His little sister makes a sand castle.","At one o'clock, they eat sandwiches and watermelon.","They go home in the evening."],"q":[["Where does Itai's family go on Saturday?","לאן המשפחה של איתי הולכת בשבת?",["To the beach.","To the zoo.","To Grandma's house."]],["Who swims with Itai?","מי שוחה עם איתי?",["His father.","His mother.","His sister."]],["What does his little sister make?","מה אחותו הקטנה עושה?",["A sand castle.","A sandwich.","A cake."]],["What do they eat at one o'clock?","מה הם אוכלים בשעה אחת?",["Sandwiches and watermelon.","Pizza and ice cream.","Soup and bread."]]],"hint":{"Where does Itai's family go on Saturday?":0,"Who swims with Itai?":2,"What does his little sister make?":4,"What do they eat at one o'clock?":5},"hard":true},{"t":"Shira Cooks Dinner","x":["Shira's father is tired today.","So Shira cooks dinner for the family.","She makes rice, chicken and a big salad.","Her brother helps her cut the tomatoes and cucumbers.","They put the plates on the table.","Everyone says, \"Thank you, Shira!\"","After dinner, her father washes the dishes."],"q":[["Why does Shira cook dinner?","למה שירה מבשלת ארוחת ערב?",["Because her father is tired.","Because it is her birthday.","Because her mother is at work."]],["What does Shira make?","מה שירה מכינה?",["Rice, chicken and a salad.","Soup and bread.","Pizza and chips."]],["Who helps Shira?","מי עוזר לשירה?",["Her brother.","Her mother.","Her friend Noa."]],["Who washes the dishes?","מי שוטף את הכלים?",["Her father.","Shira.","Her brother."]]],"hint":{"Why does Shira cook dinner?":0,"What does Shira make?":2,"Who helps Shira?":3,"Who washes the dishes?":6},"hard":true}]};
+const PRO = {"vocab":[{"en":"remember","he":"לזכור","topic":"verbs","opts":["remember","remind","member"]},{"en":"forget","he":"לשכוח","topic":"verbs","opts":["forget","forgive","fork"]},{"en":"believe","he":"להאמין","topic":"verbs","opts":["believe","belong","below"]},{"en":"describe","he":"לתאר","topic":"verbs","opts":["describe","decide","divide"]},{"en":"answer","he":"לענות; תשובה","topic":"verbs","opts":["answer","another","ask"]},{"en":"laugh","he":"לצחוק","topic":"verbs","opts":["laugh","cough","lose"]},{"en":"explain","he":"להסביר","topic":"verbs","opts":["explain","explore","expect"]},{"en":"understand","he":"להבין","topic":"verbs","opts":["understand","underline","umbrella"]},{"en":"borrow","he":"לשאול (חפץ), ללוות","topic":"verbs","opts":["borrow","tomorrow","follow"]},{"en":"choose","he":"לבחור","topic":"verbs","opts":["choose","cheese","close"]},{"en":"decide","he":"להחליט","topic":"verbs","opts":["decide","divide","describe"]},{"en":"arrive","he":"להגיע","topic":"verbs","opts":["arrive","arrow","drive"]},{"en":"travel","he":"לנסוע, לטייל","topic":"verbs","opts":["travel","trouble","tower"]},{"en":"build","he":"לבנות","topic":"verbs","opts":["build","bring","burn"]},{"en":"thought","he":"חשב (עבר של think)","topic":"verbs","opts":["thought","though","through"]},{"en":"quiet","he":"שקט","topic":"adjectives","opts":["quiet","quite","quit"]},{"en":"beautiful","he":"יפה","topic":"adjectives","opts":["beautiful","painful","careful"]},{"en":"different","he":"שונה","topic":"adjectives","opts":["different","difficult","dinner"]},{"en":"dangerous","he":"מסוכן","topic":"adjectives","opts":["dangerous","generous","dancer"]},{"en":"careful","he":"זהיר","topic":"adjectives","opts":["careful","careless","colorful"]},{"en":"important","he":"חשוב","topic":"adjectives","opts":["important","impossible","imagine"]},{"en":"interesting","he":"מעניין","topic":"adjectives","opts":["interesting","interested","internet"]},{"en":"delicious","he":"טעים","topic":"adjectives","opts":["delicious","dangerous","dishes"]},{"en":"comfortable","he":"נוח","topic":"adjectives","opts":["comfortable","colorful","vegetable"]},{"en":"expensive","he":"יקר","topic":"adjectives","opts":["expensive","excited","exercise"]},{"en":"famous","he":"מפורסם","topic":"adjectives","opts":["famous","funny","family"]},{"en":"strange","he":"מוזר","topic":"adjectives","opts":["strange","strong","orange"]},{"en":"special","he":"מיוחד","topic":"adjectives","opts":["special","speak","spinach"]},{"en":"clever","he":"חכם, פיקח","topic":"adjectives","opts":["clever","clover","cleaner"]},{"en":"polite","he":"מנומס","topic":"adjectives","opts":["polite","police","pilot"]},{"en":"weekend","he":"סוף שבוע","topic":"time","opts":["weekend","weekday","weekly"]},{"en":"holiday","he":"חג; חופשה","topic":"time","opts":["holiday","holy","hobby"]},{"en":"afternoon","he":"אחר הצהריים","topic":"time","opts":["afternoon","autumn","evening"]},{"en":"midnight","he":"חצות","topic":"time","opts":["midnight","midday","middle"]},{"en":"minute","he":"דקה","topic":"time","opts":["minute","month","minus"]},{"en":"calendar","he":"לוח שנה","topic":"time","opts":["calendar","cylinder","collar"]},{"en":"tonight","he":"הלילה (הערב הזה)","topic":"time","opts":["tonight","tomorrow","today"]},{"en":"moment","he":"רגע","topic":"time","opts":["moment","money","mountain"]},{"en":"mountain","he":"הר","topic":"places","opts":["mountain","fountain","maintain"]},{"en":"island","he":"אי","topic":"places","opts":["island","Ireland","inland"]},{"en":"village","he":"כפר","topic":"places","opts":["village","villa","vinegar"]},{"en":"museum","he":"מוזיאון","topic":"places","opts":["museum","music","mushroom"]},{"en":"airport","he":"שדה תעופה","topic":"places","opts":["airport","passport","airplane"]},{"en":"restaurant","he":"מסעדה","topic":"places","opts":["restaurant","restroom","resident"]},{"en":"country","he":"מדינה, ארץ","topic":"places","opts":["country","county","century"]},{"en":"desert","he":"מדבר","topic":"places","opts":["desert","dessert","deserve"]},{"en":"journey","he":"מסע","topic":"places","opts":["journey","journal","jersey"]},{"en":"question","he":"שאלה","topic":"school","opts":["question","quarter","quest"]},{"en":"subject","he":"מקצוע לימוד","topic":"school","opts":["subject","object","submarine"]},{"en":"dictionary","he":"מילון","topic":"school","opts":["dictionary","diary","discovery"]},{"en":"science","he":"מדע","topic":"school","opts":["science","scene","silence"]},{"en":"history","he":"היסטוריה","topic":"school","opts":["history","mystery","story"]},{"en":"exam","he":"מבחן","topic":"school","opts":["exam","example","exit"]},{"en":"mistake","he":"טעות","topic":"school","opts":["mistake","misty","mixture"]},{"en":"classmate","he":"חבר לכיתה","topic":"school","opts":["classmate","classroom","classic"]},{"en":"weather","he":"מזג אוויר","topic":"nature","opts":["weather","whether","feather"]},{"en":"thunder","he":"רעם","topic":"nature","opts":["thunder","wonder","under"]},{"en":"lightning","he":"ברק","topic":"nature","opts":["lightning","lighting","lightly"]},{"en":"storm","he":"סערה","topic":"nature","opts":["storm","store","stone"]},{"en":"rainbow","he":"קשת בענן","topic":"nature","opts":["rainbow","raincoat","rainy"]},{"en":"forest","he":"יער","topic":"nature","opts":["forest","forget","fortress"]},{"en":"river","he":"נהר","topic":"nature","opts":["river","driver","liver"]},{"en":"ocean","he":"אוקיינוס","topic":"nature","opts":["ocean","oven","onion"]},{"en":"insect","he":"חרק","topic":"nature","opts":["insect","inside","insert"]},{"en":"worried","he":"מודאג","topic":"feelings","opts":["worried","hurried","married"]},{"en":"surprised","he":"מופתע","topic":"feelings","opts":["surprised","surprising","supported"]},{"en":"proud","he":"גאה","topic":"feelings","opts":["proud","loud","cloud"]},{"en":"lonely","he":"בודד","topic":"feelings","opts":["lonely","lovely","likely"]},{"en":"nervous","he":"לחוץ, עצבני","topic":"feelings","opts":["nervous","serious","generous"]},{"en":"embarrassed","he":"נבוך","topic":"feelings","opts":["embarrassed","excited","exhausted"]},{"en":"jealous","he":"מקנא","topic":"feelings","opts":["jealous","jelly","generous"]},{"en":"confused","he":"מבולבל","topic":"feelings","opts":["confused","amused","refused"]},{"en":"vegetable","he":"ירק","topic":"food","opts":["vegetable","vegetarian","table"]},{"en":"strawberry","he":"תות","topic":"food","opts":["strawberry","straw","blueberry"]},{"en":"pineapple","he":"אננס","topic":"food","opts":["pineapple","apple","pinecone"]},{"en":"cereal","he":"דגני בוקר","topic":"food","opts":["cereal","serial","ceremony"]},{"en":"dessert","he":"קינוח","topic":"food","opts":["dessert","desert","desk"]},{"en":"flour","he":"קמח","topic":"food","opts":["flour","flower","floor"]},{"en":"meal","he":"ארוחה","topic":"food","opts":["meal","mail","meat"]},{"en":"ceiling","he":"תקרה","topic":"house","opts":["ceiling","selling","seeing"]},{"en":"cupboard","he":"ארון (מטבח)","topic":"house","opts":["cupboard","keyboard","clipboard"]},{"en":"pillow","he":"כרית","topic":"house","opts":["pillow","yellow","willow"]},{"en":"mirror","he":"מראה","topic":"house","opts":["mirror","minor","mister"]},{"en":"furniture","he":"רהיטים","topic":"house","opts":["furniture","future","furnace"]},{"en":"balcony","he":"מרפסת","topic":"house","opts":["balcony","balloon","bakery"]},{"en":"refrigerator","he":"מקרר","topic":"house","opts":["refrigerator","radiator","elevator"]},{"en":"stomach","he":"בטן, קיבה","topic":"body","opts":["stomach","stamp","stomp"]},{"en":"throat","he":"גרון","topic":"body","opts":["throat","throne","thread"]},{"en":"elbow","he":"מרפק","topic":"body","opts":["elbow","below","elder"]},{"en":"ankle","he":"קרסול","topic":"body","opts":["ankle","uncle","angle"]},{"en":"tongue","he":"לשון","topic":"body","opts":["tongue","tone","tough"]},{"en":"neighbor","he":"שכן","topic":"people","opts":["neighbor","nephew","nearby"]},{"en":"stranger","he":"אדם זר","topic":"people","opts":["stranger","danger","stronger"]},{"en":"guest","he":"אורח","topic":"people","opts":["guest","guess","guard"]},{"en":"scientist","he":"מדען","topic":"people","opts":["scientist","dentist","artist"]},{"en":"pilot","he":"טייס","topic":"people","opts":["pilot","pillow","polite"]},{"en":"usually","he":"בדרך כלל","topic":"adverbs","opts":["usually","unusual","useful"]},{"en":"often","he":"לעתים קרובות","topic":"adverbs","opts":["often","offer","open"]},{"en":"quite","he":"די, למדי","topic":"adverbs","opts":["quite","quiet","quick"]},{"en":"enough","he":"מספיק","topic":"adverbs","opts":["enough","though","rough"]},{"en":"already","he":"כבר","topic":"adverbs","opts":["already","ready","almost"]},{"en":"together","he":"ביחד","topic":"adverbs","opts":["together","tomorrow","another"]},{"en":"suddenly","he":"פתאום","topic":"adverbs","opts":["suddenly","sadly","Sunday"]},{"en":"finally","he":"לבסוף, סוף סוף","topic":"adverbs","opts":["finally","family","friendly"]},{"en":"through","he":"דרך, מבעד ל־","topic":"adverbs","opts":["through","though","throw"]},{"en":"noisy","he":"רועש (ההפך של שקט)","topic":"opposites","opts":["noisy","nosy","noise"]},{"en":"shallow","he":"רדוד (ההפך של עמוק)","topic":"opposites","opts":["shallow","swallow","shadow"]},{"en":"narrow","he":"צר (ההפך של רחב)","topic":"opposites","opts":["narrow","arrow","borrow"]},{"en":"cheap","he":"זול (ההפך של יקר)","topic":"opposites","opts":["cheap","sheep","chip"]},{"en":"ancient","he":"עתיק (ההפך של חדש)","topic":"opposites","opts":["ancient","agent","accent"]}],"grammar":[{"s":"Yesterday we ___ to the beach in Tel Aviv.","a":"went","opts":["went","go","goes"],"full":"Yesterday we went to the beach in Tel Aviv.","he":"אתמול הלכנו לחוף בתל אביב."},{"s":"Last night I ___ a funny movie with my dad.","a":"saw","opts":["saw","see","seen"],"full":"Last night I saw a funny movie with my dad.","he":"אתמול בערב ראיתי סרט מצחיק עם אבא שלי."},{"s":"Omer ___ three slices of pizza at the party.","a":"ate","opts":["ate","eat","eaten"],"full":"Omer ate three slices of pizza at the party.","he":"עומר אכל שלושה משולשי פיצה במסיבה."},{"s":"The children ___ very tired after the long trip.","a":"were","opts":["were","was","is"],"full":"The children were very tired after the long trip.","he":"הילדים היו עייפים מאוד אחרי הטיול הארוך."},{"s":"My grandmother ___ a teacher many years ago.","a":"was","opts":["was","were","is"],"full":"My grandmother was a teacher many years ago.","he":"סבתא שלי הייתה מורה לפני הרבה שנים."},{"s":"___ you finish your homework last night?","a":"Did","opts":["Did","Do","Does"],"full":"Did you finish your homework last night?","he":"סיימת את שיעורי הבית אתמול בערב?"},{"s":"Tamar ___ a letter to her friend last week.","a":"wrote","opts":["wrote","write","writes"],"full":"Tamar wrote a letter to her friend last week.","he":"תמר כתבה מכתב לחברה שלה בשבוע שעבר."},{"s":"Last summer my family ___ in a hotel in Eilat.","a":"stayed","opts":["stayed","stay","stays"],"full":"Last summer my family stayed in a hotel in Eilat.","he":"בקיץ שעבר המשפחה שלי נשארה במלון באילת."},{"s":"The dog ___ the ball and ran away.","a":"caught","opts":["caught","catch","catches"],"full":"The dog caught the ball and ran away.","he":"הכלב תפס את הכדור וברח."},{"s":"Ido ___ his bike to school two days ago.","a":"rode","opts":["rode","ride","rides"],"full":"Ido rode his bike to school two days ago.","he":"עידו רכב על האופניים שלו לבית הספר לפני יומיים."},{"s":"Yesterday it ___ all day, so we stayed home.","a":"rained","opts":["rained","rains","raining"],"full":"Yesterday it rained all day, so we stayed home.","he":"אתמול ירד גשם כל היום, אז נשארנו בבית."},{"s":"I ___ my keys, but my mom found them.","a":"lost","opts":["lost","lose","loses"],"full":"I lost my keys, but my mom found them.","he":"איבדתי את המפתחות שלי, אבל אמא שלי מצאה אותם."},{"s":"Where ___ you go last Hanukkah?","a":"did","opts":["did","do","were"],"full":"Where did you go last Hanukkah?","he":"לאן נסעתם בחנוכה שעבר?"},{"s":"Look! The baby ___ sleeping in his little bed.","a":"is","opts":["is","are","am"],"full":"Look! The baby is sleeping in his little bed.","he":"תראו! התינוק ישן במיטה הקטנה שלו."},{"s":"Noam and Yael ___ playing football right now.","a":"are","opts":["are","is","am"],"full":"Noam and Yael are playing football right now.","he":"נועם ויעל משחקים כדורגל עכשיו."},{"s":"I am ___ a story about a dragon now.","a":"writing","opts":["writing","write","wrote"],"full":"I am writing a story about a dragon now.","he":"אני כותב עכשיו סיפור על דרקון."},{"s":"Be quiet, please. Dad ___ talking on the phone.","a":"is","opts":["is","are","be"],"full":"Be quiet, please. Dad is talking on the phone.","he":"שקט, בבקשה. אבא מדבר בטלפון."},{"s":"What are you ___ right now?","a":"doing","opts":["doing","do","did"],"full":"What are you doing right now?","he":"מה אתה עושה עכשיו?"},{"s":"An elephant is ___ than a horse.","a":"bigger","opts":["bigger","big","biggest"],"full":"An elephant is bigger than a horse.","he":"פיל גדול יותר מסוס."},{"s":"Mount Everest is the ___ mountain in the world.","a":"highest","opts":["highest","higher","high"],"full":"Mount Everest is the highest mountain in the world.","he":"האוורסט הוא ההר הגבוה ביותר בעולם."},{"s":"My brother is ___ than me, but I am faster.","a":"taller","opts":["taller","tall","tallest"],"full":"My brother is taller than me, but I am faster.","he":"אחי גבוה ממני, אבל אני מהיר יותר."},{"s":"This is the ___ day of my life!","a":"best","opts":["best","better","good"],"full":"This is the best day of my life!","he":"זה היום הכי טוב בחיים שלי!"},{"s":"A cheetah is the ___ animal on land.","a":"fastest","opts":["fastest","faster","fast"],"full":"A cheetah is the fastest animal on land.","he":"הברדלס הוא החיה המהירה ביותר ביבשה."},{"s":"My new phone is ___ expensive than my old one.","a":"more","opts":["more","most","many"],"full":"My new phone is more expensive than my old one.","he":"הטלפון החדש שלי יקר יותר מהישן."},{"s":"Today is ___ than yesterday, so let's go swimming.","a":"hotter","opts":["hotter","hottest","hot"],"full":"Today is hotter than yesterday, so let's go swimming.","he":"היום חם יותר מאתמול, אז בואו נלך לשחות."},{"s":"My cookies are ___ than my sister's cookies.","a":"better","opts":["better","good","best"],"full":"My cookies are better than my sister's cookies.","he":"העוגיות שלי טובות יותר מהעוגיות של אחותי."},{"s":"There ___ a big tree in front of our house.","a":"is","opts":["is","are","am"],"full":"There is a big tree in front of our house.","he":"יש עץ גדול מול הבית שלנו."},{"s":"There ___ some apples in the fridge.","a":"are","opts":["are","is","be"],"full":"There are some apples in the fridge.","he":"יש כמה תפוחים במקרר."},{"s":"___ there any milk in the bottle?","a":"Is","opts":["Is","Are","Do"],"full":"Is there any milk in the bottle?","he":"יש חלב בבקבוק?"},{"s":"There aren't ___ chairs in this room.","a":"any","opts":["any","some","a"],"full":"There aren't any chairs in this room.","he":"אין כיסאות בחדר הזה."},{"s":"___ is your birthday? It's in May.","a":"When","opts":["When","Where","Who"],"full":"When is your birthday? It's in May.","he":"מתי יום ההולדת שלך? בחודש מאי."},{"s":"___ are you crying? Because I fell down.","a":"Why","opts":["Why","What","Who"],"full":"Why are you crying? Because I fell down.","he":"למה אתה בוכה? כי נפלתי."},{"s":"___ is that girl? She is my cousin Tamar.","a":"Who","opts":["Who","Where","When"],"full":"Who is that girl? She is my cousin Tamar.","he":"מי הילדה ההיא? היא בת הדודה שלי, תמר."},{"s":"___ books did you read this summer?","a":"How many","opts":["How many","How much","How old"],"full":"How many books did you read this summer?","he":"כמה ספרים קראת בקיץ הזה?"},{"s":"___ did you put my pencil case? In your bag.","a":"Where","opts":["Where","When","Who"],"full":"Where did you put my pencil case? In your bag.","he":"איפה שמת את הקלמר שלי? בתיק שלך."},{"s":"___ do you get to school? By bus.","a":"How","opts":["How","What","Who"],"full":"How do you get to school? By bus.","he":"איך אתה מגיע לבית הספר? באוטובוס."},{"s":"I sit ___ Noam and Yael, in the middle.","a":"between","opts":["between","next","behind"],"full":"I sit between Noam and Yael, in the middle.","he":"אני יושב בין נועם ליעל, באמצע."},{"s":"The car is ___ the house, so I can't see it.","a":"behind","opts":["behind","in front of","next to"],"full":"The car is behind the house, so I can't see it.","he":"המכונית מאחורי הבית, אז אני לא יכול לראות אותה."},{"s":"The teacher stands ___ the class, near the board.","a":"in front of","opts":["in front of","between","under"],"full":"The teacher stands in front of the class, near the board.","he":"המורה עומדת מול הכיתה, ליד הלוח."},{"s":"The bakery is ___ to the bank on our street.","a":"next","opts":["next","between","under"],"full":"The bakery is next to the bank on our street.","he":"המאפייה נמצאת ליד הבנק ברחוב שלנו."},{"s":"The cat is sleeping ___ the table, in the shade.","a":"under","opts":["under","between","through"],"full":"The cat is sleeping under the table, in the shade.","he":"החתול ישן מתחת לשולחן, בצל."},{"s":"You ___ wear a helmet when you ride a bike.","a":"must","opts":["must","can't","doesn't"],"full":"You must wear a helmet when you ride a bike.","he":"חייבים לחבוש קסדה כשרוכבים על אופניים."},{"s":"Penguins ___ fly, but they can swim very well.","a":"can't","opts":["can't","can","must"],"full":"Penguins can't fly, but they can swim very well.","he":"פינגווינים לא יכולים לעוף, אבל הם שוחים טוב מאוד."},{"s":"You ___ talk to your friends during the test.","a":"mustn't","opts":["mustn't","must","doesn't"],"full":"You mustn't talk to your friends during the test.","he":"אסור לדבר עם החברים בזמן המבחן."},{"s":"___ I go to Omer's house after school, Mom?","a":"Can","opts":["Can","Do","Am"],"full":"Can I go to Omer's house after school, Mom?","he":"אמא, אפשר ללכת לבית של עומר אחרי בית הספר?"},{"s":"___ your little brother like chocolate cake?","a":"Does","opts":["Does","Do","Is"],"full":"Does your little brother like chocolate cake?","he":"אחיך הקטן אוהב עוגת שוקולד?"},{"s":"We ___ have school on Saturday.","a":"don't","opts":["don't","doesn't","aren't"],"full":"We don't have school on Saturday.","he":"אין לנו בית ספר בשבת."},{"s":"My cat ___ eat vegetables at all.","a":"doesn't","opts":["doesn't","don't","isn't"],"full":"My cat doesn't eat vegetables at all.","he":"החתול שלי בכלל לא אוכל ירקות."},{"s":"___ you and Ido walk to school every day?","a":"Do","opts":["Do","Does","Are"],"full":"Do you and Ido walk to school every day?","he":"אתה ועידו הולכים ברגל לבית הספר כל יום?"},{"s":"The happy dog is wagging ___ tail.","a":"its","opts":["its","it's","their"],"full":"The happy dog is wagging its tail.","he":"הכלב השמח מכשכש בזנב שלו."},{"s":"___ bag is this? It's Yael's.","a":"Whose","opts":["Whose","Who's","Who"],"full":"Whose bag is this? It's Yael's.","he":"של מי התיק הזה? של יעל."},{"s":"The twins love ___ new bikes.","a":"their","opts":["their","there","they're"],"full":"The twins love their new bikes.","he":"התאומים אוהבים את האופניים החדשים שלהם."},{"s":"The bird built ___ nest in our tree.","a":"its","opts":["its","it's","his"],"full":"The bird built its nest in our tree.","he":"הציפור בנתה את הקן שלה בעץ שלנו."},{"s":"I ate ___ egg and a banana this morning.","a":"an","opts":["an","a","any"],"full":"I ate an egg and a banana this morning.","he":"הבוקר אכלתי ביצה ובננה."},{"s":"Can I have ___ water, please? I'm thirsty.","a":"some","opts":["some","a","an"],"full":"Can I have some water, please? I'm thirsty.","he":"אפשר לקבל קצת מים, בבקשה? אני צמא."},{"s":"Is there ___ juice left in the fridge?","a":"any","opts":["any","a","an"],"full":"Is there any juice left in the fridge?","he":"נשאר מיץ במקרר?"},{"s":"Ido wants to be ___ astronaut when he grows up.","a":"an","opts":["an","a","some"],"full":"Ido wants to be an astronaut when he grows up.","he":"עידו רוצה להיות אסטרונאוט כשיגדל."},{"s":"Tamar ___ eats meat because she is vegetarian.","a":"never","opts":["never","always","usually"],"full":"Tamar never eats meat because she is vegetarian.","he":"תמר אף פעם לא אוכלת בשר כי היא צמחונית."},{"s":"We ___ visit Grandma on Friday, but not every week.","a":"usually","opts":["usually","always","never"],"full":"We usually visit Grandma on Friday, but not every week.","he":"בדרך כלל אנחנו מבקרים את סבתא ביום שישי, אבל לא כל שבוע."},{"s":"Omer is ___ late; he comes on time every day.","a":"never","opts":["never","always","often"],"full":"Omer is never late; he comes on time every day.","he":"עומר אף פעם לא מאחר; הוא מגיע בזמן כל יום."}],"stories":[{"t":"The Trip to Masada","x":["Last Tuesday, Noam's class went on a school trip to Masada.","The bus left school very early, at six o'clock in the morning.","Noam was tired, but he was also excited.","When they arrived, the weather was already very hot.","The teacher said, \"Everyone must drink a lot of water today!\"","The children climbed the mountain on the Snake Path.","It took more than an hour, and some children wanted to stop.","At the top, they saw the Dead Sea and the desert below them.","Noam's friend Ido forgot his water bottle, so Noam shared his water with him.","On the way home, everybody fell asleep on the bus."],"q":[["What time did the bus leave?","באיזו שעה יצא האוטובוס?",["At six o'clock.","At eight o'clock.","At twelve o'clock."]],["Why did the teacher tell the children to drink a lot?","למה המורה אמרה לילדים לשתות הרבה?",["Because it was very hot.","Because the water was free.","Because they were hungry."]],["What did they see from the top?","מה הם ראו מלמעלה?",["The Dead Sea and the desert.","The beach in Tel Aviv.","A big forest."]],["Why do you think everybody fell asleep on the way home?","למה לדעתך כולם נרדמו בדרך הביתה?",["They were very tired after the long day.","The bus was very noisy.","The teacher told them to sleep."]]],"hint":{"What time did the bus leave?":1,"Why did the teacher tell the children to drink a lot?":3,"What did they see from the top?":7,"Why do you think everybody fell asleep on the way home?":9},"hard":true},{"t":"Hanukkah at Grandma's","x":["On the first night of Hanukkah, Yael's family visited Grandma Rina in Haifa.","Grandma's house was warm and smelled of fresh doughnuts.","Yael's little brother Omer lit the first candle with Grandpa.","Then everyone sang Hanukkah songs together.","After dinner, the children played with a dreidel.","Yael won ten chocolate coins, but Omer won only two.","Omer looked sad, so Yael gave him four of her coins.","Grandma smiled and said, \"You are a kind sister.\"","Before they went home, Grandma gave each child a small present."],"q":[["Where does Grandma Rina live?","איפה גרה סבתא רינה?",["In Haifa.","In Eilat.","In Jerusalem."]],["Who lit the first candle with Grandpa?","מי הדליק את הנר הראשון עם סבא?",["Omer.","Yael.","Grandma."]],["How many coins did Omer have after Yael's gift?","כמה מטבעות היו לעומר אחרי המתנה של יעל?",["Six.","Two.","Ten."]],["Why did Grandma say Yael was a kind sister?","למה סבתא אמרה שיעל אחות טובת לב?",["Because she shared her coins with Omer.","Because she lit the candles.","Because she made doughnuts."]]],"hint":{"Where does Grandma Rina live?":0,"Who lit the first candle with Grandpa?":2,"How many coins did Omer have after Yael's gift?":6,"Why did Grandma say Yael was a kind sister?":6},"hard":true},{"t":"The Big Match","x":["On Saturday, Ido's football team played against a team from Netanya.","Ido was nervous because the other team had never lost a game.","In the first half, Netanya scored two goals very quickly.","At half-time, the coach said, \"Don't give up. Play together!\"","In the second half, Ido's team passed the ball much better.","Ido's best friend Noam scored the first goal with his head.","Then, two minutes before the end, Ido kicked the ball into the net.","The game ended in a draw, two to two.","Ido's team felt like winners, even though they didn't win.","After the game, all the players ate ice cream together."],"q":[["Why was Ido nervous before the game?","למה עידו היה לחוץ לפני המשחק?",["The other team had never lost a game.","He forgot his football shoes.","It was raining."]],["Who scored the first goal for Ido's team?","מי הבקיע את השער הראשון של הקבוצה של עידו?",["Noam.","Ido.","The coach."]],["What was the final score?","מה הייתה התוצאה הסופית?",["Two to two.","Two to zero.","Three to two."]],["Why did Ido's team feel like winners?","למה השחקנים בקבוצה של עידו הרגישו כמו מנצחים?",["They came back after losing two to zero.","They won the game easily.","They got a big prize."]]],"hint":{"Why was Ido nervous before the game?":1,"Who scored the first goal for Ido's team?":5,"What was the final score?":7,"Why did Ido's team feel like winners?":8},"hard":true},{"t":"Where Is Pilpel?","x":["Tamar has a small brown dog named Pilpel.","One afternoon, Tamar forgot to close the garden gate.","When she came back from her piano lesson, Pilpel wasn't there.","Tamar was very worried, and she started to cry.","Her neighbor, Mr. Levi, helped her look for the dog.","They searched the whole neighborhood, but they couldn't find him.","Then Tamar remembered that Pilpel loves the park near the school.","They ran to the park and found Pilpel under a bench, fast asleep.","Tamar hugged him and promised to always close the gate."],"q":[["How did Pilpel get out?","איך פלפל יצא החוצה?",["Tamar forgot to close the gate.","He jumped off the roof.","Mr. Levi let him out."]],["Who helped Tamar look for the dog?","מי עזר לתמר לחפש את הכלב?",["Her neighbor, Mr. Levi.","Her teacher.","Her brother."]],["Why did Tamar go to the park?","למה תמר הלכה לפארק?",["She remembered that Pilpel loves it.","Her friends were there.","She wanted to play football."]],["Why do you think Tamar promised to always close the gate?","למה לדעתך תמר הבטיחה לסגור תמיד את השער?",["She didn't want Pilpel to get lost again.","The gate was broken.","Mr. Levi asked her to."]]],"hint":{"How did Pilpel get out?":1,"Who helped Tamar look for the dog?":4,"Why did Tamar go to the park?":6,"Why do you think Tamar promised to always close the gate?":8},"hard":true},{"t":"A Birthday at the Beach","x":["Omer's birthday is in August, so he had his party at the beach in Tel Aviv.","Twelve friends came, and everyone brought a towel and a hat.","First, they built a huge sandcastle near the water.","Then a big wave came and destroyed half of the castle.","Everybody laughed, even Omer.","Omer's dad brought a cold watermelon and a chocolate cake.","The cake started to melt because the sun was so strong.","So they ate it very quickly, with their fingers!","In the evening, they watched the sun go down over the sea.","Omer said it was the best birthday of his life."],"q":[["When is Omer's birthday?","מתי יום ההולדת של עומר?",["In August.","In December.","In April."]],["What happened to the sandcastle?","מה קרה לארמון החול?",["A wave destroyed half of it.","A dog ate it.","It won a prize."]],["Why did the cake start to melt?","למה העוגה התחילה להימס?",["Because the sun was very strong.","Because it was in the fridge.","Because it was raining."]],["Why did they eat the cake very quickly?","למה הם אכלו את העוגה מהר מאוד?",["So it wouldn't melt completely.","Because they were late for school.","Because it wasn't tasty."]]],"hint":{"When is Omer's birthday?":0,"What happened to the sandcastle?":3,"Why did the cake start to melt?":6,"Why did they eat the cake very quickly?":7},"hard":true}]};
+PRO.stories.forEach(st => { st.hard = true; STORIES.push(st); Object.assign(STORY_HINT, Object.fromEntries(Object.entries(st.hint || {}).map(([q, i]) => [q, i]))); });
 G4.stories.forEach(st => { Object.assign(STORY_HINT, st.hint); const c = Object.assign({}, st); delete c.hint; STORIES.push(c); });
 const TOPIC_HE = { animals:'חיות', body:'הגוף', clothes:'בגדים', colors:'צבעים', days:'ימי השבוע', family:'משפחה', feelings:'רגשות', food:'אוכל', house:'הבית', months:'חודשים', places:'מקומות', school:'בית הספר', seasons:'עונות', time:'זמן', verbs:'פעולות', weather:'מזג אוויר' };
 const TENS = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
@@ -3461,6 +3534,64 @@ function qGrammar() {
     prompt: `<p class="ask">איזו מילה משלימה את המשפט?</p><p class="sent en">${it.s.replace('___', '<u class="gap">____</u>')}</p>`,
     layout: 'words', options: g4Opt(it, 3), answer: it.a, rv: `${it.full}`,
     hint: { he: `המשפט אומר: <b>${it.he}</b>` } };
+}
+/* ---------- the harder questions (grade 4-5): wider vocabulary, spelling, word order, meaning ---------- */
+const proOpts = it => { const o = it.opts.slice(0, 3); const more = shuffle(PRO.vocab.filter(v => v.topic === it.topic && !o.includes(v.en))); if (more[0]) o.push(more[0].en); return shuffle(o); };
+function qProVocab() {
+  const it = pick(PRO.vocab);
+  return { key: 'pv:' + it.en, hue: 3, sayAfter: it.en,
+    prompt: `<p class="hword">${it.he}</p><p class="ask">איך אומרים את זה באנגלית?</p>`,
+    layout: 'words', options: proOpts(it).map(x => ({ v: x, html: `<span class="en">${x}</span>` })), answer: it.en, rv: `${it.he} = ${it.en}`,
+    hint: { he: `המילה מתחילה באות <b class="en">${it.en[0]}</b>.`, say: it.en, slow: true } };
+}
+function qProVocabRev() {
+  const it = pick(PRO.vocab), pool = PRO.vocab.filter(v => v.en !== it.en && v.he !== it.he), same = shuffle(pool.filter(v => v.topic === it.topic));
+  const others = same.concat(shuffle(pool)).filter((v, i, a) => a.findIndex(x => x.he === v.he) === i).slice(0, 3);
+  return { key: 'pr:' + it.en, hue: 6, speak: it.en,
+    prompt: `<p class="word en">${it.en}</p><p class="ask">מה פירוש המילה?</p>`,
+    layout: 'words', options: shuffle([it, ...others]).map(x => ({ v: x.en, html: x.he })), answer: it.en, rv: `${it.en} = ${it.he}`,
+    hint: { he: 'הקשב למילה שוב, לאט.', say: it.en, slow: true } };
+}
+function qProSpell() { // the Hebrew meaning; which spelling is right?
+  const it = pick(PRO.vocab.filter(v => /^[a-z]{4,}$/.test(v.en))), w = it.en;
+  const wrong = shuffle(misspell(w)).slice(0, 3); if (wrong.length < 2) return qProVocab();
+  return { key: 'ps:' + w, hue: 4, sayAfter: w,
+    prompt: `<p class="hword">${it.he}</p><p class="ask">איך כותבים את המילה נכון?</p>`,
+    layout: 'words', options: shuffle([w, ...wrong]).map(x => ({ v: x, html: `<span class="en">${x}</span>` })), answer: w, rv: `${it.he} = ${w}`,
+    hint: { he: 'הקשב למילה לאט, צליל אחרי צליל.', say: w, slow: true } };
+}
+function qListenSpell() { // only the sound: which word did you hear?
+  const it = pick(PRO.vocab.concat(G4.vocab).filter(v => /^[a-z]{4,}$/.test(v.en))), w = it.en;
+  const wrong = shuffle(misspell(w)).slice(0, 3); if (wrong.length < 2) return qProVocab();
+  return { key: 'pl:' + w, hue: 2, speak: w,
+    prompt: `<div class="pic" aria-hidden="true">🔊</div><p class="ask">שמע את המילה ובחר איך כותבים אותה</p>`,
+    layout: 'words', options: shuffle([w, ...wrong]).map(x => ({ v: x, html: `<span class="en">${x}</span>` })), answer: w, rv: `🔊 ${w} = ${it.he}`,
+    hint: { he: 'הקשב שוב, לאט.', say: w, slow: true } };
+}
+function qProGrammar() {
+  const it = pick(PRO.grammar);
+  return { key: 'pg:' + it.s, hue: 5, sayAfter: it.full,
+    prompt: `<p class="ask">איזו מילה משלימה את המשפט?</p><p class="sent en">${it.s.replace('___', '<u class="gap">____</u>')}</p>`,
+    layout: 'words', options: g4Opt(it, 3), answer: it.a, rv: it.full, hint: { he: `המשפט אומר: <b>${it.he}</b>` } };
+}
+function qSentOrder() { // which sentence is written in the right order?
+  const it = pick(PRO.grammar.concat(G4.grammar).filter(x => { const n = x.full.split(' ').length; return n >= 4 && n <= 10; }));
+  const w = it.full.replace(/[.!?]$/, '').split(' ').map((x, i) => i === 0 && x !== 'I' && !/^(Noam|Yael|Omer|Tamar|Ido|Dan|Maya|Noa|Shira|Tel|Grandma|Mom|Dad)$/.test(x) ? x.toLowerCase() : x), end = it.full.match(/[.!?]$/) ? it.full.slice(-1) : '';
+  const outs = new Set();
+  for (let t = 0; t < 30 && outs.size < 3; t++) { const v = w.slice(), i = rint(0, v.length - 2), j = Math.random() < 0.5 ? i + 1 : rint(0, v.length - 1); if (i === j) continue; [v[i], v[j]] = [v[j], v[i]]; const x = v.join(' ') + end; const y = x[0].toUpperCase() + x.slice(1); if (y !== it.full) outs.add(y); }
+  if (outs.size < 2) return qProGrammar();
+  return { key: 'so:' + it.full, hue: 1, sayAfter: it.full,
+    prompt: `<p class="ask">איזה משפט כתוב בסדר הנכון?</p><p class="hint">${it.he}</p>`,
+    layout: 'wide', options: shuffle([it.full, ...outs]).map(x => ({ v: x, html: `<span class="en">${x}</span>` })), answer: it.full, rv: it.full,
+    hint: { he: 'באנגלית: מי עושה, מה הוא עושה, ואז את מה.' } };
+}
+function qSentMean() { // read a sentence, choose what it means
+  const all = PRO.grammar.concat(G4.grammar), it = pick(all);
+  const others = shuffle(all.filter(x => x.he !== it.he)).slice(0, 3);
+  return { key: 'sm:' + it.full, hue: 6, sayAfter: it.full,
+    prompt: `<p class="ask">קרא את המשפט. מה הוא אומר?</p><p class="sent en">${it.full}</p>`,
+    layout: 'wide', options: shuffle([it, ...others]).map(x => ({ v: x.full, html: x.he })), answer: it.full, rv: `${it.full} = ${it.he}`,
+    hint: { he: 'מצא קודם את המילה החשובה במשפט.', say: it.full, slow: true } };
 }
 function bigNumOpts(n) {
   const c = new Set([n]), sw = n >= 10 && n % 10 ? (n % 10) * 10 + Math.floor(n / 10) : 0;
@@ -3519,10 +3650,10 @@ function qNumNext() {
 function qSentence(it, reverse) {
   if (!reverse) return { key: 'sf' + it.s, hue: 5, sayAfter: it.s, help: it.s,
     prompt: `<p class="ask">קרא את המשפט ובחר את התמונה המתאימה</p><p class="sent en">${it.s}</p>`,
-    layout: 'emoji', options: shuffle([it.p, ...it.wp.slice(0, optN() - 1)]).map(x => ({ v: x, html: x })), answer: it.p, rv: `${it.s} → ${it.p}`, hint: { he: `קרא לאט את המילה החשובה: <b class="en">${keyWords(it).join(' ')}</b>. מה היא אומרת?` } };
+    layout: 'emoji', options: shuffle([it.p, ...it.wp.slice(0, optN() - 1)]).map(x => ({ v: x, html: scn(x) })), answer: it.p, rv: `${it.s} → ${scn(it.p)}`, hint: { he: `קרא לאט את המילה החשובה: <b class="en">${keyWords(it).join(' ')}</b>. מה היא אומרת?` } };
   return { key: 'sr' + it.s, hue: 5, sayAfter: it.s,
-    prompt: `<div class="pic">${it.p}</div><p class="ask">איזה משפט מתאים לתמונה?</p>`,
-    layout: 'wide', options: shuffle([it.s, ...it.ws.slice(0, optN() - 1)]).map(x => ({ v: x, html: `<span class="en">${x}</span>` })), answer: it.s, rv: `${it.p} → ${it.s}`, hint: { he: 'המשפטים כמעט זהים. חפש את המילה ששונה בכל משפט וקרא אותה לאט.' } };
+    prompt: `<div class="pic">${scn(it.p)}</div><p class="ask">איזה משפט מתאים לתמונה?</p>`,
+    layout: 'wide', options: shuffle([it.s, ...it.ws.slice(0, optN() - 1)]).map(x => ({ v: x, html: `<span class="en">${x}</span>` })), answer: it.s, rv: `${scn(it.p)} → ${it.s}`, hint: { he: 'המשפטים כמעט זהים. חפש את המילה ששונה בכל משפט וקרא אותה לאט.' } };
 }
 function storyQs(st) {
   return st.q.map(([q, he, o]) => ({ key: 'st' + q, hue: 6, story: st,
@@ -3696,13 +3827,13 @@ const LOCK_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.
 function journeyMapHTML(G, st) {
   const J = G.J;
   const rows = ALPHA.map((c, k) => {
-    const state = k < J.n ? 'done' : k === J.n ? 'cur' : 'lock', U = c.toUpperCase();
-    const x = Math.sin(k * 0.85), wd = WORDS.find(w => w.L.toLowerCase() === c && !w.f) || WORDS.find(w => w.L.toLowerCase() === c);
+    const state = k < J.n ? 'done' : k === J.n ? 'cur' : 'lock', U = c.toUpperCase(), SR = isStars(st);
+    const x = SR ? Math.sin(k * 1.3) * 1.25 : Math.sin(k * 0.85), wd = SR ? { e: ['🪐', '☄️', '🌙', '🛰️', '🌌', '🌠'][k % 6], w: '' } : WORDS.find(w => w.L.toLowerCase() === c && !w.f) || WORDS.find(w => w.L.toLowerCase() === c);
     const stop = false, ring = state === 'cur' ? Math.min(100, Math.round(G.csp / G.steps * 100)) : 0;
     return `<div class="mrow${state === 'cur' ? ' mcur' : ''}" style="--x:${x.toFixed(2)}">
       ${wd ? `<span class="mdeco ${x > 0 ? 'l' : 'r'}" aria-hidden="true"><span class="mdi">${wd.e}</span><small class="en">${wd.w}</small></span>` : ''}
       <button type="button" class="mnode ${state}" ${state === 'cur' ? `style="--ring:${ring}%"` : ''} data-stage="${k}" aria-label="שלב ${k + 1}: האות ${U}${state === 'done' ? ', פתוחה' : state === 'lock' ? ', נעולה' : ''}${stop ? ', עם גלגל' : ''}">
-        <b class="en">${U}<i>${c}</i></b>${stop ? `<span class="mwb ${k < J.n ? 'got' : ''}" aria-hidden="true">${miniWheel((st.prizes || []).length)}</span>` : ''}${state === 'done' ? '<span class="mchk" aria-hidden="true">✓</span>' : state === 'lock' ? `<span class="mlock" aria-hidden="true">${LOCK_SVG}</span>` : ''}
+        ${SR ? `<b class="snum">${k + 1}</b>` : `<b class="en">${U}<i>${c}</i></b>`}${stop ? `<span class="mwb ${k < J.n ? 'got' : ''}" aria-hidden="true">${miniWheel((st.prizes || []).length)}</span>` : ''}${state === 'done' ? '<span class="mchk" aria-hidden="true">✓</span>' : state === 'lock' ? `<span class="mlock" aria-hidden="true">${LOCK_SVG}</span>` : ''}
       </button>${state === 'cur' ? `<span class="mhere" aria-hidden="true">🚀</span><span class="msteps" aria-label="צעד ${G.csp} מתוך ${G.steps}">${[...Array(G.steps)].map((_, i) => `<i class="${i < G.csp ? 'on' : ''}">${i < G.csp ? '👣' : ''}</i>`).join('')}</span>` : ''}</div>`;
   }).join('');
   const megaOpen = G.mega && !G.megaWait;
@@ -3712,11 +3843,11 @@ function journeyMapHTML(G, st) {
   const nextL = ALPHA[J.n] ? ALPHA[J.n].toUpperCase() : '';
   return `<div class="jmapwrap" id="jmapwrap">
     <button type="button" class="mapfullbtn" id="mapfull" aria-label="לפתוח את המפה במסך מלא"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
-    <div class="mapbar"><b>🗺️ מסע 26 האותיות <span dir="ltr">${J.n}/${JOUR_N}</span></b><button type="button" class="mapx" id="mapx" aria-label="לסגור את המפה">✕ סגירה</button></div>
+    <div class="mapbar"><b>${isStars(st) ? '⭐ מסע הכוכבים' : '🗺️ מסע 26 האותיות'} <span dir="ltr">${J.n}/${JOUR_N}</span></b><button type="button" class="mapx" id="mapx" aria-label="לסגור את המפה">✕ סגירה</button></div>
     ${J.n < JOUR_N && !G.capped ? `<div class="mapgo"><button type="button" class="btn primary" id="mapgo">▶ להמשיך במסע · שלב ${J.n + 1} ${stepsHTML(G.csp, G.steps, false, nextL)}</button></div>` : ''}
     <div class="jmap" id="jmap" role="list" aria-label="מפת האותיות: ${J.n} מתוך ${JOUR_N}">
     <svg class="jline" aria-hidden="true"><path class="jl-all"/><path class="jl-done"/></svg>
-    <div class="mstart" aria-hidden="true"><span class="mflag">🚩</span>start</div>${rows}${end}</div></div>`;
+    <div class="mstart" aria-hidden="true"><span class="mflag">${isStars(st) ? '🚀' : '🚩'}</span>${isStars(st) ? 'level 2' : 'start'}</div>${rows}${end}</div></div>`;
 }
 function journeyCardHTML(G, st) {
   const J = G.J, nextL = ALPHA[J.n] ? ALPHA[J.n].toUpperCase() : '';
@@ -3724,9 +3855,10 @@ function journeyCardHTML(G, st) {
   if (G.mega && st.wheel && !G.megaWait) action = `<button class="btn spinbtn megabtn" id="megaspin">👑 פתחת את כל 26 האותיות! למגה גלגל</button>`;
   else if (G.avail && st.wheel) action = `<button class="btn spinbtn" id="spin">🎡 גלגל ההפתעות של היום נפתח! לסובב</button>`;
   else if (G.capped) action = `<div class="jrest">🌙 <b>להיום מספיק, כל הכבוד!</b><span>${lines(`תרגלת היום ${G.maxM} דקות.`, 'המוח צריך מנוחה כדי לזכור.', 'נמשיך מחר.')}</span></div>`;
-  else if (J.n < JOUR_N && G.csp >= G.steps) action = `<button class="btn spinbtn" id="claim">🔓 הגעת לסוף השלב! לפתוח את האות <span class="en">${nextL}</span></button>`;
-  else if (J.n < JOUR_N) action = `<button class="btn stagebtn" id="stagego"><span class="stl">▶</span><span>להמשיך במסע · שלב ${J.n + 1}<small class="stmin">${stepsHTML(G.csp, G.steps, false, nextL)}</small></span><span aria-hidden="true">←</span></button>`;
-  else if (!G.mega) action = `<div class="jdone"><b>🏆 סיימת את כל המסע! אתה מוכן למבחן.</b><button class="btn" id="jnew">להתחיל מסע חדש</button></div>`;
+  else if (J.n < JOUR_N && G.csp >= G.steps) action = isStars(st) ? `<button class="btn spinbtn" id="claim">⭐ הגעת לסוף השלב! לאסוף את כוכב ${J.n + 1}</button>` : `<button class="btn spinbtn" id="claim">🔓 הגעת לסוף השלב! לפתוח את האות <span class="en">${nextL}</span></button>`;
+  else if (J.n < JOUR_N) action = `<button class="btn stagebtn" id="stagego"><span class="stl">▶</span><span>${isStars(st) ? `למסע הכוכבים · כוכב ${J.n + 1}` : `להמשיך במסע · שלב ${J.n + 1}`}<small class="stmin">${stepsHTML(G.csp, G.steps, false, isStars(st) ? '⭐' : nextL)}</small></span><span aria-hidden="true">←</span></button>`;
+  else if (!isStars(st) && (!G.mega || !st.wheel)) action = `<div class="jdone"><b>🏆 סיימת את כל 26 האותיות! כל הכבוד!</b><button class="btn spinbtn" id="jstars">⭐ לפתוח את מסע הכוכבים (רמה קשה)</button></div>`;
+  else if (!G.mega || !st.wheel) action = `<div class="jdone"><b>👑 אספת את כל הכוכבים! אתה אלוף.</b><button class="btn" id="jnew">להתחיל עוד מסע כוכבים</button></div>`;
   else action = '';
   const wait = st.wheel && (G.waiting || G.megaWait)
     ? `<p class="jwait">${G.megaWait ? '👑' : '🎡'} ${G.megaWait ? 'המגה גלגל' : 'הגלגל'} מחכה לך! עוד <b>${G.waiting || G.megaWait} דקות</b> תרגול היום והוא נפתח.</p>`
@@ -3737,9 +3869,21 @@ function journeyCardHTML(G, st) {
     : st.wheel && !G.avail && J.n < JOUR_N ? `<div class="jwait">🎡 כל יום יכול להיפתח גלגל הפתעות.<br>משלימים את הצעדים של היום. ${wheelInfo(st)}</div>` : '';
   const T = G.target, tn = Math.min(G.todayN, T || G.todayN), minPct = G.minM ? Math.min(100, Math.round(G.mins / G.minM * 100)) : 100;
   const mission = `<div class="mission">
-      <span>📋 היום: <b>${T ? `${tn}/${T}` : G.todayN}</b> אותיות${T && G.todayN >= T ? ' · <b>בוצעה! 🎉</b>' : ''}</span>
+      <span>📋 היום: <b>${T ? `${tn}/${T}` : G.todayN}</b> ${isStars(st) ? 'כוכבים' : 'אותיות'}${T && G.todayN >= T ? ' · <b>בוצעה! 🎉</b>' : ''}</span>
       ${T ? `<span class="mdots" aria-hidden="true">${[...Array(T)].map((_, i) => `<i class="${i < tn ? 'on' : ''}"></i>`).join('')}</span>` : ''}
 </div>`;
+  if (isStars(st)) return `<section class="goal stk h3 journey stars">
+    <div class="goalhead"><span class="glabel">⭐ מסע הכוכבים · רמה 2</span><span class="gbig" dir="ltr">${J.n} / ${JOUR_N}</span></div>
+    ${blt([
+      '<b>המטרה:</b> לאסוף 26 כוכבים ⭐',
+      '<b>רמה קשה:</b> מילים של כיתה ד׳-ה׳, משפטים, סיפורים ודקדוק.',
+      `כל שלב = <b>${G.steps} צעדים</b> 👣. צעד נספר רק בסבב עם <b>70%</b> ומעלה 💪`,
+      st.wheel ? 'גלגל ההפתעות ממשיך כרגיל 🎡' : ''], 'gsub')}
+    ${action}
+    ${wait}
+    ${mission}
+    ${journeyMapHTML(G, st)}
+  </section>`;
   return `<section class="goal stk h3 journey">
     <div class="goalhead"><span class="glabel">🔤 מסע 26 האותיות</span><span class="gbig" dir="ltr">${J.n} / ${JOUR_N}</span></div>
     ${blt([
@@ -3761,6 +3905,15 @@ function stagePop(el) {
   const s_ = load(), G_ = goalState(s_), k = +el.dataset.stage, J = jour(s_), L = ALPHA[k].toUpperCase(), card = el.closest('.jmap') || el.closest('.journey');
   const state = G_.capped && k <= J.n ? 'rest' : k < J.n ? 'done' : k === J.n ? 'cur' : 'lock';
   const pop = document.createElement('div');
+  if (isStars(s_)) {
+    pop.className = `jpop ${state}`; pop.dataset.k = k; pop.setAttribute('role', 'dialog');
+    pop.innerHTML = `<b>⭐ כוכב ${k + 1}</b><span>${state === 'rest' ? '🌙 להיום מספיק. נמשיך מחר!' : state === 'lock' ? `🔒 עוד נעול. קודם כוכב ${J.n + 1}.` : state === 'cur' ? `${stepsHTML(G_.csp, G_.steps, false)}<br>צעד ${G_.csp} מתוך ${G_.steps}.` : 'את הכוכב הזה כבר אספת ✓'}</span>${state === 'cur' ? '<button class="btn primary" data-popgo>▶ להמשיך במסע</button>' : ''}`;
+    card.appendChild(pop); const cb = card.getBoundingClientRect(), r = el.getBoundingClientRect();
+    pop.style.top = (r.bottom - cb.top + card.scrollTop + 10) + 'px'; pop.style.left = Math.max(8, Math.min(cb.width - pop.offsetWidth - 8, r.left - cb.left + r.width / 2 - pop.offsetWidth / 2)) + 'px';
+    pop.style.setProperty('--ax', (r.left - cb.left + r.width / 2 - parseFloat(pop.style.left)) + 'px');
+    const pg = pop.querySelector('[data-popgo]'); if (pg) pg.onclick = () => go(stageQuiz);
+    return;
+  }
   pop.className = `jpop ${state}`; pop.dataset.k = k; pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', `שלב ${k + 1}`);
   pop.innerHTML = state === 'rest'
     ? `<b>שלב ${k + 1} · האות <span class="en">${L}</span></b><span>🌙 להיום מספיק.<br>נמשיך מחר!</span>`
@@ -3828,7 +3981,8 @@ function wireJourney() {
   $$('.journey .mnode[data-stage]', app).forEach(x => { x.onclick = e => { e.stopPropagation(); stagePop(x); }; x.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); x.click(); } }; });
   const mw = $('#pmegaw'); if (mw) mw.onclick = () => { const g = goalState(load()); WHEEL_MEGA = g.mega && !g.megaWait; go(wheelView); };
   const ms = $('#megaspin'); if (ms) ms.onclick = () => { WHEEL_MEGA = true; go(wheelView); };
-  const jn = $('#jnew'); if (jn) jn.onclick = () => { const s = load(); const r = (jour(s).round || 1) + 1; s.jour = { n: 0, spins: 0, mega: false, round: r }; s.giftSpins = 0; save(s); home(); };
+  const jn = $('#jnew'); if (jn) jn.onclick = () => startStars();
+  const js = $('#jstars'); if (js) js.onclick = () => startStars();
 }
 
 /* one stage = about 10 questions (the stage letter, letters he has not covered yet, and one of the
@@ -3854,10 +4008,21 @@ function stageQuiz() {
     WRITE_ROUND = { items: pool.map(([i, cs], k) => ({ m: k < 2 ? 'trace' : 'dict', i, cs })) };
     writeView(); return;
   }
-  const base = lvl === 'hard' ? build([qDecodeAll, qVocab, qGrammar, qSight, qVocabRev], 5)
-    : lvl === 'medium' ? build([qSound, qDecodeEasy, qVocab, qCase, qName], 5)
-    : build([qSound, qCase, qPic, qName, qSeq], 5);
+  const PROL = isStars(s0); if (PROL) lvl = 'hard';
   const t = round % 5;
+  if (PROL) { // the stars journey: 12 questions of grade 4-5 English
+    const base = build([qProVocab, qProSpell, qProGrammar, qSentOrder, qSentMean, qListenSpell, qProVocabRev, qDecodeAll], 8);
+    const block = t === 0 ? build([qNum100, qProGrammar, qNum100, qSentOrder], 4)
+      : t === 1 ? build([qProGrammar, qSentOrder], 2).concat(freshFirst(SENTENCES, sentKeys).slice(0, 2).map(it => qSentence(it, true)))
+      : t === 2 ? storyQs(freshFirst(PRO.stories, storyKeys)[0]).slice(0, 4)
+      : t === 3 ? build([qProSpell, qListenSpell, qProVocabRev, qSentOrder], 4)
+      : build([qSentMean, qProVocab, qSentMean, qProGrammar], 4);
+    runQuiz('stage', `מסע הכוכבים · כוכב ${J0.n + 1}`, [...base, ...block], stageQuiz); return;
+  }
+  // harder than before on every level: medium gets what hard was, hard gets the grade 4-5 words
+  const base = lvl === 'hard' ? build([qProVocab, qGrammar, qSentOrder, qDecodeAll, qProGrammar, qSentMean, qVocabRev], 7)
+    : lvl === 'medium' ? build([qDecodeAll, qVocab, qGrammar, qSight, qVocabRev], 5)
+    : build([qSound, qCase, qPic, qName, qSeq], 5);
   const block = t === 0 ? build(SETS.numbers[lvl], 4)
     : t === 1 ? (lvl === 'hard' ? build([qGrammar], 2).concat(freshFirst(SENTENCES, sentKeys).slice(0, 2).map(it => qSentence(it, true))) : freshFirst(SENTENCES, sentKeys).slice(0, 3).map((it, i) => qSentence(it, i % 2 === 1)))
     : t === 2 ? storyQs(freshFirst(STORIES.filter(st => lvl === 'hard' ? st.hard : !st.hard), storyKeys)[0]).slice(0, 4)
@@ -3866,16 +4031,29 @@ function stageQuiz() {
   runQuiz('stage', `המסע · שלב ${J0.n + 1}`, [...base, ...block], stageQuiz);
 }
 function stageFinish(score, n) {
-  const s0 = load(), J0 = jour(s0); J0.cr = (J0.cr || 0) + 1; addStep(s0); save(s0);
+  const s0 = load(), J0 = jour(s0), ST = isStars(s0), pass = !ST || !n || score / n >= (n >= 8 ? STAR_PASS : 0.5);
+  J0.cr = (J0.cr || 0) + 1; if (pass) addStep(s0); save(s0);
   if (stopReached(s0)) return claimLetter();
-  sfx('ok');
-  const need = stageSteps(s0), have = curSteps(s0), rest = restNow(), L = (ALPHA[J0.n] || 'z').toUpperCase();
-  app.innerHTML = `${top(`המסע · שלב ${J0.n + 1}`)}
+  sfx(pass ? 'ok' : 'no');
+  const need = stageSteps(s0), have = curSteps(s0), rest = restNow(), L = ST ? '⭐' : (ALPHA[J0.n] || 'z').toUpperCase();
+  if (!pass) {
+    app.innerHTML = `${top(`מסע הכוכבים · כוכב ${J0.n + 1}`)}
+    <section class="result stk">
+      <div class="score">${score}/${n}</div>
+      <h2>כמעט! 💪</h2>
+      ${blt([`במסע הכוכבים צעד נספר רק מ־<b>${Math.ceil(n * STAR_PASS)}/${n}</b> ומעלה.`, 'זה מסע של אלופים, הוא אמור להיות קשה.', 'עוד סבב, ואתה שם!'])}
+      <div class="jstep">${stepsHTML(have, need, false, '⭐')}</div>
+      <div class="row center">${rest ? '' : `<button class="btn primary" id="more">▶ עוד סבב</button>`}<button class="btn" data-back="home">לדף הבית</button></div>
+    </section>`;
+    const m = $('#more'); if (m) m.onclick = () => go(stageQuiz);
+    return;
+  }
+  app.innerHTML = `${top(ST ? `מסע הכוכבים · כוכב ${J0.n + 1}` : `המסע · שלב ${J0.n + 1}`)}
     <section class="result stk">
       <div class="score">${score}/${n}</div>
       <h2>${score / n >= 0.8 ? 'סבב מצוין! 💪' : score / n >= 0.5 ? 'יפה! ממשיכים 💪' : 'כל סבב מקדם אותך 💪'}</h2>
       <div class="jstep"><b>👣 צעד ${have} מתוך ${need}!</b>${stepsHTML(have, need, true, L)}
-        <span>${need - have === 1 ? 'עוד <b>צעד אחד</b>' : `עוד <b>${need - have}</b> צעדים`} ופותחים את האות <b class="en">${L}</b></span></div>
+        <span>${need - have === 1 ? 'עוד <b>צעד אחד</b>' : `עוד <b>${need - have}</b> צעדים`} ${ST ? 'ואוספים כוכב ⭐' : `ופותחים את האות <b class="en">${L}</b>`}</span></div>
       ${rest ? blt(['להיום מספיק.', 'הצעדים שלך שמורים.', 'ממשיכים מחר!']) : ''}
       <div class="row center">${rest ? '' : `<button class="btn primary" id="more">▶ עוד סבב</button>`}<button class="btn" data-back="home">לדף הבית</button></div>
     </section>`;
@@ -3887,7 +4065,7 @@ function journeyBanner(where) {
   const s = load(); if ((s.goal || {}).type !== 'journey' || !stopReached(s) || !where) return;
   const L = ALPHA[jour(s).n].toUpperCase();
   const b = document.createElement('div'); b.className = 'jbanner';
-  b.innerHTML = `<b>🏁 הגעת לסוף השלב!</b><button class="btn primary">🔓 לפתוח את האות <span class="en">${L}</span></button>`;
+  b.innerHTML = isStars(s) ? '<b>🏁 הגעת לסוף השלב!</b><button class="btn primary">⭐ לאסוף את הכוכב</button>' : `<b>🏁 הגעת לסוף השלב!</b><button class="btn primary">🔓 לפתוח את האות <span class="en">${L}</span></button>`;
   b.querySelector('button').onclick = () => claimLetter();
   where.prepend(b);
 }
@@ -3901,7 +4079,9 @@ function claimLetter() {
 }
 function letterWon(k) {
   const st = load(), G = goalState(st), L = ALPHA[k].toUpperCase();
-  const atStop = !!G.avail, atEnd = k + 1 === JOUR_N;
+  const atStop = !!G.avail, atEnd = k + 1 === JOUR_N, ST = isStars(st);
+  if (atEnd) setTimeout(() => bigParty(ST, () => { if (!st.wheel && !ST) startStars(); }), 350);
+  if (ST) return starWon(k, st, G, atStop, atEnd);
   sfx('win'); setTimeout(() => say(NAME[L]), 500);
   app.innerHTML = `${top('פתחת אות!')}
     <section class="result stk lwon">
@@ -3923,6 +4103,70 @@ function letterWon(k) {
   const nx = $('#nextst'); if (nx) nx.onclick = () => go(stageQuiz);
 }
 
+function starWon(k, st, G, atStop, atEnd) {
+  sfx('win');
+  app.innerHTML = `${top('אספת כוכב!')}
+    <section class="result stk lwon">
+      <p class="hint">🏁 סיימת את שלב ${k + 1} במסע הכוכבים</p>
+      <div class="stagebig got pop">⭐</div>
+      <h2>אספת את כוכב ${k + 1}! 🌟</h2>
+      <p class="hint">${G.J.n}/${JOUR_N} כוכבים</p>
+      <div class="row center">
+        ${atEnd && st.wheel ? `<button class="btn spinbtn megabtn" id="megaspin">👑 למגה גלגל!</button>`
+          : atStop && st.wheel ? `<button class="btn spinbtn" id="spin">🎡 הגלגל של היום נפתח! לסובב</button>`
+          : atEnd ? '' : G.capped ? `<p class="jrest">🌙 <b>להיום מספיק, כל הכבוד!</b> נמשיך מחר.</p>`
+          : `<button class="btn primary" id="nextst">להמשיך במסע ←</button>`}
+        <button class="btn" data-back="home">לדף הבית</button></div>
+    </section>`;
+  const sp = $('#spin'); if (sp) sp.onclick = () => go(wheelView);
+  const ms = $('#megaspin'); if (ms) ms.onclick = () => { WHEEL_MEGA = true; go(wheelView); };
+  const nx = $('#nextst'); if (nx) nx.onclick = () => go(stageQuiz);
+}
+function startStars() {
+  const s = load(), r = (jour(s).round || 1) + 1;
+  s.jour = { n: 0, spins: 0, mega: false, round: r, lv: 2, sv: 2, ck: 0, cms: 0, cr: 0, sp: 0 }; s.giftSpins = 0; save(s);
+  try { cloudFlush && cloudFlush(); } catch (e) {}
+  go(home);
+}
+// the end of the road: fireworks, confetti and a big well done
+function bigParty(stars, after) {
+  if ($('.partyov')) return;
+  const nm = KID && KID.name ? esc(KID.name) : '';
+  const ov = document.createElement('div'); ov.className = 'partyov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-label', 'כל הכבוד!');
+  ov.innerHTML = `<canvas class="partycv" aria-hidden="true"></canvas>
+    <div class="partycard">
+      <div class="partytrophy" aria-hidden="true">🏆</div>
+      <p class="partyen en">WELL DONE!</p>
+      <h2 class="partyh">כל הכבוד${nm ? ` ${nm}` : ''}! 🎉</h2>
+      <p class="partysub">${stars ? 'אספת את כל 26 הכוכבים!<br>אתה אלוף אמיתי של אנגלית 👑' : 'סיימת את כל 26 האותיות!<br>מ־A ועד Z. וואו!'}</p>
+      ${stars ? '' : `<div class="partynext"><b>⭐ נפתחה לך רמה חדשה: מסע הכוכבים</b><span>מילים חדשות, משפטים ארוכים, סיפורים.<br>הרבה יותר קשה ומאתגר. מוכן?</span></div>`}
+      <button class="btn primary partygo" id="partygo">${stars ? 'יש! 🎉' : st_wheelOn() ? 'יאללה! קודם המגה גלגל 👑' : 'יאללה, למסע הכוכבים! 🚀'}</button>
+    </div>`;
+  document.body.appendChild(ov);
+  sfx('win'); setTimeout(() => sfx('win'), 900); setTimeout(() => say('Well done! You did it!'), 600);
+  const cv = $('.partycv', ov), x = cv.getContext('2d'), reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W, H, run = true; const fit = () => { const r = devicePixelRatio || 1; W = innerWidth; H = innerHeight; cv.width = W * r; cv.height = H * r; x.setTransform(r, 0, 0, r, 0, 0); }; fit(); addEventListener('resize', fit);
+  const cols = ['#FFD23F', '#FF6B9A', '#4DD4FF', '#7CE38B', '#B98CFF', '#FF9F43', '#fff'], parts = [], rockets = [];
+  const burst = (bx, by) => { const c = pick(cols), n = 46; for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2, v = 2.2 + Math.random() * 3.4; parts.push({ x: bx, y: by, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, c, sz: 2.4 + Math.random() * 2, k: 'spark' }); } };
+  const rain = () => { for (let i = 0; i < 6; i++) parts.push({ x: Math.random() * W, y: -10, vx: (Math.random() - .5) * 2, vy: 2 + Math.random() * 2.5, life: 1.6, c: pick(cols), sz: 6 + Math.random() * 6, r: Math.random() * 6, vr: (Math.random() - .5) * .3, k: 'conf' }); };
+  let t0 = performance.now(), lastR = 0;
+  const step = t => {
+    if (!run) return;
+    x.clearRect(0, 0, W, H);
+    if (!reduce && t - t0 < 9000) { if (t - lastR > 520) { lastR = t; rockets.push({ x: W * (.15 + Math.random() * .7), y: H + 10, vy: -(9 + Math.random() * 4), ty: H * (.12 + Math.random() * .3) }); } rain(); }
+    for (let i = rockets.length - 1; i >= 0; i--) { const r = rockets[i]; r.y += r.vy; r.vy *= .985; x.fillStyle = '#FFE9A8'; x.beginPath(); x.arc(r.x, r.y, 3, 0, 7); x.fill(); if (r.y <= r.ty || r.vy > -2) { burst(r.x, r.y); rockets.splice(i, 1); } }
+    for (let i = parts.length - 1; i >= 0; i--) { const q = parts[i]; q.x += q.vx; q.y += q.vy;
+      if (q.k === 'spark') { q.vy += .06; q.vx *= .985; q.life -= .014; x.globalAlpha = Math.max(0, q.life); x.fillStyle = q.c; x.beginPath(); x.arc(q.x, q.y, q.sz, 0, 7); x.fill(); }
+      else { q.r += q.vr; q.life -= .004; x.globalAlpha = Math.min(1, q.life); x.save(); x.translate(q.x, q.y); x.rotate(q.r); x.fillStyle = q.c; x.fillRect(-q.sz / 2, -q.sz / 4, q.sz, q.sz / 2); x.restore(); }
+      if (q.life <= 0 || q.y > H + 20) parts.splice(i, 1); }
+    x.globalAlpha = 1;
+    if (t - t0 < 9000 || parts.length || rockets.length) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+  $('#partygo', ov).onclick = () => { run = false; removeEventListener('resize', fit); ov.remove(); after && after(); };
+  $('#partygo', ov).focus({ preventScroll: true });
+}
+const st_wheelOn = () => load().wheel !== false;
 function lettersPopup() {
   const st = load();
   const ov = document.createElement('div');
@@ -4952,21 +5196,37 @@ const sxCode = w => { // soundex, with every vowel start treated alike
   return (out + '000').slice(0, 4);
 };
 function lev(a, b) { const d = [...Array(b.length + 1).keys()]; for (let i = 1; i <= a.length; i++) { let p = d[0]; d[0] = i; for (let j = 1; j <= b.length; j++) { const t = d[j]; d[j] = Math.min(d[j] + 1, d[j - 1] + 1, p + (a[i - 1] === b[j - 1] ? 0 : 1)); p = t; } } return d[b.length]; }
-const toks = s => String(s).toLowerCase().replace(/(\d+)/g, (_, n) => DIG[+n] || n).replace(/[^a-z' ]+/g, ' ').replace(/'/g, '').split(/\s+/).filter(Boolean);
+// iPad dictation set to Hebrew writes what it hears in Hebrew letters: "פיש" for fish. Spell it back in English.
+const HEB2EN = { 'א': '', 'ב': 'b', 'ג': 'g', 'ד': 'd', 'ה': 'h', 'ו': 'o', 'ז': 'z', 'ח': 'h', 'ט': 't', 'י': 'i', 'כ': 'k', 'ך': 'k', 'ל': 'l', 'מ': 'm', 'ם': 'm', 'נ': 'n', 'ן': 'n', 'ס': 's', 'ע': '', 'פ': 'f', 'ף': 'f', 'צ': 'ts', 'ץ': 'ts', 'ק': 'k', 'ר': 'r', 'ש': 'sh', 'ת': 't', "'": '' };
+const heb2en = s => String(s).replace(/[\u0590-\u05FF']+/g, w => /[\u05D0-\u05EA]/.test(w) ? [...w].map(c => HEB2EN[c] ?? '').join('') : w);
+// what an Israeli accent keeps: the consonants, with the sounds Hebrew merges made the same
+const acc = w => w.toLowerCase().replace(/^wh/, 'w').replace(/th/g, 't').replace(/ph/g, 'f').replace(/ck/g, 'k').replace(/c(?=[eiy])/g, 's').replace(/[cq]/g, 'k').replace(/sh|ch|tch/g, 'S').replace(/[zx]/g, 's').replace(/w/g, 'v').replace(/gh/g, '').replace(/[aeiouyh]/g, '').replace(/(.)\1+/g, '$1').replace(/s$/, '');
+const toks = s => heb2en(s).toLowerCase().replace(/(\d+)/g, (_, n) => DIG[+n] || n).replace(/[^a-z' ]+/g, ' ').replace(/'/g, '').split(/\s+/).filter(Boolean);
 function sameWord(target, heard) {
   if (heard === target || heard === target + 's' || heard + 's' === target) return true;
   if ((HOMO[target] || []).includes(heard)) return true;
   if (target.length >= 4 && lev(target, heard) <= (target.length >= 7 ? 2 : 1)) return true;
   if (target.length >= 3 && heard.length >= 2 && sxCode(target) === sxCode(heard) && Math.abs(target.length - heard.length) <= 2) return true;
+  const A = acc(target), B = acc(heard); // fish = fis = fiS = פיש; three = tree; very = wery
+  if (A && A === B && heard[0] && (target[0] === heard[0] || acc(target[0]) === acc(heard[0]) || !acc(target[0]) === !acc(heard[0]))) return true;
+  if (A.length >= 3 && lev(A, B) <= 1) return true;
+  if (A.includes('S') && A.replace(/S/g, 's') === B && /[ie]/.test(heard)) return true; // fish heard as "fees"
   return false;
 }
+const SMALLW = new Set(['a', 'an', 'the', 'is', 'are', 'am', 'to', 'of']);
 // -> {ok, hit:[bool per target word], heard:'best guess'}
 function judgeSpeech(target, alts) {
   const tw = toks(target); let best = { ok: false, hit: tw.map(() => false), heard: alts[0] || '', n: -1 };
+  const big = tw.filter(t => !SMALLW.has(t)).length || tw.length;
+  const score = hit => tw.length === 1 ? hit[0] : hit.filter((h, i) => h && !SMALLW.has(tw[i])).length / big >= 0.6;
   for (const a of alts) {
-    const hw = toks(a), hit = tw.map(t => hw.some(h => sameWord(t, h))), n = hit.filter(Boolean).length;
-    const ok = tw.length === 1 ? hit[0] : n / tw.length >= 0.75;
+    const hw = toks(a), joined = hw.join(''), hit = tw.map(t => hw.some(h => sameWord(t, h)) || tw.length === 1 && sameWord(t, joined)), n = hit.filter(Boolean).length;
+    const ok = score(hit);
     if (ok && !best.ok || n > best.n && ok === best.ok) best = { ok, hit, heard: a, n };
+  }
+  if (!best.ok && alts.length > 1) { // a word any of the guesses got right counts
+    const all = alts.flatMap(toks), hit = tw.map(t => all.some(h => sameWord(t, h)));
+    if (score(hit)) best = { ok: true, hit, heard: best.heard, n: hit.filter(Boolean).length };
   }
   return best;
 }
@@ -5004,7 +5264,7 @@ function speakView() {
   }
   const N = RND ? 4 : 5;
   const items = lvl === 'hard'
-    ? freshFirst(SENTENCES, sentKeys).slice(0, N).map(it => ({ t: it.s.replace(/[.!?]$/, ''), full: it.s, e: it.p, sent: true }))
+    ? freshFirst(SENTENCES, sentKeys).slice(0, N).map(it => ({ t: it.s.replace(/[.!?]$/, ''), full: it.s, e: scn(it.p), sent: true }))
     : freshFirst(wordPool(3, lvl === 'easy' ? 5 : 8), x => ['sp' + x.w]).slice(0, N).map(x => ({ t: x.w, full: x.w, e: x.e }));
   let k = 0, score = 0, tries = 0, rec = null, busy = false, finished = false;
   function render() {
@@ -5062,7 +5322,8 @@ function speakView() {
       $('#spn').onclick = next; say(it.full);
       return;
     }
-    $('#fb').innerHTML = `<div class="fb bad"><div class="msg"><b>עוד לא.</b>${heard ? `<span class="heard">שמעתי: <span class="en" dir="ltr">${heard}</span></span>` : ''}${lines(it.sent ? 'המילים באדום עוד לא נשמעו טוב.' : '', tries === 2 ? 'הקשב קודם לדוגמה, ואז נסה שוב.' : 'לוחצים שוב ומדברים לאט וברור.')}</div></div>`;
+    $('#fb').innerHTML = `<div class="fb bad"><div class="msg"><b>עוד לא.</b>${heard ? `<span class="heard">שמעתי: <span class="en" dir="ltr">${heard}</span></span>` : ''}${lines(it.sent ? 'המילים באדום עוד לא נשמעו טוב.' : '', tries === 2 ? 'הקשב קודם לדוגמה, ואז נסה שוב.' : 'לוחצים שוב ומדברים לאט וברור.')}</div><button class="btn sm" id="spskip">🤖 המחשב לא הבין אותי? לדלג ←</button></div>`;
+    $('#spskip').onclick = () => { finished = true; next(); };
     if (tries === 2) say(it.full);
   }
   function next() {
