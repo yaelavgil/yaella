@@ -126,6 +126,7 @@ h2{font:600 24px/1.2 var(--f-display);margin:0;text-wrap:balance}
 .micbtn.on{animation:micp 1s ease-in-out infinite;background:linear-gradient(#7BD88F,#2F9E55);box-shadow:0 6px 0 #1F7A3E,0 0 0 10px rgba(47,158,85,.18)}
 @keyframes micp{50%{box-shadow:0 6px 0 #1F7A3E,0 0 0 20px rgba(47,158,85,.08)}}
 .michint{font-size:15px;color:var(--muted)}
+.fwwhy{display:block;margin-top:4px}
 #hushbtn{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translate(-50%,140%);z-index:90;border:0;border-radius:999px;padding:10px 18px;font:700 16px var(--f-display,inherit);background:#2A2340;color:#fff;box-shadow:0 8px 24px rgba(20,10,40,.3);cursor:pointer;opacity:0;pointer-events:none;transition:transform .2s,opacity .2s}
 #hushbtn.on{transform:translate(-50%,0);opacity:.92;pointer-events:auto}
 .micguide{background:#fff;border-radius:14px;padding:10px 12px;margin-top:8px;color:var(--ink);text-align:start}
@@ -4144,6 +4145,99 @@ function fitInto(inkStrokes, tplStrokes) {
   return inkStrokes.map(st => st.map(([x, y]) => [tcx + (x - dcx) * sx, tcy + (y - dcy) * sy]));
 }
 
+/* ---------- free writing judge (no guide letter): forgiving about slant, tilt, size and place,
+   and it says WHAT is off: a missing line (red, with start dot + arrow), an extra line (orange),
+   a letter written backwards, or a letter that came out as another one ---------- */
+const UTPL = {}; const unitTpl = ch => UTPL[ch] || (UTPL[ch] = layoutGlyphs([ch]).glyphs[0]);
+const subP = (a, n = 60) => { const k = Math.max(1, Math.floor(a.length / n)); return a.filter((_, i) => i % k === 0); };
+const chamU = (A, B) => { const a = subP(A.flat()), b = subP(B.flat()); if (!a.length || !b.length) return 9; const d1 = a.reduce((t, p) => t + nearest(p, b), 0) / a.length, d2 = b.reduce((t, p) => t + nearest(p, a), 0) / b.length; return Math.max(d1, d2); };
+// slant (shear) and tilt (rotation) a child's letter often has; each variant is tried before judging
+const FW_VAR = [[0, 0], [0.2, 0], [-0.2, 0], [0.4, 0], [-0.4, 0], [0, 0.17], [0, -0.17], [0.2, 0.12], [-0.2, -0.12]];
+function fwVariant(inkS, [sh, rot]) {
+  if (!sh && !rot) return inkS;
+  const c = centre(inkS.flat()), cx = (c.x0 + c.x1) / 2, cy = (c.y0 + c.y1) / 2, co = Math.cos(rot), si = Math.sin(rot);
+  return inkS.map(st => st.map(([x, y]) => { let dx = x - cx, dy = y - cy; dx += sh * dy; return [cx + dx * co - dy * si, cy + dx * si + dy * co]; }));
+}
+function fwScore(inkS, ch) { // best fit of the drawing to letter ch over the variants -> {sc, F (drawing in letter space)}
+  const t = unitTpl(ch); let best = { sc: 9, F: null, v: FW_VAR[0] };
+  for (const v of FW_VAR) { const F = fitInto(fwVariant(inkS, v), t), sc = chamU(F, t); if (sc < best.sc) best = { sc, F, v }; }
+  return best;
+}
+const MIRROR = { b: 'd', d: 'b', p: 'q', q: 'p', S: 'S', s: 's', N: 'N', Z: 'Z', z: 'z', J: 'J', j: 'j', E: 'E', C: 'C', c: 'c', R: 'R', L: 'L', F: 'F', G: 'G', K: 'K', k: 'k', r: 'r', f: 'f', h: 'h', y: 'y', a: 'a', e: 'e', g: 'g', t: 't', D: 'D', B: 'B', P: 'P' };
+// lay the letter over what he drew so that his lines sit on it (a part drawn = that part of the letter):
+// size from his drawing, then slide it around to where his ink fits best. -> letter strokes in screen pixels
+function fwAlign(inkS, ch, U) {
+  const t = unitTpl(ch), b = centre(t.flat()), d = centre(inkS.flat());
+  const sc = Math.min(1.7 * U, Math.max(0.6 * U, (d.y1 - d.y0) / Math.max(0.3, b.y1 - b.y0)));
+  const ink = subP(inkS.flat(), 50), base = t.map(st => st.map(([x, y]) => [x * sc, y * sc])), bp = subP(base.flat(), 120);
+  const bc = centre(base.flat()), cx = (d.x0 + d.x1) / 2 - (bc.x0 + bc.x1) / 2, cy = (d.y0 + d.y1) / 2 - (bc.y0 + bc.y1) / 2, R = sc * 1.1, st_ = sc * 0.07;
+  let best = [9e9, cx, cy];
+  const tryAt = (x, y) => { let e = 0; for (const p of ink) { e += nearest([p[0] - x, p[1] - y], bp); if (e >= best[0]) return; } best = [e, x, y]; };
+  for (let dx = -R; dx <= R + 1e-6; dx += sc * 0.2) for (let dy = -R; dy <= R + 1e-6; dy += sc * 0.2) tryAt(cx + dx, cy + dy); // coarse
+  const [, bx, by] = best;
+  for (let dx = -sc * 0.2; dx <= sc * 0.2 + 1e-6; dx += st_) for (let dy = -sc * 0.2; dy <= sc * 0.2 + 1e-6; dy += st_) tryAt(bx + dx, by + dy); // fine
+  return { T: base.map(st => st.map(([x, y]) => [x + best[1], y + best[2]])), sc };
+}
+function judgeFree(inkS, ch, U = 60) {
+  if (inkS.flat().length < 6) return { ok: false, ex: { empty: true } };
+  const pool = /[A-Z]/.test(ch) ? ALPHA.map(c => c.toUpperCase()) : ALPHA;
+  const me = fwScore(inkS, ch); let other = 9, like = null;
+  for (const c of pool) { if (c === ch) continue; const sc = fwScore(inkS, c).sc; if (sc < other) { other = sc; like = c; } }
+  let ok = me.sc <= 0.34 && me.sc <= other * 1.08;
+  // what is off? straighten his slant/tilt, lay the letter over it and compare line by line
+  const inkV = fwVariant(inkS, me.v), { T: TV, sc } = fwAlign(inkV, ch, U), fp = inkV.flat(), tp = TV.flat(), T = TV;
+  // each point he drew belongs to the letter line it is closest to, so a short line crossing a long one (the bar of f or t)
+  // isn't counted as drawn just because the long one passes through it
+  const own = T.map(() => []);
+  fp.forEach(p => { let bi = 0, bd = 9e9; T.forEach((st, i) => { const dd = nearest(p, st); if (dd < bd) { bd = dd; bi = i; } }); own[bi].push(p); });
+  const missing = T.map((st, i) => (own[i].length ? st.filter(p => nearest(p, own[i]) <= 0.3 * sc).length / st.length : 0) < 0.6 ? i : -1).filter(i => i >= 0);
+  const extra = inkV.map((st, i) => st.length > 3 && plen(st) > 0.35 * sc && st.filter(p => nearest(p, tp) > 0.4 * sc).length / st.length > 0.6 ? i : -1).filter(i => i >= 0);
+  if (ok && !extra.length) return { ok: true };
+  ok = false;
+  let mirror = false;
+  if (MIRROR[ch]) { const c = centre(inkS.flat()), m = inkS.map(st => st.map(([x, y]) => [c.x0 + c.x1 - x, y])); mirror = fwScore(m, ch).sc <= 0.3 && fwScore(m, ch).sc < me.sc * 0.75; }
+  return { ok: false, ex: { ch, missing, extra, mirror, like: other < me.sc ? like : null, T: me.v[0] || me.v[1] ? fwAlign(inkS, ch, U).T : T } };
+}
+// where the letter would sit over what he drew (same box), in screen pixels
+function fwPlace(inkS, ch) {
+  const t = unitTpl(ch), d = centre(inkS.flat()), b = centre(t.flat());
+  const dh = Math.max(20, d.y1 - d.y0), s = dh / (b.y1 - b.y0), cx = (d.x0 + d.x1) / 2, cy = (d.y0 + d.y1) / 2, tx = (b.x0 + b.x1) / 2, ty = (b.y0 + b.y1) / 2;
+  return t.map(st => st.map(([x, y]) => [cx + (x - tx) * s, cy + (y - ty) * s]));
+}
+function fwDraw(ctx, inkS, ex, U) {
+  if (!ex || ex.empty) return;
+  const css_ = v => getComputedStyle(document.body).getPropertyValue(v).trim(), bad = css_('--bad') || '#E5484D';
+  const T = ex.mirror ? fwPlace(inkS, ex.ch) : ex.T, line = st => { ctx.beginPath(); ctx.moveTo(st[0][0], st[0][1]); st.forEach(p => ctx.lineTo(p[0], p[1])); };
+  ctx.save(); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  // the right shape, faint, where he wrote
+  ctx.globalAlpha = 0.22; ctx.strokeStyle = bad; ctx.lineWidth = U * 0.2; T.forEach(st => { line(st); ctx.stroke(); });
+  // extra lines: orange over his own stroke
+  if (!ex.mirror) ex.extra.forEach(i => { const st = inkS[i]; if (!st || st.length < 2) return; ctx.globalAlpha = 0.75; ctx.strokeStyle = '#F59E0B'; ctx.lineWidth = U * 0.22; line(st); ctx.stroke(); });
+  // missing lines (or the whole letter when it's backwards / another letter): red dashes, start dot, arrow
+  const show = ex.mirror || (ex.like && !ex.missing.length && !ex.extra.length) ? T.map((_, i) => i) : ex.missing;
+  show.forEach(i => {
+    const st = T[i]; if (!st || st.length < 2) return;
+    ctx.globalAlpha = 0.9; ctx.strokeStyle = bad; ctx.lineWidth = U * 0.1; ctx.setLineDash([U * 0.15, U * 0.15]); line(st); ctx.stroke(); ctx.setLineDash([]);
+    ctx.globalAlpha = 1; ctx.fillStyle = bad; ctx.beginPath(); ctx.arc(st[0][0], st[0][1], U * 0.12, 0, 7); ctx.fill();
+    const a = st[Math.max(0, st.length - 6)], b = st[st.length - 1], an = Math.atan2(b[1] - a[1], b[0] - a[0]), h = U * 0.26;
+    ctx.beginPath(); ctx.moveTo(b[0], b[1]); ctx.lineTo(b[0] - h * Math.cos(an - 0.5), b[1] - h * Math.sin(an - 0.5)); ctx.moveTo(b[0], b[1]); ctx.lineTo(b[0] - h * Math.cos(an + 0.5), b[1] - h * Math.sin(an + 0.5));
+    ctx.strokeStyle = bad; ctx.lineWidth = U * 0.09; ctx.stroke();
+  });
+  ctx.restore();
+}
+function fwText(ex) {
+  if (!ex || ex.empty) return lines('כותבים את האות בתוך המסגרת.');
+  const L = `<span class="en">${ex.ch}</span>`;
+  if (ex.mirror) return lines(`האות הפוכה, כמו במראה.`, `ככה ${L} נראית: היא מסומנת באדום.`);
+  const out = [];
+  if (ex.missing.length) out.push(ex.missing.length === 1 ? 'חסר קו אחד: הוא מסומן באדום.' : 'חסרים קווים: הם מסומנים באדום.', 'מתחילים בנקודה והולכים לכיוון החץ.');
+  if (ex.extra.length) out.push(ex.extra.length === 1 ? 'הקו הכתום מיותר: האות בלי הקו הזה.' : 'הקווים הכתומים מיותרים.');
+  if (!out.length && ex.like) out.push(`זה יצא דומה ל־<span class="en">${ex.like}</span>.`, `${L} נראית ככה: היא מסומנת באדום.`);
+  if (!out.length) out.push('הצורה עוד לא מדויקת.', 'האדום מראה איך האות צריכה להיראות.');
+  return lines(...out);
+}
+
+window.__fw = { judgeFree, unitTpl, recogniseOld: (inkS, ch) => { const pool = /[A-Z]/.test(ch) ? ALPHA.map(c => c.toUpperCase()) : ALPHA; let mine = 9, best = 9; for (const c of pool) { const t = unitTpl(c), sc = chamU(fitInto(inkS, t), t); if (c === ch) mine = sc; else best = Math.min(best, sc); } return mine <= 0.31 && mine <= best * 1.18; } }; // used by automated checks
 let WRITE_START = null; // {i, cs} when opened from a letter card
 let WRITE_ROUND = null;  // {items:[{m:'trace'|'dict', i, cs}], title} for a journey writing round
 function writeView() {
@@ -4239,6 +4333,7 @@ function writeView() {
     dots = [];
     strokesPx.forEach(gl => gl.forEach((st, j) => arrowsFor(ctx, st, j + 1, col)));
     if (hinting) hintMissing(ctx);
+    fwEx.forEach(f => fwDraw(ctx, f.inkS, f.ex, U));
   }
   // show the line that is still missing, on the board, where it belongs: the guide stroke in red with
   // a start dot and an arrow at its end. Everything the child already got right stays as it was.
@@ -4271,7 +4366,7 @@ function writeView() {
   }
   // hush(): moving to another letter has to silence the one before it. Without this the name of the
   // previous letter keeps being read out over the new one, which sounds like the app has frozen.
-  function clear() { hush(); cancelAnimationFrame(anim); d.getContext('2d').clearRect(0, 0, W, H); ink = []; resetMatch(); hist = []; refreshUndo(); missing = []; hinting = false; $('#wfb').innerHTML = ''; try { wRec = new Set(); } catch (e) {} }
+  function clear() { fwEx = []; hush(); cancelAnimationFrame(anim); d.getContext('2d').clearRect(0, 0, W, H); ink = []; resetMatch(); hist = []; refreshUndo(); missing = []; hinting = false; $('#wfb').innerHTML = ''; try { wRec = new Set(); } catch (e) {} }
   // rub out just what the eraser passes over, like a paint program: the child fixes one line instead
   // of losing the letter. A guide line the eraser touches is released back to "not drawn yet".
   function eraseAt(p) {
@@ -4435,7 +4530,9 @@ function writeView() {
   const sub = (a, n = 60) => { const k = Math.max(1, Math.floor(a.length / n)); return a.filter((_, i) => i % k === 0); };
   const chamfer = (inkS, tplS) => { const a = sub(inkS.flat()), b = sub(tplS.flat()); const d1 = a.reduce((t, p) => t + nearest(p, b), 0) / a.length, d2 = b.reduce((t, p) => t + nearest(p, a), 0) / b.length; return Math.max(d1, d2) / U; };
   const tplOf = ch => layoutGlyphs([ch]).glyphs[0].map(st => st.map(([x, y]) => [x * U, y * U]));
-  function recognise(inkS, ch) {
+  let fwEx = []; // [{inkS, ex}] explanations on the board after a wrong free-written letter
+  function recognise(inkS, ch) { const r = judgeFree(inkS, ch, U); if (!r.ok) fwEx.push({ inkS, ex: r.ex }); return r.ok; }
+  function recogniseOld(inkS, ch) {
     if (inkS.flat().length < 6) return false;
     const pool = /[A-Z]/.test(ch) ? ALPHA.map(c => c.toUpperCase()) : ALPHA;
     let mine = 9, best = 9;
@@ -4479,12 +4576,13 @@ function writeView() {
       if (won || auto) return;
       const letters = chars(), boxes = strokesPx.map(gl => centre(gl.flat())), groups = letters.map(() => []);
       for (const st of ink) { const c = centre(st), cx = (c.x0 + c.x1) / 2; let b = 0; boxes.forEach((x, g) => { if (Math.abs((x.x0 + x.x1) / 2 - cx) < Math.abs((boxes[b].x0 + boxes[b].x1) / 2 - cx)) b = g; }); groups[b].push(st); }
-      const r = letters.map((ch, g) => recognise(groups[g], ch));
+      fwEx = []; const r = letters.map((ch, g) => recognise(groups[g], ch));
       if (r.every(Boolean)) { success(''); return; }
+      const why = fwEx.map(f => `<span class="fwwhy">${letters.length > 1 ? `<b class="en">${f.ex.ch}</b>: ` : ''}${fwText(f.ex)}</span>`).join('');
       sfx('no'); recW(letters, r); if (RND) RND.miss = true;
-      ghost = true; drawGuide();
+      drawGuide();
       const chips = letters.length > 1 ? `<span class="wfrow">${letters.map((l, i) => `<span class="wfl ${r[i] ? 'ok' : 'bad'}"><b>${l}</b>${r[i] ? '✓ נכונה' : '✗ עוד לא'}</span>`).join('')}</span>` : '';
-      $('#wfb').innerHTML = `<div class="fb bad"><div class="msg"><b>עוד לא.</b>${chips}<span>${lines('ככה כותבים את האות: היא מופיעה עכשיו בלוח.', 'אפשר לנסות שוב.')}</span></div><button class="btn" id="wagain">↻ לנסות שוב</button></div>`;
+      $('#wfb').innerHTML = `<div class="fb bad"><div class="msg"><b>עוד לא.</b>${chips}${why}</div><button class="btn" id="wagain">↻ לנסות שוב</button></div>`;
       $('#wagain').onclick = () => { clear(); won = false; ghost = false; drawGuide(); };
       return;
     }
@@ -4510,15 +4608,15 @@ function writeView() {
       return;
     }
     // dictation: shape matters, size and place are free (there is no guide letter)
-    state = 'checked'; ghost = true; drawGuide();
-    const ok = recognise(ink, chars()[0]);
+    state = 'checked'; fwEx = [];
+    const ok = recognise(ink, chars()[0]); ghost = ok; drawGuide();
     recordLetter(chars()[0], chars()[0] === chars()[0].toUpperCase() ? 'wu' : 'wl', ok);
     if (ok) { addStar(); markDone('write'); writeRun(); }
     if (RND && !RND.tried) { RND.tried = true; if (ok) RND.score++; }
     sfx(ok ? 'ok' : 'no');
     $('#wfb').innerHTML = ok
       ? `<div class="fb good"><div class="msg"><b><span class="en">${pick(PRAISE)}</span> ✅ נכון!</b> <br>השווה לאות שעל המסך.</div></div>`
-      : `<div class="fb bad"><div class="msg"><b>עוד לא.</b><br>ככה כותבים את האות.<br>אפשר לנסות שוב.</div></div>`;
+      : `<div class="fb bad"><div class="msg"><b>עוד לא.</b>${fwText((fwEx[0] || {}).ex)}</div></div>`;
     renderButtons(ok);
   }
   function rndLoad() {
@@ -4685,7 +4783,7 @@ function wordWriteView() {
       <div class="row center wwbtns"><button class="btn sm" id="wwu" aria-label="ביטול הקו האחרון">↶ חזרה</button><button class="btn sm" id="wwx">🧽 ניקוי</button><button class="btn primary" id="wwok">✓ בדיקה</button></div>
       <div id="wfb" aria-live="polite"></div>`;
     const d = $('#wwd');
-    d.addEventListener('pointerdown', e => { e.preventDefault(); if (pos >= wd.w.length) return; clearTimeout(idle); drawing = true; try { d.setPointerCapture(e.pointerId); } catch (_) {} ink.push([pt(e)]); paint(); });
+    d.addEventListener('pointerdown', e => { e.preventDefault(); if (pos >= wd.w.length) return; clearTimeout(idle); if (fw) { fw = null; ink = []; guide(); } drawing = true; try { d.setPointerCapture(e.pointerId); } catch (_) {} ink.push([pt(e)]); paint(); });
     d.addEventListener('pointermove', e => { if (!drawing) return; ink[ink.length - 1].push(pt(e)); paint(); });
     ['pointerup', 'pointercancel'].forEach(t => d.addEventListener(t, () => { if (!drawing) return; drawing = false; clearTimeout(idle); idle = setTimeout(() => judge(true), 900); }));
     $('#wwu').onclick = () => { ink.pop(); paint(); };
@@ -4714,6 +4812,7 @@ function wordWriteView() {
       ctx.save(); ctx.globalAlpha = helped ? 0.35 : 0.2; ctx.strokeStyle = helped ? css(document.body, '--bad') : col; ctx.lineWidth = U * 0.24; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
       tplAt(wd.w[pos]).forEach(st => { ctx.beginPath(); ctx.moveTo(st[0][0], st[0][1]); st.forEach(p => ctx.lineTo(p[0], p[1])); ctx.stroke(); }); ctx.restore();
     }
+    if (fw) fwDraw(ctx, fw.inkS, fw.ex, U);
   }
   function paint() {
     const ctx = $('#wwd').getContext('2d'); ctx.clearRect(0, 0, W, H);
@@ -4723,7 +4822,9 @@ function wordWriteView() {
   // the same shape test as letter writing, a little more forgiving: close to the letter AND closer to it than to any other small letter
   const sub = (a, n = 60) => { const q = Math.max(1, Math.floor(a.length / n)); return a.filter((_, i) => i % q === 0); };
   const chamfer = (a0, b0) => { const a = sub(a0.flat()), b = sub(b0.flat()); const d1 = a.reduce((t, p) => t + nearest(p, b), 0) / a.length, d2 = b.reduce((t, p) => t + nearest(p, a), 0) / b.length; return Math.max(d1, d2) / U; };
-  function isLetter(ch) {
+  let fw = null;
+  function isLetter(ch) { const r = judgeFree(ink, ch, U); fw = r.ok ? null : { inkS: ink.map(s => s.slice()), ex: r.ex }; return r.ok; }
+  function isLetterOld(ch) {
     const pts = ink.flat(); if (pts.length < 6) return false;
     let mine = 9, best = 9;
     for (const c of ALPHA) { const t = layoutGlyphs([c]).glyphs[0].map(st => st.map(([x, y]) => [x * U, y * U])), sc = chamfer(fitInto(ink, t), t); if (c === ch) mine = sc; else best = Math.min(best, sc); }
@@ -4743,8 +4844,10 @@ function wordWriteView() {
     }
     tries++; missed = true; sfx('no'); if (tries === 1) recordLetter(ch, 'wl', false);
     if (tries >= 2) { helped = true; guide(); say(NAME[ch.toUpperCase()]); }
-    $('#wfb').innerHTML = `<div class="fb bad"><div class="msg"><b>עוד לא.</b>${tries >= 2 ? lines('ככה כותבים את האות הזאת: היא מופיעה עכשיו בלוח.', 'כותבים עליה.') : lines('מנקים ומנסים שוב.', 'כותבים אות אחת, גדולה, בתוך המסגרת.')}</div></div>`;
-    ink = []; setTimeout(paint, 350);
+    if (tries >= 2) fw = null; // the letter itself is on the board now
+    guide();
+    $('#wfb').innerHTML = `<div class="fb bad"><div class="msg"><b>עוד לא.</b>${tries >= 2 ? lines('ככה כותבים את האות הזאת: היא מופיעה עכשיו בלוח.', 'כותבים עליה.') : fwText(fw && fw.ex) + lines('כותבים שוב: הלוח יתנקה כשמתחילים.')}</div></div>`;
+    if (tries >= 2) { ink = []; setTimeout(paint, 350); }
   }
   function wordDone() {
     if (!missed) { score++; addStar(); }
