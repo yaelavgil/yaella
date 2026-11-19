@@ -4492,6 +4492,7 @@ function fwScore(inkS, ch) { // best fit of the drawing to letter ch over the va
   for (const v of FW_VAR) { const F = fitInto(fwVariant(inkS, v), t), sc = chamU(F, t); if (sc < best.sc) best = { sc, F, v }; }
   return best;
 }
+const nearest2 = (p, arr) => { let b = arr[0], bd = 9e9; for (const q of arr) { const d = Math.hypot(q[0] - p[0], q[1] - p[1]); if (d < bd) { bd = d; b = q; } } return b; };
 const MIRROR = { b: 'd', d: 'b', p: 'q', q: 'p', S: 'S', s: 's', N: 'N', Z: 'Z', z: 'z', J: 'J', j: 'j', E: 'E', C: 'C', c: 'c', R: 'R', L: 'L', F: 'F', G: 'G', K: 'K', k: 'k', r: 'r', f: 'f', h: 'h', y: 'y', a: 'a', e: 'e', g: 'g', t: 't', D: 'D', B: 'B', P: 'P' };
 // lay the letter over what he drew so that his lines sit on it (a part drawn = that part of the letter):
 // size from his drawing, then slide it around to where his ink fits best. -> letter strokes in screen pixels
@@ -4507,6 +4508,30 @@ function fwAlign(inkS, ch, U) {
   for (let dx = -sc * 0.2; dx <= sc * 0.2 + 1e-6; dx += st_) for (let dy = -sc * 0.2; dy <= sc * 0.2 + 1e-6; dy += st_) tryAt(bx + dx, by + dy); // fine
   return { T: base.map(st => st.map(([x, y]) => [x + best[1], y + best[2]])), sc };
 }
+// the points that make a letter's shape: where each line starts and ends, and its sharp turns (the peaks of W, the point of V)
+const KEYS = {}; function keyPts(ch) {
+  if (KEYS[ch]) return KEYS[ch];
+  const out = [];
+  unitTpl(ch).forEach(st => {
+    if (!st.length) return; out.push(st[0], st[st.length - 1]);
+    const k = Math.max(2, Math.round(st.length / 14));
+    for (let i = k; i < st.length - k; i++) {
+      const a = st[i - k], b = st[i], c = st[i + k], v1 = [b[0] - a[0], b[1] - a[1]], v2 = [c[0] - b[0], c[1] - b[1]];
+      const cos = (v1[0] * v2[0] + v1[1] * v2[1]) / (Math.hypot(...v1) * Math.hypot(...v2) || 1);
+      if (cos < 0.35 && !out.some(q => Math.hypot(q[0] - b[0], q[1] - b[1]) < 0.25)) out.push(b);
+    }
+  });
+  const uniq = out.filter((q, i) => out.findIndex(r => Math.hypot(r[0] - q[0], r[1] - q[1]) < 0.12) === i);
+  return (KEYS[ch] = uniq);
+}
+// fit the drawing to the letter's box, keeping its proportions within reason; -> {F, back(p): letter space -> screen}
+function fitKeep(inkS, ch) {
+  const t = unitTpl(ch), d = centre(inkS.flat()), b = centre(t.flat());
+  const dw = d.x1 - d.x0, dh = d.y1 - d.y0, tw = b.x1 - b.x0, th = b.y1 - b.y0;
+  const sy = dh > 4 ? th / dh : 1; let sx = dw > 4 && tw > th * 0.25 ? tw / dw : sy; sx = Math.min(Math.max(sx, sy * 0.72), sy * 1.4);
+  const dcx = (d.x0 + d.x1) / 2, dcy = (d.y0 + d.y1) / 2, tcx = (b.x0 + b.x1) / 2, tcy = (b.y0 + b.y1) / 2;
+  return { F: inkS.map(st => st.map(([x, y]) => [tcx + (x - dcx) * sx, tcy + (y - dcy) * sy])), back: ([x, y]) => [dcx + (x - tcx) / sx, dcy + (y - tcy) / sy], H: th };
+}
 function judgeFree(inkS, ch, U = 60) {
   if (inkS.flat().length < 6) return { ok: false, ex: { empty: true } };
   const pool = /[A-Z]/.test(ch) ? ALPHA.map(c => c.toUpperCase()) : ALPHA;
@@ -4521,11 +4546,24 @@ function judgeFree(inkS, ch, U = 60) {
   fp.forEach(p => { let bi = 0, bd = 9e9; T.forEach((st, i) => { const dd = nearest(p, st); if (dd < bd) { bd = dd; bi = i; } }); own[bi].push(p); });
   const missing = T.map((st, i) => (own[i].length ? st.filter(p => nearest(p, own[i]) <= 0.3 * sc).length / st.length : 0) < 0.6 ? i : -1).filter(i => i >= 0);
   const extra = inkV.map((st, i) => st.length > 3 && plen(st) > 0.35 * sc && st.filter(p => nearest(p, tp) > 0.4 * sc).length / st.length > 0.6 ? i : -1).filter(i => i >= 0);
-  if (ok && !extra.length) return { ok: true };
+  // shape details: every corner and end of the letter has to be reached (a W whose peaks stop low isn't a W yet),
+  // and nearly everything drawn has to lie on the letter
+  const K = fitKeep(fwVariant(inkS, me.v), ch), kp = subP(K.F.flat(), 120), tol = Math.max(0.16, K.H * 0.13), tt = unitTpl(ch).flat();
+  const keysMiss = keyPts(ch).filter(q => nearest(q, kp) > tol);
+  const offShare = kp.filter(q => nearest(q, tt) > tol * 1.15).length / Math.max(1, kp.length);
+  if (ok && !extra.length && !keysMiss.length && offShare <= 0.12) return { ok: true };
+  const unV = q => { // a point in letter space back onto the screen, undoing the slant/tilt variant
+    const v = K.back(q), [sh, rot] = me.v; if (!sh && !rot) return v;
+    const c = centre(inkS.flat()), cx = (c.x0 + c.x1) / 2, cy = (c.y0 + c.y1) / 2, co = Math.cos(-rot), si = Math.sin(-rot);
+    let dx = v[0] - cx, dy = v[1] - cy; const rx = dx * co - dy * si, ry = dx * si + dy * co; return [cx + rx - sh * ry, cy + ry];
+  };
+  const keys = keysMiss.map(q => { const to = unV(q), from = nearest2(to, inkS.flat()); return { to, from }; });
+  const offStrokes = offShare > 0.12 ? K.F.map((st, i) => st.length > 3 && st.filter(q => nearest(q, tt) > tol * 1.15).length / st.length > 0.4 ? i : -1).filter(i => i >= 0 && !extra.includes(i)) : [];
+  extra.push(...offStrokes);
   ok = false;
   let mirror = false;
   if (MIRROR[ch]) { const c = centre(inkS.flat()), m = inkS.map(st => st.map(([x, y]) => [c.x0 + c.x1 - x, y])); mirror = fwScore(m, ch).sc <= 0.3 && fwScore(m, ch).sc < me.sc * 0.75; }
-  return { ok: false, ex: { ch, missing, extra, mirror, like: other < me.sc ? like : null, T: me.v[0] || me.v[1] ? fwAlign(inkS, ch, U).T : T } };
+  return { ok: false, ex: { ch, missing, extra, mirror, keys: mirror || missing.length ? [] : keys, like: other < me.sc ? like : null, T: me.v[0] || me.v[1] ? fwAlign(inkS, ch, U).T : T } };
 }
 // where the letter would sit over what he drew (same box), in screen pixels
 function fwPlace(inkS, ch) {
@@ -4542,6 +4580,14 @@ function fwDraw(ctx, inkS, ex, U) {
   ctx.globalAlpha = 0.22; ctx.strokeStyle = bad; ctx.lineWidth = U * 0.2; T.forEach(st => { line(st); ctx.stroke(); });
   // extra lines: orange over his own stroke
   if (!ex.mirror) ex.extra.forEach(i => { const st = inkS[i]; if (!st || st.length < 2) return; ctx.globalAlpha = 0.75; ctx.strokeStyle = '#F59E0B'; ctx.lineWidth = U * 0.22; line(st); ctx.stroke(); });
+  // a corner or end he didn't reach: a red ring where the line should get to, and an arrow from his line
+  if (!ex.mirror) (ex.keys || []).forEach(({ to, from }) => {
+    ctx.globalAlpha = 1; ctx.strokeStyle = bad; ctx.lineWidth = U * 0.07; ctx.beginPath(); ctx.arc(to[0], to[1], U * 0.16, 0, 7); ctx.stroke();
+    if (!from || Math.hypot(to[0] - from[0], to[1] - from[1]) < U * 0.3) return;
+    const an = Math.atan2(to[1] - from[1], to[0] - from[0]), e = [to[0] - Math.cos(an) * U * 0.2, to[1] - Math.sin(an) * U * 0.2], h = U * 0.2;
+    ctx.setLineDash([U * 0.1, U * 0.08]); ctx.beginPath(); ctx.moveTo(from[0], from[1]); ctx.lineTo(e[0], e[1]); ctx.stroke(); ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(e[0], e[1]); ctx.lineTo(e[0] - h * Math.cos(an - 0.5), e[1] - h * Math.sin(an - 0.5)); ctx.moveTo(e[0], e[1]); ctx.lineTo(e[0] - h * Math.cos(an + 0.5), e[1] - h * Math.sin(an + 0.5)); ctx.stroke();
+  });
   // missing lines (or the whole letter when it's backwards / another letter): red dashes, start dot, arrow
   const show = ex.mirror || (ex.like && !ex.missing.length && !ex.extra.length) ? T.map((_, i) => i) : ex.missing;
   show.forEach(i => {
@@ -4560,13 +4606,14 @@ function fwText(ex) {
   if (ex.mirror) return lines(`האות הפוכה, כמו במראה.`, `ככה ${L} נראית: היא מסומנת באדום.`);
   const out = [];
   if (ex.missing.length) out.push(ex.missing.length === 1 ? 'חסר קו אחד: הוא מסומן באדום.' : 'חסרים קווים: הם מסומנים באדום.', 'מתחילים בנקודה והולכים לכיוון החץ.');
-  if (ex.extra.length) out.push(ex.extra.length === 1 ? 'הקו הכתום מיותר: האות בלי הקו הזה.' : 'הקווים הכתומים מיותרים.');
+  if (ex.extra.length) out.push(ex.extra.length === 1 ? 'הקו הכתום מיותר: צריך למחוק אותו.' : 'הקווים הכתומים מיותרים: צריך למחוק אותם.');
+  if ((ex.keys || []).length) out.push(ex.keys.length === 1 ? 'הקו צריך להגיע עד העיגול האדום: החץ מראה לאן.' : 'הקווים צריכים להגיע עד העיגולים האדומים: החצים מראים לאן.');
   if (!out.length && ex.like) out.push(`זה יצא דומה ל־<span class="en">${ex.like}</span>.`, `${L} נראית ככה: היא מסומנת באדום.`);
   if (!out.length) out.push('הצורה עוד לא מדויקת.', 'האדום מראה איך האות צריכה להיראות.');
   return lines(...out);
 }
 
-window.__fw = { judgeFree, unitTpl, recogniseOld: (inkS, ch) => { const pool = /[A-Z]/.test(ch) ? ALPHA.map(c => c.toUpperCase()) : ALPHA; let mine = 9, best = 9; for (const c of pool) { const t = unitTpl(c), sc = chamU(fitInto(inkS, t), t); if (c === ch) mine = sc; else best = Math.min(best, sc); } return mine <= 0.31 && mine <= best * 1.18; } }; // used by automated checks
+window.__fw = { judgeFree, unitTpl, keyPts, recogniseOld: (inkS, ch) => { const pool = /[A-Z]/.test(ch) ? ALPHA.map(c => c.toUpperCase()) : ALPHA; let mine = 9, best = 9; for (const c of pool) { const t = unitTpl(c), sc = chamU(fitInto(inkS, t), t); if (c === ch) mine = sc; else best = Math.min(best, sc); } return mine <= 0.31 && mine <= best * 1.18; } }; // used by automated checks
 let WRITE_START = null; // {i, cs} when opened from a letter card
 let WRITE_ROUND = null;  // {items:[{m:'trace'|'dict', i, cs}], title} for a journey writing round
 function writeView() {
@@ -4645,6 +4692,7 @@ function writeView() {
         strokesPx.forEach(gl => { const b = centre(gl.flat()), mid = (b.x0 + b.x1) / 2, mids = strokesPx.map(q => { const c = centre(q.flat()); return (c.x0 + c.x1) / 2; }), gap = mids.length > 1 ? Math.abs(mids[1] - mids[0]) : W, hw = Math.min(gap / 2 - 7, W / 2 - 14, Math.max((b.x1 - b.x0) / 2 + U * 0.45, U * 1.15)), x0 = mid - hw, x1 = mid + hw, y0 = oy - U * 0.1, y1 = oy + 3.1 * U;
           ctx.save(); ctx.fillStyle = col; ctx.globalAlpha = 0.07; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x0, y0, x1 - x0, y1 - y0, 18) : ctx.rect(x0, y0, x1 - x0, y1 - y0); ctx.fill();
           ctx.globalAlpha = 0.55; ctx.strokeStyle = col; ctx.lineWidth = 3; ctx.setLineDash([10, 9]); ctx.stroke(); ctx.restore(); });
+        startDots(ctx, col); if (liveHint) drawLive(ctx, col);
         return;
       }
     } else {
@@ -4663,6 +4711,44 @@ function writeView() {
     strokesPx.forEach(gl => gl.forEach((st, j) => arrowsFor(ctx, st, j + 1, col)));
     if (hinting) hintMissing(ctx);
     fwEx.forEach(f => fwDraw(ctx, f.inkS, f.ex, U));
+  }
+  // free writing: where the letter starts (a numbered dot and a short arrow), but not the letter itself
+  function startDots(ctx, col) {
+    strokesPx.forEach(gl => { const st = gl[0]; if (!st || st.length < 3) return;
+      const a = st[0]; let b = st[1]; for (const q of st) { b = q; if (Math.hypot(q[0] - a[0], q[1] - a[1]) > U * 0.55) break; }
+      const an = Math.atan2(b[1] - a[1], b[0] - a[0]), r = U * 0.17, e = [a[0] + Math.cos(an) * U * 0.62, a[1] + Math.sin(an) * U * 0.62], h = U * 0.17;
+      ctx.save(); ctx.globalAlpha = 0.85; ctx.strokeStyle = col; ctx.lineWidth = U * 0.07; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(a[0] + Math.cos(an) * r * 1.3, a[1] + Math.sin(an) * r * 1.3); ctx.lineTo(e[0], e[1]); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(e[0], e[1]); ctx.lineTo(e[0] - h * Math.cos(an - 0.55), e[1] - h * Math.sin(an - 0.55)); ctx.moveTo(e[0], e[1]); ctx.lineTo(e[0] - h * Math.cos(an + 0.55), e[1] - h * Math.sin(an + 0.55)); ctx.stroke();
+      ctx.globalAlpha = 1; ctx.fillStyle = col; ctx.beginPath(); ctx.arc(a[0], a[1], r, 0, 7); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.font = `700 ${Math.round(r * 1.25)}px system-ui,sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('1', a[0], a[1] + 1); ctx.restore(); });
+  }
+  // a light hint while he writes: when the line leaves the letter's path, an arrow shows where it should go on
+  var liveHint = null; // var: drawGuide can run before this line
+  function liveCheck() {
+    liveHint = null; if (chars().length !== 1 || !ink.length || !ink[0].length) return;
+    const gl = strokesPx[0], o = [ink[0][0][0] - gl[0][0][0], ink[0][0][1] - gl[0][0][1]]; // the letter starts where he started
+    const T = gl.map(st => st.map(([x, y]) => [x + o[0], y + o[1]])), seq = T.flatMap((st, j) => st.map((q, i) => [q, j, i]));
+    const pts = ink.flat(), far = U * 0.5, near = q => { let b = seq[0], bd = 9e9; for (const r of seq) { const d = Math.hypot(r[0][0] - q[0], r[0][1] - q[1]); if (d < bd) { bd = d; b = r; } } return [b, bd]; };
+    let dev = -1; for (let i = 0; i < pts.length - 4; i++) if ([0, 1, 2, 3, 4].every(k => near(pts[i + k])[1] > far)) { dev = i; break; }
+    if (dev < 0) return;
+    let after = 0; for (let i = dev + 1; i < pts.length; i++) after += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+    if (after < U * 0.6) return;
+    // how far along the letter he got, walking forward only (so a nearby part of the letter isn't mistaken for progress)
+    let prog = 0; for (let n = 0; n < dev; n++) { let bi = prog, bd = 9e9; for (let m = prog; m < Math.min(seq.length, prog + 40); m++) { const dd = Math.hypot(seq[m][0][0] - pts[n][0], seq[m][0][1] - pts[n][1]); if (dd < bd) { bd = dd; bi = m; } } if (bd < far) prog = bi; }
+    const [q, j, i] = seq[prog], st = T[j]; let k = i, run = 0;
+    while (k < st.length - 1 && run < U * 0.75) { run += Math.hypot(st[k + 1][0] - st[k][0], st[k + 1][1] - st[k][1]); k++; }
+    if (k === i && T[j + 1]) liveHint = { a: T[j + 1][0], b: T[j + 1][Math.min(T[j + 1].length - 1, 8)], jump: true }; else liveHint = { a: q, b: st[k] };
+    drawGuide();
+    if ($('#wfb') && !won) $('#wfb').innerHTML = `<div class="fb"><div class="msg"><b>👉 רמז:</b> הקו יצא מהדרך. החץ מראה לאן ממשיכים.<br>אפשר למחוק את מה שיצא עקום (↶) ולהמשיך.</div></div>`;
+  }
+  function drawLive(ctx, col) {
+    const { a, b } = liveHint, an = Math.atan2(b[1] - a[1], b[0] - a[0]), h = U * 0.2;
+    ctx.save(); ctx.globalAlpha = 0.95; ctx.strokeStyle = '#F59E0B'; ctx.fillStyle = '#F59E0B'; ctx.lineWidth = U * 0.09; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.arc(a[0], a[1], U * 0.1, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(b[0], b[1]); ctx.lineTo(b[0] - h * Math.cos(an - 0.55), b[1] - h * Math.sin(an - 0.55)); ctx.moveTo(b[0], b[1]); ctx.lineTo(b[0] - h * Math.cos(an + 0.55), b[1] - h * Math.sin(an + 0.55)); ctx.stroke();
+    ctx.restore();
   }
   // show the line that is still missing, on the board, where it belongs: the guide stroke in red with
   // a start dot and an arrow at its end. Everything the child already got right stays as it was.
@@ -4695,7 +4781,7 @@ function writeView() {
   }
   // hush(): moving to another letter has to silence the one before it. Without this the name of the
   // previous letter keeps being read out over the new one, which sounds like the app has frozen.
-  function clear() { fwEx = []; hush(); cancelAnimationFrame(anim); d.getContext('2d').clearRect(0, 0, W, H); ink = []; resetMatch(); hist = []; refreshUndo(); missing = []; hinting = false; $('#wfb').innerHTML = ''; try { wRec = new Set(); } catch (e) {} }
+  function clear() { fwEx = []; liveHint = null; hush(); cancelAnimationFrame(anim); d.getContext('2d').clearRect(0, 0, W, H); ink = []; resetMatch(); hist = []; refreshUndo(); missing = []; hinting = false; $('#wfb').innerHTML = ''; try { wRec = new Set(); } catch (e) {} }
   // rub out just what the eraser passes over, like a paint program: the child fixes one line instead
   // of losing the letter. A guide line the eraser touches is released back to "not drawn yet".
   function eraseAt(p) {
@@ -4836,6 +4922,7 @@ function writeView() {
     e.preventDefault(); if (state !== 'draw') return; clearTimeout(idle);
     snapshot();
     drawing = true; try { d.setPointerCapture(e.pointerId); } catch (_) {} last = pt(e);
+    if (liveHint) { liveHint = null; drawGuide(); }
     if (eraser) { hinting = false; eraseAt(last); redrawInk(); drawGuide(); return; }
     ink.push([last]); seg(last, [last[0] + 0.1, last[1]]);
   });
@@ -4847,6 +4934,7 @@ function writeView() {
   ['pointerup', 'pointercancel'].forEach(t => d.addEventListener(t, () => {
     if (!drawing) return; drawing = false;
     if (eraser) { refreshUndo(); return; }
+    if (FREE && state === 'draw') liveCheck();
     if (mode === 'trace' && !FREE) {
       const st = ink[ink.length - 1];
       if (!liveMatch(st)) { clearTimeout(idle); idle = setTimeout(() => check(true), 800); }
