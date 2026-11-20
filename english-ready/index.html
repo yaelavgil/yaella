@@ -689,7 +689,22 @@ body.pdash #pbar .pbrow{padding:12px 18px}
 .kt b{font:700 24px var(--f-display);font-variant-numeric:tabular-nums;line-height:1.1}
 .kt b small{font-size:14px;color:var(--muted);font-weight:600}
 .kt span{font-size:13px;color:var(--muted);line-height:1.3}
-.kt.big{background:var(--t2)}
+.kto{position:relative;border:1.5px solid transparent;text-align:start;color:var(--ink);font:inherit;cursor:pointer;transition:border-color .15s}
+.kto:hover{border-color:var(--line)}
+.kto.on{border-color:var(--ink)}
+.kto:focus-visible{outline:3px solid var(--c2);outline-offset:2px}
+.ktmore{position:absolute;top:8px;inset-inline-end:10px;font-style:normal;font-size:12px;color:var(--muted)}
+.kdet{margin-top:10px;padding:12px 14px;border-radius:14px;background:var(--bg);display:grid;gap:8px}
+.kdet h4{margin:0;font:700 15px var(--f-display)}
+.kdet .winrows{margin:0}
+.kdnext{margin:0;font-weight:600}
+.kdbars{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.kdbars li{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid var(--line);font-size:14px}
+.kdbars li:last-child{border-bottom:0}
+.kdok{color:var(--good)}.kdno{color:#B3261E}
+.kddays{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:4px;direction:ltr}
+.kddays span{aspect-ratio:1;border-radius:8px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;font-size:11px;color:var(--muted)}
+.kddays span.on{background:#2BB673;border-color:#2BB673;color:#fff;font-weight:700}
 @media (min-width:700px){.kstrip.n1 .kst{padding:16px 20px}.kstrip.n1 .ktiles{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}}
 .kst{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:14px 16px;display:block}
 .kstmain{flex:1 1 180px;display:grid;gap:3px;text-align:start;background:none;border:0;padding:4px 2px;cursor:pointer;color:inherit}
@@ -1651,11 +1666,11 @@ function markDone(mod, pct) {
 }
 function addStar() { const s = load(); s.stars++; day(s).stars++; save(s); }
 // practice time: time between taps while inside a practice screen (gaps over 90s don't count)
-let practicing = false, lastAct = 0, inStage = false;
+let practicing = false, lastAct = 0, inStage = false, CURMOD = '';
 document.addEventListener('pointerdown', () => {
   const now = Date.now();
   if (practicing && lastAct && now - lastAct < 90000) {
-    const s = load(); day(s).ms += now - lastAct; setTimeout(energyPaint, 0);
+    const s = load(), dd = day(s); dd.ms += now - lastAct; if (CURMOD) { const mm = (dd.mm = dd.mm || {}); mm[CURMOD] = (mm[CURMOD] || 0) + (now - lastAct); } setTimeout(energyPaint, 0);
     if (s.jour && (s.goal || {}).type === 'journey' && s.jour.n < JOUR_N) { const J = s.jour; if (J.ck !== J.n) { J.ck = J.n; J.cms = 0; } J.cms = (J.cms || 0) + (now - lastAct); }
     save(s);
   }
@@ -1912,7 +1927,7 @@ let cleanup = null;
 function go(fn, ...a) {
   if (cleanup) { cleanup(); cleanup = null; }
   mapFullOff();
-  practicing = ![home, wheelView, parentSettings, parentCloud, restView].includes(fn); lastAct = 0; inStage = false;
+  practicing = ![home, wheelView, parentSettings, parentCloud, restView].includes(fn); lastAct = 0; inStage = false; if (practicing) CURMOD = fn.name || '';
   hush();
   if (practicing && KID && restNow()) { restView(); window.scrollTo(0, 0); return; }
   fn(...a);
@@ -2188,6 +2203,64 @@ function watchParentKids(A) { // each kid's card follows his progress live
   PWATCH.forEach(f => { try { f(); } catch (e) {} }); PWATCH = [];
   PKIDS.forEach(k => { try { const f = A.watchKid(k.id, d => { const i = PKIDS.findIndex(x => x.id === k.id); if (i < 0) return; PKIDS[i] = Object.assign({ id: k.id }, d); renderParentBar(); }); if (typeof f === 'function') PWATCH.push(f); } catch (e) {} });
 }
+/* ---------- the parent's card: each number opens what it means and what comes next ---------- */
+const KOPEN = {};
+const MOD_HE = { stageQuiz: 'המסע', learnView: 'לימוד המילים', talkView: 'שיחה באנגלית', speakView: 'אומרים בקול', quizMock: 'מבחן ניסיון', writeView: 'כתיבת אותיות', wordWriteView: 'כתיבת מילים', k5Learn: 'מילים חדשות', k5Game: 'משחק מילים', k5Abc: 'אותיות', k5AbcGame: 'משחק אותיות', k5Sing: 'שירים', k5Do: 'תעשי כמוני' };
+const ddmm = t => t.split('-').slice(1).reverse().join('.');
+function kidState(k) { const st = abcMigrate(Object.assign(fresh(), JSON.parse(JSON.stringify(k.settings || {})))); const p = JSON.parse(JSON.stringify(k.progress || {})); PROGRESS_KEYS.forEach(x => { if (p[x] !== undefined && x !== 'level') st[x] = p[x]; }); st.td = JSON.parse(JSON.stringify(kidDay(k))); st.td.date = today(); return st; }
+function kidDetail(k, key) {
+  const S = kidState(k), d = S.td, p = k.progress || {}, J = p.jour || {}, pk = (k.settings || {}).pack || 'g4-mapping', nm = esc(k.name);
+  const L = a => blt(a.filter(Boolean));
+  if (key === 'spins') {
+    const wins = (S.wins || []).filter(w => w.date === today()), older = (S.wins || []).filter(w => w.date !== today()).slice(0, 5);
+    const win = w => `<li><span class="wrill" aria-hidden="true">${emojiOf(w.prize)}</span><span class="wrtx"><span class="en">${esc(textOf(w.prize))}</span>${heOf(w.prize) ? `<small>${esc(heOf(w.prize))}</small>` : ''}</span>${w.date === today() ? '' : `<span class="wrdate">${ddmm(w.date)}</span>`}</li>`;
+    let next;
+    if (!S.wheel) next = 'הגלגל כבוי אצל ' + nm + '.';
+    else if (pk === 'k5') { const K = S.k5 || {}, stars = (K.n || 0) + (K.lg || 0), owed = Math.floor(stars / 3) - (K.spun || 0); next = owed > 0 ? `מחכה לו סיבוב עכשיו (${owed}).` : `הסיבוב הבא: אחרי עוד ${3 - stars % 3} כוכבים.`; }
+    else {
+      const X = xsGrant(S), jw = d.jw || 0, per = wheelPerDay(S), kk = jw + 1, mins = Math.floor((d.ms || 0) / 60000), needM = wheelMin(S) * kk - mins, needS = kk - (d.jl || 0);
+      if (X) next = `נתתם היום עוד סיבוב: נפתח אחרי ${X.m} דקות תרגול.`;
+      else if (jw >= per) next = `סיים את הסיבובים של היום (${jw}/${per}). מחר אפשר שוב.`;
+      else if (st_wheelToday(S, d)) next = 'הסיבוב הבא כבר פתוח ומחכה לו.';
+      else next = `הסיבוב הבא (${kk} מתוך ${per} היום) נפתח אחרי ${[needS > 0 ? `עוד ${needS === 1 ? 'שלב אחד' : needS + ' שלבים'} במסע` : '', needM > 0 ? `עוד ${needM} דקות תרגול` : ''].filter(Boolean).join(' ו') || 'הסבב הבא'}.`;
+    }
+    return `<h4>🎡 במה זכה היום</h4>${wins.length ? `<ul class="winrows">${wins.map(win).join('')}</ul>` : '<p class="hint">עוד לא זכה היום.</p>'}
+      <p class="kdnext">👉 ${next}</p>${older.length ? `<h4>זכיות קודמות</h4><ul class="winrows">${older.map(win).join('')}</ul>` : ''}`;
+  }
+  if (key === 'road') {
+    if (pk === 'k5') { const K = S.k5 || {}; return `<h4>⭐ הכוכבים של ${nm}</h4>${L([`${K.n || 0} כוכבים של מילים (מתוך ${K5P.length} נושאים).`, `${(K.lg || 0) * 2} אותיות מתוך 26${K.lg ? `: <span class="en">${ALPHA.slice(0, K.lg * 2).join(' ').toUpperCase()}</span>` : ''}.`])}
+      <p class="kdnext">👉 הבא: ${K5P[K.n || 0] ? `הנושא „${esc(K5P[K.n || 0].title_he || '')}”` : 'כל נושאי המילים הושלמו'}${(K.lg || 0) < 13 ? `, והאותיות <span class="en">${ALPHA.slice((K.lg || 0) * 2, (K.lg || 0) * 2 + 2).join(' ').toUpperCase()}</span>` : ''}. כל שני משחקים = כוכב.</p>`; }
+    const stars = (J.lv || 1) >= 2, need = stageSteps(S), have = J.ck === J.n ? Math.min(need, J.sp || 0) : 0, wk = Object.values(S.wk || {}).filter(r => r[0] >= 1).length;
+    const lm = (J.lm || []).filter(x => x > 0), avg = lm.length ? Math.round(lm.reduce((a, b) => a + b, 0) / lm.length) : 0;
+    return `<h4>${stars ? '⭐ מסע הכוכבים' : '🔤 מסע האותיות'}</h4>${L([stars ? `${J.n || 0} כוכבים מתוך 26.` : `${J.n || 0} אותיות נפתחו מתוך 26${J.n ? `: <span class="en">${ALPHA.slice(0, J.n).join(' ').toUpperCase()}</span>` : ''}.`,
+      stars && wk ? `מילים שהוא כבר יודע (ענה נכון בלי רמז): <b>${wk}</b>.` : '', avg ? `שלב לוקח לו בערך ${avg} דקות.` : ''])}
+      <p class="kdnext">👉 ${stars ? `כוכב ${(J.n || 0) + 1}` : `האות <span class="en">${(ALPHA[J.n || 0] || 'z').toUpperCase()}</span>`}: ${have}/${need} צעדים. ${need - have > 0 ? `חסרים עוד ${need - have} סבבים מוצלחים (כל סבב בערך 5 דקות)${stars ? ', ולדעת את רוב המילים של הכוכב' : ''}.` : stars ? 'הצעדים מוכנים. נשאר לדעת עוד מילים של הכוכב.' : 'הצעדים מוכנים: בסבב הבא נפתחת האות.'}</p>`;
+  }
+  if (key === 'mins') {
+    const mins = Math.floor((d.ms || 0) / 60000), mx = dayMaxToday(S), mm = Object.entries(d.mm || {}).sort((a, b) => b[1] - a[1]);
+    return `<h4>⏱ הזמן של היום</h4>${mm.length ? `<ul class="kdbars">${mm.map(([m, ms]) => `<li><span>${MOD_HE[m] || 'תרגול לפי נושא'}</span><b>${Math.max(1, Math.round(ms / 60000))} דק׳</b></li>`).join('')}</ul>` : `<p class="hint">${mins ? 'הפירוט לפי פעילות נרשם מהיום, ויופיע מהתרגול הבא.' : 'עוד לא תרגל היום.'}</p>`}
+      <p class="kdnext">👉 ${mx ? (mins >= mx ? `האנרגיה של היום נגמרה (${mx} דקות). היא תתחדש מחר.` : `נשארו לו היום ${mx - mins} דקות אנרגיה מתוך ${mx}${xeToday(S) ? ` (כולל ${xeToday(S)} שנתתם)` : ''}.`) : 'אין הגבלת זמן יומית.'}</p>`;
+  }
+  if (key === 'rounds') {
+    const rs = d.rs || [];
+    return `<h4>👣 הסבבים של היום</h4>${rs.length ? `<ul class="kdbars">${rs.map(r => `<li><span>${new Date(r.at).toTimeString().slice(0, 5)} · ${r.st ? `כוכב ${r.k + 1}` : `שלב <span class="en">${(ALPHA[r.k] || 'z').toUpperCase()}</span>`}</span><b class="${r.ok ? 'kdok' : 'kdno'}">${r.sc}/${r.of} ${r.ok ? '✓ צעד' : '· לא נספר'}</b></li>`).join('')}</ul>` : `<p class="hint">${d.jl ? 'הפירוט נרשם מהיום, ויופיע מהסבב הבא.' : 'עוד אין סבבים היום.'}</p>`}
+      ${rs.length ? `<p class="kdnext">👉 ${rs.filter(r => r.ok).length} מתוך ${rs.length} סבבים הצליחו וקידמו אותו צעד.</p>` : ''}`;
+  }
+  if (key === 'days') {
+    const set = new Set(S.days || []), back = [...Array(14)].map((_, i) => { const t = new Date(); t.setDate(t.getDate() - (13 - i)); return `${t.getFullYear()}-${t.getMonth() + 1}-${t.getDate()}`; });
+    let streak = 0; for (let i = 13; i >= 0; i--) { if (set.has(back[i])) streak++; else if (i === 13) continue; else break; }
+    return `<h4>📅 ימי תרגול: שבועיים אחרונים</h4><div class="kddays">${back.map(t => `<span class="${set.has(t) ? 'on' : ''}" title="${ddmm(t)}">${t.split('-')[2]}</span>`).join('')}</div>
+      <p class="kdnext">👉 ${streak >= 2 ? `רצף של ${streak} ימים ברציפות! 🔥` : streak === 1 ? 'תרגל אתמול או היום. מחר אפשר להתחיל רצף.' : 'אין רצף כרגע. תרגול קצר מחר יתחיל אחד.'} סך הכול ${set.size} ימים.</p>`;
+  }
+  if (key === 'mock') {
+    const m = p.mock; if (!m) return '';
+    const rows = Object.keys(SECS).filter(x => m.secs && m.secs[x]).map(x => { const [a, b] = m.secs[x]; return `<li><span>${SECS[x]}</span><b class="${a / b >= 0.8 ? 'kdok' : 'kdno'}">${a}/${b}</b></li>`; }).join('');
+    const weak = Object.keys(SECS).filter(x => m.secs && m.secs[x] && m.secs[x][0] / m.secs[x][1] < 0.8).map(x => SECS[x]);
+    return `<h4>📝 מבחן ניסיון · ${ddmm(m.date)}</h4>${rows ? `<ul class="kdbars">${rows}</ul>` : ''}
+      <p class="kdnext">👉 ${weak.length ? `כדאי לחזק: ${weak.join(', ')}.` : 'כל הנושאים טובים. כדאי לעשות מבחן נוסף לפני המבחן האמיתי.'}${(p.mocks || []).length > 1 ? ` (${p.mocks.length} מבחנים עד היום)` : ''}</p>`;
+  }
+  return '';
+}
 function renderParentBar() {
   const bar = $('#pbar'); if (!bar || !PUSER) return;
   const who = esc((PUSER.name || PUSER.email || '').split(' ')[0] || 'הורה');
@@ -2202,7 +2275,7 @@ function renderParentBar() {
       const trk = pk === 'g7' ? 'כיתה ז׳' : pk === 'k5' ? 'גן' : 'כיתה ד׳';
       const mx = ((st.goal || {}).max == null ? 60 : +(st.goal || {}).max) ? dayMaxToday(Object.assign({}, st, { goal: Object.assign({ max: 60 }, st.goal || {}) })) : 0;
       const road = pk === 'k5' ? { v: `${(p.k5 || {}).n || 0}`, l: 'כוכבים' } : (J.lv || 1) >= 2 ? { v: `${J.n || 0}/26`, l: `כוכבים במסע ${J.lv > 2 ? (J.lv === 3 ? 'הירח' : 'השמש') : 'הכוכבים'}` } : { v: `${J.n || 0}/26`, l: 'אותיות במסע' };
-      const tile = (v, l, cls = '') => `<div class="kt ${cls}"><b>${v}</b><span>${l}</span></div>`;
+      const OPEN = (KOPEN[k.id] || ''), tile = (v, l, key) => key ? `<button type="button" class="kt kto ${OPEN === key ? 'on' : ''}" data-kd="${key}" data-kid="${k.id}" aria-expanded="${OPEN === key}"><b>${v}</b><span>${l}</span><i class="ktmore" aria-hidden="true">${OPEN === key ? '▴' : '▾'}</i></button>` : `<div class="kt"><b>${v}</b><span>${l}</span></div>`;
       return `<article class="kst" data-k="${k.id}">
         <header class="ksthead">
           ${ph ? `<img class="kstph" src="${ph}" alt="">` : `<span class="kstph kstini" aria-hidden="true">${esc(k.name.slice(0, 1))}</span>`}
@@ -2210,13 +2283,14 @@ function renderParentBar() {
           <div class="kstact"><button class="btn sm kstlink" data-link="${k.id}">שליחת קישור</button><button class="btn sm" data-set="${k.id}">הגדרות</button></div>
         </header>
         <div class="ktiles">
-          ${tile(road.v, road.l, 'big')}
-          ${tile(`${mins}${mx ? `<small>/${mx}</small>` : ''}`, mx ? 'דקות היום (מתוך ההגבלה)' : 'דקות תרגול היום')}
-          ${pk === 'k5' ? '' : tile(d.jl || 0, 'שלבים היום')}
-          ${tile(d.spins || 0, 'סיבובים בגלגל היום')}
-          ${tile((p.days || []).length, 'ימי תרגול')}
-          ${p.mock ? tile(`${p.mock.score}/${p.mock.n}`, 'מבחן ניסיון אחרון') : ''}
+          ${tile(road.v, road.l, 'road')}
+          ${tile(`${mins}${mx ? `<small>/${mx}</small>` : ''}`, mx ? 'דקות היום (מתוך ההגבלה)' : 'דקות תרגול היום', 'mins')}
+          ${pk === 'k5' ? '' : tile((d.rs || []).length || d.jl || 0, 'סבבים במסע היום', 'rounds')}
+          ${tile(d.spins || 0, 'סיבובים בגלגל היום', 'spins')}
+          ${tile((p.days || []).length, 'ימי תרגול', 'days')}
+          ${p.mock ? tile(`${p.mock.score}/${p.mock.n}`, 'מבחן ניסיון אחרון', 'mock') : ''}
         </div>
+        ${OPEN ? `<div class="kdet" role="region">${kidDetail(k, OPEN)}</div>` : ''}
         <div class="kquick">
           ${mx ? `<button class="btn sm" data-qe="${k.id}">⚡ עוד 10 דקות היום</button>` : ''}
           ${st.wheel ? `<button class="btn sm" data-qs="${k.id}">🎁 עוד סיבוב היום</button>` : ''}
@@ -2230,6 +2304,7 @@ function renderParentBar() {
   $('#popen').onclick = () => settingsSheet();
   $$('[data-link]', bar).forEach(b => b.onclick = () => sendKidLink(b, PKIDS.find(k => k.id === b.dataset.link)));
   $$('[data-set]', bar).forEach(b => b.onclick = () => settingsSheet(b.dataset.set, 'learn'));
+  $$('[data-kd]', bar).forEach(b => b.onclick = () => { KOPEN[b.dataset.kid] = KOPEN[b.dataset.kid] === b.dataset.kd ? '' : b.dataset.kd; renderParentBar(); const t = $(`.kst[data-k="${b.dataset.kid}"] [data-kd="${b.dataset.kd}"]`); if (t) t.focus({ preventScroll: true }); });
   $$('[data-qp]', bar).forEach(b => b.onclick = () => settingsSheet(b.dataset.qp, 'goal'));
   $$('[data-qg]', bar).forEach(b => b.onclick = () => settingsSheet(b.dataset.qg, 'prog'));
   const quick = async (b, f, msg) => { // one tap, saved straight to the child's settings
@@ -4424,6 +4499,7 @@ function stageFinish(score, n) {
   }
   const s0 = load(), J0 = jour(s0), ST = isStars(s0), pass = starPassOK(s0, score, n);
   J0.cr = (J0.cr || 0) + 1; if (pass) addStep(s0);
+  { const dd = day(s0); dd.rs = [...(dd.rs || []), { k: J0.n, sc: score, of: n, ok: pass ? 1 : 0, st: ST ? 1 : 0, at: Date.now() }].slice(-20); }
   let LVUP = '';
   if (!ST) { // the letters journey gets harder with success: 3 strong rounds in a row -> the next level
     if (score / n >= 0.85) { s0.alvs = (s0.alvs || 0) + 1; if (s0.alvs >= 3 && lvl !== 'hard') { s0.alv = (s0.alv || 0) + 1; s0.alvs = 0; LVUP = LV3[LV3.indexOf(lvl) + 1]; } }
