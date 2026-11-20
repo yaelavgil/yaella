@@ -351,6 +351,17 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .k5opt.ok{border-color:#1E9E5A;background:#E3F6EA;transform:scale(1.08)}.k5opt.no{opacity:.3;animation:shake .35s}
 @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 .k5line{font-size:22px;cursor:pointer;margin:6px 0}.k5done{text-align:center;font-size:24px}
+#energy{display:flex;margin-inline-start:auto;flex:none;width:max-content;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--surface);border:2px solid var(--line);box-shadow:0 3px 0 var(--shadow);direction:ltr}
+#energy .eic{font-size:18px;line-height:1}
+#energy .elab{font-size:14px;font-weight:700;color:#55556a}
+#energy .ebat{position:relative;display:block;width:64px;height:16px;border:2.5px solid currentColor;border-radius:5px;padding:1.5px;color:#6b6b80}
+#energy .ebat::after{content:'';position:absolute;right:-6px;top:3px;width:3px;height:6px;border-radius:0 2px 2px 0;background:currentColor}
+#energy .ebat i{display:block;height:100%;border-radius:2px;transition:width .6s}
+#energy.hi i{background:#2BB673}#energy.mid i{background:#F2B233}#energy.lo i{background:#E5533D}
+.ewarn{position:fixed;bottom:16px;inset-inline:16px;margin:auto;max-width:420px;z-index:41;text-align:center;padding:12px 16px;border-radius:16px;background:#FFF6DC;border:2.5px solid #F2B233;box-shadow:0 5px 0 #0002;font-size:18px;transition:opacity .6s}
+.ewarn.out{opacity:0}
+.hero #energy{margin:0 auto}
+.restmsg{font-size:20px;margin:0}
 .vlearn{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px;margin:12px 0}
 .vcard{display:flex;flex-direction:column;align-items:center;gap:3px;padding:12px 8px 10px;border-radius:18px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;cursor:pointer;text-align:center;box-shadow:0 3px 0 var(--shadow)}
 .vcard.on{outline:3px solid #FFB020;outline-offset:1px}
@@ -1599,7 +1610,7 @@ let practicing = false, lastAct = 0, inStage = false;
 document.addEventListener('pointerdown', () => {
   const now = Date.now();
   if (practicing && lastAct && now - lastAct < 90000) {
-    const s = load(); day(s).ms += now - lastAct;
+    const s = load(); day(s).ms += now - lastAct; setTimeout(energyPaint, 0);
     if (s.jour && (s.goal || {}).type === 'journey' && s.jour.n < JOUR_N) { const J = s.jour; if (J.ck !== J.n) { J.ck = J.n; J.cms = 0; } J.cms = (J.cms || 0) + (now - lastAct); }
     save(s);
   }
@@ -1752,12 +1763,36 @@ function stepNoteHTML(s1) {
 }
 const dayMax = s => { const v = (s.goal || {}).max; return v == null ? 60 : +v; };      // after this many minutes, no more practice today (0 = no limit)
 const restNow = () => { const s = load(), m = dayMax(s); return !!m && Math.floor((day(s).ms || 0) / 60000) >= m; };
+/* ---------- energy: when the parent set a daily limit, a battery empties with real practice time.
+   Empty = rest until tomorrow (calendar day, not 24 hours). It is a limit the parent set, not a game life:
+   nothing earns or buys it back. A round already started is never cut; a warning comes near the end. */
+const ENERGY_WARN = 5; // minutes left
+function energy() { if (!KID) return null; const s = load(), m = dayMax(s); if (!m) return null; const used = (day(s).ms || 0) / 60000; return { m, left: Math.max(0, m - used), pct: Math.max(0, Math.min(1, 1 - used / m)) }; }
+function energyPaint() {
+  let el = document.getElementById('energy'); const E = energy(), host = app.querySelector('.qtop') || app.querySelector('.hero');
+  if (!E || !host) { if (el) el.remove(); return; }
+  if (!el) { el = document.createElement('div'); el.id = 'energy'; el.setAttribute('data-nofem', ''); el.setAttribute('role', 'img'); }
+  if (el.parentNode !== host) host.appendChild(el);
+  const p = Math.round(E.pct * 100), c = p > 40 ? 'hi' : p > 15 ? 'mid' : 'lo';
+  el.hidden = false; el.className = c; el.setAttribute('aria-label', `אנרגיה: ${p}%`);
+  el.innerHTML = `<span class="elab" aria-hidden="true">אנרגיה</span><span class="eic" aria-hidden="true">⚡</span><span class="ebat"><i style="width:${p}%"></i></span>`;
+  if (practicing && E.left > 0 && E.left <= Math.min(ENERGY_WARN, E.m / 4)) { const s = load(), d = day(s); if (!d.ew) { d.ew = 1; save(s); energyWarn(); } }
+}
+function energyWarn() {
+  const t = document.createElement('div'); t.className = 'ewarn'; t.setAttribute('role', 'status');
+  t.innerHTML = '🔋 <b>האנרגיה כמעט נגמרה!</b><br>אפשר לסיים בשקט את מה שהתחלת, ואז זה הזמן לנוח.';
+  document.body.appendChild(t); setTimeout(() => t.classList.add('out'), 8000); setTimeout(() => t.remove(), 8700);
+}
+setInterval(energyPaint, 5000);
+new MutationObserver(() => { const h = app.querySelector('.qtop') || app.querySelector('.hero'); if (h && !h.querySelector('#energy')) energyPaint(); }).observe(app, { childList: true });
 function restView() {
   const m = dayMax(load());
-  app.innerHTML = `${top('להיום מספיק')}
-    <section class="result stk"><div class="stagebig" aria-hidden="true">🌙</div>
-      <h2>תרגלת היום ${m >= 60 && m % 60 === 0 ? (m === 60 ? 'שעה שלמה' : `${m / 60} שעות`) : `${m} דקות`}. כל הכבוד!</h2>
-      ${blt(['המוח צריך מנוחה כדי לזכור.', 'נמשיך מחר!'])}
+  practicing = false; energyPaint();
+  app.innerHTML = `${top('האנרגיה של היום נגמרה')}
+    <section class="result stk"><div class="stagebig" aria-hidden="true">🪫</div>
+      <h2>האנרגיה של היום נגמרה 😴</h2>
+      <p class="restmsg">היא תתחדש מחר, אחרי שינה טובה בלילה 🌙</p>
+      ${blt([`היום היו ${m >= 60 && m % 60 === 0 ? (m === 60 ? 'שעה שלמה' : `${m / 60} שעות`) : `${m} דקות`} של תרגול. כל הכבוד!`, 'בזמן השינה המוח שומר את כל מה שלמדנו היום.', 'נתראה מחר! ☀️'])}
       <div class="row center"><button class="btn primary" data-back="home">לדף הבית</button></div></section>`;
 }
 function avgLesson(s) { const l = (jour(s).lm || []).filter(x => x > 0); return l.length ? Math.round(l.reduce((a, b) => a + b, 0) / l.length) : 6; }
@@ -1830,9 +1865,11 @@ let cleanup = null;
 function go(fn, ...a) {
   if (cleanup) { cleanup(); cleanup = null; }
   mapFullOff();
-  practicing = ![home, wheelView, parentSettings, parentCloud].includes(fn); lastAct = 0; inStage = false;
+  practicing = ![home, wheelView, parentSettings, parentCloud, restView].includes(fn); lastAct = 0; inStage = false;
   hush();
+  if (practicing && KID && restNow()) { restView(); window.scrollTo(0, 0); return; }
   fn(...a);
+  energyPaint();
   window.scrollTo(0, 0);
 }
 const top = (title, back = 'home', extra = '') =>
@@ -4117,7 +4154,7 @@ function journeyCardHTML(G, st) {
   let action;
   if (G.mega && st.wheel && !G.megaWait) action = `<button class="btn spinbtn megabtn" id="megaspin">👑 פתחת את כל 26 האותיות! למגה גלגל</button>`;
   else if (G.avail && st.wheel) action = `<button class="btn spinbtn" id="spin">🎡 גלגל ההפתעות של היום נפתח! לסובב</button>`;
-  else if (G.capped) action = `<div class="jrest">🌙 <b>להיום מספיק, כל הכבוד!</b><span>${lines(`תרגלת היום ${G.maxM} דקות.`, 'המוח צריך מנוחה כדי לזכור.', 'נמשיך מחר.')}</span></div>`;
+  else if (G.capped) action = `<div class="jrest">🪫 <b>האנרגיה של היום נגמרה, כל הכבוד!</b><span>${lines(`היום היו ${G.maxM} דקות של תרגול.`, 'היא תתחדש מחר, אחרי שינה טובה בלילה 🌙', 'נתראה מחר!')}</span></div>`;
   else if (J.n < JOUR_N && G.csp >= G.steps) action = isStars(st) ? `<button class="btn spinbtn" id="claim">⭐ הגעת לסוף השלב! לאסוף את כוכב ${J.n + 1}</button>` : `<button class="btn spinbtn" id="claim">🔓 הגעת לסוף השלב! לפתוח את האות <span class="en">${nextL}</span></button>`;
   else if (J.n < JOUR_N) action = `<button class="btn stagebtn" id="stagego"><span class="stl">▶</span><span>${isStars(st) ? `למסע הכוכבים · כוכב ${J.n + 1}` : `להמשיך במסע · שלב ${J.n + 1}`}<small class="stmin">${stepsHTML(G.csp, G.steps, false, isStars(st) ? '⭐' : nextL)}</small></span><span aria-hidden="true">←</span></button>${isStars(st) ? '<button class="btn" id="jwords">📖 המילים של הכוכב</button>' : ''}`;
   else if (!isStars(st) && (!G.mega || !st.wheel)) action = `<div class="jdone"><b>🏆 סיימת את כל 26 האותיות! כל הכבוד!</b><button class="btn spinbtn" id="jstars">⭐ לפתוח את מסע הכוכבים (רמה קשה)</button></div>`;
@@ -4391,7 +4428,7 @@ function letterWon(k) {
         ${atEnd && st.wheel ? `<button class="btn spinbtn megabtn" id="megaspin">👑 למגה גלגל!</button>`
           : atStop && st.wheel ? `<button class="btn spinbtn" id="spin">🎡 הגלגל של היום נפתח! לסובב</button>`
           : G.almost && st.wheel && !G.capped ? `<div class="jwait">🎡 הגלגל של היום כמעט נפתח!<br>עוד קצת תרגול היום. ${wheelInfo(st)}</div><button class="btn primary" id="nextst">להמשיך במסע ←</button>`
-          : atEnd ? '' : G.capped ? `<p class="jrest">🌙 <b>להיום מספיק, כל הכבוד!</b> נמשיך מחר.</p>`
+          : atEnd ? '' : G.capped ? `<p class="jrest">🪫 <b>האנרגיה של היום נגמרה, כל הכבוד!</b> היא תתחדש מחר, אחרי שינה טובה 🌙</p>`
           : `<button class="btn primary" id="nextst">להמשיך במסע ←</button>`}
         <button class="btn" data-back="home">לדף הבית</button></div>
     </section>`;
@@ -4412,7 +4449,7 @@ function starWon(k, st, G, atStop, atEnd) {
       <div class="row center">
         ${atEnd && st.wheel ? `<button class="btn spinbtn megabtn" id="megaspin">👑 למגה גלגל!</button>`
           : atStop && st.wheel ? `<button class="btn spinbtn" id="spin">🎡 הגלגל של היום נפתח! לסובב</button>`
-          : atEnd ? '' : G.capped ? `<p class="jrest">🌙 <b>להיום מספיק, כל הכבוד!</b> נמשיך מחר.</p>`
+          : atEnd ? '' : G.capped ? `<p class="jrest">🪫 <b>האנרגיה של היום נגמרה, כל הכבוד!</b> היא תתחדש מחר, אחרי שינה טובה 🌙</p>`
           : `<button class="btn primary" id="nextst">להמשיך במסע ←</button>`}
         <button class="btn" data-back="home">לדף הבית</button></div>
     </section>`;
