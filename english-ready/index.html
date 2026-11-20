@@ -506,8 +506,14 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .story{padding:16px;margin-bottom:14px}
 .sthead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .sthead b{font:700 22px var(--f-en)}
-.stx{font:400 clamp(20px,5vw,23px)/1.75 var(--f-en);margin:8px 0 0;direction:ltr;text-align:left}
-.ss{cursor:pointer;border-radius:6px;padding:0 2px}
+.stx{font:400 clamp(20px,5vw,23px)/1.65 var(--f-en);margin:8px 0 0;direction:ltr;text-align:left;max-width:27em;margin-right:auto;word-spacing:normal}
+.stx p{margin:0 0 .85em}
+.stx p:last-child{margin-bottom:0}
+.stx.lines .ss{display:block;width:fit-content;max-width:100%;padding:2px 10px;margin:0 -10px 2px;border-radius:10px}
+.stx.lines .ss::after{content:'🔊';font-size:.55em;margin-inline-start:.5em;opacity:0;transition:opacity .15s;vertical-align:.2em}
+.stx.lines .ss:hover::after,.stx.lines .ss.hl::after{opacity:.7}
+@media (hover:none){.stx.lines .ss::after{opacity:.3}}
+.ss{cursor:pointer;border-radius:6px}
 .ss:hover{background:var(--t3)}
 .hint{font-size:14px;color:var(--muted);margin:6px 0 0}
 .pts{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:5px;text-align:start}
@@ -4232,11 +4238,23 @@ function quizMock() {
 }
 
 const PRAISE = ['Great job!', 'Super!', 'Well done!', 'Excellent!', 'Yes!', 'You got it!'];
+// a passage is split into paragraphs: a new one starts where the story moves on (time, place, a new point)
+const PARA_START = /^(On |The next|Next |In the |Then|After|Later|Finally|At the end|At last|In the end|One day|Every |However|On the other|But |So |What do you|In some|Today|Yesterday|Last |First|Now|Suddenly|When )/;
+function paras(xs) {
+  const P = [[]];
+  xs.forEach(x => { const c = P[P.length - 1]; if (c.length >= 4 || (c.length >= 2 && PARA_START.test(x))) P.push([x]); else c.push(x); });
+  if (P.length > 1 && P[P.length - 1].length === 1) P[P.length - 2].push(...P.pop()); // never end on a lonely sentence
+  return P;
+}
 function storyHTML(st) {
+  const clean = x => String(x).replace(/\s+/g, ' ').trim();
+  const lines = TRACK() !== 'g7'; // grade 4 and younger: a sentence per line; grade 7: regular paragraphs, like the real test
+  
+  const span = x => `<span class="ss" data-say="${esc(clean(x))}">${clean(x)}</span>`;
   return `<section class="story stk">
-    <div class="sthead"><b class="en">${st.t}</b><button class="btn sm" data-say="${esc(st.x.join('|'))}">🔊 הקרא לי</button></div>
-    <p class="stx">${st.x.map(s => `<span class="ss" data-say="${esc(s)}">${s}</span>`).join(' ')}</p>
-    ${blt(['קרא בעצמך קודם.', 'לחיצה על משפט משמיעה אותו.'], 'hint')}
+    <div class="sthead"><b class="en">${st.t}</b><button class="btn sm" data-say="${esc(st.x.map(clean).join('|'))}">🔊 הקרא לי</button></div>
+    <div class="stx ${lines ? 'lines' : ''}">${paras(st.x).map(p => `<p>${p.map(span).join(lines ? '' : ' ')}</p>`).join('')}</div>
+    ${blt(['קרא בעצמך קודם.', lines ? 'לחיצה על שורה משמיעה אותה 🔊' : 'לחיצה על משפט משמיעה אותו.'], 'hint')}
   </section>`;
 }
 
