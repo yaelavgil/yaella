@@ -663,6 +663,8 @@ body.pdash #pbar .pbrow{padding:12px 18px}
 @media (min-width:900px){.kstrip.n2{grid-template-columns:1fr 1fr}.kstrip.n3{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .popen{gap:8px}
 .popen svg{width:18px;height:18px}
+.kquick{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.kqok{font-size:14px;color:var(--good);font-weight:600}
 .ksthead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .kstph{width:52px;height:52px;border-radius:50%;object-fit:cover;flex:none}
 .kstini{display:grid;place-items:center;background:var(--t2);color:var(--c2);font:700 22px var(--f-display)}
@@ -1086,7 +1088,12 @@ html.noscroll{overflow:hidden}
 .sheetov.page .shhead,.sheetov.page .shkids,.sheetov.page .shtabs,.sheetov.page .shbody,.sheetov.page .shfoot{padding-inline:max(18px,calc(50% - 600px))}
 .sheetov.page .shhead{padding-block:14px}
 .shback{min-height:42px;padding:6px 14px;flex:none}
+[data-part][hidden]{display:none!important}
 @media (min-width:980px){.sheetov.page .shbody{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+  .sheetov.page .shbody>[data-part]{grid-column:1/-1;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+  .sheetov.page [data-part]>.trycard{grid-column:1/-1}
+  .sheetov.page [data-part]>#shprz{display:contents}
+  .sheetov.page [data-part]>#shprz[hidden]{display:none}
   .sheetov.page .shbody>.shstats,.sheetov.page .shbody>.shform,.sheetov.page .shbody>.kphoto,.sheetov.page .shbody>:only-child{grid-column:1/-1}}
 @media (prefers-reduced-motion:reduce){.sheet,.sheetov{animation:none}.gearbtn:hover{transform:none}}
 
@@ -1788,12 +1795,14 @@ function stepNoteHTML(s1) {
   return `<div class="jstep"><b>👣 עוד צעד במסע!</b>${stepsHTML(n, need, true, L)}<span>${need - n === 1 ? 'עוד צעד אחד' : `עוד ${need - n} צעדים`} ופותחים את האות <b class="en">${L}</b></span></div>`;
 }
 const dayMax = s => { const v = (s.goal || {}).max; return v == null ? 60 : +v; };      // after this many minutes, no more practice today (0 = no limit)
-const restNow = () => { const s = load(), m = dayMax(s); return !!m && Math.floor((day(s).ms || 0) / 60000) >= m; };
+const xeToday = s => { const x = (s.goal || {}).xe; return x && x.d === today() ? +x.m || 0 : 0; };
+const dayMaxToday = s => { const m = dayMax(s); return m ? m + xeToday(s) : 0; };
+const restNow = () => { const s = load(), m = dayMaxToday(s); return !!m && Math.floor((day(s).ms || 0) / 60000) >= m; };
 /* ---------- energy: when the parent set a daily limit, a battery empties with real practice time.
    Empty = rest until tomorrow (calendar day, not 24 hours). It is a limit the parent set, not a game life:
    nothing earns or buys it back. A round already started is never cut; a warning comes near the end. */
 const ENERGY_WARN = 5; // minutes left
-function energy() { if (!KID) return null; const s = load(), m = dayMax(s); if (!m) return null; const used = (day(s).ms || 0) / 60000; return { m, left: Math.max(0, m - used), pct: Math.max(0, Math.min(1, 1 - used / m)) }; }
+function energy() { if (!KID) return null; const s = load(), m = dayMaxToday(s); if (!m) return null; const used = (day(s).ms || 0) / 60000; return { m, left: Math.max(0, m - used), pct: Math.max(0, Math.min(1, 1 - used / m)) }; }
 function energyPaint() {
   let el = document.getElementById('energy'); const E = energy(), host = app.querySelector('.qtop') || app.querySelector('.hero');
   if (!E || !host) { if (el) el.remove(); return; }
@@ -1812,7 +1821,7 @@ function energyWarn() {
 setInterval(energyPaint, 5000);
 new MutationObserver(() => { const h = app.querySelector('.qtop') || app.querySelector('.hero'); if (h && !h.querySelector('#energy')) energyPaint(); }).observe(app, { childList: true });
 function restView() {
-  const m = dayMax(load());
+  const m = dayMaxToday(load());
   practicing = false; energyPaint();
   app.innerHTML = `${top('האנרגיה של היום נגמרה')}
     <section class="result stk"><div class="stagebig" aria-hidden="true">🪫</div>
@@ -1847,7 +1856,7 @@ const wheelAlmost = (s, d) => !xsState(s, d) && (d.jw || 0) < wheelPerDay(s) && 
 function goalState(s) {
   if ((s.goal || {}).type === 'journey') {
     const d = day(s), J = jour(s), T = dailyTarget(s), todayN = d.jl || 0, mins = Math.floor((d.ms || 0) / 60000);
-    const stops = [], reached = 0, owed = 0, minM = 0, maxM = dayMax(s);
+    const stops = [], reached = 0, owed = 0, minM = 0, maxM = dayMaxToday(s);
     const XS = xsState(s, d), spunToday = (d.jw || 0) >= wheelPerDay(s) && !XS;
     const avail = st_wheelToday(s, d) ? 1 : 0, almost = wheelAlmost(s, d);
     const capped = J.n < JOUR_N && !!maxM && mins >= maxM;
@@ -1961,7 +1970,7 @@ function home() {
     <button class="btn testbtn" id="mock">להתחיל מבחן ניסיון ←</button>
   </section>`}
 
-  ${restNow() ? `<div class="jrest">🌙 <b>תרגלת היום ${dayMax(st)} דקות.</b><span>להיום מספיק.<br>נמשיך מחר!</span></div>` : ''}
+  ${restNow() ? `<div class="jrest">🌙 <b>תרגלת היום ${dayMaxToday(st)} דקות.</b><span>להיום מספיק.<br>נמשיך מחר!</span></div>` : ''}
   ${KID && KID.mode === 'test' ? '' : `<section class="zone practice">
     <div class="zhead"><span class="zico" aria-hidden="true">🎒</span><span class="ztag">תרגול</span><h2>תרגול לפי נושא</h2></div>
     ${blt(['כאן לומדים, אז מותר לטעות.', 'אפשר לנסות שוב, לבקש רמז ולראות את התשובה.', 'כל סבב שמסיימים כאן = צעד 👣 במסע.'], 'zdesc')}
@@ -2179,7 +2188,7 @@ function renderParentBar() {
       const d = kidDay(k), mins = Math.floor((d.ms || 0) / 60000), st = k.settings || {};
       const p = k.progress || {}, J = p.jour || {}, ph = (k.profile || {}).photo, pk = st.pack || 'g4-mapping';
       const trk = pk === 'g7' ? 'כיתה ז׳' : pk === 'k5' ? 'גן' : 'כיתה ד׳';
-      const mx = ((st.goal || {}).max == null ? 60 : +(st.goal || {}).max);
+      const mx = ((st.goal || {}).max == null ? 60 : +(st.goal || {}).max) ? dayMaxToday(Object.assign({}, st, { goal: Object.assign({ max: 60 }, st.goal || {}) })) : 0;
       const road = pk === 'k5' ? { v: `${(p.k5 || {}).n || 0}`, l: 'כוכבים' } : (J.lv || 1) >= 2 ? { v: `${J.n || 0}/26`, l: `כוכבים במסע ${J.lv > 2 ? (J.lv === 3 ? 'הירח' : 'השמש') : 'הכוכבים'}` } : { v: `${J.n || 0}/26`, l: 'אותיות במסע' };
       const tile = (v, l, cls = '') => `<div class="kt ${cls}"><b>${v}</b><span>${l}</span></div>`;
       return `<article class="kst" data-k="${k.id}">
@@ -2196,12 +2205,31 @@ function renderParentBar() {
           ${tile((p.days || []).length, 'ימי תרגול')}
           ${p.mock ? tile(`${p.mock.score}/${p.mock.n}`, 'מבחן ניסיון אחרון') : ''}
         </div>
+        <div class="kquick">
+          ${mx ? `<button class="btn sm" data-qe="${k.id}">⚡ עוד 10 דקות היום</button>` : ''}
+          ${st.wheel ? `<button class="btn sm" data-qs="${k.id}">🎁 עוד סיבוב היום</button>` : ''}
+          <button class="btn sm" data-qp="${k.id}">🎡 הפתעות</button>
+          <button class="btn sm" data-qg="${k.id}">📈 ההתקדמות</button>
+          <span class="kqok" aria-live="polite"></span>
+        </div>
       </article>`;
     }).join('')}</div>` : '<p class="hint pbhint">עוד אין ילדים. לחצו על גלגל השיניים כדי להוסיף.</p>'}`;
   document.body.classList.toggle('pdash', !!PKIDS.length);
   $('#popen').onclick = () => settingsSheet();
   $$('[data-link]', bar).forEach(b => b.onclick = () => sendKidLink(b, PKIDS.find(k => k.id === b.dataset.link)));
   $$('[data-set]', bar).forEach(b => b.onclick = () => settingsSheet(b.dataset.set, 'learn'));
+  $$('[data-qp]', bar).forEach(b => b.onclick = () => settingsSheet(b.dataset.qp, 'goal'));
+  $$('[data-qg]', bar).forEach(b => b.onclick = () => settingsSheet(b.dataset.qg, 'prog'));
+  const quick = async (b, f, msg) => { // one tap, saved straight to the child's settings
+    const k = PKIDS.find(x => x.id === (b.dataset.qe || b.dataset.qs)); if (!k) return;
+    const st = Object.assign(defaultSettings(), JSON.parse(JSON.stringify(k.settings || {}))); st.goal = st.goal || {}; f(st);
+    const ok = b.closest('.kquick').querySelector('.kqok'); b.disabled = true;
+    try { if (PAPI && PAPI.saveSettings) await PAPI.saveSettings(k.id, st, k.name); k.settings = st; renderParentBar(); const o2 = $(`.kst[data-k="${k.id}"] .kqok`); if (o2) o2.textContent = msg(st); return; }
+    catch (e) { ok.textContent = 'לא נשמר. נסו שוב.'; }
+    b.disabled = false;
+  };
+  $$('[data-qe]', bar).forEach(b => b.onclick = () => quick(b, st => { const x = st.goal.xe && st.goal.xe.d === today() ? +st.goal.xe.m : 0; st.goal.xe = { d: today(), m: x + 10 }; }, st => `✓ ניתנו היום עוד ${st.goal.xe.m} דקות`));
+  $$('[data-qs]', bar).forEach(b => b.onclick = () => quick(b, st => { st.goal.xs = { d: today(), at: Date.now(), m: 5 }; }, () => '✓ עוד סיבוב, אחרי 5 דקות תרגול'));
 }
 
 // one tap: the child's own link, in their own mode, ready to send
@@ -2228,7 +2256,7 @@ const GOAL_NOTE = {
 };
 const winRowsHTML = wins => wins.length ? `<ul class="winrows">${wins.map(w => { const he = heOf(w.prize);
   return `<li><span class="wrill" aria-hidden="true">${emojiOf(w.prize)}</span><span class="wrtx"><span class="en">${esc(textOf(w.prize))}</span>${he ? `<small>${esc(he)}</small>` : ''}</span><span class="wrdate">${w.date.split('-').slice(1).reverse().join('.')}</span></li>`; }).join('')}</ul>` : '<p class="hint">עוד אין.</p>';
-const SHEET_TABS = [['kid', 'פרטים'], ['learn', 'לימוד'], ['goal', 'יעד והפתעות'], ['prog', 'התקדמות'], ['link', 'קישור']];
+const SHEET_TABS = [['kid', 'פרטים'], ['learn', 'לימוד'], ['time', 'זמן ואנרגיה'], ['goal', 'הפתעות'], ['prog', 'התקדמות'], ['link', 'קישור']];
 function settingsSheet(kidId, tab) {
   const old = document.querySelector('.sheetov'); if (old) old.remove();
   let kid = PKIDS.find(k => k.id === kidId) || PKIDS[0] || null;
@@ -2339,22 +2367,32 @@ function settingsSheet(kidId, tab) {
       $$s('input[name="pack"]').forEach(r => r.onchange = () => { st.pack = r.value; touch(); });
       bindSeg('gd', v => st.gender = v); bindSeg('ll', v => st.level = v); bindSeg('tl', v => st.testLevel = v);
       $s('#shalu').onchange = e => { st.allowLevelUp = e.target.checked; touch(); };
-    } else if (cur === 'goal') {
+    } else if (cur === 'goal' || cur === 'time') {
+      const PK = st.pack || 'g4-mapping', LET = PK === 'g4-mapping' && (((kid.progress || {}).jour || {}).lv || 1) < 2;
       if (st.goal.type !== 'journey') st.goal = { type: 'journey', every: 5, perDay: 0 };
       if (!st.megaPrizes || st.megaPrizes.length < 2) st.megaPrizes = DEFAULT_MEGA.slice();
       B.innerHTML = `
+        <div data-part="time" class="shstack">
+        <div class="shgrp"><h3>⚡ אנרגיה יומית</h3>
+          ${blt(['כשיש הגבלה, הילד רואה סוללה של אנרגיה שמתרוקנת עם זמן התרגול.', 'כשנשארות בערך 5 דקות הוא מקבל הודעה, וסבב שהתחיל אפשר לסיים.', 'כשהיא נגמרת כתוב לו שהיא תתחדש מחר, אחרי שינה טובה בלילה.', 'אי אפשר להרוויח אותה בחזרה. רק אתם יכולים לתת עוד.'], 'hint')}
+          <label class="shfield">כמה זמן תרגול ביום</label>
+          <div class="seg" role="group" aria-label="הגבלה יומית">${segs('mx', String(dayMax(st)), [['45', '45 דק׳'], ['60', 'שעה'], ['90', 'שעה וחצי'], ['0', 'בלי']])}</div>
+          <div class="hint" id="shpdnote"></div>
+          <label class="shfield">עוד אנרגיה היום</label>
+          <div class="row" id="shxerow"></div></div>
+        <div class="shgrp" ${PK === 'k5' ? 'hidden' : ''}><h3>${LET ? 'מסע 26 האותיות' : 'המסע'}</h3>
+          ${LET ? `${blt(['כל שלב במפה בנוי מצעדים.', 'צעד = סבב תרגול שהוא מסיים (במסע, בתרגול לפי נושא, או 5 אותיות בכתיבה).', 'בסוף כל שלב נפתחת האות הבאה, לפי הסדר A→Z.', 'גלגל ההפתעות נפתח פעם ביום: אחרי שנפתחה אות באותו יום, וגם תורגלו מספיק דקות.', 'לילד כתוב רק "משלימים את הצעדים של היום", והדקות מופיעות רק בהסבר הקטן (i).', 'הילד לא רואה שעון.', 'הדקות נספרות ברקע, להגבלה היומית, ומוצגות רק לכם.'], 'hint')}` : blt(['כל כוכב במסע בנוי מצעדים.', 'צעד = סבב תרגול שמסיימים בהצלחה.'], 'hint')}
+          <label class="shfield">כמה צעדים בשלב (סבב ≈ 5 דקות)</label>
+          <div class="seg" role="group" aria-label="צעדים בשלב">${segs('sp', String(stageSteps(st)), [['4', '4 (≈20 דק׳)'], ['5', '5'], ['6', '6 (≈30)'], ['8', '8']])}</div>
+        </div></div>
+        <div data-part="goal" class="shstack">
         <button type="button" class="trycard" id="shtry" ${st.wheel ? '' : 'hidden'} aria-label="נסו את גלגל ההפתעות בעצמכם">
           <span class="trywheel">${miniWheel(st.prizes.length)}</span>
           <span class="trytx"><b>נסו בעצמכם</b><small>כך ${esc(kid.name)} רואה את גלגל ההפתעות.<br>הסיבובים כאן לא נספרים.</small></span>
           <span class="tryarrow" aria-hidden="true">←</span>
         </button>
-        <div class="shgrp"><h3>מסע 26 האותיות</h3>
-          ${blt(['כל שלב במפה בנוי מצעדים.', 'צעד = סבב תרגול שהוא מסיים (במסע, בתרגול לפי נושא, או 5 אותיות בכתיבה).', 'בסוף כל שלב נפתחת האות הבאה, לפי הסדר A→Z.', 'גלגל ההפתעות נפתח פעם ביום: אחרי שנפתחה אות באותו יום, וגם תורגלו מספיק דקות.', 'לילד כתוב רק "משלימים את הצעדים של היום", והדקות מופיעות רק בהסבר הקטן (i).', 'הילד לא רואה שעון.', 'הדקות נספרות ברקע, להגבלה היומית, ומוצגות רק לכם.'], 'hint')}
-          <label class="shfield">כמה צעדים בשלב (סבב ≈ 5 דקות)</label>
-          <div class="seg" role="group" aria-label="צעדים בשלב">${segs('sp', String(stageSteps(st)), [['4', '4 (≈20 דק׳)'], ['5', '5'], ['6', '6 (≈30)'], ['8', '8']])}</div>
-          <label class="shfield">הגבלה יומית לכל התרגול (שיעור שהתחיל אפשר לסיים)</label>
-          <div class="seg" role="group" aria-label="הגבלה יומית">${segs('mx', String(dayMax(st)), [['45', '45 דק׳'], ['60', 'שעה'], ['90', 'שעה וחצי'], ['0', 'בלי']])}</div>
-          <div class="hint" id="shpdnote"></div>
+        <div class="shgrp"><h3>🎡 גלגל ההפתעות</h3>
+          <div class="seg" role="group" aria-label="גלגל ההפתעות">${segs('wh', st.wheel ? '1' : '0', [['1', 'פעיל'], ['0', 'כבוי: רק המסע']])}</div>
           <label class="shfield">כמה דקות תרגול ביום לפני שהגלגל נפתח</label>
           <div class="seg" role="group" aria-label="דקות לגלגל">${segs('wm', String(wheelMin(st)), [['0', 'בלי'], ['10', '10 דק׳'], ['20', '20'], ['30', '30']])}</div>
           ${blt(['כשנראה שהמשימות לוקחות לו באמת 20 דקות, אפשר להוריד ל"בלי".'], 'hint')}
@@ -2362,9 +2400,8 @@ function settingsSheet(kidId, tab) {
           <div class="seg" role="group" aria-label="זכיות ביום">${segs('wp', String(wheelPerDay(st)), [['1', '1'], ['2', '2'], ['3', '3']])}</div>
           ${blt(['כל זכייה נוספת באותו יום: עוד אות שנפתחת, ועוד אותן דקות תרגול.'], 'hint')}
           <label class="shfield">עוד סיבוב היום</label>
-          <div class="row" id="shxsrow"></div></div>
-        <div class="shgrp"><h3>גלגל ההפתעות</h3>
-          <div class="seg" role="group" aria-label="גלגל ההפתעות">${segs('wh', st.wheel ? '1' : '0', [['1', 'פעיל'], ['0', 'כבוי: רק המסע']])}</div></div>
+          <div class="row" id="shxsrow"></div>
+        </div>
         <div id="shprz" class="shstack" ${st.wheel ? '' : 'hidden'}>
           <div class="shgrp"><h3>ההפתעות בגלגל</h3>
             ${blt(['לחיצה על שם: עריכה.', 'לחיצה על התמונה: החלפה (מהמחשב, מהגלריה או מהמצלמה).', 'אפשר לכתוב הפתעה בעברית, ונציע תרגום לאנגלית.', 'את שניהם אפשר לערוך.'], 'hint')}
@@ -2378,14 +2415,16 @@ function settingsSheet(kidId, tab) {
           <div class="shgrp"><h3>הפתעה משלו</h3>
             <div class="seg" role="group" aria-label="הפתעה אישית">${segs('kp', st.kidPrize ? '1' : '0', [['0', 'כבוי'], ['1', 'מותר']])}</div>
             ${blt([`כשמותר, ${esc(kid.name)} יכול להוסיף לגלגל הפתעה אחת משלו (עם תרגום ותמונה).`, 'הוא יכול לערוך אותה ולהסיר אותה.', 'כאן תראו מה בחר, ותוכלו להסיר.'], 'hint')}</div>
+        </div>
         </div>`;
-      const pdNote = () => { const J = (p && p.jour) || { n: 0 }, left = JOUR_N - (J.n || 0), real = (J.lm || []).filter(x => x > 0), lm = real.length ? Math.round(real.reduce((a, b) => a + b, 0) / real.length) : stageSteps(st) * STEP_MIN, mx = dayMax(st) || 60, per = Math.max(1, Math.floor(mx / lm)), days = Math.ceil(left / per), dd = daysToTest();
+      $$s('[data-part]').forEach(x => x.hidden = x.dataset.part !== cur);
+      const pdNote = () => { if (!LET) return; const J = (p && p.jour) || { n: 0 }, left = JOUR_N - (J.n || 0), real = (J.lm || []).filter(x => x > 0), lm = real.length ? Math.round(real.reduce((a, b) => a + b, 0) / real.length) : stageSteps(st) * STEP_MIN, mx = dayMax(st) || 60, per = Math.max(1, Math.floor(mx / lm)), days = Math.ceil(left / per), dd = daysToTest();
         $s('#shpdnote').innerHTML = blt([real.length ? `שלב לוקח לו בפועל בערך ${lm} דקות.` : '', `לכל היותר ${per} אותיות ביום.`, `נשארו ${left} אותיות: בערך ${days} ימי תרגול.`,
           dd > 0 && days > dd ? `עד המבחן נשארו ${dd} ימים, אז הוא יגיע בערך לאות ${ALPHA[Math.min(25, (J.n || 0) + dd * per - 1)].toUpperCase()}.` : '',
           dd > 0 && days > dd ? 'כל סבב מתרגל את כל נושאי המבחן, כך שגם בלי לסיים את המסע הוא מתכונן לכולם.' : '']); };
       pdNote();
       bindSeg('sp', v => { st.goal.steps = +v; pdNote(); });
-      bindSeg('mx', v => { st.goal.max = +v; pdNote(); });
+      bindSeg('mx', v => { st.goal.max = +v; pdNote(); xeRow(); });
       bindSeg('wm', v => { st.goal.wmn = +v; });
       bindSeg('wp', v => { st.goal.wpd = +v; });
       const xsRow = () => { const R = $s('#shxsrow'); if (!R) return; const x = xsGrant(st);
@@ -2394,6 +2433,12 @@ function settingsSheet(kidId, tab) {
         if ($s('#shxs')) $s('#shxs').onclick = () => { st.goal.xs = { d: today(), at: Date.now(), m: 5 }; touch(); xsRow(); };
         if ($s('#shxs0')) $s('#shxs0').onclick = () => { delete st.goal.xs; touch(); xsRow(); }; };
       xsRow();
+      const xeRow = () => { const R = $s('#shxerow'); if (!R) return; const x = st.goal.xe && st.goal.xe.d === today() ? st.goal.xe.m : 0;
+        R.innerHTML = !dayMax(st) ? '<span class="hint">אין הגבלה, אז אין צורך.</span>'
+          : `${x ? `<b class="shdone">⚡ ניתנו היום עוד ${x} דקות</b>` : ''}<button type="button" class="btn sm" id="shxe">⚡ עוד 10 דקות היום</button>${x ? '<button type="button" class="btn sm" id="shxe0">ביטול</button>' : ''}`;
+        if ($s('#shxe')) $s('#shxe').onclick = () => { st.goal.xe = { d: today(), m: x + 10 }; touch(); xeRow(); };
+        if ($s('#shxe0')) $s('#shxe0').onclick = () => { delete st.goal.xe; touch(); xeRow(); }; };
+      xeRow();
       bindSeg('wh', v => { st.wheel = v === '1'; $s('#shprz').hidden = !st.wheel; $s('#shtry').hidden = !st.wheel; });
       const PZW = pzWire($s('#shprz'), { lists: st, art: st.prizeArt, defaults: { prizes: DEFAULT_PRIZES, megaPrizes: DEFAULT_MEGA }, min: 2, touch: () => { pzDirty = true; touch(); } });
       PZW.render('prizes'); PZW.render('megaPrizes');
