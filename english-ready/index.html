@@ -245,7 +245,10 @@ h2{font:600 24px/1.2 var(--f-display);margin:0;text-wrap:balance}
 .dict p{flex:none}
 .lvlrow{display:flex;align-items:center;gap:10px;font-weight:600;flex-wrap:wrap}
 .lvlup{display:grid;gap:8px;justify-items:center;background:var(--t4);border-radius:14px;padding:12px 16px;width:100%}
-u.gap{text-decoration:none;display:inline-block;min-width:.7em;border-bottom:5px solid var(--c);color:transparent}
+u.gap{text-decoration:none;display:inline-block;min-width:2.2em;padding:0 .25em;margin:0 .08em;border:3px dashed var(--c,#7B5CD6);border-radius:12px;background:#ffffffb0;color:var(--c,#7B5CD6);line-height:1.15;text-align:center;transition:background .2s}
+u.gap.fill{border-style:solid;border-color:#1E9E5A;background:#E3F6EA;color:#14703F}
+u.gap.wrong{border-color:#D9433B;background:#FDECEA;color:#B3261E;text-decoration:line-through}
+.gapq{display:inline-block;border:2px dashed currentColor;border-radius:8px;padding:0 .35em;font-family:var(--f-en)}
 .pbox h3{font:600 18px var(--f-display);margin:6px 0 0}
 .parentrow{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-top:16px}
 .gmark{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#fff;color:#4285F4;font:700 16px Arial,sans-serif;border:1px solid #dadce0}
@@ -1530,7 +1533,7 @@ const DEFAULT_MEGA = [
   'A family movie night with pizza 🍕 | ערב סרט משפחתי עם פיצה',
 ];
 const fresh = () => ({ stars: 0, days: [], done: {}, best: {}, td: null, goal: { type: 'journey', every: 5, perDay: 0 }, prizes: DEFAULT_PRIZES.slice(), megaPrizes: DEFAULT_MEGA.slice(), wins: [], wheel: true, level: 'medium', testLevel: 'medium', allowLevelUp: true, pack: 'g4-mapping', prizeArt: {}, kidPrize: false });
-const PROGRESS_KEYS = ['stars', 'days', 'done', 'best', 'td', 'mock', 'mocks', 'wins', 'level', 'lt', 'allGreen', 'allGreenSeen', 'firstGift', 'jour', 'wk', 'k5', 'giftSpins', 'myPrize', 'resetAt', 'updatedAt'];
+const PROGRESS_KEYS = ['stars', 'days', 'done', 'best', 'td', 'mock', 'mocks', 'wins', 'level', 'lt', 'allGreen', 'allGreenSeen', 'firstGift', 'jour', 'wk', 'k5', 'alv', 'alvs', 'giftSpins', 'myPrize', 'resetAt', 'updatedAt'];
 const SETTING_KEYS = ['goal', 'prizes', 'megaPrizes', 'wheel', 'level', 'testLevel', 'allowLevelUp', 'pack', 'prizeArt', 'kidPrize'];
 const defaultSettings = () => { const f = fresh(); return Object.fromEntries(SETTING_KEYS.map(k => [k, f[k]])); };
 // KID is set when the app is opened from a parent's link: settings come from the parent, progress is saved to the cloud
@@ -3680,7 +3683,7 @@ function qVocabRev() {
 function qGrammar() {
   const it = pick(G4.grammar);
   return { key: 'gr:' + it.s, hue: 5, sayAfter: it.full,
-    prompt: `<p class="ask">איזו מילה משלימה את המשפט?</p><p class="sent en">${it.s.replace('___', '<u class="gap">____</u>')}</p>`,
+    prompt: `<p class="ask">חסרה מילה במקום סימן השאלה.<br><b>איזו מילה מתאימה?</b></p><p class="sent en">${it.s.replace('___', '<u class="gap">?</u>')}</p>`,
     layout: 'words', options: g4Opt(it, 3), answer: it.a, rv: `${it.full}`, qhe: it.he,
     hint: { he: `המילה החסרה מתחילה ב־<b class="en">${it.a[0]}</b>.` } };
 }
@@ -3741,7 +3744,7 @@ function qExGap() { // the example sentence with the new word missing
   if (pool.length < 4) return qProVocab();
   const it = pick(pool), others = [...new Set(shuffle(pool.filter(v => v.en !== it.en)).map(v => v.en))].slice(0, 3);
   return { vw: it, key: 'eg:' + it.en, hue: 5, sayAfter: it.ex,
-    prompt: `<p class="ask">איזו מילה משלימה את המשפט?</p><p class="sent en">${it.ex.replace(exRe(it.en), '<u class="gap">____</u>')}</p>`,
+    prompt: `<p class="ask">חסרה מילה במקום סימן השאלה.<br><b>איזו מילה מתאימה?</b></p><p class="sent en">${it.ex.replace(exRe(it.en), '<u class="gap">?</u>')}</p>`,
     layout: 'words', options: shuffle([it.en, ...others]).map(x => ({ v: x, html: `<span class="en">${x}</span>` })), answer: it.en, rv: it.ex,
     qhe: it.exhe, hint: { he: `המילה החסרה = <b>${it.he}</b>. היא מתחילה ב־<b class="en">${it.en[0]}</b>.` } };
 }
@@ -3762,7 +3765,7 @@ const enOpts = o => shuffle(o.slice()).map(x => ({ v: x, html: `<span class="en"
 function qGap2() { // grammar: which word fits?
   const it = bankPick('gap'); if (!it) return qProGrammar();
   return { key: 'gap:' + it.s, hue: 5, sayAfter: it.full, qhe: it.he,
-    prompt: `<p class="ask">איזו מילה משלימה את המשפט?</p><p class="sent en">${esc(it.s).replace('___', '<u class="gap">____</u>')}</p>`,
+    prompt: `<p class="ask">חסרה מילה במקום סימן השאלה.<br><b>איזו מילה מתאימה?</b></p><p class="sent en">${esc(it.s).replace('___', '<u class="gap">?</u>')}</p>`,
     layout: 'words', options: enOpts(it.opts), answer: it.a, rv: it.full, hint: { he: `המילה החסרה מתחילה ב־<b class="en">${esc(it.a[0])}</b>.` } };
 }
 function qFix() { // find the mistake: which is the right way to write it?
@@ -3798,7 +3801,7 @@ function uItem(kind) {
 function qUGap() {
   const r = uItem('gap'); if (!r) return qGap2(); const it = r.it, full = it.full || it.s.replace('___', it.a);
   return { key: 'ug:' + it.s, hue: 5, sayAfter: full, qhe: it.he,
-    prompt: `<p class="ask"><small class="utag">📐 ${esc(r.u.title)}</small><br>איזו מילה משלימה את המשפט?</p><p class="sent en">${esc(it.s).replace('___', '<u class="gap">____</u>')}</p>`,
+    prompt: `<p class="ask"><small class="utag">📐 ${esc(r.u.title)}</small><br>איזו מילה משלימה את המשפט?</p><p class="sent en">${esc(it.s).replace('___', '<u class="gap">?</u>')}</p>`,
     layout: 'words', options: enOpts(it.opts), answer: it.a, rv: full, hint: { he: `התשובה מתחילה ב־<b class="en">${esc(it.a.slice(0, 2))}</b>…` } };
 }
 function qUFix() {
@@ -3830,7 +3833,7 @@ const STAR_GENS = [null,
 function qProGrammar() {
   const it = pick(PRO.grammar);
   return { key: 'pg:' + it.s, hue: 5, sayAfter: it.full,
-    prompt: `<p class="ask">איזו מילה משלימה את המשפט?</p><p class="sent en">${it.s.replace('___', '<u class="gap">____</u>')}</p>`,
+    prompt: `<p class="ask">חסרה מילה במקום סימן השאלה.<br><b>איזו מילה מתאימה?</b></p><p class="sent en">${it.s.replace('___', '<u class="gap">?</u>')}</p>`,
     layout: 'words', options: g4Opt(it, 3), answer: it.a, rv: it.full, qhe: it.he, hint: { he: `המילה החסרה מתחילה ב־<b class="en">${it.a[0]}</b>.` } };
 }
 function qSentOrder() { // which sentence is written in the right order?
@@ -3938,7 +3941,8 @@ function freshFirst(list, keyOf) { const sn = seenToday(); const sh = shuffle(li
 const sentKeys = it => ['sf' + it.s, 'sr' + it.s, 'sp' + it.s.replace(/[.!?]$/, '')];
 const storyKeys = st => st.q.map(q => 'st' + q[0]);
 /* ---------- quiz sessions ---------- */
-const setLvl = () => { const s = load(); lvl = s.level || 'medium'; VPOOL = null; if (isStars(s)) { lvl = 'hard'; setStarPool(s); } };
+const LV3 = ['easy', 'medium', 'hard'];
+const setLvl = () => { const s = load(); lvl = LV3[Math.min(2, Math.max(0, LV3.indexOf(s.level || 'medium')) + (s.alv || 0))]; VPOOL = null; if (isStars(s)) { lvl = 'hard'; setStarPool(s); } };
 const SETS = {
   sounds:  { easy: [qSound, qPic], medium: [qSound, qPic, qDecodeEasy, qMissing], hard: [qDecodeAll, qSight, qSpell, qDecodeAll, qMissing] },
   vocab:   { easy: [qVocab], medium: [qVocab, qVocabRev, qGrammar, qVocab, qGrammar], hard: [qProVocab, qProVocabRev, qExGap, qBuildWord, qProGrammar, qExMean, qListenSpell] },
@@ -4281,7 +4285,7 @@ function stageQuiz() {
       : G7T && t === 2 && G7R.length ? storyQs(freshFirst(G7R, storyKeys)[0]).slice(0, 5)
       : G7T ? build([qUGap, qUFix, qExMean, qProSpell], 4)
       : t === 0 ? build([qGap2, qFix, qGap2, qDlg], 4)
-      : t === 1 ? build([qGap2, qSentOrder], 2).concat(freshFirst(SENTENCES, sentKeys).slice(0, 2).map(it => qSentence(it, true)))
+      : t === 1 ? build([qGap2, qSentOrder], 2).concat(sentsFor().slice(0, 2).map(it => qSentence(it, true)))
       : t === 2 ? storyQs(freshFirst(storyPool(true), storyKeys)[0]).slice(0, 4)
       : t === 3 ? build([qSnd, qDef, qSnd, qFix], 4)
       : build([qDlg, qDef, qSentMean, qGap2], 4);
@@ -4292,13 +4296,15 @@ function stageQuiz() {
     : lvl === 'medium' ? build([qVocab, qProVocab, qGrammar, qVocabRev, qExGap], 5)
     : build([qSound, qCase, qPic, qName, qSeq], 5);
   const block = t === 0 ? build(SETS.numbers[lvl], 4)
-    : t === 1 ? (lvl === 'hard' ? build([qGrammar], 2).concat(freshFirst(SENTENCES, sentKeys).slice(0, 2).map(it => qSentence(it, true))) : freshFirst(SENTENCES, sentKeys).slice(0, 3).map((it, i) => qSentence(it, i % 2 === 1)))
+    : t === 1 ? (lvl === 'hard' ? build([qGrammar], 2).concat(sentsFor().slice(0, 2).map(it => qSentence(it, true))) : sentsFor().slice(0, 3).map((it, i) => qSentence(it, i % 2 === 1)))
     : t === 2 ? storyQs(freshFirst(storyPool(lvl === 'hard'), storyKeys)[0]).slice(0, 4)
     : t === 3 ? build(lvl === 'easy' ? [qSeq, qPic, qCase] : lvl === 'hard' ? [qSpell, qDecodeAll, qSight, qMissing] : [qMissing, qSpell, qSeq], 4)
-    : build([qNumListen, qNumWord], 2).concat(freshFirst(SENTENCES, sentKeys).slice(0, 2).map((it, i) => qSentence(it, i === 1)));
+    : build([qNumListen, qNumWord], 2).concat(sentsFor().slice(0, 2).map((it, i) => qSentence(it, i === 1)));
   runQuiz('stage', `המסע · שלב ${J0.n + 1}`, [...base, ...block], stageQuiz);
 }
 let WARMUP = false;
+const sentLen = it => it.s.split(' ').length;
+const sentsFor = () => { const L = lvl === 'easy' ? SENTENCES.filter(x => sentLen(x) <= 4) : lvl === 'hard' ? SENTENCES.filter(x => sentLen(x) >= 5) : SENTENCES; return freshFirst(L.length >= 4 ? L : SENTENCES, sentKeys); };
 function stageFinish(score, n) {
   if (WARMUP) { // the easy warm-up: no step, straight on to the real rounds
     WARMUP = false; sfx(score / n >= 0.75 ? 'ok' : 'no');
@@ -4312,7 +4318,13 @@ function stageFinish(score, n) {
     return;
   }
   const s0 = load(), J0 = jour(s0), ST = isStars(s0), pass = starPassOK(s0, score, n);
-  J0.cr = (J0.cr || 0) + 1; if (pass) addStep(s0); save(s0);
+  J0.cr = (J0.cr || 0) + 1; if (pass) addStep(s0);
+  let LVUP = '';
+  if (!ST) { // the letters journey gets harder with success: 3 strong rounds in a row -> the next level
+    if (score / n >= 0.85) { s0.alvs = (s0.alvs || 0) + 1; if (s0.alvs >= 3 && lvl !== 'hard') { s0.alv = (s0.alv || 0) + 1; s0.alvs = 0; LVUP = LV3[LV3.indexOf(lvl) + 1]; } }
+    else if (score / n < 0.7) s0.alvs = 0;
+  }
+  save(s0);
   if (stopReached(s0)) return claimLetter();
   sfx(pass ? 'ok' : 'no');
   const need = stageSteps(s0), have = curSteps(s0), rest = restNow(), L = ST ? '⭐' : (ALPHA[J0.n] || 'z').toUpperCase();
@@ -4338,6 +4350,7 @@ function stageFinish(score, n) {
       <div class="jstep"><b>👣 צעד ${have} מתוך ${need}!</b>${stepsHTML(have, need, true, L)}
         <span>${have >= need ? 'הצעדים מוכנים! עכשיו צריך לדעת עוד מילים של הכוכב 👇' : need - have === 1 ? 'עוד <b>צעד אחד</b>' : `עוד <b>${need - have}</b> צעדים`} ${have >= need ? '' : ST ? 'ואוספים כוכב ⭐' : `ופותחים את האות <b class="en">${L}</b>`}</span></div>
       ${ST ? (() => { const M = starMastery(s0); return `<p class="wkline">📖 מילים של הכוכב שאתה כבר יודע: <b>${M.have}/${M.all}</b>${M.ok ? ' ✅' : ` · צריך <b>${M.need}</b>${wkTimes(s0) > 1 ? ' (בדרגת זהב: כל מילה פעמיים נכון, בלי רמז)' : ' (נכון בפעם הראשונה, בלי רמז)'}`}</p>`; })() : ''}
+      ${LVUP ? `<div class="lvlup"><b>🚀 שלושה סבבים מצוינים ברצף, עולים רמה!</b><span>מעכשיו: יותר כתיבה, משפטים ארוכים יותר ושאלות מאתגרות.</span></div>` : ''}
       ${rest ? blt(['להיום מספיק.', 'הצעדים שלך שמורים.', 'ממשיכים מחר!']) : ''}
       <div class="row center">${rest ? '' : `<button class="btn primary" id="more">▶ עוד סבב</button>`}<button class="btn" data-back="home">לדף הבית</button></div>
     </section>`;
@@ -4551,6 +4564,7 @@ function runQuiz(mod, title, qs, again) {
   let sayT = 0;
   function close(msgHTML, good) {
     const q = qs[i]; closed = true;
+    const gp = $('u.gap', app); if (gp && typeof q.answer === 'string' && q.answer.split(' ').length <= 3) { gp.textContent = q.answer; gp.className = 'gap fill'; }
     $$('.opt', app).forEach((b, j) => {
       b.disabled = true;
       const lab = $('.lab', b); if (lab) lab.hidden = false;
@@ -4589,6 +4603,7 @@ function runQuiz(mod, title, qs, again) {
     if (tries === 0) tally(false);
     tries++;
     const b = $(`.opt[data-k="${k}"]`, app); b.classList.add('no'); b.disabled = true;
+    const gp = $('u.gap', app); if (gp && typeof q.options[k].v === 'string' && q.options[k].v.split(' ').length <= 3) { gp.textContent = q.options[k].v; gp.className = 'gap wrong'; }
     const left = $$('.opt:not(:disabled)', app).length;
     if (left <= 1) { close('כמעט! הנה התשובה הנכונה.', false); return; }
     $('#fb').innerHTML = `<div class="fb bad">
@@ -4598,7 +4613,7 @@ function runQuiz(mod, title, qs, again) {
         ${hintsLeft(q) ? '<button class="btn" id="hint">💡 רמז</button>' : ''}
         <button class="btn" id="show">👀 הראה תשובה</button>
       </div></div>`;
-    $('#retry').onclick = () => { $('#fb').innerHTML = ''; const f = $('.opt:not(:disabled)', app); if (f) f.focus(); };
+    $('#retry').onclick = () => { $('#fb').innerHTML = ''; const g0 = $('u.gap', app); if (g0) { g0.textContent = '?'; g0.className = 'gap'; } const f = $('.opt:not(:disabled)', app); if (f) f.focus(); };
     const hb = $('#hint'); if (hb) hb.onclick = () => { showHint(); $('#fb').innerHTML = ''; };
     $('#show').onclick = () => close('הנה התשובה הנכונה, בירוק.', false);
     $('#fb').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
@@ -5965,6 +5980,8 @@ function speakView() {
 }
 
 const QS = new URLSearchParams(location.search);
+// ?demo — lets automated checks open one kind of question: __er.q('qExGap')
+if (QS.has('demo')) window.__er = { q: (n, k = 6) => { const G = { qExGap, qGap2, qProGrammar, qSentMean, qSentOrder, qExMean, qCase, qNum100 }; runQuiz('vocab', n, [...Array(k)].map(() => G[n]()), home); } };
 // ?trywheel — opens the wheel straight away in try-it mode, for checking the win card
 // and the sharing without having to earn a spin first. Spins here are not counted and
 // nothing is saved, exactly like the preview a parent gets from the settings.
