@@ -354,6 +354,7 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 #energy{display:flex;margin-inline-start:auto;flex:none;width:max-content;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--surface);border:2px solid var(--line);box-shadow:0 3px 0 var(--shadow);direction:ltr}
 #energy .eic{font-size:18px;line-height:1}
 #energy .elab{font-size:14px;font-weight:700;color:#55556a}
+@media (max-width:480px){#energy .elab{display:none}#energy .ebat{width:44px}}
 #energy .ebat{position:relative;display:block;width:64px;height:16px;border:2.5px solid currentColor;border-radius:5px;padding:1.5px;color:#6b6b80}
 #energy .ebat::after{content:'';position:absolute;right:-6px;top:3px;width:3px;height:6px;border-radius:0 2px 2px 0;background:currentColor}
 #energy .ebat i{display:block;height:100%;border-radius:2px;transition:width .6s}
@@ -362,6 +363,17 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .ewarn.out{opacity:0}
 .hero #energy{margin:0 auto}
 .restmsg{font-size:20px;margin:0}
+.k5abc{background:linear-gradient(180deg,#FFF1C9,#FFD98A);color:#4A2C00}
+.k5abcards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:10px 0 16px}
+.k5abcard{display:grid;justify-items:center;gap:4px;padding:16px 10px;border-radius:24px;border:3px solid #fff;background:var(--t);color:var(--ink);box-shadow:0 6px 0 var(--shadow);cursor:pointer}
+.k5abcard.on{outline:4px solid var(--c)}
+.k5big2{font:800 clamp(64px,18vw,110px)/1 var(--f-en);color:var(--c,#7B5CD6);display:inline-flex;align-items:baseline;gap:.12em}
+.k5big2 small{font-size:.6em;opacity:.8}
+.k5big2.center{display:flex;justify-content:center;margin:6px 0}
+.k5known{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:14px}
+.k5kl{min-width:56px;min-height:48px;border-radius:14px;border:2px solid var(--line);background:var(--surface);font:700 22px var(--f-en);cursor:pointer}
+.k5optl{font:800 56px/1 var(--f-en);display:inline-flex;align-items:baseline;gap:.1em}
+.k5optl small{font-size:.6em;opacity:.75}
 .vlearn{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px;margin:12px 0}
 .vcard{display:flex;flex-direction:column;align-items:center;gap:3px;padding:12px 8px 10px;border-radius:18px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;cursor:pointer;text-align:center;box-shadow:0 3px 0 var(--shadow)}
 .vcard.on{outline:3px solid #FFB020;outline-offset:1px}
@@ -5709,15 +5721,17 @@ const K5_WELL = [1, 2, 3, 4, 5, 6, 7, 8].map(i => 'well_done_' + i), K5_TRY = [1
 function k5Home() {
   const st = load(), K = k5s(st), nm = KID ? esc(KID.name) : '';
   const done = K.n >= K5P.length, P = K5P[Math.min(K.n, K5P.length - 1)];
-  const owed = st.wheel ? Math.floor(K.n / 3) - (K.spun || 0) : 0;
+  const owed = st.wheel ? Math.floor((K.n + (K.lg || 0)) / 3) - (K.spun || 0) : 0, LG = K.lg || 0, AB = ALPHA.slice(LG * 2, LG * 2 + 2).map(c => c.toUpperCase() + c);
   app.innerHTML = `<header class="hero k5hero"><h1>${KID && KID.photo ? `<img class="kavatar" src="${KID.photo}" alt="">` : ''}שלום ${nm}! 👋</h1><p class="sub en">Hello! Let's play in English!</p></header>
     ${owed > 0 ? `<button class="btn spinbtn k5big" id="k5spin">🎡 מגיע לך סיבוב בגלגל!</button>` : ''}
     ${done ? '<p class="k5done">👑 סיימת את כל הכוכבים! כל הכבוד!</p>' : `<button class="btn primary k5go" id="k5go"><span class="k5em">${P.words.slice(0, 3).map(w => w.e).join(' ')}</span><b>▶ ${esc(P.title_he || '')}</b><small>${K.r ? 'עוד משחק אחד וקיבלת כוכב ⭐' : 'מילים חדשות!'}</small></button>`}
+    ${LG < 13 ? `<button class="btn k5go k5abc" id="k5abc"><span class="k5em en">${AB.join(' ')}</span><b>▶ אותיות</b><small>🔤 ${LG * 2}/26</small></button>` : '<p class="k5done">🔤 את מכירה את כל האותיות! 👑</p>'}
     <div class="k5more"><button class="btn k5big" id="k5sing">🎵 שירים</button><button class="btn k5big" id="k5do">🤸 תעשי כמוני</button></div>
     <section class="k5map" aria-label="הכוכבים שלי: ${K.n} מתוך ${K5P.length}">${K5P.map((p, i) => `<span class="k5stop ${i < K.n ? 'done' : i === K.n ? 'cur' : ''}">${i < K.n ? '⭐' : p.words[0].e}</span>`).join('')}</section>
     <p class="hint center">⭐ ${K.n}/${K5P.length}</p>`;
   const g = $('#k5go'); if (g) g.onclick = () => go(k5Learn);
   $('#k5sing').onclick = () => go(k5Sing); $('#k5do').onclick = () => go(k5Do);
+  const ab = $('#k5abc'); if (ab) ab.onclick = () => go(k5Abc);
   const sp = $('#k5spin'); if (sp) sp.onclick = () => { const s1 = load(); k5s(s1).spun = (k5s(s1).spun || 0) + 1; save(s1); go(wheelView, { prizes: s1.prizes, art: artMap() }); };
 }
 function k5Learn() {
@@ -5759,6 +5773,65 @@ function k5Game() {
       <h2>${star ? 'קיבלת כוכב! ⭐' : 'כל הכבוד!'}</h2><p class="hint">${score}/${N} 👍</p>
       <div class="row center">${star ? '<button class="btn primary k5big" data-back="home">🏠 הביתה</button>' : '<button class="btn primary k5big" id="k5again">▶ עוד משחק</button><button class="btn" data-back="home">🏠</button>'}</div></section>`;
     const a = $('#k5again'); if (a) a.onclick = () => go(k5Game);
+  }
+  show();
+}
+/* ---------- the little ones' letters: two at a time, each with its picture; then a listening game ---------- */
+const k5Word = U => WORDS.find(x => x.L === U && !x.f) || WORDS.find(x => x.L === U);
+const k5Say = U => { const w = k5Word(U); return say(NAME[U]).then(() => new Promise(r => setTimeout(r, 250))).then(() => w ? say(w.w) : 0, () => 0); };
+const k5Pair = K => ALPHA.slice((K.lg || 0) * 2, (K.lg || 0) * 2 + 2).map(c => c.toUpperCase());
+function k5Abc() {
+  const K = k5s(load()), cur = k5Pair(K), known = ALPHA.slice(0, (K.lg || 0) * 2).map(c => c.toUpperCase());
+  app.innerHTML = `${top('🔤 אותיות חדשות')}
+    <p class="k5say">👂 לוחצים על אות ושומעים</p>
+    <div class="k5abcards">${cur.map((U, i) => { const w = k5Word(U); return `<button class="k5abcard h${(ALPHA.indexOf(U.toLowerCase()) % 6) + 1}" data-u="${U}">
+      <span class="k5big2 en">${U}<small>${U.toLowerCase()}</small></span><span class="k5pic">${w ? w.e : ''}</span><b class="en">${w ? esc(w.w) : ''}</b></button>`; }).join('')}</div>
+    ${known.length ? `<p class="hint center">האותיות שכבר למדנו:</p><div class="k5known">${known.map(U => `<button class="k5kl en" data-u="${U}">${U}${U.toLowerCase()}</button>`).join('')}</div>` : ''}
+    <div class="row center"><button class="btn primary k5big" id="k5play">▶ למשחק!</button></div>`;
+  heSay('new_letters');
+  $$('[data-u]', app).forEach(b => b.onclick = () => { heAud.pause(); b.classList.add('on'); k5Say(b.dataset.u); });
+  $('#k5play').onclick = () => go(k5AbcGame);
+}
+function k5AbcGame() {
+  const K = k5s(load()), cur = k5Pair(K), known = ALPHA.slice(0, (K.lg || 0) * 2).map(c => c.toUpperCase());
+  const N = 6, qs = [...Array(N)].map((_, k) => ({ U: k % 3 === 2 && known.length ? pick(known) : cur[k % cur.length], t: k % 2 ? 'pic' : 'find' }));
+  const others = U => shuffle(known.concat(cur).filter(x => x !== U)).concat(shuffle(ALPHA.map(c => c.toUpperCase()).filter(x => x !== U && !cur.includes(x) && !known.includes(x))));
+  let i = 0, score = 0, miss = false;
+  function show() {
+    const q = qs[i], U = q.U; miss = false;
+    let opts, prompt, play;
+    if (q.t === 'find') { // hear the letter, tap it
+      opts = shuffle([U, ...others(U).slice(0, 2)]).map(x => ({ v: x, html: `<span class="en k5optl">${x}<small>${x.toLowerCase()}</small></span>` }));
+      prompt = '<p class="k5say">👂 איפה האות ששמעת?</p>'; play = () => say(NAME[U]);
+    } else { // see the letter, tap the picture that starts with it
+      const w = k5Word(U), ws = [w, ...others(U).map(k5Word).filter(x => x && x.e !== w.e).filter((x, j, a) => a.findIndex(y => y.e === x.e) === j).slice(0, 2)];
+      opts = shuffle(ws).map(x => ({ v: x.L, html: x.e, say: x.w }));
+      prompt = `<div class="k5big2 en center">${U}<small>${U.toLowerCase()}</small></div><p class="k5say">איזו תמונה מתחילה באות הזאת?</p>`; play = () => say(NAME[U]);
+    }
+    app.innerHTML = `${top('🔤 אותיות', 'home', `<span class="qnum">${i + 1} / ${N}</span>`)}
+      <div class="bar" aria-hidden="true"><i style="width:${i / N * 100}%"></i></div>
+      ${prompt}
+      <div class="row center"><button class="btn k5ear" id="k5ear" aria-label="לשמוע שוב">👂🔊</button></div>
+      <div class="k5opts">${opts.map(o => `<button class="k5opt" data-v="${o.v}" ${o.say ? `data-w="${esc(o.say)}"` : ''}>${o.html}</button>`).join('')}</div>`;
+    const first = i === 0 || qs[i - 1].t !== q.t;
+    if (first) heSay(q.t === 'find' ? 'find_letter' : 'which_starts').then(() => setTimeout(play, 250)); else play();
+    $('#k5ear').onclick = play;
+    $$('.k5opt', app).forEach(b => b.onclick = () => {
+      if (b.dataset.v === U) {
+        if (!miss) score++; b.classList.add('ok'); sfx('ok'); $$('.k5opt', app).forEach(x => x.disabled = true);
+        k5Say(U).then(() => heSay(K5_WELL)); setTimeout(() => { i++; i < N ? show() : end(); }, 2600);
+      } else { miss = true; b.classList.add('no'); b.disabled = true; sfx('no'); (b.dataset.w ? say(b.dataset.w) : Promise.resolve()).then(() => heSay(K5_TRY)); }
+    });
+  }
+  function end() {
+    const s1 = load(), K1 = k5s(s1); K1.lr = (K1.lr || 0) + 1; let star = false;
+    if (K1.lr >= 2) { K1.lr = 0; K1.lg = Math.min(13, (K1.lg || 0) + 1); star = true; }
+    save(s1); sfx('win'); heSay(star ? 'finished_pack' : K5_WELL);
+    app.innerHTML = `${top(star ? 'קיבלת כוכב!' : 'כל הכבוד!')}
+      <section class="result stk"><div class="stagebig got pop">${star ? '⭐' : '🎉'}</div>
+      <h2>${star ? `למדת את <span class="en">${cur.join(' ')}</span>! ⭐` : 'כל הכבוד!'}</h2><p class="hint">${score}/${N} 👍</p>
+      <div class="row center">${star ? '<button class="btn primary k5big" data-back="home">🏠 הביתה</button>' : '<button class="btn primary k5big" id="k5again">▶ עוד משחק</button><button class="btn" data-back="home">🏠</button>'}</div></section>`;
+    const a = $('#k5again'); if (a) a.onclick = () => go(k5AbcGame);
   }
   show();
 }
