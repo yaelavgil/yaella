@@ -57,3 +57,52 @@
 | 49 | between | בין | `art/v-between.webp` | a cat between two boxes |
 | 50 | in front of | לפני / מול | `art/v-in-front-of.webp` | a cat in front of a box |
 | 51 | near | קרוב ל- | `art/v-near.webp` | a cat near a house, a little apart |
+
+## סט 3
+
+**סגנון אחיד לכל התמונות:** flat, friendly children's-book illustration, single object, centered, plain transparent background, soft colors.
+
+סה"כ 40 מילים (מילים מוחשיות ופעלי פעולה בלי אימוג'י). שם קובץ: `art/v-<slug>.webp`.
+
+| # | מילה | פירוש | קובץ | תיאור התמונה |
+|---|---|---|---|---|
+| 1 | vacuum | לשאוב אבק / שואב אבק | `art/v-vacuum.webp` | a boy pushing a vacuum cleaner over a carpet |
+| 2 | fold | לקפל | `art/v-fold.webp` | a boy folding a T-shirt on a bed |
+| 3 | tidy | לסדר / מסודר | `art/v-tidy.webp` | a boy putting toys back on a shelf in a neat room |
+| 4 | stamp | בול | `art/v-stamp.webp` | a single colorful postage stamp with a bird on it |
+| 5 | comics | חוברות קומיקס | `art/v-comics.webp` | an open comic book with speech bubbles |
+| 6 | uniform | תלבושת אחידה | `art/v-uniform.webp` | a school uniform: a light-blue shirt with a school logo |
+| 7 | costume | תחפושת | `art/v-costume.webp` | a boy in a pirate costume with a hat and eye patch |
+| 8 | bake | לאפות | `art/v-bake.webp` | a boy putting a tray of cookies into an oven |
+| 9 | boil | להרתיח | `art/v-boil.webp` | a pot of water boiling with bubbles and steam on a stove |
+| 10 | mix | לערבב | `art/v-mix.webp` | a boy mixing batter in a bowl with a spoon |
+| 11 | pour | למזוג / לשפוך | `art/v-pour.webp` | a hand pouring orange juice from a jug into a glass |
+| 12 | peel | לקלף | `art/v-peel.webp` | hands peeling a potato with a peeler |
+| 13 | taste | לטעום / טעם | `art/v-taste.webp` | a boy tasting soup from a spoon |
+| 14 | chin | סנטר | `art/v-chin.webp` | a boy's face with an arrow pointing to his chin |
+| 15 | cheek | לחי | `art/v-cheek.webp` | a boy's face with a pink round cheek highlighted |
+| 16 | cough | שיעול / להשתעל | `art/v-cough.webp` | a boy coughing into his elbow |
+| 17 | corner | פינה | `art/v-corner.webp` | a street corner with a small shop on it |
+| 18 | cross | לחצות | `art/v-cross.webp` | a boy crossing the street on a zebra crossing |
+| 19 | cave | מערה | `art/v-cave.webp` | the dark entrance of a rocky cave |
+| 20 | jungle | ג'ונגל | `art/v-jungle.webp` | a green jungle with tall trees, vines and a monkey |
+| 21 | tail | זנב | `art/v-tail.webp` | a fox with a big bushy tail, tail in focus |
+| 22 | fur | פרווה | `art/v-fur.webp` | a close-up of soft, thick brown fur on a bear |
+| 23 | hunt | לצוד | `art/v-hunt.webp` | a lion hunting, crouching low in tall grass |
+| 24 | passport | דרכון | `art/v-passport.webp` | a closed passport booklet |
+| 25 | tourist | תייר | `art/v-tourist.webp` | a tourist with a camera, a map and a sun hat |
+| 26 | coach | מאמן | `art/v-coach.webp` | a sports coach with a whistle and a clipboard |
+| 27 | hit | להכות / לפגוע | `art/v-hit.webp` | a boy hitting a baseball with a bat |
+| 28 | type | להקליד / סוג | `art/v-type.webp` | hands typing on a laptop keyboard |
+| 29 | bring | להביא | `art/v-bring.webp` | a boy bringing a plate of cake to a table |
+| 30 | teach | ללמד | `art/v-teach.webp` | a teacher pointing at a board in front of kids |
+| 31 | hold | להחזיק | `art/v-hold.webp` | a boy holding a small puppy in his arms |
+| 32 | feed | להאכיל | `art/v-feed.webp` | a boy feeding a cat from a bowl |
+| 33 | hide | להתחבא / להחביא | `art/v-hide.webp` | a boy hiding behind a tree, peeking out |
+| 34 | send | לשלוח | `art/v-send.webp` | a boy putting a letter into a red mailbox |
+| 35 | fall | ליפול | `art/v-fall.webp` | a boy falling off a skateboard (soft, funny) |
+| 36 | lend | להשאיל | `art/v-lend.webp` | a boy giving a pencil to a friend at a desk |
+| 37 | pay | לשלם | `art/v-pay.webp` | a boy paying with coins at a shop counter |
+| 38 | sell | למכור | `art/v-sell.webp` | a boy selling lemonade at a small stand |
+| 39 | principal | מנהל בית הספר | `art/v-principal.webp` | a smiling school principal in a suit in front of a school |
+| 40 | band | להקה | `art/v-band.webp` | a small music band: guitar, drums and a singer |
