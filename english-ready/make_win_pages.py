@@ -13,7 +13,7 @@ from PIL import Image
 D = pathlib.Path(__file__).resolve().parent
 CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 BASE = 'https://yaelavgil.github.io/yaella/english-ready/'
-V = '3'  # bump to make WhatsApp fetch the pictures again
+V = '4'  # bump to make WhatsApp fetch the pictures again
 # slug, first name as the kid sees it, 'f' or 'm' (זכתה / זכה)
 KIDS = [('gur', 'גור', 'm'), ('dani', 'דני', 'f'), ('lili', 'לילי', 'f')]
 
@@ -34,7 +34,7 @@ def main():
         title = f'🎡 {name} {won} בגלגל ההפתעות!'
         img = f'{BASE}og-win-{slug}.jpg?v={V}'
         s = src
-        s = re.sub(r'<title>[^<]*</title>', f'<title>{title} · מוכן לאנגלית</title>', s, count=1)
+        s = re.sub(r'<title>[^<]*</title>', f'<title>{title} · מאסטר אנגלית</title>', s, count=1)
         s = re.sub(r'(<meta property="og:title" content=")[^"]*', rf'\g<1>{title}', s, count=1)
         s = re.sub(r'(<meta name="twitter:title" content=")[^"]*', rf'\g<1>{title}', s, count=1)
         s = re.sub(r'(<meta (?:property="og:image"|name="twitter:image") content=")[^"]*', rf'\g<1>{img}', s)

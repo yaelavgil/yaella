@@ -25,7 +25,7 @@ const sl=document.getElementById('sl'),n=8,c=['#FF5C8A','#FFB020','#22C3A6','#4E
 const P=(a,r)=>[50+r*Math.sin(a*Math.PI/180),50-r*Math.cos(a*Math.PI/180)];
 for(let i=0;i<n;i++){const a0=i*45,a1=a0+45,[x0,y0]=P(a0,44),[x1,y1]=P(a1,44);sl.insertAdjacentHTML('beforeend',`<path d="M50 50 L${x0} ${y0} A44 44 0 0 1 ${x1} ${y1} Z" fill="${c[i]}" stroke="#fff" stroke-width=".8"/>`);}
 </script>
-<span class="pill">מוכן לאנגלית</span>
+<span class="pill">מאסטר אנגלית</span>
 <h1 id="t">זכייה!<br>בגלגל ההפתעות</h1>
 <script>{const q=new URLSearchParams(location.search),n=q.get('n');if(n)document.getElementById('t').innerHTML=`${n.replace(/[<>&]/g,'')} ${q.get('v')==='f'?'זכתה':'זכה'}!<br>בגלגל ההפתעות`;}</script>
 <p class="s">אחרי אימון באנגלית</p>
