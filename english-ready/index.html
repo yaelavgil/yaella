@@ -756,6 +756,13 @@ body.pdash #pbar .pbrow{padding:12px 18px}
 body.pdash #app > :not(#pbar){display:none}
 body.pdash .pbar{margin-bottom:12px}
 .kst{cursor:pointer}
+.kstat{display:block;width:100%;text-align:right;margin-top:10px;padding:10px 12px 10px 30px;border:0;border-radius:12px;background:var(--bg);font:inherit;font-size:15px;line-height:1.55;color:var(--ink);cursor:pointer;position:relative}
+.kstat.on{outline:2px solid var(--kc,var(--c2))}
+.kstat .ktmore{position:absolute;left:12px;top:12px;font-style:normal;color:var(--muted)}
+.kson{color:#1f8a4c}.ksoff{color:var(--muted)}.ksdot{color:var(--muted)}
+.kdweek{display:flex;gap:6px;margin:8px 0 2px}
+.kdweek span{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:13px;background:var(--bg);color:var(--muted)}
+.kdweek span.on{background:#1f8a4c;color:#fff;font-weight:700}
 .kst .kquick,.kst .kdet{cursor:auto}
 .kstwarn{display:block;margin-top:4px;font-size:13px;line-height:1.35;color:#9a4a00;background:#fff3e0;border-radius:8px;padding:4px 8px}
 .ownbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:0 auto 10px;max-width:640px;background:#EEF4FF;border:1.5px solid #CFE0FF;border-radius:14px;padding:7px 12px;font-size:14px}
@@ -2363,9 +2370,69 @@ const KOPEN = {};
 const MOD_HE = { stageQuiz: 'המסע', learnView: 'לימוד המילים', talkView: 'שיחה באנגלית', speakView: 'אומרים בקול', quizMock: 'מבחן ניסיון', writeView: 'כתיבת אותיות', wordWriteView: 'כתיבת מילים', k5Learn: 'מילים חדשות', k5Game: 'משחק מילים', k5Abc: 'אותיות', k5AbcGame: 'משחק אותיות', k5Sing: 'שירים', k5Do: 'תעשי כמוני' };
 const ddmm = t => t.split('-').slice(1).reverse().join('.');
 function kidState(k) { const st = abcMigrate(Object.assign(fresh(), JSON.parse(JSON.stringify(k.settings || {})))); const p = JSON.parse(JSON.stringify(k.progress || {})); PROGRESS_KEYS.forEach(x => { if (p[x] !== undefined && x !== 'level') st[x] = p[x]; }); st.td = JSON.parse(JSON.stringify(kidDay(k))); st.td.date = today(); return st; }
+/* ---------- the daily status: one line per kid that reads at a glance, the details a tap away ----------
+   Only what the app really records: minutes (time between taps, gaps over 90s not counted), stages with
+   their score, wins with their date, practice days, the place on the journey, and for each word how often
+   it was answered and how often right (recorded since 20.11). Levels are said inside the kid's own track,
+   never as a number that could be compared between kids. */
+const dayKey = t => { const d = new Date(t); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+function streakOf(days) { // days in a row up to today (or up to yesterday, if today is still open)
+  const D = new Set(days || []); let n = 0, t = Date.now();
+  if (!D.has(dayKey(t))) t -= 864e5;
+  while (D.has(dayKey(t))) { n++; t -= 864e5; }
+  return n;
+}
+function kidLevel(k) { // where the kid is, in the words of their own track
+  const p = k.progress || {}, st = k.settings || {}, pk = st.pack || 'g4-mapping', J = p.jour || {};
+  if (pk === 'k5') { const K = p.k5 || {}; return { line: `מסלול הגן · ${K.n || 0} נושאי מילים ו־${(K.lg || 0) * 2} אותיות`, tier: '' }; }
+  const JJ = jOf(J, pk), PM = JJ && PP_BY[JJ.id];
+  if (PM) { const t = PM.st[Math.min(J.n || 0, PM.st.length - 1)] || {}; return { line: `${JJ.name} · תחנה ${Math.min((J.n || 0) + 1, PM.st.length)} מתוך ${PM.st.length}`, tier: t.k === 'boss' ? TIER[3] : TIER[2] }; }
+  if (JJ) return { line: `${JJ.name} · ${pk === 'g7' ? 'כוכב' : 'כוכב'} ${Math.min((J.n || 0) + 1, 26)} מתוך 26`, tier: TIER[Math.min(3, 1 + Math.floor(Math.min(J.n || 0, 25) / 9))] };
+  const lv = LV3[Math.min(2, Math.max(0, LV3.indexOf(p.level || st.level || 'medium')) + (p.alv || 0))];
+  return { line: `מסע האותיות · האות ${(ALPHA[J.n || 0] || 'z').toUpperCase()} (${J.n || 0} מתוך 26)`, tier: `רמת תרגול: ${LEVELS[lv]}` };
+}
+function kidHardWords(k, n = 5) { // answered wrong more than right, the most-missed first
+  const wk = (k.progress || {}).wk || {}, all = TRACK_WORDS[(k.settings || {}).pack === 'g7' ? 'g7' : 'g4'] || [];
+  const he = en => { const w = all.find(x => x.en === en); return w ? w.he : ''; };
+  return Object.entries(wk).filter(([, r]) => r[1] - r[0] > 0 && r[1] - r[0] >= r[0]).sort((a, b) => (b[1][1] - b[1][0]) - (a[1][1] - a[1][0])).slice(0, n)
+    .map(([en, r]) => ({ en, he: he(en), miss: r[1] - r[0], of: r[1] }));
+}
+function kidStatusLine(k) {
+  const d = kidDay(k), p = k.progress || {}, st = k.settings || {}, g = GIRL_K(k), mins = Math.floor((d.ms || 0) / 60000), rs = d.rs || [];
+  const did = mins > 0 || rs.length || (d.stars || 0) > 0;
+  const wins = (p.wins || []).filter(w => w.date === today());
+  const mx = ((st.goal || {}).max == null ? 60 : +(st.goal || {}).max) ? dayMaxToday(Object.assign({}, st, { goal: Object.assign({ max: 60 }, st.goal || {}) })) : 0;
+  const left = mx ? Math.max(0, mx - mins) : null, sk = streakOf(p.days);
+  const bits = [did ? `<b class="kson">✅ ${g ? 'תרגלה' : 'תרגל'} היום</b>` : `<b class="ksoff">⚪ עוד לא ${g ? 'תרגלה' : 'תרגל'} היום</b>`];
+  if (did) bits.push(`${mins} דק׳`, ...(st.pack === 'k5' ? [] : [(n => n === 1 ? 'שלב אחד' : `${n} שלבים`)(rs.filter(r => r.ok).length)]));
+  if (wins.length) bits.push(`🎡 ${g ? 'זכתה' : 'זכה'}: ${esc(heOf(wins[0].prize) || textOf(wins[0].prize))}${wins.length > 1 ? ` ועוד ${wins.length - 1}` : ''}`);
+  if (left != null) bits.push(left ? `🔋 ${left} דק׳ נשארו` : '🔋 האנרגיה נגמרה');
+  if (sk >= 2) bits.push(`🔥 ${sk} ימים ברצף`);
+  return bits.join('<span class="ksdot" aria-hidden="true"> · </span>');
+}
 function kidDetail(k, key) {
   const S = kidState(k), d = S.td, p = k.progress || {}, J = p.jour || {}, pk = (k.settings || {}).pack || 'g4-mapping', nm = esc(k.name);
   const L = a => blt(a.filter(Boolean));
+  if (key === 'status') {
+    const d = kidDay(k), mins = Math.floor((d.ms || 0) / 60000), rs = d.rs || [], g = GIRL_K(k), Lv = kidLevel(k), sk = streakOf(p.days), H = kidHardWords(k);
+    const wins = (p.wins || []).filter(w => w.date === today()), mx = dayMaxToday(S);
+    const last7 = [...Array(7)].map((_, i) => dayKey(Date.now() - (6 - i) * 864e5)), D = new Set(p.days || []);
+    return `<h4>📋 הסטטוס של ${nm} היום</h4>
+      <ul class="kdbars">
+        <li><span>זמן תרגול היום</span><b>${mins} דק׳</b></li>
+        ${pk === 'k5' ? '' : `<li><span>שלבים שהצליחו היום</span><b>${rs.filter(r => r.ok).length}${rs.length ? ` מתוך ${rs.length}` : ''}</b></li>`}
+        <li><span>גלגל ההפתעות</span><b>${wins.length ? wins.map(w => `${emojiOf(w.prize)} ${esc(heOf(w.prize) || textOf(w.prize))}`).join(', ') : (g ? 'עוד לא זכתה היום' : 'עוד לא זכה היום')}</b></li>
+        <li><span>אנרגיה</span><b>${mx ? (mins >= mx ? 'נגמרה, מתחדשת מחר' : `נשארו ${mx - mins} מתוך ${mx} דק׳`) : 'אין הגבלה'}</b></li>
+        <li><span>איפה ${g ? 'היא' : 'הוא'} עכשיו</span><b>${esc(Lv.line)}${Lv.tier ? ` · ${Lv.tier}` : ''}</b></li>
+        <li><span>רצף</span><b>${sk ? `${sk} ${sk === 1 ? 'יום' : 'ימים'} ברצף` : 'אין רצף כרגע'} · ${(p.days || []).length} ימי תרגול בסך הכול</b></li>
+      </ul>
+      <p class="kdweek" aria-label="השבוע האחרון">${last7.map(t => `<span class="${D.has(t) ? 'on' : ''}" title="${ddmm(t)}">${'אבגדהוש'[new Date(t).getDay()]}׳</span>`).join('')}</p>
+      <h4>🧩 ${g ? 'מתקשה' : 'מתקשה'} ב…</h4>
+      ${pk === 'k5' ? '<p class="hint">במסלול הגן לא נרשמות טעויות לפי מילה.</p>'
+        : H.length ? `<ul class="kdbars">${H.map(w => `<li><span><span class="en">${esc(w.en)}</span>${w.he ? ` · ${esc(w.he)}` : ''}</span><b class="kdno">${w.miss} טעויות מתוך ${w.of}</b></li>`).join('')}</ul>
+          <p class="kdnext">👉 המילים האלה חוזרות אצל${g ? 'ה' : 'ו'} בתרגול, ובדרכון בתחנת 🔁. אפשר גם לשאול אות${g ? 'ה' : 'ו'} עליהן בעל פה.</p>`
+        : '<p class="hint">אין כרגע מילים שחוזרות כטעות. (המעקב לפי מילה התחיל ב־20.11.)</p>'}`;
+  }
   if (key === 'spins') {
     const wins = (S.wins || []).filter(w => w.date === today()), older = (S.wins || []).filter(w => w.date !== today()).slice(0, 5);
     const win = w => `<li><span class="wrill" aria-hidden="true">${emojiOf(w.prize)}</span><span class="wrtx"><span class="en">${esc(textOf(w.prize))}</span>${fineHTML(w.prize)}${heOf(w.prize) ? `<small>${esc(heOf(w.prize))}</small>` : ''}${fineHeHTML(w.prize)}</span>${w.date === today() ? '' : `<span class="wrdate">${ddmm(w.date)}</span>`}</li>`;
@@ -2445,6 +2512,7 @@ function renderParentBar() {
           <div class="kstwho"><b class="kstname">${esc(k.name)}</b><span class="kstsub"><span class="chip">${trk}</span> · ${agoTxt(p.updatedAt)}</span>${warn ? `<span class="kstwarn" role="note">⚠️ ${warn}</span>` : ''}</div>
           <div class="kstact"><button class="btn sm kstlink" data-link="${k.id}">שליחת קישור</button><button class="btn sm" data-set="${k.id}">הגדרות</button></div>
         </header>
+        <button type="button" class="kstat ${OPEN === 'status' ? 'on' : ''}" data-kd="status" data-kid="${k.id}" aria-expanded="${OPEN === 'status'}">${kidStatusLine(k)}<i class="ktmore" aria-hidden="true">${OPEN === 'status' ? '▴' : '▾'}</i></button>
         <div class="ktiles">
           ${tile(road.v, road.l, 'road')}
           ${tile(`${mins}${mx ? `<small>/${mx}</small>` : ''}`, mx ? 'דקות היום (מתוך ההגבלה)' : freeT ? 'דקות היום (היום בלי הגבלה)' : 'דקות תרגול היום', 'mins')}
