@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>🎡 גור זכה בגלגל ההפתעות! · מוכן לאנגלית</title>
+
+<!-- WhatsApp and the rest read these from the raw HTML and never run the script below,
+     this copy is made by make_win_pages.py for one kid (gur); edit w.html, not this file. The win itself loads when the page opens. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="מוכן לאנגלית">
+<meta property="og:title" content="🎡 גור זכה בגלגל ההפתעות!">
+<meta property="og:description" content="אחרי אימון באנגלית. לחצו כדי לראות במה זכה.">
+<meta property="og:image" content="https://yaelavgil.github.io/yaella/english-ready/og-win-gur.jpg?v=3">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://yaelavgil.github.io/yaella/english-ready/w-gur.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="🎡 גור זכה בגלגל ההפתעות!">
+<meta name="twitter:description" content="אחרי אימון באנגלית. לחצו כדי לראות במה זכה.">
+<meta name="twitter:image" content="https://yaelavgil.github.io/yaella/english-ready/og-win-gur.jpg?v=3">
+<meta name="theme-color" content="#3B1F8F">
+
+<link rel="icon" href="favicon.ico">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Rubik:wght@400;500;700&display=swap">
+<style>
+  :root{color-scheme:light;--ink:#1F2A44;--muted:#5E6680}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100svh;display:grid;place-items:center;padding:20px 16px;
+    font-family:Rubik,system-ui,sans-serif;color:var(--ink);
+    background:linear-gradient(160deg,#3B1F8F 0%,#6A2BB8 60%,#8E3BC9 100%)}
+  .wrap{width:min(460px,100%);display:grid;gap:16px;justify-items:center}
+  h1{margin:0;font:700 clamp(22px,6vw,28px)/1.25 Fredoka,Rubik,sans-serif;color:#fff;text-align:center;text-wrap:balance}
+  .sub{margin:0;color:rgba(255,255,255,.82);font-size:15px;text-align:center}
+  .card{width:100%;background:#fff;border-radius:22px;padding:12px;
+    box-shadow:0 18px 50px rgba(20,8,60,.38);display:grid;gap:12px;justify-items:center}
+  img.win{width:100%;height:auto;border-radius:14px;display:block}
+  .ph{width:100%;aspect-ratio:4/5;border-radius:14px;display:grid;place-items:center;
+    background:#F3EEFF;color:#6A3FD0;font-weight:600;text-align:center;padding:20px;line-height:1.6}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;
+    padding:10px 22px;border:0;border-radius:999px;font:700 16px Rubik,sans-serif;cursor:pointer;
+    text-decoration:none;background:#FFD23F;color:#3A1A00;box-shadow:0 4px 14px rgba(0,0,0,.22)}
+  .btn.ghost{background:rgba(255,255,255,.16);color:#fff}
+  .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+  .foot{color:rgba(255,255,255,.6);font-size:13px;text-align:center;margin:0}
+  @media (prefers-reduced-motion:no-preference){
+    .card{animation:rise .5s cubic-bezier(.2,.8,.2,1) both}
+    @keyframes rise{from{opacity:0;transform:translateY(14px) scale(.97)}}
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>🎡 זכייה בגלגל ההפתעות</h1>
+  <p class="sub">אחרי אימונים קשים באנגלית</p>
+  <div class="card"><div class="ph" id="slot">טוען את הזכייה…</div></div>
+  <div class="row" id="acts" hidden>
+    <a class="btn" id="dl" download="win.png">⬇ שמירת התמונה</a>
+    <a class="btn ghost" href="./">מוכן לאנגלית</a>
+  </div>
+  <p class="foot">מוכן לאנגלית · גלגל ההפתעות</p>
+</main>
+<script>
+const DB = 'https://home-picks-47450-default-rtdb.europe-west1.firebasedatabase.app';
+const slot = document.getElementById('slot');
+const id = (new URLSearchParams(location.search).get('i') || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 24);
+(async () => {
+  if (!id) { slot.textContent = 'אין קוד זכייה בקישור.'; return; }
+  try {
+    const r = await fetch(`${DB}/board/wins/${encodeURIComponent(id)}.json`, { cache: 'no-store' });
+    const o = await r.json();
+    if (!o || !o.d) { slot.textContent = 'הזכייה הזאת כבר לא זמינה.'; return; }
+    const im = new Image();
+    im.className = 'win'; im.alt = 'כרטיס הזכייה';
+    im.onload = () => { slot.replaceWith(im); };
+    im.onerror = () => { slot.textContent = 'לא הצלחנו להציג את התמונה.'; };
+    im.src = o.d;
+    const dl = document.getElementById('dl');
+    dl.href = o.d; dl.download = 'win-' + id + '.png';
+    document.getElementById('acts').hidden = false;
+    if (o.name) document.querySelector('h1').textContent = `🎡 ${o.name} ${o.g === 'f' ? 'זכתה' : 'זכה'} בגלגל ההפתעות`;
+  } catch (e) { slot.textContent = 'אין חיבור. נסו שוב.'; }
+})();
+</script>
+</body>
+</html>

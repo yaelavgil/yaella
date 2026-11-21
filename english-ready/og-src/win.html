@@ -1,0 +1,33 @@
+<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;width:1200px;height:630px;overflow:hidden}
+body{background:linear-gradient(135deg,#5B2BB0,#3F1F95 60%,#6A2FC0);font-family:Rubik,sans-serif;color:#fff;position:relative}
+.cf{position:absolute;width:22px;height:12px;border-radius:2px;opacity:.55}
+.wheel{position:absolute;left:70px;top:75px;width:440px;height:440px}
+.pill{position:absolute;right:62px;top:96px;background:#FFD23F;color:#3A2370;font:700 28px Rubik;padding:12px 28px;border-radius:999px}
+h1{position:absolute;right:60px;top:200px;margin:0;font:800 74px/1.1 Rubik;text-align:right}
+.s{position:absolute;right:62px;top:385px;margin:0;font:500 34px Rubik;opacity:.92}
+.go{position:absolute;right:62px;top:450px;margin:0;font:700 30px Rubik;color:#FFD23F}
+</style></head><body>
+<script>
+const cols=['#FF5C8A','#FFB020','#22C3A6','#4E8CFF','#A66BFF','#FF7A3D','#16B8D6'];
+for(let i=0;i<46;i++){const d=document.createElement('i');d.className='cf';d.style.left=Math.random()*1200+'px';d.style.top=Math.random()*630+'px';d.style.background=cols[i%cols.length];d.style.transform=`rotate(${Math.random()*180}deg)`;document.body.appendChild(d);}
+</script>
+<svg class="wheel" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="49" fill="#2B1660"/><circle cx="50" cy="50" r="46.5" fill="#F7C948"/>
+  <g id="sl"></g>
+  <circle cx="50" cy="50" r="11" fill="#FFF4D6"/><text x="50" y="54.6" text-anchor="middle" font-size="12">⭐</text>
+  <path d="M50 1 L57 13 L43 13 Z" fill="#FF3D6E" stroke="#fff" stroke-width="1.2"/>
+</svg>
+<script>
+const sl=document.getElementById('sl'),n=8,c=['#FF5C8A','#FFB020','#22C3A6','#4E8CFF','#A66BFF','#FF7A3D','#16B8D6','#F25EC4'];
+const P=(a,r)=>[50+r*Math.sin(a*Math.PI/180),50-r*Math.cos(a*Math.PI/180)];
+for(let i=0;i<n;i++){const a0=i*45,a1=a0+45,[x0,y0]=P(a0,44),[x1,y1]=P(a1,44);sl.insertAdjacentHTML('beforeend',`<path d="M50 50 L${x0} ${y0} A44 44 0 0 1 ${x1} ${y1} Z" fill="${c[i]}" stroke="#fff" stroke-width=".8"/>`);}
+</script>
+<span class="pill">מוכן לאנגלית</span>
+<h1 id="t">זכייה!<br>בגלגל ההפתעות</h1>
+<script>{const q=new URLSearchParams(location.search),n=q.get('n');if(n)document.getElementById('t').innerHTML=`${n.replace(/[<>&]/g,'')} ${q.get('v')==='f'?'זכתה':'זכה'}!<br>בגלגל ההפתעות`;}</script>
+<p class="s">אחרי אימון באנגלית</p>
+<p class="go">לחצו כדי לראות מה הפרס ←</p>
+</body></html>

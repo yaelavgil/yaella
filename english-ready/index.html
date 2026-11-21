@@ -3542,7 +3542,9 @@ function syncShare() { if (lastWin && lastWin.blob) for (const el of shareButton
 // fetched by the page when somebody opens it.
 const WINS_DB = 'https://home-picks-47450-default-rtdb.europe-west1.firebasedatabase.app/board/wins';
 const winCode = () => (Date.now().toString(36) + Math.random().toString(36).slice(2, 6)).toUpperCase();
-function winPage(code) { return location.origin + location.pathname.replace(/[^/]*$/, '') + 'w.html?i=' + code; }
+// each kid has a copy of w.html whose WhatsApp preview says "<name> won!" (made by make_win_pages.py; keep in step)
+const WIN_PAGES = { 'גור': 'gur', 'דני': 'dani', 'לילי': 'lili' };
+function winPage(code) { const sl = WIN_PAGES[String((KID && KID.name) || '').trim()]; return location.origin + location.pathname.replace(/[^/]*$/, '') + (sl ? `w-${sl}.html` : 'w.html') + '?i=' + code; }
 
 function prepWin(pz, msg, at, art) {
   const mine = lastWin = { pz, msg, at, blob: null, link: '', name: `win-${winStamp(at).code}.png` };
