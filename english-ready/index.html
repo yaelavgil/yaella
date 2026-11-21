@@ -742,6 +742,9 @@ body.pdash #pbar .pbrow{padding:12px 18px}
 .pdtitle{margin:14px 4px 0;font:700 20px var(--f-display)}
 body.pdash #app > :not(#pbar){display:none}
 body.pdash .pbar{margin-bottom:12px}
+.kst{cursor:pointer}
+.kst .kquick,.kst .kdet{cursor:auto}
+.kstwarn{display:block;margin-top:4px;font-size:13px;line-height:1.35;color:#9a4a00;background:#fff3e0;border-radius:8px;padding:4px 8px}
 .ownbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:0 auto 10px;max-width:640px;background:#EEF4FF;border:1.5px solid #CFE0FF;border-radius:14px;padding:7px 12px;font-size:14px}
 .ownbar a{font-weight:700}
 
@@ -2292,7 +2295,7 @@ const kidLink = (id, mode) => `${location.origin}${location.pathname}?k=${id}&m=
    Getting in used to mean scrolling past everything a child sees to a link at the very
    bottom. The way in now sits above the page, and once a parent is in, each child's day
    and a one-tap link are there with it. */
-let PAPI = null, PUSER = null, PKIDS = [], PKIDS_LOADED = null;
+let PAPI = null, PUSER = null, PKIDS = [], PKIDS_LOADED = null; const PDASH_K = 'english-ready-pdash';
 const kidDay = k => { const p = k.progress || {}; return (p.td && p.td.date === today()) ? p.td : { stars: 0, ms: 0, letters: 0, spins: 0 }; };
 const kidMode = k => ((k.settings || {}).linkMode) || 'learn';
 const GIRL_K = k => ((k && k.settings) || {}).gender === 'f';
@@ -2304,6 +2307,8 @@ async function parentBar() {
   const bar = $('#pbar'); if (!bar) return;
   bar.innerHTML = `<div class="pbrow"><span class="pbwho">אזור ההורים</span><button class="gearbtn" id="pgo" aria-label="הגדרות וכניסת הורים" title="הגדרות">${GEAR_SVG}</button></div>`;
   $('#pgo').onclick = () => settingsSheet();
+  // a parent's device: show the dashboard frame at once instead of the kid's page until the sign-in answers
+  try { if (localStorage.getItem(PDASH_K)) { document.body.classList.add('pdash'); bar.insertAdjacentHTML('beforeend', '<p class="loading">טוען את הילדים…</p>'); } } catch (e) {}
   let A; try { A = PAPI || (PAPI = await api()); } catch (e) { return; }
   A.onUser(async u => {
     if (!$('#pbar')) return;
@@ -2312,6 +2317,7 @@ async function parentBar() {
       $('#pbar').innerHTML = `<div class="pbrow"><span class="pbwho">אזור ההורים</span><button class="gearbtn" id="pgo" aria-label="הגדרות וכניסת הורים" title="הגדרות">${GEAR_SVG}</button></div>`;
       const b = $('#pgo'); if (b) b.onclick = () => settingsSheet();
       document.body.classList.remove('pdash'); PWATCH.forEach(f => { try { f(); } catch (e) {} }); PWATCH = [];
+      try { localStorage.removeItem(PDASH_K); } catch (e) {}
       return;
     }
     try { PKIDS = await A.listKids(u.uid); } catch (e) { PKIDS = []; }
@@ -2322,6 +2328,7 @@ async function parentBar() {
   });
 }
 
+const gradeTrack = t => { t = String(t || ''); return /גן/.test(t) ? 'k5' : /ז|7/.test(t) ? 'g7' : /ד|4/.test(t) ? 'g4' : null; }; // the grade the parent typed, as a track
 const agoTxt = t => { if (!t) return 'עוד לא תרגל'; const m = Math.round((Date.now() - t) / 60000);
   return 'פעיל לאחרונה: ' + (m < 2 ? 'עכשיו' : m < 60 ? `לפני ${m} דק׳` : m < 1440 ? `לפני ${Math.round(m / 60)} שע׳` : `לפני ${Math.round(m / 1440)} ימים`); };
 let PWATCH = [];
@@ -2402,7 +2409,9 @@ function renderParentBar() {
     ${PKIDS.length ? `<h2 class="pdtitle">הילדים שלי</h2><div class="kstrip n${Math.min(PKIDS.length, 3)}">${PKIDS.map(k => {
       const d = kidDay(k), mins = Math.floor((d.ms || 0) / 60000), st = k.settings || {};
       const p = k.progress || {}, J = p.jour || {}, ph = (k.profile || {}).photo, pk = st.pack || 'g4-mapping';
-      const trk = pk === 'g7' ? 'כיתה ז׳' : pk === 'k5' ? 'גן' : 'כיתה ד׳';
+      const trk = pk === 'g7' ? 'כיתה ז׳' : pk === 'k5' ? 'גן' : 'כיתה ד׳', tk = pk === 'g7' ? 'g7' : pk === 'k5' ? 'k5' : 'g4';
+      const pg = gradeTrack((k.profile || {}).grade), jbad = J.jid && !(JOURNEYS[tk === 'g7' ? 'g7' : 'g4'] || []).some(x => x.id === J.jid);
+      const warn = tk !== 'k5' && pg && pg !== tk ? `בפרופיל כתוב ״כיתה ${esc((k.profile || {}).grade)}״, אבל התוכן הוא של ${trk}. בודקים בהגדרות ← תוכן.` : jbad ? 'המסע השמור שייך למסלול אחר. בודקים בהגדרות ← תוכן.' : '';
       const mx = ((st.goal || {}).max == null ? 60 : +(st.goal || {}).max) ? dayMaxToday(Object.assign({}, st, { goal: Object.assign({ max: 60 }, st.goal || {}) })) : 0, freeT = xeFree(st);
       const JJ = jOf(J, pk), PM = JJ && PP_BY[JJ.id];
       const road = pk === 'k5' ? { v: `${(p.k5 || {}).n || 0}`, l: 'כוכבים' } : PM ? { v: `${J.n || 0}/${PM.st.length}`, l: `חותמות ב${JJ.name}` } : JJ ? { v: `${J.n || 0}/26`, l: `כוכבים ב${JJ.name}` } : { v: `${J.n || 0}/26`, l: 'אותיות במסע' };
@@ -2410,7 +2419,7 @@ function renderParentBar() {
       return `<article class="kst" data-k="${k.id}" style="--kc:${kidCol(k)}">
         <header class="ksthead">
           ${ph ? `<img class="kstph" src="${ph}" alt="">` : `<span class="kstph kstini" aria-hidden="true">${esc(k.name.slice(0, 1))}</span>`}
-          <div class="kstwho"><b class="kstname">${esc(k.name)}</b><span class="kstsub"><span class="chip">${trk}</span> · ${agoTxt(p.updatedAt)}</span></div>
+          <div class="kstwho"><b class="kstname">${esc(k.name)}</b><span class="kstsub"><span class="chip">${trk}</span> · ${agoTxt(p.updatedAt)}</span>${warn ? `<span class="kstwarn" role="note">⚠️ ${warn}</span>` : ''}</div>
           <div class="kstact"><button class="btn sm kstlink" data-link="${k.id}">שליחת קישור</button><button class="btn sm" data-set="${k.id}">הגדרות</button></div>
         </header>
         <div class="ktiles">
@@ -2431,10 +2440,14 @@ function renderParentBar() {
         </div>
       </article>`;
     }).join('')}</div>` : '<p class="hint pbhint">עוד אין ילדים. לחצו על גלגל השיניים כדי להוסיף.</p>'}`;
-  document.body.classList.toggle('pdash', !!PKIDS.length);
+  document.body.classList.toggle('pdash', !!PKIDS.length); try { PKIDS.length ? localStorage.setItem(PDASH_K, '1') : localStorage.removeItem(PDASH_K); } catch (e) {}
   $('#popen').onclick = () => settingsSheet();
   $$('[data-link]', bar).forEach(b => b.onclick = () => sendKidLink(b, PKIDS.find(k => k.id === b.dataset.link)));
   $$('[data-set]', bar).forEach(b => b.onclick = () => settingsSheet(b.dataset.set, 'learn'));
+  $$('.kst', bar).forEach(c => c.onclick = e => { // the photo, the name, the grade and the space around: the kid's settings
+    if (e.target.closest('button, a, input, select, textarea, label, .kdet, .kquick') || String(getSelection() || '')) return;
+    settingsSheet(c.dataset.k, 'learn');
+  });
   $$('[data-kd]', bar).forEach(b => b.onclick = () => { KOPEN[b.dataset.kid] = KOPEN[b.dataset.kid] === b.dataset.kd ? '' : b.dataset.kd; renderParentBar(); const t = $(`.kst[data-k="${b.dataset.kid}"] [data-kd="${b.dataset.kd}"]`); if (t) t.focus({ preventScroll: true }); });
   $$('[data-qp]', bar).forEach(b => b.onclick = () => settingsSheet(b.dataset.qp, 'goal'));
   $$('[data-qg]', bar).forEach(b => b.onclick = () => settingsSheet(b.dataset.qg, 'prog'));
@@ -2811,8 +2824,9 @@ function settingsSheet(kidId, tab) {
     loadKid(); kidsRow(); tabs(); body();
   }
   function waiting() { $s('#shkids').innerHTML = ''; $s('#shtabs').hidden = true; $s('.shfoot').classList.add('nosave'); $s('#shout').hidden = true; $s('#shbody').innerHTML = '<p class="loading">טוען…</p>'; }
+  let viaLogin = false;
   function loginView() {
-    waiting();
+    waiting(); viaLogin = true;
     $s('#shbody').innerHTML = `<div class="shform shlogin">
       <h3>כניסה להורים</h3>
       <p>אחרי הכניסה אפשר להגדיר לכל ילד יעד, גלגל הפתעות ורמה, לשלוח לו קישור ולראות את ההתקדמות שלו.</p>
@@ -2831,6 +2845,9 @@ function settingsSheet(kidId, tab) {
       waiting();
       try { PKIDS = await PAPI.listKids(u.uid); } catch (e) { PKIDS = []; }
       PKIDS.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0)); PKIDS_LOADED = u.uid;
+    }
+    if (viaLogin && !kidId && PKIDS.length && document.body.contains(ov)) { // just signed in: straight to the dashboard
+      ov.remove(); document.documentElement.classList.remove('noscroll'); document.removeEventListener('keydown', esc_); renderParentBar(); return;
     }
     if (document.body.contains(ov) && !$s('.shtab.on, .shform:not(.shlogin)')) start();
   }
@@ -2857,7 +2874,7 @@ async function parentCloud() {
     PAPI = A; PUSER = u;
     try { PKIDS = await A.listKids(u.uid); } catch (e) { PKIDS = []; }
     PKIDS.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
-    go(home); settingsSheet();
+    go(home); if (!PKIDS.length) settingsSheet(); // with kids: the dashboard itself
   });
 }
 function parentLogin(A) {
