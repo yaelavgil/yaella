@@ -2414,7 +2414,8 @@ function renderParentBar() {
       const warn = tk !== 'k5' && pg && pg !== tk ? `בפרופיל כתוב ״כיתה ${esc((k.profile || {}).grade)}״, אבל התוכן הוא של ${trk}. בודקים בהגדרות ← תוכן.` : jbad ? 'המסע השמור שייך למסלול אחר. בודקים בהגדרות ← תוכן.' : '';
       const mx = ((st.goal || {}).max == null ? 60 : +(st.goal || {}).max) ? dayMaxToday(Object.assign({}, st, { goal: Object.assign({ max: 60 }, st.goal || {}) })) : 0, freeT = xeFree(st);
       const JJ = jOf(J, pk), PM = JJ && PP_BY[JJ.id];
-      const road = pk === 'k5' ? { v: `${(p.k5 || {}).n || 0}`, l: 'כוכבים' } : PM ? { v: `${J.n || 0}/${PM.st.length}`, l: `חותמות ב${JJ.name}` } : JJ ? { v: `${J.n || 0}/26`, l: `כוכבים ב${JJ.name}` } : { v: `${J.n || 0}/26`, l: 'אותיות במסע' };
+      const k5n = (p.k5 || {}).n || 0;
+      const road = pk === 'k5' ? (k5n ? { v: `${k5n}`, l: 'כוכבים במסלול הגן' } : { v: '🌱', l: `מסלול הגן · עוד לא ${GIRL_K(k) ? 'התחילה' : 'התחיל'}` }) : PM ? { v: `${J.n || 0}/${PM.st.length}`, l: `חותמות ב${JJ.name}` } : JJ ? { v: `${J.n || 0}/26`, l: `כוכבים ב${JJ.name}` } : { v: `${J.n || 0}/26`, l: 'אותיות במסע' };
       const OPEN = (KOPEN[k.id] || ''), tile = (v, l, key) => key ? `<button type="button" class="kt kto ${OPEN === key ? 'on' : ''}" data-kd="${key}" data-kid="${k.id}" aria-expanded="${OPEN === key}"><b>${v}</b><span>${l}</span><i class="ktmore" aria-hidden="true">${OPEN === key ? '▴' : '▾'}</i></button>` : `<div class="kt"><b>${v}</b><span>${l}</span></div>`;
       return `<article class="kst" data-k="${k.id}" style="--kc:${kidCol(k)}">
         <header class="ksthead">
