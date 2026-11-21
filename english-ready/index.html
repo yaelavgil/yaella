@@ -508,6 +508,7 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .sthead b{font:700 22px var(--f-en)}
 .stx{font:400 clamp(20px,5vw,23px)/1.65 var(--f-en);margin:8px 0 0;direction:ltr;text-align:left;max-width:27em;margin-right:auto;word-spacing:normal}
 .stx p{margin:0 0 .85em}
+.clean{font:600 19px/1.4 var(--f-display);color:#1f8a4c;margin:4px 0 8px;text-align:center}
 .stx p:last-child{margin-bottom:0}
 .stx.lines .ss{display:block;width:fit-content;max-width:100%;padding:2px 10px;margin:0 -10px 2px;border-radius:10px}
 .stx.lines .ss::after{content:'🔊';font-size:.55em;margin-inline-start:.5em;opacity:0;transition:opacity .15s;vertical-align:.2em}
@@ -1766,10 +1767,10 @@ function markDone(mod, pct) {
 }
 function addStar() { const s = load(); s.stars++; day(s).stars++; save(s); }
 // practice time: time between taps while inside a practice screen (gaps over 90s don't count)
-let practicing = false, lastAct = 0, inStage = false, CURMOD = '';
+let practicing = false, lastAct = 0, inStage = false, CURMOD = '', FREE_T = false; // FREE_T: the closing round of a stage, off the clock
 document.addEventListener('pointerdown', () => {
   const now = Date.now();
-  if (practicing && lastAct && now - lastAct < 90000) {
+  if (practicing && lastAct && now - lastAct < 90000 && !FREE_T) {
     const s = load(), dd = day(s); dd.ms += now - lastAct; if (CURMOD) { const mm = (dd.mm = dd.mm || {}); mm[CURMOD] = (mm[CURMOD] || 0) + (now - lastAct); } setTimeout(energyPaint, 0);
     if (s.jour && (s.goal || {}).type === 'journey' && s.jour.n < JOUR_N) { const J = s.jour; if (J.ck !== J.n) { J.ck = J.n; J.cms = 0; } J.cms = (J.cms || 0) + (now - lastAct); }
     save(s);
@@ -4273,13 +4274,27 @@ function storyQs(st) {
     layout: 'wide', options: shuffle([o[0], ...o.slice(1, optN())]).map(x => ({ v: x, html: `<span class="en">${x}</span>` })), answer: o[0], rv: `${q} → ${o[0]}`,
     hint: { he: 'התשובה נמצאת במשפט המסומן בסיפור. קרא אותו שוב לאט.', mark: STORY_HINT[q] } }));
 }
+// STAGE_W: the words a stage already asks about. A word answered right never comes back in the same stage,
+// not even as another type of question (a miss comes back on purpose, see runQuiz).
+let STAGE_W = null;
 function build(gens, n) {
-  const out = [], keys = new Set(), seen = seenToday(); BUILT = new Set();
+  const out = [], keys = new Set(), seen = seenToday(), words = STAGE_W || new Set(); BUILT = new Set();
   for (let tries = 0; out.length < n && tries < 400; tries++) {
     const q = gens[out.length % gens.length]();
-    if (keys.has(q.key) || tries < 300 && seen.has(q.key)) continue; keys.add(q.key); out.push(q);
+    if (keys.has(q.key) || tries < 300 && seen.has(q.key) || tries < 380 && q.vw && words.has(q.vw.en)) continue;
+    keys.add(q.key); if (q.vw) words.add(q.vw.en); out.push(q);
   }
   return out;
+}
+// the same word as another type of question (a miss comes back in a new form)
+function qOther(q) {
+  const w = q.vw, form = k => String(k).split('#')[0].replace(w.en, ''), was = form(q.key), keep = VPOOL;
+  const G = lvl === 'easy' ? [qWordPic, qProVocab, qProVocabRev] : [qProVocab, qProVocabRev, qProSpell, qListenSpell, qBuildWord, qExGap, qWordPic];
+  for (const g of shuffle(G)) {
+    let n = null; VPOOL = [w]; try { n = g(); } catch (e) { n = null; } VPOOL = keep;
+    if (n && n.vw && n.vw.en === w.en && form(n.key) !== was) return n;
+  }
+  VPOOL = keep; return null;
 }
 
 // questions already shown today on this device: new rounds take fresh ones first
@@ -4648,7 +4663,7 @@ const stopReached = s => { const J = jour(s); return J.n < JOUR_N && J.ck === J.
    a different subject block each round. The stop on the map is reached by time, not by a letter. */
 function stageQuiz() {
   if (goalState(load()).capped) { restView(); return; }
-  setLvl();
+  setLvl(); STAGE_W = new Set();
   const s0 = load(), J0 = jour(s0);
   if (J0.ck !== J0.n) { J0.ck = J0.n; J0.cms = 0; J0.cr = 0; J0.sp = 0; save(s0); }
   const round = J0.cr || 0;
@@ -4691,7 +4706,7 @@ function stageQuiz() {
     : build([qNumListen, qNumWord], 2).concat(sentsFor().slice(0, 2).map((it, i) => qSentence(it, i === 1)));
   runQuiz('stage', `המסע · האות ${(ALPHA[J0.n] || 'z').toUpperCase()}`, [...base, ...block], stageQuiz);
 }
-let WARMUP = false;
+let WARMUP = false, LAST_CLEAN = false;
 const sentLen = it => it.s.split(' ').length;
 const sentsFor = () => { const L = lvl === 'easy' ? SENTENCES.filter(x => sentLen(x) <= 4) : lvl === 'hard' ? SENTENCES.filter(x => sentLen(x) >= 5) : SENTENCES; return freshFirst(L.length >= 4 ? L : SENTENCES, sentKeys); };
 function stageFinish(score, n) {
@@ -4737,6 +4752,7 @@ function stageFinish(score, n) {
     <section class="result stk">
       <div class="score">${score}/${n}</div>
       <h2>${score / n >= 0.8 ? 'שלב מצוין! 💪' : score / n >= 0.5 ? 'יפה! ממשיכים 💪' : 'כל שלב מקדם אותך 💪'}</h2>
+      ${LAST_CLEAN ? '<p class="clean">בלי טעויות הפעם 🎉</p>' : ''}
       <div class="jstep"><b>👣 שלב ${have} מתוך ${need}!</b>${stepsHTML(have, need, true, L)}
         <span>${have >= need ? 'השלבים מוכנים! עכשיו צריך לדעת עוד מילים של הכוכב 👇' : need - have === 1 ? 'עוד <b>שלב אחד</b>' : `עוד <b>${need - have}</b> שלבים`} ${have >= need ? '' : ST ? 'ואוספים כוכב ⭐' : `ופותחים את האות <b class="en">${L}</b>`}</span></div>
       ${ST ? (() => { const M = starMastery(s0); return `<p class="wkline">📖 מילים של הכוכב שאתה כבר יודע: <b>${M.have}/${M.all}</b>${M.ok ? ' ✅' : ` · צריך <b>${M.need}</b>${wkTimes(s0) > 1 ? ' (בדרגת זהב: כל מילה פעמיים נכון, בלי רמז)' : ' (נכון בפעם הראשונה, בלי רמז)'}`}</p>`; })() : ''}
@@ -4970,13 +4986,16 @@ function celebrateAll() {
 const SECS = { sounds:'צלילים', letters:'גדולות וקטנות', sentences:'קריאת משפטים', stories:'הבנת הנקרא', numbers:'מספרים עד 12' };
 function runQuiz(mod, title, qs, again) {
   if (mod !== 'stage' && restNow()) { restView(); return; }
-  let i = 0, score = 0; const wrong = [], secs = {};
+  let i = 0, score = 0, closing = false, missed = 0; const wrong = [], secs = {}; let CLOSE = [];
+  STAGE_W = null; FREE_T = false;
+  const nBase = () => qs.filter(x => !x.extra).length; // the score is out of the round's own questions; the second chances never lower it
   let tries = 0, hintUsed = false, closed = false, hintLv = 0;
   const hintList = q => [q.qhe && { he: `השאלה בעברית: <b>${q.qhe}</b>`, soft: true }, q.hint].filter(Boolean);
   const hintsLeft = q => mod !== 'mock' && hintLv < hintList(q).length;
   function step() {
     clearTimeout(sayT); hush(); // nothing from the card before carries on over this one
     const q = qs[i]; tries = 0; hintUsed = false; hintLv = 0; closed = false; markSeen(q.key);
+    if (window.__er) window.__er.round = () => ({ i, ans: qs[i].answer, extra: !!qs[i].extra, close: !!qs[i].close, free: FREE_T, words: qs.map(x => (x.vw || {}).en || null), keys: qs.map(x => x.key) }); // demo only: lets a test see the round
     prefetch(q.sayAfter); prefetch((qs[i + 1] || {}).sayAfter);
     const sayBtns = q.speak
       ? `<div class="sayrow"><button class="btn sm" data-say="${esc(q.speak)}">🔊 שמע שוב</button><button class="btn sm" data-say="${esc(q.speak)}" data-slow="1">🐢 לאט</button></div>`
@@ -4999,11 +5018,35 @@ function runQuiz(mod, title, qs, again) {
   }
   function tally(ok) {
     const q = qs[i];
-    if (ok && hintUsed && q.vw && mod !== 'mock') { score++; addStar(); recWord(q.vw.en, false); if (q.sec) { secs[q.sec] = secs[q.sec] || [0, 0]; secs[q.sec][1]++; secs[q.sec][0]++; } return; }
-    if (ok) { score++; addStar(); flyStar($('.opt.okpick, .opt:focus') || $('.qcard')); } else wrong.push(q.rv);
+    if (ok && hintUsed && q.vw && mod !== 'mock') { if (!q.extra) score++; addStar(); recWord(q.vw.en, false); if (q.sec) { secs[q.sec] = secs[q.sec] || [0, 0]; secs[q.sec][1]++; secs[q.sec][0]++; } return; }
+    if (ok) { if (!q.extra) score++; addStar(); flyStar($('.opt.okpick, .opt:focus') || $('.qcard')); if (q.vw) CLOSE = CLOSE.filter(x => x.vw.en !== q.vw.en); }
+    else { missed++; if (!q.extra && !wrong.includes(q.rv)) wrong.push(q.rv); miss(q); }
     if (q.lt) recordLetter(q.lt, q.sk, ok);
     if (q.vw && mod !== 'mock') recWord(q.vw.en, ok);
     if (q.sec) { secs[q.sec] = secs[q.sec] || [0, 0]; secs[q.sec][1]++; if (ok) secs[q.sec][0]++; }
+  }
+  // a miss: once more later in this round, as another type of question; still wrong -> the closing round.
+  // Wrong in the closing round too: no loop. recWord has it, and the 🔁 stations and review take it from s.wk.
+  function miss(q) {
+    if (mod === 'mock' || !q.vw || q.close) return;
+    if (!q.again && !q.retry && !q.taught && qs.length - i > 2) {
+      const n = qOther(q); if (n) { qs.splice(Math.min(qs.length, i + 3 + rint(0, 1)), 0, Object.assign(n, { retry: true, extra: true, key: n.key + '#r' })); return; }
+    }
+    if (!CLOSE.some(x => x.vw.en === q.vw.en)) CLOSE.push(q);
+  }
+  function closingRound() { // short, kind, and off the clock
+    closing = true;
+    const add = CLOSE.slice(0, 5).map(q => { const n = qOther(q) || Object.assign({}, q); return Object.assign(n, { close: true, extra: true, key: n.key + '#c' }); });
+    qs.push(...add); FREE_T = true;
+    const N = add.length;
+    app.innerHTML = `${top(title)}
+      <section class="result stk">
+        <div class="score">🏁</div>
+        <h2>עוד ${N === 1 ? 'מילה אחת' : N + ' מילים'} ונסגור את השלב 💪</h2>
+        ${blt(['המילים שהיו קצת קשות, עוד פעם אחת.', 'הסוללה לא יורדת עכשיו 🔋'])}
+        <div class="row center"><button class="btn primary" id="cgo">▶ קדימה</button></div>
+      </section>`;
+    $('#cgo').onclick = () => { window.scrollTo(0, 0); step(); };
   }
   let sayT = 0;
   function close(msgHTML, good) {
@@ -5087,7 +5130,7 @@ function runQuiz(mod, title, qs, again) {
   }
   function teachWord() { // "I don't know this word": a short lesson, then he answers (it counts as a miss)
     const q = qs[i], w = q.vw, T = WTIPS[w.en] || {};
-    if (tries === 0) tally(false); tries++;
+    q.taught = true; if (tries === 0) tally(false); tries++;
     const dn = $('#dunno'); if (dn) dn.remove();
     const pre = $('.prehint', app); if (pre && !pre.children.length) pre.remove();
     $('#fb').innerHTML = `<div class="wlesson h${q.hue || 2}">
@@ -5121,22 +5164,25 @@ function runQuiz(mod, title, qs, again) {
     if (wrongs.length > 1) { const w = pick(wrongs); w.disabled = true; w.classList.add('dim'); }
   }
   function finish() {
-    if (mod === 'stage') { markDone('stage'); return stageFinish(score, qs.length); }
-    const pct = Math.round((score / qs.length) * 100);
+    if (mod !== 'mock' && !closing && CLOSE.length) return closingRound();
+    FREE_T = false; LAST_CLEAN = mod !== 'mock' && !missed;
+    if (mod === 'stage') { markDone('stage'); return stageFinish(score, nBase()); }
+    const pct = Math.round((score / nBase()) * 100);
     markDone(mod, pct);
     const isMock = mod === 'mock';
-    if (isMock) { const s = load(); s.mock = { date: today(), score, n: qs.length, secs, level: lvl }; s.mocks = [s.mock, ...(s.mocks || [])].slice(0, 20); save(s); }
+    if (isMock) { const s = load(); s.mock = { date: today(), score, n: nBase(), secs, level: lvl }; s.mocks = [s.mock, ...(s.mocks || [])].slice(0, 20); save(s); }
     // a finished round is worth a letter, and a round at 90% or better is worth two
     // the very first round of practice: a spin on the house, whatever the score (stars are kept as earned)
     let firstGift = false;
     { const s0 = load(); if (!s0.firstGift && s0.wheel !== false) { s0.firstGift = today(); s0.giftSpins = (s0.giftSpins || 0) + 1; save(s0); firstGift = true; } }
     let stepNote = '';
-    { const s1 = load(); if ((s1.goal || {}).type === 'journey' && jour(s1).n < JOUR_N) { if (!starPassOK(s1, score, qs.length)) stepNote = `<div class="jstep"><b>⭐ בדרגת ${TIER[starTier(s1)]} שלב נספר רק מ־${Math.ceil(qs.length * tierNeed(s1, qs.length) - 1e-9)}/${qs.length}.</b><span>עוד שלב, ואתה שם!</span></div>`; else if (addStep(s1)) { save(s1); if (!stopReached(s1)) stepNote = stepNoteHTML(s1); } } }
+    { const s1 = load(); if ((s1.goal || {}).type === 'journey' && jour(s1).n < JOUR_N) { if (!starPassOK(s1, score, nBase())) stepNote = `<div class="jstep"><b>⭐ בדרגת ${TIER[starTier(s1)]} שלב נספר רק מ־${Math.ceil(nBase() * tierNeed(s1, nBase()) - 1e-9)}/${nBase()}.</b><span>עוד שלב, ואתה שם!</span></div>`; else if (addStep(s1)) { save(s1); if (!stopReached(s1)) stepNote = stepNoteHTML(s1); } } }
     const msg = pct >= 90 ? 'מעולה! אתה מוכן!' : pct >= 70 ? 'יפה מאוד!<br>עוד קצת תרגול ואתה שם.' : 'כל שלב מקדם אותך.<br>ננסה שוב?';
     app.innerHTML = `${top(title)}
       <section class="result stk">
-        <div class="score">${score}/${qs.length}</div>
+        <div class="score">${score}/${nBase()}</div>
         <p class="hint">תשובות נכונות בניסיון הראשון</p>
+        ${LAST_CLEAN ? '<p class="clean">בלי טעויות הפעם 🎉</p>' : ''}
         <h2>${msg}</h2>
         ${stepNote}
         ${firstGift ? `<div class="giftbox"><b>🎉 סיבוב פתיחה עלינו!</b><span>${lines('זה האימון הראשון שלך!', 'מגיע לך סיבוב בגלגל ההפתעות, במתנה.', 'השלב במסע נשאר שלך.')}</span><button class="btn spinbtn" id="giftspin">🎡 לסובב עכשיו</button></div>` : ''}
