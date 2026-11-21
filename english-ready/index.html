@@ -886,6 +886,67 @@ body.pdash .pbar{margin-bottom:12px}
 .journey.stars .msteps{top:84px}
 .journey.stars .mend .mendt{color:#FFE9A8}
 .journey.stars .msky{display:none}
+/* the passport: a sea map, stations are round stamps */
+.journey.pp .goalhead .glabel{color:#0E6A8A}
+.jmapwrap.pp::before{background:linear-gradient(#CFEAF2,rgba(207,234,242,0))}
+.jmapwrap.pp::after{background:linear-gradient(rgba(190,226,236,0),#BEE2EC)}
+.jmapwrap.pp.full{background:#CFEAF2}
+.jmapwrap.pp.full .mapgo{background:linear-gradient(rgba(190,226,236,0),#BEE2EC 40%)}
+.jmapwrap.pp .jmap{background:repeating-linear-gradient(0deg,rgba(255,255,255,.35) 0 1px,transparent 1px 64px),repeating-linear-gradient(90deg,rgba(255,255,255,.35) 0 1px,transparent 1px 64px),
+  radial-gradient(40% 18% at 85% 22%,#E9DDB5 0 60%,transparent 62%),radial-gradient(35% 15% at 8% 58%,#E9DDB5 0 60%,transparent 62%),radial-gradient(30% 12% at 90% 86%,#E9DDB5 0 60%,transparent 62%),
+  linear-gradient(#CFEAF2,#BEE2EC)}
+.jmapwrap.pp .jl-all{stroke:#fff;stroke-width:6;stroke-dasharray:10 10;filter:none;opacity:.9}
+.jmapwrap.pp .jl-done{stroke:#E0457B;stroke-width:6;stroke-dasharray:10 10;filter:none}
+.jmapwrap.pp .mstart{color:#0E6A8A}
+.jmapwrap.pp .mdeco{opacity:1}
+.jmapwrap.pp .mdeco small{display:block;color:#0E4A60;font:700 12px var(--f-en);background:rgba(255,255,255,.7);border-radius:6px;padding:0 5px}
+.jmapwrap.pp .mdi{font-size:26px}
+.jmapwrap.pp .mnode{transform:none;border-radius:50%;background:#F6F1E3;box-shadow:0 5px 0 #CDBF98;color:#7A6A45;border:3px dashed #B9A777}
+.jmapwrap.pp .mnode>*{transform:none}
+.jmapwrap.pp .mnode .ppic{font-size:24px;line-height:1}
+.jmapwrap.pp .mnode .snum{position:absolute;bottom:-6px;inset-inline-end:-6px;font:800 12px/1 var(--f-display);background:#0E6A8A;color:#fff;border-radius:999px;padding:3px 6px}
+.jmapwrap.pp .mnode.lock .ppic{filter:grayscale(.7);opacity:.6}
+.jmapwrap.pp .mnode.done{background:#FFE6EE;border:3px solid #E0457B;box-shadow:0 5px 0 #B8335F;color:#B8335F;transform:rotate(-8deg)}
+.jmapwrap.pp .mnode.cur{background:conic-gradient(#E0457B var(--ring,0%),transparent 0) border-box,linear-gradient(#FFFFFF,#E6F6FB) padding-box;border:5px solid transparent;box-shadow:0 6px 0 #0E6A8A,0 0 0 8px rgba(14,106,138,.18);color:#0E6A8A;animation:mpulse 1.8s ease-in-out infinite}
+.jmapwrap.pp .mchk,.jmapwrap.pp .mlock{transform:none}
+.jmapwrap.pp .ppboss .mnode{width:80px;height:80px;border-color:#E0A21B}
+.jmapwrap.pp .ppboss .mnode .ppic{font-size:32px}
+.jmapwrap.pp .ppwrow{height:72px}
+.jmapwrap.pp .mnode.ppw{width:56px;height:56px;background:#fff;border:0;box-shadow:0 4px 0 #E0A21B,0 0 0 4px rgba(255,201,77,.35);padding:4px}
+.jmapwrap.pp .mnode.ppw .mw{width:100%;height:100%}
+.jmapwrap.pp .mnode.ppw.lock{filter:saturate(.35) opacity(.75)}
+.jmapwrap.pp .mnode.ppw.open{animation:pbob 1.3s ease-in-out infinite;box-shadow:0 4px 0 #E0A21B,0 0 0 6px rgba(255,201,77,.6),0 0 18px rgba(255,190,40,.8)}
+.jmapwrap.pp .mnode.ppw.bonus{width:64px;height:64px}
+.ppwt{position:absolute;top:50%;transform:translateY(-50%);left:calc(50% + 40px);font-size:12px;font-weight:700;color:#8A5A00;background:rgba(255,255,255,.8);border-radius:8px;padding:1px 6px;white-space:nowrap}
+.jmapwrap.pp .msteps{top:84px}
+.jmapwrap.pp .mend .mendt{color:#0E4A60}
+.ppstamp{width:150px;height:150px;margin:6px auto;border-radius:50%;border:5px double #E0457B;color:#E0457B;display:grid;place-items:center;align-content:center;gap:2px;transform:rotate(-10deg);background:rgba(224,69,123,.05)}
+.ppstamp.pop{animation:ppstamp .55s cubic-bezier(.2,1.6,.4,1) both}
+.ppstamp.gold{border-color:#C98A00;color:#9A6A00;background:rgba(255,201,77,.12)}
+.ppstamp.sm{width:96px;height:96px;border-width:4px;margin:0 auto 4px}
+.ppsc{font:800 18px/1.1 var(--f-en);text-transform:uppercase;letter-spacing:.04em;max-width:120px;text-align:center}
+.ppstamp.sm .ppsc{font-size:12px;max-width:80px}
+.ppsf{font-size:34px;line-height:1}.ppstamp.sm .ppsf{font-size:22px}
+.ppsn{font:700 12px/1 var(--f-en);opacity:.8}
+@keyframes ppstamp{0%{transform:scale(2.4) rotate(-30deg);opacity:0}70%{transform:scale(.92) rotate(-8deg);opacity:1}100%{transform:scale(1) rotate(-10deg)}}
+@media (prefers-reduced-motion:reduce){.ppstamp.pop{animation:none}}
+.ppcard{display:grid;gap:10px;text-align:start;background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:14px 16px;margin:8px 0}
+.pphead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pphead div{display:grid}.pphead b{font:800 20px var(--f-en)}.pphead small{color:var(--muted);font-size:13px}
+.ppflag{font-size:34px;line-height:1}
+.ppkind{margin-inline-start:auto;font-size:14px;font-weight:700;background:var(--bg);border-radius:999px;padding:4px 10px}
+.ppen{margin:0;font:600 clamp(19px,4.6vw,23px)/1.5 var(--f-en);text-align:left;max-width:27em}
+.pppunch{color:#B8335F}
+.ppsmall{margin:0;font:400 16px/1.5 var(--f-en);text-align:left;color:var(--muted)}
+.ppmsg{margin:0;font:700 20px/1.5 var(--f-body)}
+.ppdo{margin:0;font-weight:700}
+.ppbtns{display:flex;flex-wrap:wrap;gap:8px}
+.ppreveal{justify-self:start}
+.pphe{margin:0;font-size:17px;line-height:1.5}
+.ppwhy{margin:0;background:#FFF6D9;border-radius:12px;padding:8px 12px;font-size:16px;line-height:1.5}
+.ppov{max-width:520px;max-height:calc(100vh - 32px);overflow:auto}
+.lcov.ppcov{z-index:90}
+.shta{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:8px 10px;font:inherit;resize:vertical;min-height:60px}
 .partyov{position:fixed;inset:0;z-index:120;display:grid;place-items:center;padding:16px;background:radial-gradient(circle at 50% 40%,#3C1E8C,#0A0828);animation:fade .3s both}
 .partycv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .partycard{position:relative;z-index:1;width:min(420px,100%);text-align:center;color:#fff;display:grid;gap:10px;justify-items:center;animation:partyin .8s cubic-bezier(.2,1.4,.4,1) both}
@@ -1806,14 +1867,14 @@ function letterMapHTML(s, opts = {}) {
    on the first try, then writing the letter) earns that letter. Every `every` letters there is a
    wheel stop; after Z the mega wheel. The daily mission spreads what is left over the days until
    the test (23.11), so each day is about 20-30 minutes (a stage is about 6 minutes). */
-const JOUR_N = 26;
+let JOUR_N = 26; // 26 letters or stars; a passport map has 15 stations (set in jour())
 // after Z: the stars journey. Same 26 stages, but much harder questions, and a round counts only when it is good enough
 const isStars = s => (jour(s).lv || 1) >= 2;
 const TRACK = () => { const p = ((KID && KID.settings) || {}).pack; return p === 'g7' ? 'g7' : p === 'k5' ? 'k5' : 'g4'; };
 const GIRL = () => ((KID && KID.settings) || {}).gender === 'f';
 const STAR_PASS = 0.7;
 // the stars journey has 3 grades: bronze (stars 1-9), silver (10-18), gold (19-26). Each grade asks for more right answers and more steps
-const starTier = s => isStars(s) ? Math.min(3, 1 + Math.floor(Math.min(jour(s).n, JOUR_N - 1) / 9)) : 0;
+const starTier = s => !isStars(s) ? 0 : isPP(s) ? ((ppSt(s, jour(s).n) || {}).k === 'boss' ? 3 : 2) : Math.min(3, 1 + Math.floor(Math.min(jour(s).n, JOUR_N - 1) / 9));
 const TIER = ['', '🥉 ארד', '🥈 כסף', '🥇 זהב'], TIER_PASS = [0, 0.75, 0.85, 0.9], TIER_PASS_SHORT = [0, 0.6, 0.7, 0.8];
 const tierNeed = (s, n) => (n >= 8 ? TIER_PASS : TIER_PASS_SHORT)[starTier(s)] || 0;
 const WK_NEED = [0, 0.7, 0.85, 0.9];
@@ -1827,6 +1888,7 @@ const blt = (items, cls = '') => `<ul class="pts${cls ? ' ' + cls : ''}">${items
 const lines = (...a) => a.filter(Boolean).join('<br>');
 const jour = s => {
   const J = (s.jour = s.jour || { n: 0, spins: 0, mega: false, round: 1 });
+  { const M = (J.lv || 1) >= 2 && J.jid && typeof PP_BY !== 'undefined' ? PP_BY[J.jid] : null; JOUR_N = M ? M.st.length : 26; }
   if (J.sv !== 2) { J.sv = 2; if (J.ck === J.n) J.sp = Math.min(5, Math.max(J.cr || 0, Math.floor((J.cms || 0) / 300000))); } // minutes → steps, once
   return J;
 };
@@ -1844,7 +1906,7 @@ function wheelBanner(where) { // the wheel just opened: offer it right where he 
 const letterMin = s => { const v = (s.goal || {}).lmin; return v == null ? 30 : Math.max(5, +v); }; // minutes of practice that earn a letter
 const curLetterMin = s => { const J = jour(s); return J.ck === J.n ? Math.floor((J.cms || 0) / 60000) : 0; };
 const STEP_MIN = 5; // a round takes about 5 minutes
-const stageSteps = s => { const v = (s.goal || {}).steps; return (v == null ? 6 : Math.max(3, +v)) + (isStars(s) ? starTier(s) - 1 : 0); };
+const stageSteps = s => { const v = (s.goal || {}).steps, b = v == null ? 6 : Math.max(3, +v); return isPP(s) ? b + (starTier(s) === 3 ? 2 : 0) : b + (isStars(s) ? starTier(s) - 1 : 0); };
 const curSteps = s => { const J = jour(s); return J.ck === J.n ? Math.min(stageSteps(s), J.sp || 0) : 0; };
 function addStep(s) {
   const J = jour(s); if ((s.goal || {}).type !== 'journey' || J.n >= JOUR_N) return 0;
@@ -1857,7 +1919,7 @@ function stepsHTML(have, need, fresh, L) {
 }
 function stepNoteHTML(s1) {
   const n = curSteps(s1), need = stageSteps(s1), L = (ALPHA[jour(s1).n] || 'z').toUpperCase();
-  if (isStars(s1)) return `<div class="jstep"><b>👣 עוד שלב במסע הכוכבים!</b>${stepsHTML(n, need, true, '⭐')}<span>${need - n === 1 ? 'עוד שלב אחד' : `עוד ${need - n} שלבים`} ואוספים כוכב</span></div>`;
+  if (isStars(s1)) return `<div class="jstep"><b>👣 עוד שלב במסע!</b>${stepsHTML(n, need, true, '⭐')}<span>${need - n === 1 ? 'עוד שלב אחד' : `עוד ${need - n} שלבים`} ואוספים כוכב</span></div>`;
   return `<div class="jstep"><b>👣 עוד שלב במסע!</b>${stepsHTML(n, need, true, L)}<span>${need - n === 1 ? 'עוד שלב אחד' : `עוד ${need - n} שלבים`} ופותחים את האות <b class="en">${L}</b></span></div>`;
 }
 const dayMax = s => { const v = (s.goal || {}).max; return v == null ? 60 : +v; };      // after this many minutes, no more practice today (0 = no limit)
@@ -1942,12 +2004,12 @@ function goalState(s) {
     const d = day(s), J = jour(s), T = dailyTarget(s), todayN = d.jl || 0, mins = Math.floor((d.ms || 0) / 60000);
     const stops = [], reached = 0, owed = 0, minM = 0, maxM = dayMaxToday(s);
     const XS = xsState(s, d), spunToday = (d.jw || 0) >= wheelPerDay(s) && !XS;
-    const avail = st_wheelToday(s, d) ? 1 : 0, almost = wheelAlmost(s, d);
+    const xw = ppXW(s), avail = (st_wheelToday(s, d) ? 1 : 0) + xw, almost = wheelAlmost(s, d);
     const capped = J.n < JOUR_N && !!maxM && mins >= maxM;
     return { d, g: s.goal, mins, journey: true, J, stops, value: J.n, earned: reached, owed, avail, waiting: owed && !spunToday && !avail ? minM - mins : 0,
       mega: J.n >= JOUR_N && !J.mega, megaWait: 0,
       target: T, todayN, capped, spunToday, almost, bonusPend: !!(XS && XS.pend), nextDay: 0, lmin: letterMin(s), cmin: curLetterMin(s), steps: stageSteps(s), csp: curSteps(s), minM, maxM, lesson: letterMin(s),
-      left: 1, unit: 'אות', pct: Math.min(100, (J.n / JOUR_N) * 100) };
+      left: 1, unit: 'אות', pct: Math.min(100, (J.n / JOUR_N) * 100), xw };
   }
   const d = day(s), g = s.goal, mins = Math.floor(d.ms / 60000);
   if (g.type === 'lvl' || g.type === 'abc') { // letters that moved up today; after all 26, the review list
@@ -2042,7 +2104,7 @@ function home() {
     <div class="blocks" aria-hidden="true"><span class="blk h1">A</span><span class="blk h2">B</span><span class="blk h4">C</span></div>
     <h1>${KID ? `${KID.photo ? `<img class="kavatar" src="${KID.photo}" alt="">` : ''}שלום ${esc(KID.name)}!` : 'מוכן לאנגלית'}</h1>
     ${KID ? `<p class="sub">${KID.mode === 'test' ? 'כאן עושים מבחן ניסיון.' : KID.mode === 'learn' ? 'כאן מתרגלים אנגלית.<br>בהצלחה!' : 'מתכוננים למבחן באנגלית.'}</p>` : ''}
-    <div class="pills">${G4 ? `<span class="pill due">${countdown()}</span>` : ''}<span class="pill">${isStars(st) ? `⭐ ${jour(st).n}/26 כוכבים` : `🔤 ${jour(st).n}/26 אותיות`}</span></div>
+    <div class="pills">${G4 ? `<span class="pill due">${countdown()}</span>` : ''}<span class="pill">${isPP(st) ? `🛂 ${jour(st).n}/${JOUR_N} חותמות` : isStars(st) ? `⭐ ${jour(st).n}/26 כוכבים` : `🔤 ${jour(st).n}/26 אותיות`}</span></div>
   </header>
 
   ${KID && KID.mode === 'test' ? '' : journeyCardHTML(G, st)}
@@ -2293,7 +2355,11 @@ function kidDetail(k, key) {
       <p class="kdnext">👉 הבא: ${K5P[K.n || 0] ? `הנושא „${esc(K5P[K.n || 0].title_he || '')}”` : 'כל נושאי המילים הושלמו'}${(K.lg || 0) < 13 ? `, והאותיות <span class="en">${ALPHA.slice((K.lg || 0) * 2, (K.lg || 0) * 2 + 2).join(' ').toUpperCase()}</span>` : ''}. כל שני משחקים = כוכב.</p>`; }
     const stars = (J.lv || 1) >= 2, need = stageSteps(S), have = J.ck === J.n ? Math.min(need, J.sp || 0) : 0, wk = Object.values(S.wk || {}).filter(r => r[0] >= 1).length;
     const lm = (J.lm || []).filter(x => x > 0), avg = lm.length ? Math.round(lm.reduce((a, b) => a + b, 0) / lm.length) : 0;
-    return `<h4>${stars ? '⭐ מסע הכוכבים' : '🔤 מסע האותיות'}</h4>${L([stars ? `${J.n || 0} כוכבים מתוך 26.` : `${J.n || 0} אותיות נפתחו מתוך 26${J.n ? `: <span class="en">${ALPHA.slice(0, J.n).join(' ').toUpperCase()}</span>` : ''}.`,
+    const JJ = jOf(J, pk), PM = JJ && PP_BY[JJ.id];
+    if (PM) { const t = PM.st[Math.min(J.n || 0, PM.st.length - 1)];
+      return `<h4>🛂 ${esc(JJ.name)}</h4>${L([`${J.n || 0} חותמות מתוך ${PM.st.length}.`, (J.xw || []).length ? `גלגלי אקסטרה במפה: ${(J.xw || []).length}, סובבו ${J.xs || 0}.` : '', avg ? `תחנה לוקחת לו בערך ${avg} דקות.` : ''])}
+      <p class="kdnext">👉 ${(J.n || 0) >= PM.st.length ? 'הדרכון מלא.' : `תחנה ${(J.n || 0) + 1} · <span class="en">${esc(t.c)}</span> ${t.f} (${PP_IC[t.k]} ${ppKind(t.k, pk === 'g7')}): ${have}/${need} שלבים.`}</p>`; }
+    return `<h4>${stars ? `⭐ ${JJ ? esc(JJ.name) : 'מסע הכוכבים'}` : '🔤 מסע האותיות'}</h4>${L([stars ? `${J.n || 0} כוכבים מתוך 26.` : `${J.n || 0} אותיות נפתחו מתוך 26${J.n ? `: <span class="en">${ALPHA.slice(0, J.n).join(' ').toUpperCase()}</span>` : ''}.`,
       stars && wk ? `מילים שהוא כבר יודע (ענה נכון בלי רמז): <b>${wk}</b>.` : '', avg ? `${stars ? 'כוכב לוקח' : 'אות לוקחת'} לו בערך ${avg} דקות.` : ''])}
       <p class="kdnext">👉 ${stars ? `כוכב ${(J.n || 0) + 1}` : `האות <span class="en">${(ALPHA[J.n || 0] || 'z').toUpperCase()}</span>`}: ${have}/${need} שלבים. ${need - have > 0 ? `חסרים עוד ${need - have} שלבים מוצלחים (כל שלב בערך 5 דקות)${stars ? ', ולדעת את רוב המילים של הכוכב' : ''}.` : stars ? 'השלבים מוכנים. נשאר לדעת עוד מילים של הכוכב.' : 'השלבים מוכנים: בשלב הבא נפתחת האות.'}</p>`;
   }
@@ -2335,7 +2401,8 @@ function renderParentBar() {
       const p = k.progress || {}, J = p.jour || {}, ph = (k.profile || {}).photo, pk = st.pack || 'g4-mapping';
       const trk = pk === 'g7' ? 'כיתה ז׳' : pk === 'k5' ? 'גן' : 'כיתה ד׳';
       const mx = ((st.goal || {}).max == null ? 60 : +(st.goal || {}).max) ? dayMaxToday(Object.assign({}, st, { goal: Object.assign({ max: 60 }, st.goal || {}) })) : 0, freeT = xeFree(st);
-      const road = pk === 'k5' ? { v: `${(p.k5 || {}).n || 0}`, l: 'כוכבים' } : (J.lv || 1) >= 2 ? { v: `${J.n || 0}/26`, l: `כוכבים במסע ${J.lv > 2 ? (J.lv === 3 ? 'הירח' : 'השמש') : 'הכוכבים'}` } : { v: `${J.n || 0}/26`, l: 'אותיות במסע' };
+      const JJ = jOf(J, pk), PM = JJ && PP_BY[JJ.id];
+      const road = pk === 'k5' ? { v: `${(p.k5 || {}).n || 0}`, l: 'כוכבים' } : PM ? { v: `${J.n || 0}/${PM.st.length}`, l: `חותמות ב${JJ.name}` } : JJ ? { v: `${J.n || 0}/26`, l: `כוכבים ב${JJ.name}` } : { v: `${J.n || 0}/26`, l: 'אותיות במסע' };
       const OPEN = (KOPEN[k.id] || ''), tile = (v, l, key) => key ? `<button type="button" class="kt kto ${OPEN === key ? 'on' : ''}" data-kd="${key}" data-kid="${k.id}" aria-expanded="${OPEN === key}"><b>${v}</b><span>${l}</span><i class="ktmore" aria-hidden="true">${OPEN === key ? '▴' : '▾'}</i></button>` : `<div class="kt"><b>${v}</b><span>${l}</span></div>`;
       return `<article class="kst" data-k="${k.id}" style="--kc:${kidCol(k)}">
         <header class="ksthead">
@@ -2569,6 +2636,9 @@ function settingsSheet(kidId, tab) {
             <ul class="pzlist" id="pzl-megaPrizes"></ul>
             <div class="pzfoot"><button type="button" class="btn sm" data-pzadd="megaPrizes">＋ הוספת פרס</button><button type="button" class="pzlink" data-pzreset="megaPrizes">שחזור הרשימה המקורית</button></div>
             <button type="button" class="btn sm" id="shmtry">👑 לנסות את המגה גלגל</button></div>
+          <div class="shgrp"><h3>⭐ תחנת ההורים בדרכון</h3>
+            ${blt(['בכל מפת דרכון יש תחנה אחת שלכם (תחנה 8).', 'כשמגיעים אליה, רואים את מה שכתבתם כאן.', 'אפשר להחליף מתי שרוצים: הודעה, אתגר, או פרס שמחכה.'], 'hint')}
+            <textarea id="shppm" class="shta" rows="2" maxlength="300" placeholder="למשל: מחכה לך גלידה אחרי ארוחת הערב 🍦">${esc((st.goal || {}).ppm || '')}</textarea></div>
           <div class="shgrp"><h3>הפתעה משלו</h3>
             <div class="seg" role="group" aria-label="הפתעה אישית">${segs('kp', st.kidPrize ? '1' : '0', [['0', 'כבוי'], ['1', 'מותר']])}</div>
             ${blt([`כשמותר, ${esc(kid.name)} יכול להוסיף לגלגל הפתעה אחת משלו (עם תרגום ותמונה).`, 'הוא יכול לערוך אותה ולהסיר אותה.', 'כאן תראו מה בחר, ותוכלו להסיר.'], 'hint')}</div>
@@ -2613,6 +2683,7 @@ function settingsSheet(kidId, tab) {
         $s('#pzkidrm').onclick = async () => { try { await PAPI.clearMyPrize(kid.id); delete kid.progress.myPrize; $s('#pzkid').textContent = 'ההפתעה שלו הוסרה.'; } catch (e) { $s('#pzkid').textContent = 'ההסרה נכשלה. נסו שוב.'; } };
       }
       bindSeg('kp', v => { st.kidPrize = v === '1'; });
+      { const pm = $s('#shppm'); if (pm) pm.oninput = () => { st.goal = Object.assign({}, st.goal, { ppm: pm.value.slice(0, 300) }); touch(); }; }
       $s('#shtry').onclick = () => wheelView({ prizes: pzCleanList(st.prizes), art: st.prizeArt });
       $s('#shmtry').onclick = () => wheelView({ prizes: pzCleanList(st.megaPrizes), mega: true, art: st.prizeArt });
     } else if (cur === 'prog') {
@@ -3630,7 +3701,7 @@ function wheelView(preview) {
       if (k < 1) { requestAnimationFrame(frame); return; }
       spinning = false;
       let g2 = { avail: 1 };
-      if (!preview) { const s2 = load(); day(s2).spins++; const J2 = jour(s2); if (mega) J2.mega = true; else { J2.spins = (J2.spins || 0) + 1; day(s2).jw = (day(s2).jw || 0) + 1; } s2.wins.unshift({ date: today(), prize: prizes[win], mega: mega || undefined }); s2.wins = s2.wins.slice(0, 60); save(s2); g2 = goalState(s2); if (mega) g2 = { avail: 0 }; }
+      if (!preview) { const s2 = load(); day(s2).spins++; const J2 = jour(s2); if (mega) J2.mega = true; else if (ppXW(s2)) { J2.xs = (J2.xs || 0) + 1; J2.spins = (J2.spins || 0) + 1; } else { J2.spins = (J2.spins || 0) + 1; day(s2).jw = (day(s2).jw || 0) + 1; } s2.wins.unshift({ date: today(), prize: prizes[win], mega: mega || undefined }); s2.wins = s2.wins.slice(0, 60); save(s2); g2 = goalState(s2); if (mega) g2 = { avail: 0 }; }
       const pz = prizes[win], he = heOf(pz), who = KID && KID.name ? KID.name : '';
       const msg = `אמא ואבא! ${who ? who + ' כאן. ' : ''}זכיתי בגלגל ההפתעות 🎉\n${emojiOf(pz)} ${textOf(pz)}${he ? `\n(${he})` : ''}\nאתם חייבים לי 😄`;
       const details = `
@@ -3867,17 +3938,37 @@ const UNIT_BY = {}; (UNITS.units || []).forEach(u => UNIT_BY[u.id] = u); (G7.uni
 const G7U = (G7.units || []).map(u => u.id), G7R = (G7.reading || []).map(r => ({ t: r.title, x: r.text, q: r.q, hard: true }));
 const JOURNEYS = {
   g4: [{ id: 'stars', name: 'מסע הכוכבים', ic: '⭐', deco: ['🪐', '☄️', '🌙', '🛰️', '🌌', '🌠'], units: [], talk: 1, desc: 'מילים של כיתה ד׳-ה׳ וההווה הפשוט.' },
+    { id: 'ppuk', pp: 1, name: 'דרכון · בריטניה ואירלנד', ic: '🛂', deco: [], units: [], talk: 1, desc: 'ערים באנגליה, סקוטלנד, ויילס ואירלנד. בכל תחנה חותמת, ומשהו מיוחד: בדיחה, ביטוי, עובדה.' },
+    { id: 'ppam', pp: 1, name: 'דרכון · צפון אמריקה', ic: '🛂', deco: [], units: [], talk: 2, desc: 'ערים בארה״ב ובקנדה. חותמות, בדיחות וביטויים.' },
     { id: 'moon', name: 'מסע הירח', ic: '🌙', deco: ['🌑', '🌒', '🌓', '🌔', '🌕', '🌖'], units: ['plural', 'progressive', 'spelling_ing'], talk: 2, desc: 'יחיד ורבים, ומה קורה עכשיו (am/is/are + ing).' },
     { id: 'sun', name: 'מסע השמש', ic: '☀️', deco: ['🌞', '🔥', '🌅', '✨', '🌻', '🌈'], units: ['past_regular', 'past_irregular', 'past_questions'], talk: 3, desc: 'זמן עבר ופעלים יוצאי דופן.' }],
   g7: [{ id: 'g7a', name: 'מסע הגלקסיה', ic: '🌌', deco: ['🪐', '☄️', '🌙', '🛰️', '🌠', '✨'], units: G7U.slice(0, Math.ceil(G7U.length / 2)), talk: 'g7', desc: 'אוצר מילים של כיתה ז׳, זמנים ודקדוק.' },
+    { id: 'ppaf', pp: 1, name: 'דרכון · אפריקה ואסיה', ic: '🛂', deco: [], units: [], talk: 'g7', desc: 'מקומות שמדברים בהם אנגלית ואולי לא ידעת: ניגריה, קניה, סינגפור ועוד. הידעת, בדיחות וסלנג.' },
+    { id: 'ppis', pp: 1, name: 'דרכון · איים ומבטאים', ic: '🛂', deco: [], units: [], talk: 'g7', desc: 'מלטה, ג׳מייקה, אוסטרליה, ניו זילנד ועוד. מבטאים, סלנג מקומי והידעת.' },
     { id: 'g7b', name: 'מסע אנדרומדה', ic: '🪐', deco: ['🌌', '🚀', '🌟', '🛸', '🌍', '💫'], units: G7U.slice(Math.ceil(G7U.length / 2)), talk: 'g7', desc: 'מילים קשות יותר, סביל, תנאי ועוד.' }],
 };
 const trackW = () => { const w = TRACK_WORDS[TRACK()]; return w && w.length ? w : TRACK_WORDS.g4; };
 const jList = () => JOURNEYS[TRACK()] || JOURNEYS.g4;
-const jIdx = s => Math.max(0, (jour(s).lv || 2) - 2);
+const OLDJ = { g4: ['stars', 'moon', 'sun'], g7: ['g7a', 'g7b'] };
+const jOf = (J, pk) => { if ((J.lv || 1) < 2) return null; const T = pk === 'g7' ? 'g7' : 'g4', id = J.jid || (OLDJ[T] || [])[(J.lv || 2) - 2]; return (JOURNEYS[T] || []).find(x => x.id === id) || null; }; // the order before the passport, for saves without an id
+const jIdx = s => { const J = jour(s), L = jList(); if ((J.lv || 1) < 2) return 0;
+  let i = J.jid ? L.findIndex(x => x.id === J.jid) : -1;
+  if (i < 0) { const o = (OLDJ[TRACK()] || [])[Math.max(0, (J.lv || 2) - 2)]; i = Math.max(0, L.findIndex(x => x.id === o)); J.jid = L[i].id; }
+  J.lv = i + 2; return i; };
+const PP = /*PP*/{"g4": [{"id": "ppuk", "name": "דרכון · בריטניה ואירלנד", "region": "🇬🇧", "st": [{"c": "Cardiff", "f": "🏴󠁧󠁢󠁷󠁬󠁳󠁿", "n": "ויילס", "en": "In Wales, the signs are in two languages: English and Welsh.", "he": "בוויילס השלטים כתובים בשתי שפות: אנגלית וולשית.", "k": "fact"}, {"c": "Bath", "f": "🇬🇧", "n": "אנגליה", "en": "Why did the cookie go to the doctor? Because it felt crummy!", "he": "למה העוגייה הלכה לרופא? כי היא הרגישה ״קראמי״!", "why": "crumb זה פירור, ו־crummy זה גם ״מרגיש רע״. העוגייה מלאה פירורים וגם מרגישה רע.", "k": "joke"}, {"c": "Oxford", "f": "🇬🇧", "n": "אנגליה", "en": "It's raining cats and dogs!", "he": "יורד גשם של חתולים וכלבים!", "why": "לא באמת נופלים חתולים. זה אומר: יורד גשם חזק מאוד.", "k": "idiom"}, {"c": "Cambridge", "f": "🇬🇧", "n": "אנגליה", "en": "Cambridge University is more than 800 years old.", "he": "האוניברסיטה בקיימברידג׳ בת יותר מ־800 שנה.", "k": "fact"}, {"c": "Liverpool", "f": "🇬🇧", "n": "אנגליה", "en": "The Beatles, a very famous band, came from Liverpool.", "he": "הביטלס, להקה מפורסמת מאוד, באו מליברפול.", "k": "review"}, {"c": "Manchester", "f": "🇬🇧", "n": "אנגליה", "en": "What do you call a bear with no teeth? A gummy bear!", "he": "איך קוראים לדוב בלי שיניים? דובי גומי!", "why": "gums זה חניכיים. לדוב בלי שיניים יש רק חניכיים, וגם gummy bear זה סוכריית גומי.", "k": "joke"}, {"c": "York", "f": "🇬🇧", "n": "אנגליה", "en": "This is a very old city!", "he": "זו עיר מאוד עתיקה!", "why": "ביורק יש חומות עתיקות מסביב לכל העיר. תגיד את המשפט בקול!", "k": "speak"}, {"c": "Loch Ness", "f": "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "n": "סקוטלנד", "en": "Some people say a monster lives in Loch Ness. Her name is Nessie!", "he": "יש אנשים שאומרים שמפלצת גרה באגם לוך נס. קוראים לה נסי!", "k": "parent"}, {"c": "Edinburgh", "f": "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "n": "סקוטלנד", "en": "Break a leg!", "he": "תשבור רגל!", "why": "לא מאחלים לשבור רגל באמת! אומרים את זה לפני הופעה, וזה אומר: בהצלחה!", "k": "idiom"}, {"c": "Glasgow", "f": "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "n": "סקוטלנד", "en": "Why can't a bicycle stand up by itself? Because it is two tired!", "he": "למה אופניים לא עומדים לבד? כי הם ״טו טייערד״!", "why": "two tired = שני צמיגים. too tired = עייף מדי. נשמע אותו דבר!", "k": "joke"}, {"c": "Belfast", "f": "🇬🇧", "n": "צפון אירלנד", "en": "The Titanic, the famous big ship, was built in Belfast.", "he": "הטיטאניק, האונייה הגדולה והמפורסמת, נבנתה בבלפסט.", "k": "review"}, {"c": "Galway", "f": "🇮🇪", "n": "אירלנד", "en": "In Galway, some people speak Irish at home.", "he": "בגולוויי יש אנשים שמדברים אירית בבית.", "k": "fact"}, {"c": "Dublin", "f": "🇮🇪", "n": "אירלנד", "en": "The river Liffey goes right through Dublin.", "he": "הנהר ליפי עובר בדיוק באמצע דבלין.", "k": "boss"}, {"c": "Brighton", "f": "🇬🇧", "n": "אנגליה", "en": "What has ears but cannot hear? A cornfield!", "he": "למה יש אוזניים אבל הוא לא שומע? לשדה תירס!", "why": "ear זה אוזן, וגם קלח של תירס נקרא ear.", "k": "joke"}, {"c": "London", "f": "🇬🇧", "n": "אנגליה", "en": "People call the big clock tower Big Ben. But Big Ben is really the name of the bell!", "he": "כולם קוראים למגדל השעון ״ביג בן״. אבל ביג בן הוא בעצם השם של הפעמון!", "k": "capital"}]}, {"id": "ppam", "name": "דרכון · צפון אמריקה", "region": "🇺🇸", "st": [{"c": "Boston", "f": "🇺🇸", "n": "ארה״ב", "en": "Boston has the oldest public park in America.", "he": "בבוסטון נמצא הפארק הציבורי הכי ותיק באמריקה.", "k": "fact"}, {"c": "New York", "f": "🇺🇸", "n": "ארה״ב", "en": "Why did the teacher wear sunglasses? Because her students were so bright!", "he": "למה המורה הרכיבה משקפי שמש? כי התלמידים שלה היו כל כך ״ברייט״!", "why": "bright זה גם מבריק (אור חזק) וגם חכם.", "k": "joke"}, {"c": "Ottawa", "f": "🇨🇦", "n": "קנדה", "en": "It's a piece of cake!", "he": "זו חתיכת עוגה!", "why": "אין פה עוגה. זה אומר: זה קל מאוד!", "k": "idiom"}, {"c": "Chicago", "f": "🇺🇸", "n": "ארה״ב", "en": "People call Chicago \"the Windy City\".", "he": "לשיקגו קוראים ״העיר של הרוח״.", "k": "fact"}, {"c": "Toronto", "f": "🇨🇦", "n": "קנדה", "en": "The CN Tower in Toronto is more than 550 meters tall.", "he": "מגדל CN בטורונטו גבוה יותר מ־550 מטר.", "k": "review"}, {"c": "Niagara Falls", "f": "🇨🇦", "n": "קנדה", "en": "What did the ocean say to the beach? Nothing, it just waved!", "he": "מה האוקיינוס אמר לחוף? כלום, הוא רק נופף!", "why": "wave זה גל, וגם לנופף לשלום.", "k": "joke"}, {"c": "Vancouver", "f": "🇨🇦", "n": "קנדה", "en": "I can see the mountains and the sea!", "he": "אני רואה את ההרים ואת הים!", "why": "בוונקובר רואים הרים וים באותו מבט. תגיד את המשפט בקול!", "k": "speak"}, {"c": "Los Angeles", "f": "🇺🇸", "n": "ארה״ב", "en": "Hollywood, where many movies are made, is in Los Angeles.", "he": "הוליווד, המקום שבו עושים הרבה סרטים, נמצאת בלוס אנג׳לס.", "k": "parent"}, {"c": "San Francisco", "f": "🇺🇸", "n": "ארה״ב", "en": "Hold your horses!", "he": "תחזיק את הסוסים שלך!", "why": "אין סוסים. זה אומר: רגע, לא למהר!", "k": "idiom"}, {"c": "Orlando", "f": "🇺🇸", "n": "ארה״ב", "en": "Why did the math book look sad? Because it had too many problems!", "he": "למה ספר החשבון נראה עצוב? כי היו לו יותר מדי בעיות!", "why": "problems זה גם תרגילים בחשבון וגם צרות.", "k": "joke"}, {"c": "Houston", "f": "🇺🇸", "n": "ארה״ב", "en": "NASA's Mission Control, which talks to astronauts in space, is in Houston.", "he": "חדר הבקרה של נאס״א, שמדבר עם האסטרונאוטים בחלל, נמצא ביוסטון.", "k": "review"}, {"c": "Anchorage", "f": "🇺🇸", "n": "אלסקה", "en": "In Alaska in summer, it is light almost all night.", "he": "באלסקה בקיץ יש אור כמעט כל הלילה.", "k": "fact"}, {"c": "Grand Canyon", "f": "🇺🇸", "n": "ארה״ב", "en": "The Grand Canyon is about 1,800 meters deep.", "he": "הגרנד קניון עמוק בערך 1,800 מטר.", "k": "boss"}, {"c": "Montreal", "f": "🇨🇦", "n": "קנדה", "en": "What do you call a fish with no eyes? A fsh!", "he": "איך קוראים לדג בלי עיניים? ״פש״!", "why": "fish בלי האות i (שנשמעת כמו eye, עין) נהיה fsh.", "k": "joke"}, {"c": "Washington", "f": "🇺🇸", "n": "ארה״ב", "en": "The President of the USA lives in the White House, in Washington.", "he": "נשיא ארה״ב גר בבית הלבן, בוושינגטון.", "k": "capital"}]}], "g7": [{"id": "ppaf", "name": "דרכון · אפריקה ואסיה", "region": "🌍", "st": [{"c": "Lagos", "f": "🇳🇬", "n": "ניגריה", "en": "By some counts, more people speak English in Nigeria than in the UK.", "he": "לפי חלק מההערכות, בניגריה מדברים אנגלית יותר אנשים מאשר בבריטניה.", "why": "בניגריה יש מאות שפות מקומיות, ואנגלית היא השפה המשותפת של כולם.", "k": "fact"}, {"c": "Accra", "f": "🇬🇭", "n": "גאנה", "en": "I told my friend she drew her eyebrows too high. She looked surprised.", "he": "אמרתי לחברה שהיא ציירה את הגבות גבוה מדי. היא נראתה מופתעת.", "why": "גבות גבוהות זה בדיוק איך שנראים כשמופתעים. אז היא ״נראתה מופתעת״ גם בגלל הגבות.", "k": "joke"}, {"c": "Nairobi", "f": "🇰🇪", "n": "קניה", "en": "Don't bite off more than you can chew.", "he": "אל תנגוס יותר ממה שאתה יכול ללעוס.", "why": "כלומר: אל תיקח על עצמך יותר משאתה יכול לעשות.", "k": "idiom"}, {"c": "Kampala", "f": "🇺🇬", "n": "אוגנדה", "en": "Uganda has more than 40 local languages, so English helps people from different groups talk to each other.", "he": "באוגנדה יש יותר מ־40 שפות מקומיות, אז אנגלית עוזרת לאנשים מקבוצות שונות לדבר זה עם זה.", "k": "fact"}, {"c": "Kigali", "f": "🇷🇼", "n": "רואנדה", "en": "In 2008, Rwanda switched its schools from French to English.", "he": "ב־2008 רואנדה העבירה את בתי הספר שלה מצרפתית לאנגלית.", "k": "review"}, {"c": "Johannesburg", "f": "🇿🇦", "n": "דרום אפריקה", "en": "I'm reading a book about anti-gravity. It's impossible to put down.", "he": "אני קוראת ספר על אנטי־כבידה. אי אפשר להניח אותו.", "why": "״I can't put it down״ זה ״ספר שאי אפשר להפסיק לקרוא״. וספר נגד כבידה גם באמת לא נוחת.", "k": "joke"}, {"c": "Cape Town", "f": "🇿🇦", "n": "דרום אפריקה", "en": "I'd love to climb Table Mountain one day.", "he": "הייתי רוצה לטפס על הר השולחן יום אחד.", "why": "לדרום אפריקה יש 12 שפות רשמיות, ואנגלית היא רק אחת מהן. תגידי את המשפט בקול.", "k": "speak"}, {"c": "Gaborone", "f": "🇧🇼", "n": "בוטסואנה", "en": "Botswana is home to more elephants than any other country.", "he": "בבוטסואנה חיים יותר פילים מבכל מדינה אחרת.", "k": "parent"}, {"c": "Windhoek", "f": "🇳🇦", "n": "נמיביה", "en": "Spill the tea!", "he": "שפכי את התה!", "why": "סלנג: ספרי את הרכילות, מה קרה?", "k": "idiom"}, {"c": "Delhi", "f": "🇮🇳", "n": "הודו", "en": "Why don't skeletons fight each other? They don't have the guts.", "he": "למה שלדים לא רבים? אין להם את הקרביים.", "why": "guts זה קרביים, וגם אומץ. לשלד אין לא את זה ולא את זה.", "k": "joke"}, {"c": "Colombo", "f": "🇱🇰", "n": "סרי לנקה", "en": "Sri Lanka is shaped like a teardrop. People call it \"the pearl of the Indian Ocean\".", "he": "סרי לנקה בצורת דמעה. קוראים לה ״הפנינה של האוקיינוס ההודי״.", "k": "review"}, {"c": "Mumbai", "f": "🇮🇳", "n": "הודו", "en": "India has 22 official languages. English is used next to Hindi in the government.", "he": "בהודו יש 22 שפות רשמיות. בממשלה משתמשים באנגלית לצד הינדי.", "k": "fact"}, {"c": "Manila", "f": "🇵🇭", "n": "הפיליפינים", "en": "The Philippines is one of the biggest English-speaking countries in Asia.", "he": "הפיליפינים היא אחת המדינות הגדולות באסיה שמדברים בה אנגלית.", "why": "הרבה חברות אמריקאיות מפעילות שם מוקדי שירות, בגלל האנגלית.", "k": "boss"}, {"c": "Hong Kong", "f": "🇭🇰", "n": "הונג קונג", "en": "I used to hate facial hair, but then it grew on me.", "he": "פעם שנאתי זקן, אבל אז הוא צמח עליי.", "why": "״it grew on me״ זה ״התחלתי לאהוב את זה עם הזמן״. וזקן גם באמת צומח על הפנים.", "k": "joke"}, {"c": "Singapore", "f": "🇸🇬", "n": "סינגפור", "en": "Singapore has four official languages: English, Malay, Mandarin and Tamil. People mix them into \"Singlish\", like adding \"lah\" at the end: \"OK lah!\"", "he": "בסינגפור יש ארבע שפות רשמיות: אנגלית, מלאית, סינית וטמילית. מערבבים אותן ל״סינגליש״, למשל מוסיפים ״לה״ בסוף: ״OK lah!״", "k": "capital"}]}, {"id": "ppis", "name": "דרכון · איים ומבטאים", "region": "🏝️", "st": [{"c": "Valletta", "f": "🇲🇹", "n": "מלטה", "en": "Maltese is the only Semitic language written in Latin letters. It is related to Arabic and Hebrew!", "he": "מלטית היא השפה השמית היחידה שנכתבת באותיות לטיניות. היא קרובה לערבית ולעברית!", "why": "במלטה מדברים מלטית ואנגלית, שתיהן רשמיות.", "k": "fact"}, {"c": "Gibraltar", "f": "🇬🇮", "n": "גיברלטר", "en": "Why did the scarecrow win an award? Because he was outstanding in his field.", "he": "למה הדחליל זכה בפרס? כי הוא היה מצטיין בתחום שלו.", "why": "outstanding in his field = מצטיין בתחומו. אבל גם, מילולית, ״עומד בחוץ בשדה שלו״.", "k": "joke"}, {"c": "Dublin", "f": "🇮🇪", "n": "אירלנד", "en": "What's the craic?", "he": "מה הקראק?", "why": "סלנג אירי: מה נשמע, מה קורה? craic (נשמע ״קראק״) זה כיף וחדשות.", "k": "idiom"}, {"c": "Edinburgh", "f": "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "n": "סקוטלנד", "en": "In Scotland, \"wee\" means small. A \"wee bit\" is a little bit.", "he": "בסקוטלנד wee זה קטן. a wee bit זה ״קצת״.", "k": "fact"}, {"c": "Kingston", "f": "🇯🇲", "n": "ג׳מייקה", "en": "Jamaican Patois mixes English with West African languages.", "he": "הפטואה של ג׳מייקה מערבבת אנגלית עם שפות ממערב אפריקה.", "k": "review"}, {"c": "Bridgetown", "f": "🇧🇧", "n": "ברבדוס", "en": "I'm on a seafood diet. I see food and I eat it.", "he": "אני בדיאטת פירות ים. אני רואה אוכל ואוכלת אותו.", "why": "seafood (פירות ים) נשמע כמו see food (רואה אוכל).", "k": "joke"}, {"c": "Nassau", "f": "🇧🇸", "n": "איי בהאמה", "en": "Could you tell me how to get to the beach, please?", "he": "תוכל להגיד לי איך מגיעים לחוף, בבקשה?", "why": "איי בהאמה הם יותר מ־700 איים. תגידי את המשפט בקול.", "k": "speak"}, {"c": "Port of Spain", "f": "🇹🇹", "n": "טרינידד וטובגו", "en": "The steelpan, a drum made from an oil barrel, was invented in Trinidad.", "he": "תוף הפלדה, שעשוי מחבית נפט, הומצא בטרינידד.", "k": "parent"}, {"c": "Sydney", "f": "🇦🇺", "n": "אוסטרליה", "en": "No worries, see you this arvo!", "he": "אין בעיה, נתראה ב״ארבו״!", "why": "באוסטרליה מקצרים מילים: arvo זה afternoon, אחר הצהריים.", "k": "idiom"}, {"c": "Melbourne", "f": "🇦🇺", "n": "אוסטרליה", "en": "What do you call a fake noodle? An impasta.", "he": "איך קוראים לאטריה מזויפת? ״אימפסטה״.", "why": "impostor זה מתחזה, ו־pasta זה פסטה.", "k": "joke"}, {"c": "Auckland", "f": "🇳🇿", "n": "ניו זילנד", "en": "In New Zealand, people often say \"Kia ora\" — hello in the Māori language.", "he": "בניו זילנד אומרים הרבה ״קיה אורה״, שלום בשפת המאורים.", "k": "review"}, {"c": "Suva", "f": "🇫🇯", "n": "פיג׳י", "en": "Fiji has three official languages: English, Fijian and Hindi.", "he": "לפיג׳י יש שלוש שפות רשמיות: אנגלית, פיג׳ית והינדי.", "k": "fact"}, {"c": "Honolulu", "f": "🇺🇸", "n": "הוואי", "en": "The Hawaiian alphabet has only 13 letters.", "he": "באלפבית של הוואי יש רק 13 אותיות.", "k": "boss"}, {"c": "Toronto", "f": "🇨🇦", "n": "קנדה", "en": "Time flies like an arrow; fruit flies like a banana.", "he": "הזמן טס כמו חץ; זבובי פירות אוהבים בננה.", "why": "במשפט השני flies הוא זבובים ו־like זה אוהבים. אותן מילים, משמעות אחרת לגמרי.", "k": "joke"}, {"c": "London", "f": "🇬🇧", "n": "אנגליה", "en": "More than 300 languages are spoken in London's schools.", "he": "בבתי הספר של לונדון מדברים יותר מ־300 שפות.", "k": "capital"}]}]}/*PP*/;
+var PP_BY = {}; Object.values(PP).forEach(a => a.forEach(m => PP_BY[m.id] = m));
+const isPP = s => isStars(s) && !!PP_BY[jour(s).jid];
+const ppMap = s => PP_BY[jour(s).jid];
+const ppSt = (s, k) => { const M = ppMap(s); return M ? M.st[Math.min(k, M.st.length - 1)] : null; };
+const PP_WHEEL = { 3: 'x', 7: 'x', 11: 'x', 12: 'b' }; // after station k: an extra wheel (x) or the bonus wheel after the boss (b)
+const PP_IC = { fact: '🌍', joke: '😄', idiom: '💬', review: '🔁', speak: '🗣️', parent: '⭐', boss: '👑', capital: '🏁' };
+const ppKind = (k, g7) => ({ fact: g7 ? 'הידעת?' : 'עובדה', joke: 'בדיחה', idiom: 'ביטוי', review: 'תחנת חזרה', speak: 'אומרים בקול', parent: 'תחנת ההורים', boss: 'תחנת בוס', capital: 'תחנת הסיום' })[k] || '';
+const ppXW = s => { const J = jour(s); return isPP(s) ? Math.max(0, (J.xw || []).length - (J.xs || 0)) : 0; }; // map wheels waiting
+const jUnit = (s, k) => { if (!isPP(s)) return `כוכב ${k + 1}`; const t = ppSt(s, k); return `תחנה ${k + 1}${t ? ` · ${t.c}` : ''}`; };
 const curJ = s => { const L = jList(); return L[Math.min(jIdx(s), L.length - 1)]; };
 const jBase = s => jIdx(s) * JOUR_N * SW;
-const starWords = k => { const W = trackW(), a = jBase(load()) + k * SW; return [...Array(SW)].map((_, i) => W[(a + i) % W.length]).filter((w, i, x) => x.indexOf(w) === i); };
+const starWords = k => { const s0 = load(); if (isPP(s0) && (ppSt(s0, k) || {}).k === 'review') { const W0 = trackW(), wk = s0.wk || {}, bad = W0.filter(w => { const r = wk[w.en]; return r && r[1] > r[0]; }); if (bad.length >= 6) return shuffle(bad.slice()).sort((a, b) => (wk[b.en][1] - wk[b.en][0]) - (wk[a.en][1] - wk[a.en][0])).slice(0, SW); }
+  const W = trackW(), a = jBase(load()) + k * SW; return [...Array(SW)].map((_, i) => W[(a + i) % W.length]).filter((w, i, x) => x.indexOf(w) === i); };
 const knownWords = k => { const W = trackW(); return W.slice(0, Math.min(W.length, jBase(load()) + (k + 1) * SW)); };
 const starTopics = k => [...new Set(starWords(k).map(w => w.topic))];
 // grammar units: spread over the journey's stars; the current one comes most, earlier ones as review
@@ -4358,9 +4449,24 @@ function layoutGoalPath() {
 }
 
 const LOCK_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5" fill="currentColor"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
+function ppRows(G, st, M) {
+  const J = G.J, xw = J.xw || [], spun = J.xs || 0;
+  return M.st.map((t, k) => {
+    const state = k < J.n ? 'done' : k === J.n ? 'cur' : 'lock', x = Math.sin(k * 1.1) * 1.2, ring = state === 'cur' ? Math.min(100, Math.round(G.csp / G.steps * 100)) : 0;
+    const row = `<div class="mrow pprow${state === 'cur' ? ' mcur' : ''}${t.k === 'boss' ? ' ppboss' : ''}" style="--x:${x.toFixed(2)}">
+      <span class="mdeco ${x > 0 ? 'l' : 'r'}" aria-hidden="true"><span class="mdi">${t.f}</span><small class="en">${esc(t.c)}</small></span>
+      <button type="button" class="mnode ${state} k-${t.k}" ${state === 'cur' ? `style="--ring:${ring}%"` : ''} data-stage="${k}" aria-label="תחנה ${k + 1}, ${esc(t.c)}, ${ppKind(t.k, TRACK() === 'g7')}${state === 'done' ? ', יש חותמת' : state === 'lock' ? ', נעולה' : ''}">
+        <span class="ppic">${PP_IC[t.k]}</span><b class="snum">${k + 1}</b>${state === 'done' ? '<span class="mchk" aria-hidden="true">✓</span>' : state === 'lock' ? `<span class="mlock" aria-hidden="true">${LOCK_SVG}</span>` : ''}
+      </button>${state === 'cur' ? `<span class="mhere" aria-hidden="true">✈️</span><span class="msteps" aria-label="שלב ${G.csp} מתוך ${G.steps}">${[...Array(G.steps)].map((_, i) => `<i class="${i < G.csp ? 'on' : ''}">${i < G.csp ? '👣' : ''}</i>`).join('')}</span>` : ''}</div>`;
+    if (!PP_WHEEL[k] || !st.wheel) return row;
+    const got = xw.indexOf(k), wst = got < 0 ? 'lock' : got < spun ? 'got' : 'open', bonus = PP_WHEEL[k] === 'b';
+    return row + `<div class="mrow ppwrow" style="--x:${(x * .5).toFixed(2)}"><button type="button" class="mnode ppw ${wst}${bonus ? ' bonus' : ''}" data-ppw="${wst}" aria-label="${bonus ? 'גלגל בונוס אחרי הבוס' : 'גלגל אקסטרה'}${wst === 'open' ? ', מחכה לך' : wst === 'got' ? ', כבר סובבת' : ', נעול'}">${miniWheel((st.prizes || []).length)}${wst === 'got' ? '<span class="mchk" aria-hidden="true">✓</span>' : ''}</button><small class="ppwt">${bonus ? '🎁 בונוס' : '🎁 גלגל אקסטרה'}</small></div>`;
+  }).join('');
+}
 function journeyMapHTML(G, st) {
   const J = G.J;
-  const rows = ALPHA.map((c, k) => {
+  const PPM = isPP(st) ? ppMap(st) : null;
+  const rows = PPM ? ppRows(G, st, PPM) : ALPHA.map((c, k) => {
     const state = k < J.n ? 'done' : k === J.n ? 'cur' : 'lock', U = c.toUpperCase(), SR = isStars(st);
     const x = SR ? Math.sin(k * 1.3) * 1.25 : Math.sin(k * 0.85), wd = SR ? { e: curJ(st).deco[k % 6], w: '' } : WORDS.find(w => w.L.toLowerCase() === c && !w.f) || WORDS.find(w => w.L.toLowerCase() === c);
     const stop = false, ring = state === 'cur' ? Math.min(100, Math.round(G.csp / G.steps * 100)) : 0;
@@ -4375,22 +4481,22 @@ function journeyMapHTML(G, st) {
     ? `<button type="button" class="mnode mega ${J.mega || megaOpen ? 'open' : 'lock'}" id="pmegaw" aria-label="מגה גלגל">${miniWheel((st.megaPrizes || []).length)}<span class="pcrown" aria-hidden="true">👑</span></button>`
     : `<span class="mnode mega" aria-hidden="true">🏆</span>`}<small class="mendt">${st.wheel ? 'מגה גלגל!' : 'סוף המסע'}</small></div>`;
   const nextL = ALPHA[J.n] ? ALPHA[J.n].toUpperCase() : '';
-  return `<div class="jmapwrap" id="jmapwrap">
+  return `<div class="jmapwrap${isPP(st) ? ' pp' : ''}" id="jmapwrap">
     <button type="button" class="mapfullbtn" id="mapfull" aria-label="לפתוח את המפה במסך מלא"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
     <div class="mapbar"><b>${isStars(st) ? `${curJ(st).ic} ${curJ(st).name}` : '🗺️ מסע 26 האותיות'} <span dir="ltr">${J.n}/${JOUR_N}</span></b><button type="button" class="mapx" id="mapx" aria-label="לסגור את המפה">✕ סגירה</button></div>
-    ${J.n < JOUR_N && !G.capped ? `<div class="mapgo"><button type="button" class="btn primary" id="mapgo">▶ להמשיך במסע · ${isStars(load()) ? `כוכב ${J.n + 1}` : `האות ${(ALPHA[J.n] || 'z').toUpperCase()}`} ${stepsHTML(G.csp, G.steps, false, nextL)}</button></div>` : ''}
+    ${J.n < JOUR_N && !G.capped ? `<div class="mapgo"><button type="button" class="btn primary" id="mapgo">▶ להמשיך במסע · ${isStars(load()) ? jUnit(load(), J.n) : `האות ${(ALPHA[J.n] || 'z').toUpperCase()}`} ${stepsHTML(G.csp, G.steps, false, nextL)}</button></div>` : ''}
     <div class="jmap" id="jmap" role="list" aria-label="מפת האותיות: ${J.n} מתוך ${JOUR_N}">
     <svg class="jline" aria-hidden="true"><path class="jl-all"/><path class="jl-done"/></svg>
-    <div class="mstart" aria-hidden="true"><span class="mflag">${isStars(st) ? '🚀' : '🚩'}</span>${isStars(st) ? 'level ' + (jour(st).lv || 2) : 'start'}</div>${rows}${end}</div></div>`;
+    <div class="mstart" aria-hidden="true"><span class="mflag">${isPP(st) ? '🛂' : isStars(st) ? '🚀' : '🚩'}</span>${isPP(st) ? 'passport' : isStars(st) ? 'level ' + (jour(st).lv || 2) : 'start'}</div>${rows}${end}</div></div>`;
 }
 function journeyCardHTML(G, st) {
   const J = G.J, nextL = ALPHA[J.n] ? ALPHA[J.n].toUpperCase() : '';
   let action;
   if (G.mega && st.wheel && !G.megaWait) action = `<button class="btn spinbtn megabtn" id="megaspin">👑 פתחת את כל 26 האותיות! למגה גלגל</button>`;
-  else if (G.avail && st.wheel) action = `<button class="btn spinbtn" id="spin">🎡 גלגל ההפתעות של היום נפתח! לסובב</button>`;
+  else if (G.avail && st.wheel) action = `<button class="btn spinbtn" id="spin">${G.xw ? '🎁 גלגל אקסטרה מחכה לך במפה! לסובב' : '🎡 גלגל ההפתעות של היום נפתח! לסובב'}</button>`;
   else if (G.capped) action = `<div class="jrest">🪫 <b>האנרגיה של היום נגמרה, כל הכבוד!</b><span>${lines(`היום היו ${G.maxM} דקות של תרגול.`, 'היא תתחדש מחר, אחרי שינה טובה בלילה 🌙', 'נתראה מחר!')}</span></div>`;
-  else if (J.n < JOUR_N && G.csp >= G.steps) action = isStars(st) ? `<button class="btn spinbtn" id="claim">⭐ השלבים הושלמו! לאסוף את כוכב ${J.n + 1}</button>` : `<button class="btn spinbtn" id="claim">🔓 השלבים הושלמו! לפתוח את האות <span class="en">${nextL}</span></button>`;
-  else if (J.n < JOUR_N) action = `<button class="btn stagebtn" id="stagego"><span class="stl">▶</span><span>${isStars(st) ? `למסע הכוכבים · כוכב ${J.n + 1}` : `להמשיך במסע · האות ${(ALPHA[J.n] || 'z').toUpperCase()}`}<small class="stmin">${stepsHTML(G.csp, G.steps, false, isStars(st) ? '⭐' : nextL)}</small></span><span aria-hidden="true">←</span></button>${isStars(st) ? '<button class="btn" id="jwords">📖 המילים של הכוכב</button>' : ''}`;
+  else if (J.n < JOUR_N && G.csp >= G.steps) action = isPP(st) ? `<button class="btn spinbtn" id="claim">🛂 השלבים הושלמו! לקבל חותמת ב־${esc(ppSt(st, J.n).c)}</button>` : isStars(st) ? `<button class="btn spinbtn" id="claim">⭐ השלבים הושלמו! לאסוף את כוכב ${J.n + 1}</button>` : `<button class="btn spinbtn" id="claim">🔓 השלבים הושלמו! לפתוח את האות <span class="en">${nextL}</span></button>`;
+  else if (J.n < JOUR_N) action = `<button class="btn stagebtn" id="stagego"><span class="stl">▶</span><span>${isStars(st) ? `${isPP(st) ? 'לדרכון' : 'למסע הכוכבים'} · ${jUnit(st, J.n)}` : `להמשיך במסע · האות ${(ALPHA[J.n] || 'z').toUpperCase()}`}<small class="stmin">${stepsHTML(G.csp, G.steps, false, isStars(st) ? '⭐' : nextL)}</small></span><span aria-hidden="true">←</span></button>${isStars(st) ? `<button class="btn" id="jwords">📖 ${isPP(st) ? 'המילים של התחנה' : 'המילים של הכוכב'}</button>` : ''}`;
   else if (!isStars(st) && (!G.mega || !st.wheel)) action = `<div class="jdone"><b>🏆 סיימת את כל 26 האותיות! כל הכבוד!</b><button class="btn spinbtn" id="jstars">⭐ לפתוח את מסע הכוכבים (רמה קשה)</button></div>`;
   else if (!G.mega || !st.wheel) { const NX = jList()[jIdx(st) + 1]; action = NX ? `<div class="jdone"><b>👑 סיימת את ${curJ(st).name}! אתה אלוף.</b><button class="btn spinbtn" id="jnext">${NX.ic} לפתוח את ${NX.name}</button><small>${NX.desc}</small></div>` : `<div class="jdone"><b>👑 סיימת את כל המסעות! אתה אלוף.</b><button class="btn" id="jnew">להתחיל מסע חזרה</button></div>`; }
   else action = '';
@@ -4403,16 +4509,16 @@ function journeyCardHTML(G, st) {
     : st.wheel && !G.avail && J.n < JOUR_N ? `<div class="jwait">🎡 כל יום יכול להיפתח גלגל הפתעות.<br>משלימים את השלבים של היום. ${wheelInfo(st)}</div>` : '';
   const T = G.target, tn = Math.min(G.todayN, T || G.todayN), minPct = G.minM ? Math.min(100, Math.round(G.mins / G.minM * 100)) : 100;
   const mission = `<div class="mission">
-      <span>📋 היום: <b>${T ? `${tn}/${T}` : G.todayN}</b> ${isStars(st) ? 'כוכבים' : 'אותיות'}${T && G.todayN >= T ? ' · <b>בוצעה! 🎉</b>' : ''}</span>
+      <span>📋 היום: <b>${T ? `${tn}/${T}` : G.todayN}</b> ${isPP(st) ? 'חותמות' : isStars(st) ? 'כוכבים' : 'אותיות'}${T && G.todayN >= T ? ' · <b>בוצעה! 🎉</b>' : ''}</span>
       ${T ? `<span class="mdots" aria-hidden="true">${[...Array(T)].map((_, i) => `<i class="${i < tn ? 'on' : ''}"></i>`).join('')}</span>` : ''}
 </div>`;
-  if (isStars(st)) return `<section class="goal stk h3 journey stars">
+  if (isStars(st)) return `<section class="goal stk h3 journey stars${isPP(st) ? ' pp' : ''}">
     <div class="goalhead"><span class="glabel">${curJ(st).ic} ${curJ(st).name}</span><span class="gbig" dir="ltr">${J.n} / ${JOUR_N}</span></div>
     ${blt([
-      '<b>המטרה:</b> לאסוף 26 כוכבים ⭐',
+      isPP(st) ? `<b>המטרה:</b> לאסוף ${JOUR_N} חותמות בדרכון 🛂` : '<b>המטרה:</b> לאסוף 26 כוכבים ⭐',
       curJ(st).desc,
-      `כל כוכב = <b>${G.steps} שלבים</b> 👣. שלב נספר רק עם <b>${Math.round(TIER_PASS[starTier(st)] * 100)}%</b> ומעלה, וכוכב רק כשיודעים את המילים שלו 💪`,
-      st.wheel ? 'גלגל ההפתעות ממשיך כרגיל 🎡' : ''], 'gsub')}
+      isPP(st) ? `כל תחנה = <b>${G.steps} שלבים</b> 👣. בכל תחנה מחכה משהו מיוחד, ותחנת הבוס 👑 קשה יותר.` : `כל כוכב = <b>${G.steps} שלבים</b> 👣. שלב נספר רק עם <b>${Math.round(TIER_PASS[starTier(st)] * 100)}%</b> ומעלה, וכוכב רק כשיודעים את המילים שלו 💪`,
+      st.wheel ? (isPP(st) ? 'גלגל ההפתעות היומי ממשיך, ובמפה יש עוד גלגלי אקסטרה 🎁' : 'גלגל ההפתעות ממשיך כרגיל 🎡') : ''], 'gsub')}
     ${action}
     ${wait}
     ${mission}
@@ -4439,6 +4545,17 @@ function stagePop(el) {
   const s_ = load(), G_ = goalState(s_), k = +el.dataset.stage, J = jour(s_), L = ALPHA[k].toUpperCase(), card = el.closest('.jmap') || el.closest('.journey');
   const state = G_.capped && k <= J.n ? 'rest' : k < J.n ? 'done' : k === J.n ? 'cur' : 'lock';
   const pop = document.createElement('div');
+  if (isPP(s_)) {
+    const t = ppSt(s_, k), g7 = TRACK() === 'g7';
+    pop.className = `jpop ${state}`; pop.dataset.k = k; pop.setAttribute('role', 'dialog');
+    pop.innerHTML = `<b>${t.f} <span class="en">${esc(t.c)}</span> · ${PP_IC[t.k]} ${ppKind(t.k, g7)}</b><span>${state === 'rest' ? '🌙 להיום מספיק. נמשיך מחר!' : state === 'lock' ? `🔒 עוד נעולה. קודם ${jUnit(s_, J.n)}.${t.k === 'boss' ? '<br>👑 תחנה קשה במיוחד, ואחריה גלגל בונוס.' : ''}` : state === 'cur' ? `${stepsHTML(G_.csp, G_.steps, false)}<br>שלב ${G_.csp} מתוך ${G_.steps}. בסוף: חותמת ו${t.k === 'joke' ? 'בדיחה' : t.k === 'idiom' ? 'ביטוי' : 'הפתעה'}.` : 'יש לך חותמת מכאן ✓'}</span>${state === 'cur' ? '<button class="btn primary" data-popgo>▶ להמשיך</button>' : state === 'done' ? '<button class="btn" data-poprd>📖 לקרוא שוב</button>' : ''}`;
+    card.appendChild(pop); const cb = card.getBoundingClientRect(), r = el.getBoundingClientRect();
+    pop.style.top = (r.bottom - cb.top + card.scrollTop + 10) + 'px'; pop.style.left = Math.max(8, Math.min(cb.width - pop.offsetWidth - 8, r.left - cb.left + r.width / 2 - pop.offsetWidth / 2)) + 'px';
+    pop.style.setProperty('--ax', (r.left - cb.left + r.width / 2 - parseFloat(pop.style.left)) + 'px');
+    const pg = pop.querySelector('[data-popgo]'); if (pg) pg.onclick = () => go(stageQuiz);
+    const pr = pop.querySelector('[data-poprd]'); if (pr) pr.onclick = () => { pop.remove(); ppCardOpen(k); };
+    return;
+  }
   if (isStars(s_)) {
     pop.className = `jpop ${state}`; pop.dataset.k = k; pop.setAttribute('role', 'dialog');
     pop.innerHTML = `<b>⭐ כוכב ${k + 1}</b><span>${state === 'rest' ? '🌙 להיום מספיק. נמשיך מחר!' : state === 'lock' ? `🔒 עוד נעול. קודם כוכב ${J.n + 1}.` : state === 'cur' ? `${stepsHTML(G_.csp, G_.steps, false)}<br>שלב ${G_.csp} מתוך ${G_.steps}.` : 'את הכוכב הזה כבר אספת ✓'}</span>${state === 'cur' ? '<button class="btn primary" data-popgo>▶ להמשיך במסע</button>' : ''}`;
@@ -4512,6 +4629,7 @@ function wireJourney() {
   }
   const sg = $('#stagego'); if (sg) sg.onclick = () => go(stageQuiz);
   const cl = $('#claim'); if (cl) cl.onclick = () => claimLetter();
+  $$('.mnode[data-ppw="open"]', app).forEach(x => x.onclick = e => { e.stopPropagation(); go(wheelView); });
   $$('.journey .mnode[data-stage]', app).forEach(x => { x.onclick = e => { e.stopPropagation(); stagePop(x); }; x.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); x.click(); } }; });
   const mw = $('#pmegaw'); if (mw) mw.onclick = () => { const g = goalState(load()); WHEEL_MEGA = g.mega && !g.megaWait; go(wheelView); };
   const ms = $('#megaspin'); if (ms) ms.onclick = () => { WHEEL_MEGA = true; go(wheelView); };
@@ -4601,7 +4719,7 @@ function stageFinish(score, n) {
   sfx(pass ? 'ok' : 'no');
   const need = stageSteps(s0), have = curSteps(s0), rest = restNow(), L = ST ? '⭐' : (ALPHA[J0.n] || 'z').toUpperCase();
   if (!pass) {
-    app.innerHTML = `${top(`מסע הכוכבים · כוכב ${J0.n + 1}`)}
+    app.innerHTML = `${top(`${curJ(load()).name} · ${jUnit(load(), J0.n)}`)}
     <section class="result stk">
       <div class="score">${score}/${n}</div>
       <h2>כמעט! 💪</h2>
@@ -4615,7 +4733,7 @@ function stageFinish(score, n) {
     const wv = $('#words'); if (wv) wv.onclick = () => go(learnView, true);
     return;
   }
-  app.innerHTML = `${top(ST ? `מסע הכוכבים · כוכב ${J0.n + 1}` : `המסע · האות ${(ALPHA[J0.n] || 'z').toUpperCase()}`)}
+  app.innerHTML = `${top(ST ? `${curJ(load()).name} · ${jUnit(load(), J0.n)}` : `המסע · האות ${(ALPHA[J0.n] || 'z').toUpperCase()}`)}
     <section class="result stk">
       <div class="score">${score}/${n}</div>
       <h2>${score / n >= 0.8 ? 'שלב מצוין! 💪' : score / n >= 0.5 ? 'יפה! ממשיכים 💪' : 'כל שלב מקדם אותך 💪'}</h2>
@@ -4644,12 +4762,14 @@ function claimLetter() {
   const k = J.n;
   J.lm = [...(J.lm || []), Math.round((J.cms || 0) / 60000)].slice(-10); // real minutes per stage, for the parents
   J.n = k + 1; d.jl = (d.jl || 0) + 1; J.cms = 0; J.cr = 0; J.sp = 0; J.ck = k + 1;
+  if (isPP(s) && PP_WHEEL[k] && s.wheel !== false) J.xw = [...new Set([...(J.xw || []), k])];
   save(s); go(letterWon, k);
 }
 function letterWon(k) {
   const st = load(), G = goalState(st), L = ALPHA[k].toUpperCase();
   const atStop = !!G.avail, atEnd = k + 1 === JOUR_N, ST = isStars(st);
   if (atEnd) setTimeout(() => bigParty(ST, () => { if (!st.wheel && !ST) startStars(); }), 350);
+  if (isPP(st)) return stampWon(k, st, G, atEnd);
   if (ST) return starWon(k, st, G, atStop, atEnd);
   sfx('win'); setTimeout(() => say(NAME[L]), 500);
   app.innerHTML = `${top('פתחת אות!')}
@@ -4672,6 +4792,57 @@ function letterWon(k) {
   const nx = $('#nextst'); if (nx) nx.onclick = () => go(stageQuiz);
 }
 
+function ppCardHTML(t, st, k) {
+  const g7 = TRACK() === 'g7', q = t.k === 'joke' && /\?\s/.test(t.en) ? t.en.split(/\?\s/) : null;
+  const pm = ((st.goal || {}).ppm || '').trim();
+  const main = t.k === 'parent'
+    ? `<p class="ppmsg">💛 ${esc(pm || (GIRL() ? 'ההורים שלך גאים בך! המשיכי ככה.' : 'ההורים שלך גאים בך! המשך ככה.'))}</p>`
+    : q ? `<p class="ppen en" dir="ltr">${esc(q[0])}?</p><button type="button" class="btn sm ppreveal" data-pprv>👀 מה התשובה?</button><p class="ppen en pppunch" dir="ltr" hidden>${esc(q.slice(1).join('? '))}</p>`
+    : `<p class="ppen en" dir="ltr">${esc(t.en)}</p>`;
+  const fact = t.k === 'parent' ? `<p class="ppsmall en" dir="ltr">${esc(t.en)}</p>` : '';
+  return `<div class="ppcard k-${t.k}">
+    <div class="pphead"><span class="ppflag" aria-hidden="true">${t.f}</span><div><b class="en">${esc(t.c)}</b><small>${esc(t.n)}</small></div><span class="ppkind">${PP_IC[t.k]} ${ppKind(t.k, g7)}</span></div>
+    ${t.k === 'speak' ? `<p class="ppdo">🗣️ ${GIRL() ? 'תגידי' : 'תגיד'} את המשפט בקול:</p>` : ''}${main}${fact}
+    <div class="ppbtns"><button type="button" class="btn sm" data-say="${esc(t.k === 'parent' ? t.en : t.en)}">🔊 לשמוע</button>
+      ${g7 ? `<button type="button" class="btn sm" data-pptr>א תרגום</button>` : ''}${t.why ? `<button type="button" class="btn sm" data-ppwhy>💡 ${t.k === 'joke' ? 'למה זה מצחיק?' : t.k === 'idiom' ? 'מה זה אומר?' : 'עוד משהו'}</button>` : ''}</div>
+    <p class="pphe" ${g7 ? 'hidden' : ''}>${esc(t.he)}</p>
+    ${t.why ? `<p class="ppwhy" hidden>💡 ${esc(t.why)}</p>` : ''}
+  </div>`;
+}
+function ppBind(root) {
+  const rv = root.querySelector('[data-pprv]'); if (rv) rv.onclick = () => { rv.hidden = true; const p = root.querySelector('.pppunch'); p.hidden = false; sfx('ok'); };
+  const tr = root.querySelector('[data-pptr]'); if (tr) tr.onclick = () => { const h = root.querySelector('.pphe'); h.hidden = !h.hidden; };
+  const wy = root.querySelector('[data-ppwhy]'); if (wy) wy.onclick = () => { const h = root.querySelector('.ppwhy'); h.hidden = !h.hidden; };
+}
+function ppCardOpen(k) { // read a station again from the map
+  const st = load(), t = ppSt(st, k); if (!t) return;
+  const ov = document.createElement('div'); ov.className = 'lcov ppcov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-label', t.c);
+  ov.innerHTML = `<div class="lcard ppov"><button class="shx lcx" aria-label="סגירה">✕</button>${ppStamp(t, k, true)}${ppCardHTML(t, st, k)}</div>`;
+  document.body.appendChild(ov); ppBind(ov);
+  const close = () => ov.remove(); ov.addEventListener('click', e => { if (e.target === ov) close(); }); ov.querySelector('.lcx').onclick = close;
+}
+const ppStamp = (t, k, small) => `<div class="ppstamp${small ? ' sm' : ' pop'}${t.k === 'boss' ? ' gold' : ''}" aria-hidden="true"><span class="ppsc en">${esc(t.c)}</span><span class="ppsf">${t.f}</span><span class="ppsn en">No. ${k + 1}</span></div>`;
+function stampWon(k, st, G, atEnd) {
+  sfx('win'); const t = ppSt(st, k), M = ppMap(st), w = PP_WHEEL[k] && st.wheel !== false ? PP_WHEEL[k] : '';
+  app.innerHTML = `${top('חותמת חדשה!')}
+    <section class="result stk lwon ppwon">
+      <p class="hint">🛂 ${esc(M.name)} · חותמת ${k + 1} מתוך ${M.st.length}</p>
+      ${ppStamp(t, k)}
+      <h2>${t.k === 'boss' ? `👑 ניצחת את תחנת הבוס ב־<span class="en">${esc(t.c)}</span>!` : `הגעת ל־<span class="en">${esc(t.c)}</span>! ${t.f}`}</h2>
+      ${ppCardHTML(t, st, k)}
+      <div class="row center">
+        ${atEnd && st.wheel ? `<button class="btn spinbtn megabtn" id="megaspin">👑 הדרכון מלא! למגה גלגל</button>`
+          : w && st.wheel ? `<button class="btn spinbtn" id="spin">${w === 'b' ? '🎁 גלגל בונוס על הבוס! לסובב' : '🎁 גלגל אקסטרה במפה! לסובב'}</button>`
+          : G.avail && st.wheel ? `<button class="btn spinbtn" id="spin">🎡 הגלגל של היום נפתח! לסובב</button>`
+          : atEnd ? '' : G.capped ? `<p class="jrest">🪫 <b>האנרגיה של היום נגמרה, כל הכבוד!</b> היא תתחדש מחר, אחרי שינה טובה 🌙</p>`
+          : `<button class="btn primary" id="nextst">לתחנה הבאה ✈️</button>`}
+        <button class="btn" data-back="home">לדף הבית</button></div>
+    </section>`;
+  ppBind(app);
+  const sp = $('#spin'); if (sp) sp.onclick = () => go(wheelView);
+  const ms = $('#megaspin'); if (ms) ms.onclick = () => { WHEEL_MEGA = true; go(wheelView); };
+  const nx = $('#nextst'); if (nx) nx.onclick = () => go(stageQuiz);
+}
 function starWon(k, st, G, atStop, atEnd) {
   sfx('win');
   app.innerHTML = `${top('אספת כוכב!')}
@@ -4696,9 +4867,9 @@ function learnView(fromHome) {
   const s = load(), J = jour(s), k = Math.min(J.n, JOUR_N - 1), ws = starWords(k), T = starTier(s);
   if (!fromHome && J.lw !== J.n) { J.lw = J.n; save(s); }
   const tp = starTopics(k).map(t => TOPIC_HE[t] || t).join(' · ');
-  app.innerHTML = `${top(`${TIER[T]} · כוכב ${k + 1}`)}
+  app.innerHTML = `${top(isPP(s) ? jUnit(s, k) : `${TIER[T]} · כוכב ${k + 1}`)}
     ${(() => { const UN = unitNow(s); return UN ? `<section class="qcard stk h5 ulearn"><h2>📐 ${esc(UN.title)}</h2>${(UN.learn || []).map(l => `<div class="urule"><p>${l.rule}</p>${(l.ex || []).length ? `<p class="en" dir="ltr">${l.ex.map(x => `<button class="btn sm uex" data-say="${esc(x.replace(/→.*/, '').trim())}">${esc(x)}</button>`).join(' ')}</p>` : ''}</div>`).join('')}</section>` : ''; })()}
-    <section class="qcard stk h3 vlhead"><h2>📖 המילים של כוכב ${k + 1}</h2><p class="hint">${tp}</p>
+    <section class="qcard stk h3 vlhead"><h2>📖 ${isPP(s) && (ppSt(s, k) || {}).k === 'review' ? '🔁 תחנת חזרה: מילים שהתבלבלת בהן' : `המילים של ${jUnit(s, k)}`}</h2><p class="hint">${tp}</p>
       ${blt(['לוחצים על כרטיס ושומעים את המילה ואת המשפט.', 'קוראים את המילים בקול.', 'אחר כך: תרגול קל, ואז זה נעשה קשה יותר.'])}</section>
     <div class="vlearn">${ws.map((w, i) => `<button class="vcard h${i % 6 + 1}${wordKnown(s, w.en) ? ' known' : ''}" data-i="${i}">${wordKnown(s, w.en) ? '<i class="vok">✅</i>' : ''}${vpic(w)}<b class="en">${esc(w.en)}</b><span class="vhe">${esc(w.he)}</span>${w.ex ? `<span class="vex en">${esc(w.ex)}</span><span class="vexhe">${esc(w.exhe || '')}</span>` : ''}</button>`).join('')}</div>
     <div class="row center"><button class="btn primary" id="lgo">▶ לתרגול קל</button><button class="btn" data-back="home">לדף הבית</button></div>`;
@@ -4709,11 +4880,12 @@ function easyPractice() { // only this star's words, the easy kinds of questions
   if (goalState(load()).capped) { restView(); return; }
   const s = load(), k = Math.min(jour(s).n, JOUR_N - 1); lvl = 'hard'; setStarPool(s, true); STAGE = { k: jour(s).n };
   WARMUP = true;
-  runQuiz('stage', `${TIER[starTier(s)]} · כוכב ${k + 1} · תרגול קל`, build([qWordPic, qWordPic, qProVocab, qWordPic, qProVocabRev, qWordPic, qExGap, qProVocab], 8), stageQuiz);
+  runQuiz('stage', `${isPP(s) ? jUnit(s, k) : `${TIER[starTier(s)]} · כוכב ${k + 1}`} · תרגול קל`, build([qWordPic, qWordPic, qProVocab, qWordPic, qProVocabRev, qWordPic, qExGap, qProVocab], 8), stageQuiz);
 }
 function startStars(lv, quiet) {
   const s = load(), r = (jour(s).round || 1) + 1;
-  s.jour = { n: 0, spins: 0, mega: false, round: r, lv: Math.min(lv || 2, 1 + jList().length), sv: 2, ck: 0, cms: 0, cr: 0, sp: 0 }; s.giftSpins = 0; save(s);
+  const lvC = Math.min(lv || 2, 1 + jList().length);
+  s.jour = { n: 0, spins: 0, mega: false, round: r, lv: lvC, jid: (jList()[lvC - 2] || {}).id, sv: 2, ck: 0, cms: 0, cr: 0, sp: 0 }; s.giftSpins = 0; save(s);
   if (quiet) return;
   try { cloudFlush && cloudFlush(); } catch (e) {}
   go(home);
@@ -6334,7 +6506,7 @@ function speakView() {
 
 const QS = new URLSearchParams(location.search);
 // ?demo — lets automated checks open one kind of question: __er.q('qExGap')
-if (QS.has('demo')) window.__er = { parent: kids => { PUSER = { uid: 'demo', name: 'הורה לבדיקה' }; PKIDS = kids; PKIDS_LOADED = 'demo'; renderParentBar(); }, sheet: (id, tab) => settingsSheet(id, tab), q: (n, k = 6) => { const G = { qExGap, qGap2, qProGrammar, qSentMean, qSentOrder, qExMean, qCase, qNum100 }; runQuiz('vocab', n, [...Array(k)].map(() => G[n]()), home); } };
+if (QS.has('demo')) window.__er = { know: () => { const s = load(); s.wk = s.wk || {}; starWords(jour(s).n).forEach(w => s.wk[w.en] = [3, 3, today()]); const J = jour(s); J.ck = J.n; J.sp = stageSteps(s); save(s); go(home); }, parent: kids => { PUSER = { uid: 'demo', name: 'הורה לבדיקה' }; PKIDS = kids; PKIDS_LOADED = 'demo'; renderParentBar(); }, sheet: (id, tab) => settingsSheet(id, tab), q: (n, k = 6) => { const G = { qExGap, qGap2, qProGrammar, qSentMean, qSentOrder, qExMean, qCase, qNum100 }; runQuiz('vocab', n, [...Array(k)].map(() => G[n]()), home); } };
 // ?trywheel — opens the wheel straight away in try-it mode, for checking the win card
 // and the sharing without having to earn a spin first. Spins here are not counted and
 // nothing is saved, exactly like the preview a parent gets from the settings.
