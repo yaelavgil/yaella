@@ -3163,11 +3163,13 @@ const guessEmoji = t => {
 // Order matters: the more specific first (a water park before a park). Brand names stay as they are.
 const PZ_LIB = [
   ['A Wolt order', 'הזמנה מוולט', '🛵', /וולט|wolt/i, 'Up to 60 shekels', 'עד 60 שקלים'],
+  ['TikTok for a full day', 'טיקטוק ליום שלם', '📱', /טיקטוק.{0,12}(יום שלם|כל היום)|(יום שלם|כל היום).{0,12}טיקטוק/i, 'One day only', 'יום אחד בלבד'],
   ['30 more minutes on TikTok', 'עוד 30 דקות בטיקטוק', '📱', /טיקטוק|tiktok/i, 'Not after 8:30 pm', 'לא אחרי 20:30'],
   ['30 more minutes on YouTube', 'עוד 30 דקות ביוטיוב', '▶️', /יוטיוב|youtube/i],
   ['One more episode on Netflix', 'עוד פרק בנטפליקס', '📺', /נטפליקס|netflix|עוד פרק/i],
   ['30 more minutes of video games', 'עוד 30 דקות משחקי מחשב', '🎮', /משחקי מחשב|פלייסטיישן|קונסולה|נינטנדו|מיינקראפט|רובלוקס|פורטנייט/i],
   ['30 more minutes of screen time', 'עוד 30 דקות מסך', '📱', /מסך|טאבלט|אייפד|טלפון/i, 'Not after 8:30 pm', 'לא אחרי 20:30'],
+  ['A pajama party with up to 3 friends', 'מסיבת פיג׳מה עם עד 3 חברות', '🎉', /מסיבת פיג|פיג׳מות|פיג'מות|פיגמות/i, 'Weekends only', 'רק בסוף שבוע'],
   ['A sleepover with a friend', 'חבר או חברה לישון אצלנו', '🛏️', /לישון אצל|לישון אצלנו|לינה|sleepover/i, 'Weekends only', 'רק בסוף שבוע'],
   ['Go to bed 30 minutes later', 'ללכת לישון חצי שעה מאוחר יותר', '🌙', /מאוחר|לישון/i, 'Not on a school night', 'לא בערב שלפני בית ספר'],
   ['You choose the family movie', 'לבחור את הסרט המשפחתי', '🎞️', /לבחור.*סרט|סרט משפחתי/i],
@@ -3182,6 +3184,7 @@ const PZ_LIB = [
   ['A hot chocolate', 'שוקו חם', '☕', /שוקו/i],
   ['Breakfast in bed', 'ארוחת בוקר במיטה', '🥞', /ארוחת בוקר|פנקייק/i],
   ['Bake a cake together', 'לאפות עוגה ביחד', '🎂', /עוגה|לאפות|עוגיות/i],
+  ['A candy bag', 'שקית ממתקים', '🍬', /שקית ממתקים|שק ממתקים|שקית סוכריות/i],
   ['A candy of your choice', 'ממתק לבחירה', '🍬', /ממתק|סוכרי|שוקולד/i],
   ['A snack', 'חטיף', '🍿', /חטיף|פופקורן/i],
   ['A day with Mom, just you two', 'יום עם אמא, רק שניכם', '💛', /יום עם אמא|זמן עם אמא/i],
@@ -3244,8 +3247,12 @@ let SHEET_KID = ''; // the kid the parent area is showing; in the kid's own app 
 const artKid = () => SHEET_KID || (KID && KID.name) || '';
 const KID_ART = {
   'דני': { pre: 'd', art: [
-    ['wolt', t => has(t, /wolt|וולט/i)], ['tiktok', t => has(t, /tiktok|טיקטוק/i)], ['mall', t => has(t, /mall|קניון/i)],
+    ['wolt', t => has(t, /wolt|וולט/i)],
+    ['tiktok-day', t => has(t, /tiktok|טיקטוק/i) && has(t, /full day|all day|יום שלם|כל היום/i)],
+    ['tiktok', t => has(t, /tiktok|טיקטוק/i)], ['mall', t => has(t, /mall|קניון/i)],
     ['bus-tlv', t => has(t, /bus|tel aviv|אוטובוס|תל אביב/i)],
+    ['pajama', t => has(t, /pajama|pyjama|sleepover|פיג׳מ|פיג'מ|פיגמ|לישון אצל/i)],
+    ['candy-bag', t => has(t, /candy bag|bag of (candy|sweets)|שקית ממתקים|שק ממתקים|שקית סוכריות/i)],
     ['cards', t => has(t, /card|קלפים/i) || (has(t, /game|משחק/i) && has(t, /mom|אמא/i) && has(t, /dad|אבא/i))],
     ['candy', t => has(t, /candy|sweet|lollipop|ממתק|סוכרי/i)], ['snack', t => has(t, /snack|popcorn|חטיף|פופקורן/i)],
     ['screen', t => has(t, /screen|מסך|tablet|טאבלט|youtube|יוטיוב/i)], ['movie', t => has(t, /movie|סרט/i)],
