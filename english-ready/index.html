@@ -1206,6 +1206,9 @@ html.noscroll{overflow:hidden}
 .pzems button.on{background:var(--bg);outline:2px solid var(--c2)}
 .pzsug{font-size:13px;color:var(--muted);padding:0 4px}
 .pzmenu{display:flex;gap:8px;flex-wrap:wrap;padding-top:6px}
+.pzdraw{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:4px 0 2px;padding:6px 8px;border-radius:10px;background:var(--bg);font-size:14px}
+.pzdraw img{width:64px;height:64px;border-radius:14px;flex:none}
+.pzdraw span{flex:1 1 90px}
 .pzdel{border:0;background:none;color:var(--muted);font-size:18px;width:36px;height:36px;border-radius:50%;cursor:pointer}
 .pzdel:hover{background:var(--bg);color:#C0392B}
 .pzfoot{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
@@ -3359,11 +3362,49 @@ async function fileToDataURL(file, side, cap) {
   return url;
 }
 
+/* ---------- a proposed drawing for a surprise that has no picture ----------
+   Painted on the device from the surprise's own words: its main thing in the middle, who or when it is
+   with at the sides, a soft background. It is only a proposal: the parent approves it (then it is saved
+   like an uploaded picture), asks for another one, or says no (then the icon stays as the placeholder,
+   stored as an empty picture so the proposal does not come back). A parent's own picture always wins. */
+const PZ_SIDE = [[/\bmom\b|\bmum\b|אמא/i, '👩'], [/\bdad\b|אבא/i, '👨'], [/friend|חבר/i, '🧑‍🤝‍🧑'], [/family|משפח/i, '👨‍👩‍👧'],
+  [/night|bed|evening|ערב|לילה|לישון/i, '🌙'], [/weekend|saturday|סוף שבוע|שבת/i, '📅'], [/minute|hour|time|דקות|שעה|זמן/i, '⏰'],
+  [/\bcar\b|drive|רכב|נסיע/i, '🚗'], [/beach|sea|ים|חוף/i, '🌊'], [/park|garden|פארק|גינה/i, '🌳'], [/dinner|lunch|breakfast|eat|ארוחה|אוכל|אוכלים/i, '🍽️'],
+  [/bake|cook|לאפות|לבשל/i, '🧁'], [/choose|choice|לבחור|בחירה/i, '👆'], [/party|מסיבה/i, '🎉'], [/music|song|מוזיקה|שיר/i, '🎵'], [/money|shekel|כסף|שקל/i, '💰']];
+const PZ_BG = [['#FFE3EC', '#FFB8CE'], ['#FFF1CC', '#FFD36B'], ['#DDF6EE', '#8FE0C8'], ['#E1ECFF', '#9DBEFF'], ['#EEE4FF', '#C6AEFF'], ['#FFE6D6', '#FFB78F'], ['#DDF4FA', '#8ED8EC']];
+const pzHash = t => { let h = 7; for (const c of String(t)) h = (h * 31 + c.codePointAt(0)) >>> 0; return h; };
+function pzDraw(r, seed) {
+  const words = `${r.en} ${r.he}`, main = r.em && r.em !== '🎁' ? r.em : guessEmoji(words);
+  const side = PZ_SIDE.filter(([re, e]) => re.test(words) && e !== main).map(x => x[1]).slice(0, 2);
+  const h = pzHash(words) + (seed || 0) * 7919, bg = PZ_BG[h % PZ_BG.length], W = 256;
+  const c = document.createElement('canvas'); c.width = c.height = W; const x = c.getContext('2d');
+  const g = x.createRadialGradient(W * .45, W * .38, 20, W / 2, W / 2, W * .75); g.addColorStop(0, bg[0]); g.addColorStop(1, bg[1]);
+  x.fillStyle = g; x.fillRect(0, 0, W, W);
+  let rnd = h; const R = () => (rnd = (rnd * 1103515245 + 12345) >>> 0) / 4294967296;
+  x.globalAlpha = .55; // confetti and dots, a little different every time
+  for (let i = 0; i < 16; i++) { x.fillStyle = ['#fff', bg[1], '#FFD23F', '#FF7AA2'][i % 4]; x.save(); x.translate(R() * W, R() * W); x.rotate(R() * 3); if (i % 3) x.fillRect(-6, -3, 12, 6); else { x.beginPath(); x.arc(0, 0, 4, 0, 7); x.fill(); } x.restore(); }
+  x.globalAlpha = 1;
+  x.fillStyle = 'rgba(255,255,255,.78)'; x.beginPath(); x.arc(W / 2, W * .47, W * .3, 0, 7); x.fill();
+  x.textAlign = 'center'; x.textBaseline = 'middle';
+  const em = (t, px, cx, cy, rot) => { x.save(); x.translate(cx, cy); x.rotate(rot || 0); x.font = `${px}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; x.fillText(t, 0, px * .06); x.restore(); };
+  x.shadowColor = 'rgba(40,20,80,.18)'; x.shadowBlur = 10; x.shadowOffsetY = 5;
+  em(main, side.length ? 104 : 118, W / 2, W * .47, (R() - .5) * .25);
+  const flip = h % 2;
+  side.forEach((e, i) => em(e, 56, (i ^ flip) ? W * .2 : W * .8, W * .8, (R() - .5) * .4));
+  if (!side.length) { em('✨', 34, W * .8, W * .2); em('✨', 24, W * .2, W * .78); }
+  x.shadowColor = 'transparent';
+  x.lineWidth = 10; x.strokeStyle = '#fff'; roundRect(x, 5, 5, W - 10, W - 10, 34); x.stroke();
+  return c.toDataURL('image/jpeg', .85);
+}
+
 // The prize list editor, shared by the parent's settings and the kid's own prize.
 // lists: {key: ['English 🍕 | עברית', ...]}, art: {englishText: dataURL}; every <ul id="pzl-KEY"> inside root is one list.
 function pzWire(root, ctx) {
   const fi = document.createElement('input'); fi.type = 'file'; fi.accept = 'image/*,.heic,.heif,.avif,.webp'; fi.hidden = true; root.appendChild(fi);
-  let target = null;
+  let target = null; const seeds = {}, drafts = {};
+  const draftOf = r => { const en = r.en.trim(), k = en + '#' + (seeds[en] || 0); return drafts[k] || (drafts[k] = pzDraw(r, seeds[en] || 0)); };
+  // a proposal shows only for a surprise with no picture of its own, none of our drawings, and no answer yet
+  const wantsDraft = (t, r) => r.en.trim() && !(r.en.trim() in ctx.art) && !bCard(t);
   const pos = el => { const li = el.closest('li.pzrow'); return li ? { li, key: li.parentElement.dataset.key, i: +li.dataset.i } : null; };
   const say = (li, t) => { const n = li && li.querySelector('.pzsug'); if (n) { n.hidden = !t; n.textContent = t || ''; } };
   const used = () => Object.values(ctx.art).reduce((n, u) => n + u.length, 0);
@@ -3382,7 +3423,9 @@ function pzWire(root, ctx) {
           <input class="pzin pzfh" data-f="fh" maxlength="60" value="${esc(r.fh)}" placeholder="אותיות קטנות (לא חובה), למשל: רק בסוף שבוע" aria-label="אותיות קטנות בעברית" autocomplete="off">
           <small class="pzsug" hidden></small>
           <div class="pzprop" hidden></div>
-          <div class="pzmenu" hidden><button type="button" class="btn sm" data-act="file">📷 בחירת תמונה</button>${u ? '<button type="button" class="btn sm" data-act="unpic">הסרת התמונה</button>' : ''}
+          ${wantsDraft(t, r) ? `<div class="pzdraw"><img src="${draftOf(r)}" alt="ציור מוצע"><span>ציור מוצע להפתעה</span>
+            <button type="button" class="btn sm" data-act="dok">✓ אישור</button><button type="button" class="btn sm" data-act="dnew">🔄 ציור אחר</button><button type="button" class="btn sm ghost" data-act="dno">✕ לא צריך</button></div>` : ''}
+          <div class="pzmenu" hidden><button type="button" class="btn sm" data-act="file">📷 בחירת תמונה</button>${u ? '<button type="button" class="btn sm" data-act="unpic">הסרת התמונה</button>' : ''}${!u && r.en.trim() && !bCard(t) && !wantsDraft(t, r) ? '<button type="button" class="btn sm" data-act="dask">🎨 להציע לי ציור</button>' : ''}
             <div class="pzems" role="group" aria-label="אייקון">${PZ_EMOJI.map(x => `<button type="button" data-act="em" data-em="${x}" class="${x === r.em ? 'on' : ''}" aria-label="אייקון ${x}">${x}</button>`).join('')}</div></div>
         </div>
         ${ctx.nodel ? '<span></span>' : '<button type="button" class="pzdel" data-act="del" aria-label="הסרת ההפתעה">✕</button>'}
@@ -3465,6 +3508,14 @@ function pzWire(root, ctx) {
     else if (act === 'em') { const r = pzParse(ctx.lists[p.key][p.i]); r.em = b.dataset.em; ctx.lists[p.key][p.i] = pzBuild(r); ctx.touch(); render(p.key); }
     else if (act === 'file') { target = p; fi.value = ''; fi.click(); }
     else if (act === 'unpic') { delete ctx.art[pzParse(ctx.lists[p.key][p.i]).en.trim()]; render(p.key); ctx.touch(); }
+    else if (act === 'dnew') { const en = pzParse(ctx.lists[p.key][p.i]).en.trim(); seeds[en] = (seeds[en] || 0) + 1; render(p.key); }
+    else if (act === 'dno' || act === 'dask') { const en = pzParse(ctx.lists[p.key][p.i]).en.trim(); if (act === 'dno') ctx.art[en] = ''; else delete ctx.art[en]; render(p.key); ctx.touch(); }
+    else if (act === 'dok') {
+      const r = pzParse(ctx.lists[p.key][p.i]), en = r.en.trim(); ctx.art[en] = draftOf(r);
+      if (used() > 720000) { delete ctx.art[en]; say(p.li, 'יש יותר מדי תמונות שמורות. הסירו תמונה אחרת קודם.'); return; }
+      render(p.key); ctx.touch();
+      const row = root.querySelector(`#pzl-${p.key} li[data-i="${p.i}"]`); if (row) say(row, 'הציור נשמר ✓ אפשר תמיד להחליף אותו בתמונה שלך.');
+    }
     else if (act === 'del') {
       if (ctx.lists[p.key].length <= (ctx.min || 0)) { say(p.li, `צריך לפחות ${ctx.min} הפתעות`); return; }
       ctx.lists[p.key].splice(p.i, 1); render(p.key); ctx.touch();
