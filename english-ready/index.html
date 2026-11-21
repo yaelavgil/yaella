@@ -497,6 +497,14 @@ body{background:var(--bg);background-image:radial-gradient(700px 380px at 105% -
 .wemoji .ji{height:110px;filter:drop-shadow(0 10px 14px rgba(40,30,80,.25))}
 .wincard.ready .wemoji .ji,.winov.ready .wemoji .ji{animation:floaty 3s ease-in-out infinite}
 .wtext{margin:0;font:700 clamp(24px,7vw,32px)/1.2 var(--f-en);text-wrap:balance}
+.fine{display:block;font-size:.72em;font-weight:400;opacity:.72;line-height:1.3}
+.fine::before{content:'* '}
+.wfine{font:400 clamp(15px,4.2vw,19px)/1.3 var(--f-en);margin-top:4px;opacity:.8}
+.bfine{font-size:.8em;margin-top:4px}
+.lfine{font-size:.7em;margin-top:2px}
+.wrtx .fine{font-size:12px;color:var(--muted);opacity:1}
+.pzfe,.pzfh{font-size:13px;min-height:26px;color:var(--muted)}
+.pzfh::placeholder,.pzfe::placeholder{font-size:12px}
 .wdetails{display:grid;gap:8px;justify-items:center;width:100%;opacity:0;transform:translateY(10px);transition:opacity .4s ease,transform .4s var(--ease);pointer-events:none}
 .winov.ready .wdetails{opacity:1;transform:none;pointer-events:auto}
 .wclose{min-height:44px;font-size:15px}
@@ -2354,7 +2362,7 @@ function kidDetail(k, key) {
   const L = a => blt(a.filter(Boolean));
   if (key === 'spins') {
     const wins = (S.wins || []).filter(w => w.date === today()), older = (S.wins || []).filter(w => w.date !== today()).slice(0, 5);
-    const win = w => `<li><span class="wrill" aria-hidden="true">${emojiOf(w.prize)}</span><span class="wrtx"><span class="en">${esc(textOf(w.prize))}</span>${heOf(w.prize) ? `<small>${esc(heOf(w.prize))}</small>` : ''}</span>${w.date === today() ? '' : `<span class="wrdate">${ddmm(w.date)}</span>`}</li>`;
+    const win = w => `<li><span class="wrill" aria-hidden="true">${emojiOf(w.prize)}</span><span class="wrtx"><span class="en">${esc(textOf(w.prize))}</span>${fineHTML(w.prize)}${heOf(w.prize) ? `<small>${esc(heOf(w.prize))}</small>` : ''}${fineHeHTML(w.prize)}</span>${w.date === today() ? '' : `<span class="wrdate">${ddmm(w.date)}</span>`}</li>`;
     let next;
     if (!S.wheel) next = 'הגלגל כבוי אצל ' + nm + '.';
     else if (pk === 'k5') { const K = S.k5 || {}, stars = (K.n || 0) + (K.lg || 0), owed = Math.floor(stars / 3) - (K.spun || 0); next = owed > 0 ? `מחכה לו סיבוב עכשיו (${owed}).` : `הסיבוב הבא: אחרי עוד ${3 - stars % 3} כוכבים.`; }
@@ -2496,7 +2504,7 @@ const GOAL_NOTE = {
   mins: blt(['דקות פעילות במסכי התרגול.', 'בכל הגעה ליעד הוא מקבל סיבוב בגלגל.']),
 };
 const winRowsHTML = wins => wins.length ? `<ul class="winrows">${wins.map(w => { const he = heOf(w.prize);
-  return `<li><span class="wrill" aria-hidden="true">${emojiOf(w.prize)}</span><span class="wrtx"><span class="en">${esc(textOf(w.prize))}</span>${he ? `<small>${esc(he)}</small>` : ''}</span><span class="wrdate">${w.date.split('-').slice(1).reverse().join('.')}</span></li>`; }).join('')}</ul>` : '<p class="hint">עוד אין.</p>';
+  return `<li><span class="wrill" aria-hidden="true">${emojiOf(w.prize)}</span><span class="wrtx"><span class="en">${esc(textOf(w.prize))}</span>${fineHTML(w.prize)}${he ? `<small>${esc(he)}</small>` : ''}${fineHeHTML(w.prize)}</span><span class="wrdate">${w.date.split('-').slice(1).reverse().join('.')}</span></li>`; }).join('')}</ul>` : '<p class="hint">עוד אין.</p>';
 const SHEET_TABS = [['kid', 'פרטים'], ['learn', 'לימוד'], ['time', 'זמן ואנרגיה'], ['goal', 'הפתעות'], ['prog', 'התקדמות'], ['link', 'קישור']];
 function settingsSheet(kidId, tab) {
   const old = document.querySelector('.sheetov'); if (old) old.remove();
@@ -3057,10 +3065,16 @@ function miniWheel(n) {
   </svg>`;
 }
 let backTo = null; // where the back button goes from a preview
-const enPart = t => String(t).split('|')[0];
+const mainOf = t => String(t).split('‖')[0];
+const enPart = t => mainOf(t).split('|')[0];
+// the fine print of a prize, like a real voucher: English and Hebrew
+const fineOf = t => { const a = String(t).split('‖'); return { en: (a[1] || '').trim(), he: (a[2] || '').trim() }; };
 const emojiOf = t => (enPart(t).match(/\p{Extended_Pictographic}\uFE0F?/gu) || ['🎁']).pop();
 const textOf = t => enPart(t).replace(/\p{Extended_Pictographic}\uFE0F?/gu, '').trim();
-const heOf = t => (String(t).split('|')[1] || '').trim() || PRIZE_HE[textOf(t)] || '';
+const heOf = t => (mainOf(t).split('|')[1] || '').trim() || PRIZE_HE[textOf(t)] || '';
+const fineEn = t => { const f = fineOf(t); return f.en || f.he; }; // no translation yet: the Hebrew, never nothing
+const fineHTML = (t, cls = '') => { const f = fineOf(t); return f.en || f.he ? `<small class="fine en ${cls}" dir="ltr">${esc(f.en || f.he)}</small>` : ''; };
+const fineHeHTML = (t, cls = '') => { const f = fineOf(t); return f.he ? `<small class="fine ${cls}">${esc(f.he)}</small>` : ''; };
 
 /* ---------- prize pictures, edited prizes, photos (parent area and the kid's own prize) ---------- */
 const guessEmoji = t => {
@@ -3074,14 +3088,14 @@ const guessEmoji = t => {
 // Ready surprises: Hebrew, simple English a kid can read, an icon, and the Hebrew words that point to it.
 // Order matters: the more specific first (a water park before a park). Brand names stay as they are.
 const PZ_LIB = [
-  ['A Wolt order', 'הזמנה מוולט', '🛵', /וולט|wolt/i],
-  ['30 more minutes on TikTok', 'עוד 30 דקות בטיקטוק', '📱', /טיקטוק|tiktok/i],
+  ['A Wolt order', 'הזמנה מוולט', '🛵', /וולט|wolt/i, 'Up to 60 shekels', 'עד 60 שקלים'],
+  ['30 more minutes on TikTok', 'עוד 30 דקות בטיקטוק', '📱', /טיקטוק|tiktok/i, 'Not after 8:30 pm', 'לא אחרי 20:30'],
   ['30 more minutes on YouTube', 'עוד 30 דקות ביוטיוב', '▶️', /יוטיוב|youtube/i],
   ['One more episode on Netflix', 'עוד פרק בנטפליקס', '📺', /נטפליקס|netflix|עוד פרק/i],
   ['30 more minutes of video games', 'עוד 30 דקות משחקי מחשב', '🎮', /משחקי מחשב|פלייסטיישן|קונסולה|נינטנדו|מיינקראפט|רובלוקס|פורטנייט/i],
-  ['30 more minutes of screen time', 'עוד 30 דקות מסך', '📱', /מסך|טאבלט|אייפד|טלפון/i],
-  ['A sleepover with a friend', 'חבר או חברה לישון אצלנו', '🛏️', /לישון אצל|לישון אצלנו|לינה|sleepover/i],
-  ['Go to bed 30 minutes later', 'ללכת לישון חצי שעה מאוחר יותר', '🌙', /מאוחר|לישון/i],
+  ['30 more minutes of screen time', 'עוד 30 דקות מסך', '📱', /מסך|טאבלט|אייפד|טלפון/i, 'Not after 8:30 pm', 'לא אחרי 20:30'],
+  ['A sleepover with a friend', 'חבר או חברה לישון אצלנו', '🛏️', /לישון אצל|לישון אצלנו|לינה|sleepover/i, 'Weekends only', 'רק בסוף שבוע'],
+  ['Go to bed 30 minutes later', 'ללכת לישון חצי שעה מאוחר יותר', '🌙', /מאוחר|לישון/i, 'Not on a school night', 'לא בערב שלפני בית ספר'],
   ['You choose the family movie', 'לבחור את הסרט המשפחתי', '🎞️', /לבחור.*סרט|סרט משפחתי/i],
   ['A movie night', 'ערב סרט', '🎬', /סרט|קולנוע/i],
   ['You choose what we eat tonight', 'לבחור מה אוכלים בערב', '🍽️', /לבחור מה אוכלים|מה אוכלים|ארוחת ערב לבחיר/i],
@@ -3101,7 +3115,7 @@ const PZ_LIB = [
   ['A game with Mom', 'משחק עם אמא', '🎲', /משחק.* עם אמא/i],
   ['A game with Dad', 'משחק עם אבא', '🎲', /משחק.* עם אבא/i],
   ['A card game with Mom and Dad', 'משחק קלפים עם אמא ואבא', '🃏', /קלפים/i],
-  ['Skip one chore', 'לדלג על מטלה אחת', '🧹', /מטלה|לדלג|סידור החדר|לסדר/i],
+  ['Skip one chore', 'לדלג על מטלה אחת', '🧹', /מטלה|לדלג|סידור החדר|לסדר/i, 'Not the dishes', 'לא שטיפת כלים'],
   ['A day at the water park', 'יום בפארק מים', '🌊', /פארק מים|פארק המים/i],
   ['A trip to the park', 'פארק', '🛝', /פארק|גן שעשועים|לונה פארק/i],
   ['A trip to the pool', 'בריכה', '🏊', /בריכה|לשחות/i],
@@ -3115,8 +3129,8 @@ const PZ_LIB = [
   ['A pack of stickers', 'חבילת מדבקות', '✨', /מדבקות/i],
   ['A trip to the mall', 'קניון', '🛍️', /קניון|קניות/i],
   ['Nail polish', 'לק לציפורניים', '💅', /לק|ציפורנ/i],
-  ['10 shekels', 'עשרה שקלים', '💰', /שקל|כסף|דמי כיס/i],
-].map(([en, he, em, re]) => ({ en, he, em, re }));
+  ['10 shekels', 'עשרה שקלים', '💰', /שקל|כסף|דמי כיס/i, 'Paid on Friday', 'משולם ביום שישי'],
+].map(([en, he, em, re, fe = '', fh = '']) => ({ en, he, em, re, fe, fh }));
 // the Hebrew a parent typed -> a ready surprise, with her own number if she wrote one ("עוד 45 דק בטיקטוק" -> 45 more minutes)
 function pzLibMatch(he) {
   he = String(he || '').trim(); if (!he) return null;
@@ -3124,11 +3138,14 @@ function pzLibMatch(he) {
   const n = (he.match(/\d+/) || [])[0];
   return { en: n && /\d+/.test(it.en) ? it.en.replace(/\d+/, n) : it.en, em: it.em };
 }
+const FINE_LIB = [[/סופ?י? ?שבוע/, 'Weekends only'], [/^עד (\d+) דק/, 'Up to $1 minutes'], [/^עד (\d+) (ש״ח|ש"ח|שקל)/, 'Up to $1 shekels'], [/לא אחרי (\d{1,2}):(\d\d)/, m => `Not after ${((+m[1] + 11) % 12) + 1}:${m[2]} ${+m[1] >= 12 ? 'pm' : 'am'}`],
+  [/פעם (אחת )?ב?שבוע/, 'Once a week'], [/פעם (אחת )?בחודש/, 'Once a month'], [/בתיאום מראש/, 'Book it in advance'], [/לא בימי? לימודים|לא בערב שלפני/, 'Not on a school night']];
+function fineMatch(he) { for (const [re, out] of FINE_LIB) { const m = String(he || '').match(re); if (m) return typeof out === 'function' ? out(m) : out.replace(/\$(\d)/g, (_, k) => m[+k] || ''); } return null; }
 const PZ_EMOJI = ['🎁', '🍦', '🍕', '🍔', '🍬', '🍿', '🎬', '📺', '📱', '🎮', '🎵', '🛵', '🏊', '🏖️', '🛝', '🚲', '🧸', '🧱', '📚', '🎲', '🃏', '🛏️', '🌙', '🎂', '💛', '💙', '🗺️', '🛍️', '💰', '⭐'];
 // a prize is the text "English 🍕 | עברית"; the picture a parent or kid chose lives next to it, keyed by the English text
-const pzParse = t => ({ en: textOf(t), he: heOf(t), em: emojiOf(t) });
-const pzBuild = r => { const en = String(r.en || '').trim(), he = String(r.he || '').trim(); return `${en} ${r.em || '🎁'}${he ? ' | ' + he : ''}`; };
-const pzCleanList = arr => (arr || []).map(t => { const r = pzParse(t); if (!r.en.trim() && !r.he.trim()) return null; if (!r.en.trim()) r.en = r.he; return pzBuild(r); }).filter(Boolean);
+const pzParse = t => { const f = fineOf(t); return { en: textOf(t), he: heOf(t), em: emojiOf(t), fe: f.en, fh: f.he }; };
+const pzBuild = r => { const c = x => String(x || '').replace(/[|‖]/g, '/').trim(), en = c(r.en), he = c(r.he), fe = c(r.fe), fh = c(r.fh); return `${en} ${r.em || '🎁'}${he ? ' | ' + he : ''}${fe || fh ? ` ‖ ${fe} ‖ ${fh}` : ''}`; };
+const pzCleanList = arr => (arr || []).map(t => { const r = pzParse(t); if (!r.en.trim() && !r.he.trim()) return null; if (!r.en.trim()) r.en = r.he; if (!r.fe && r.fh) r.fe = r.fh; return pzBuild(r); }).filter(Boolean);
 const artMap = () => {
   const s = KID ? Object.assign({}, KID.settings, { myPrize: KID.progress && KID.progress.myPrize }) : load();
   const m = Object.assign({}, (s && s.prizeArt) || {}), mp = s && s.myPrize;
@@ -3264,7 +3281,9 @@ function pzWire(root, ctx) {
         <button type="button" class="pzth" data-act="pic" aria-label="תמונה להפתעה">${u ? `<img src="${u}" alt="">` : `<span class="pzem">${r.em}</span>`}<i class="pzedit" aria-hidden="true">✎</i></button>
         <div class="pztx">
           <input class="pzin pzen en" data-f="en" dir="ltr" lang="en" value="${esc(r.en)}" placeholder="חסר תרגום לאנגלית" aria-label="שם ההפתעה באנגלית" autocomplete="off">
+          <input class="pzin pzfe en" data-f="fe" dir="ltr" lang="en" maxlength="60" value="${esc(r.fe)}" placeholder="${r.fh ? 'חסר תרגום לאנגלית' : ''}" aria-label="אותיות קטנות באנגלית" autocomplete="off"${r.fe || r.fh ? '' : ' hidden'}>
           <input class="pzin pzhe" data-f="he" value="${esc(r.he)}" placeholder="בעברית" aria-label="שם ההפתעה בעברית" autocomplete="off">
+          <input class="pzin pzfh" data-f="fh" maxlength="60" value="${esc(r.fh)}" placeholder="אותיות קטנות (לא חובה), למשל: רק בסוף שבוע" aria-label="אותיות קטנות בעברית" autocomplete="off">
           <small class="pzsug" hidden></small>
           <div class="pzprop" hidden></div>
           <div class="pzmenu" hidden><button type="button" class="btn sm" data-act="file">📷 בחירת תמונה</button>${u ? '<button type="button" class="btn sm" data-act="unpic">הסרת התמונה</button>' : ''}
@@ -3284,23 +3303,25 @@ function pzWire(root, ctx) {
   });
   root.addEventListener('focusout', async e => {
     const inp = e.target.closest('.pzin'), p = inp && pos(inp); if (!p) return;
-    const f = inp.dataset.f, other = f === 'he' ? 'en' : 'he', src = inp.value.trim();
+    const f = inp.dataset.f, other = { he: 'en', en: 'he', fh: 'fe', fe: 'fh' }[f], src = inp.value.trim();
+    if (f === 'fh') { const fe = p.li.querySelector('.pzfe'); if (fe) { fe.hidden = !src && !fe.value; fe.placeholder = src ? 'חסר תרגום לאנגלית' : ''; } }
     const oi = p.li.querySelector(`[data-f="${other}"]`);
     if (!src || (oi.value.trim() && oi.dataset.auto !== '1')) return;
-    const lib = other === 'en' ? pzLibMatch(src) : null;
-    let t = lib && lib.en, em = lib && lib.em;
+    const lib = f === 'he' ? pzLibMatch(src) : null;
+    let t = lib ? lib.en : f === 'fh' ? fineMatch(src) : null, em = lib && lib.em;
     if (!t) { say(p.li, 'מחפש תרגום…'); t = await suggestText(src, f, other); }
     say(p.li, '');
-    if (!t) { say(p.li, other === 'en' ? 'אין לנו הצעה. אפשר לכתוב באנגלית, ועד אז יוצג בעברית.' : 'אין לנו הצעה לעברית.'); return; }
+    if (!t) { say(p.li, other === 'en' || other === 'fe' ? 'אין לנו הצעה. אפשר לכתוב באנגלית, ועד אז יוצג בעברית.' : 'אין לנו הצעה לעברית.'); return; }
     if ((oi.value.trim() && oi.dataset.auto !== '1') || !document.contains(p.li)) return; // typed something in the meantime
-    if (!em) em = guessEmoji(t + ' ' + src);
-    propose(p.li, other, t, em);
+    if (!em && other === 'en') em = guessEmoji(t + ' ' + src);
+    propose(p.li, other, t, other === 'en' ? em : '');
   });
   function propose(li, f, t, em) { // a suggestion waits for the parent: approve, or edit it
     const box = li.querySelector('.pzprop'); if (!box) return;
     if (!box.hidden && li.dataset.pf === f && li.dataset.pt === t) return; // already showing it (a click on its button must not lose its target)
     li.dataset.pf = f; li.dataset.pt = t; li.dataset.pem = em || '';
-    box.innerHTML = `<span>הצעה:</span> <b class="${f === 'en' ? 'en' : ''}" dir="${f === 'en' ? 'ltr' : 'rtl'}">${esc(t)}</b> <span aria-hidden="true">${em || ''}</span>
+    const ltr = f === 'en' || f === 'fe';
+    box.innerHTML = `<span>${f === 'fe' || f === 'fh' ? 'הצעה לאותיות הקטנות:' : 'הצעה:'}</span> <b class="${ltr ? 'en' : ''}" dir="${ltr ? 'ltr' : 'rtl'}">${esc(t)}</b> <span aria-hidden="true">${em || ''}</span>
       <button type="button" class="btn sm" data-act="pok">✓ אישור</button><button type="button" class="btn sm" data-act="pedit">✎ עריכה</button>`;
     box.hidden = false;
   }
@@ -3308,7 +3329,7 @@ function pzWire(root, ctx) {
     const li = p.li, f = li.dataset.pf, t = li.dataset.pt, em = li.dataset.pem; if (!f) return;
     const r = pzParse(ctx.lists[p.key][p.i]), old = r.en.trim();
     r[f] = t; if (f === 'en') moveArt(old, t.trim());
-    if (em && (r.em === '🎁' || !r.em)) r.em = em;
+    if (em && f === 'en' && (r.em === '🎁' || !r.em)) r.em = em;
     ctx.lists[p.key][p.i] = pzBuild(r); ctx.touch(); render(p.key);
     const row = root.querySelector(`#pzl-${p.key} li[data-i="${p.i}"]`);
     if (row) { say(row, edit ? 'אפשר לערוך את האנגלית.' : 'נשמר בהפתעה ✓'); if (edit) { const inp = row.querySelector(`[data-f="${f}"]`); if (inp) { inp.focus(); inp.select(); } } }
@@ -3318,7 +3339,7 @@ function pzWire(root, ctx) {
     if (box) { box.remove(); btn.setAttribute('aria-expanded', 'false'); return; }
     const have = new Set(ctx.lists[key].map(t => textOf(t).toLowerCase()));
     box = document.createElement('div'); box.className = 'pzideas'; box.dataset.for = key;
-    box.innerHTML = PZ_LIB.map((x, i) => have.has(x.en.toLowerCase()) ? '' : `<button type="button" data-pzpick="${i}" data-key="${key}" title="${esc(x.en)}">${x.em} ${esc(x.he)}</button>`).join('');
+    box.innerHTML = PZ_LIB.map((x, i) => have.has(x.en.toLowerCase()) ? '' : `<button type="button" data-pzpick="${i}" data-key="${key}" title="${esc(x.en)}${x.fe ? ' · ' + esc(x.fe) : ''}">${x.em} ${esc(x.he)}${x.fh ? ` <small>(${esc(x.fh)})</small>` : ''}</button>`).join('');
     btn.closest('.pzfoot').after(box); btn.setAttribute('aria-expanded', 'true');
   }
   root.addEventListener('click', e => {
@@ -3326,7 +3347,7 @@ function pzWire(root, ctx) {
     if (pk && root.contains(pk)) {
       const key = pk.dataset.key, L = ctx.lists[key], x = PZ_LIB[+pk.dataset.pzpick]; if (!x) return;
       if (L.length >= 12) { pk.closest('.pzideas').insertAdjacentHTML('afterbegin', '<small class="pzsug">יש כבר 12 הפתעות. מוחקים אחת קודם.</small>'); return; }
-      L.push(pzBuild({ en: x.en, he: x.he, em: x.em })); render(key); ctx.touch(); pk.remove(); return;
+      L.push(pzBuild({ en: x.en, he: x.he, em: x.em, fe: x.fe, fh: x.fh })); render(key); ctx.touch(); pk.remove(); return;
     }
     const ib = e.target.closest('[data-pzideas]'); if (ib && root.contains(ib)) { ideas(ib.dataset.pzideas, ib); return; }
     const b = e.target.closest('[data-act],[data-pzadd],[data-pzreset]'); if (!b || !root.contains(b)) return;
@@ -3476,9 +3497,12 @@ async function winCardBlob(pz, at, artM) {
   x.direction = 'ltr'; x.fillStyle = '#D9480F'; x.font = f(EN, 60);
   let y = 850;
   for (const ln of wrapLines(x, textOf(pz), W - 240)) { x.fillText(ln, W / 2, y); y += 74; }
+  const fn = fineOf(pz); // the fine print, small and grey, right under its own language: it is half the joke
+  if (fn.en || fn.he) { x.fillStyle = '#8A8FA3'; x.font = f(EN, 32); y -= 18; for (const ln of wrapLines(x, '* ' + (fn.en || fn.he), W - 300)) { x.fillText(ln, W / 2, y); y += 40; } y += 22; }
 
   x.direction = 'rtl'; const he = heOf(pz);
   if (he) { x.fillStyle = '#5E6680'; x.font = f(BOD, 42, 500); y += 14; for (const ln of wrapLines(x, he, W - 240)) { x.fillText(ln, W / 2, y); y += 56; } }
+  if (fn.he) { x.fillStyle = '#8A8FA3'; x.font = f(BOD, 30, 400); y -= 10; for (const ln of wrapLines(x, '* ' + fn.he, W - 300)) { x.fillText(ln, W / 2, y); y += 40; } }
 
   // The witty bit, in a pill. It used to sit a fixed distance off the bottom, so a prize
   // whose name wrapped to two lines grew down into it; now it keeps clear of whatever
@@ -3768,7 +3792,7 @@ function wheelView(preview) {
       <div class="wincard">
         <p class="en wtitle">You won!</p>
         <div class="wemoji">${prizeFace(pz, ART)}</div>
-        <p class="en wtext">${esc(textOf(pz))}</p>
+        <p class="en wtext">${esc(textOf(pz))}</p>${fineHTML(pz, 'wfine')}
         <div class="wdetails">${details}<button class="btn wclose" id="wclose">סגירה</button></div>
       </div>`;
     document.body.appendChild(ov); syncShare();
@@ -3819,15 +3843,16 @@ function wheelView(preview) {
       let g2 = { avail: 1 };
       if (!preview) { const s2 = load(); day(s2).spins++; const J2 = jour(s2); if (mega) J2.mega = true; else if (ppXW(s2)) { J2.xs = (J2.xs || 0) + 1; J2.spins = (J2.spins || 0) + 1; } else { J2.spins = (J2.spins || 0) + 1; day(s2).jw = (day(s2).jw || 0) + 1; } s2.wins.unshift({ date: today(), prize: prizes[win], mega: mega || undefined }); s2.wins = s2.wins.slice(0, 60); save(s2); g2 = goalState(s2); if (mega) g2 = { avail: 0 }; }
       const pz = prizes[win], he = heOf(pz), who = KID && KID.name ? KID.name : '';
-      const msg = `אמא ואבא! ${who ? who + ' כאן. ' : ''}זכיתי בגלגל ההפתעות 🎉\n${emojiOf(pz)} ${textOf(pz)}${he ? `\n(${he})` : ''}\nאתם חייבים לי 😄`;
+      const fn = fineOf(pz);
+      const msg = `אמא ואבא! ${who ? who + ' כאן. ' : ''}זכיתי בגלגל ההפתעות 🎉\n${emojiOf(pz)} ${textOf(pz)}${fn.en ? `\n* ${fn.en}` : ''}${he ? `\n(${he}${fn.he ? ` · * ${fn.he}` : ''})` : fn.he ? `\n(* ${fn.he})` : ''}\nאתם חייבים לי 😄`;
       const details = `
-        ${he ? `<button class="hebtn" data-he aria-expanded="false"><span class="heicon" aria-hidden="true">א</span><span class="helab">מה זה בעברית?</span></button><p class="hebubble" hidden>${esc(he)}</p>` : ''}
+        ${he || fineOf(pz).he ? `<button class="hebtn" data-he aria-expanded="false"><span class="heicon" aria-hidden="true">א</span><span class="helab">מה זה בעברית?</span></button><p class="hebubble" hidden>${esc(he || textOf(pz))}${fineHeHTML(pz, 'bfine')}</p>` : ''}
         <button type="button" class="btn sharebtn" data-share disabled>מכין את התמונה…</button>
         <p class="sharenote">נשלחת תמונה מעוצבת של הזכייה.<br>בוחרים וואטסאפ, ואז את הצ׳אט.</p>`;
       // small summary that stays under the wheel
       $('#prize').innerHTML = '';
       winIdx = win; draw(performance.now());
-      label.classList.remove('hint'); label.textContent = textOf(pz) + ' ' + emojiOf(pz); label.style.visibility = 'visible';
+      label.classList.remove('hint'); label.textContent = textOf(pz) + ' ' + emojiOf(pz); if (fineEn(pz)) label.insertAdjacentHTML('beforeend', fineHTML(pz, 'lfine')); label.style.visibility = 'visible';
       setTimeout(() => { if (document.body.contains(cv)) showWin(pz, details); }, 1300);
       prepWin(pz, msg, Date.now(), ART); // after the buttons exist, so they can be switched on when the picture is ready
       sfx('win'); setTimeout(() => say(textOf(prizes[win])), 600);
