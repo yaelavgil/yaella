@@ -3,22 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>גור זכה בגלגל ההפתעות · מוכן לאנגלית</title>
+<title>🎡 זכייה בגלגל ההפתעות · מוכן לאנגלית</title>
 
 <!-- WhatsApp and the rest read these from the raw HTML and never run the script below,
      so the preview is the same for every win. The win itself loads when the page opens. -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="מוכן לאנגלית">
-<meta property="og:title" content="🎡 גור זכה בגלגל ההפתעות!">
-<meta property="og:description" content="אחרי אימונים קשים באנגלית. לחצו כדי לראות במה זכה.">
-<meta property="og:image" content="https://yaelavgil.github.io/yaella/english-ready/og-win.jpg">
+<meta property="og:title" content="🎡 זכייה בגלגל ההפתעות!">
+<meta property="og:description" content="אחרי אימון באנגלית. לחצו כדי לראות מה הפרס.">
+<meta property="og:image" content="https://yaelavgil.github.io/yaella/english-ready/og-win.jpg?v=2">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://yaelavgil.github.io/yaella/english-ready/w.html">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="🎡 גור זכה בגלגל ההפתעות!">
-<meta name="twitter:description" content="אחרי אימונים קשים באנגלית. לחצו כדי לראות במה זכה.">
-<meta name="twitter:image" content="https://yaelavgil.github.io/yaella/english-ready/og-win.jpg">
+<meta name="twitter:title" content="🎡 זכייה בגלגל ההפתעות!">
+<meta name="twitter:description" content="אחרי אימון באנגלית. לחצו כדי לראות מה הפרס.">
+<meta name="twitter:image" content="https://yaelavgil.github.io/yaella/english-ready/og-win.jpg?v=2">
 <meta name="theme-color" content="#3B1F8F">
 
 <link rel="icon" href="favicon.ico">
@@ -54,7 +54,7 @@
 </head>
 <body>
 <main class="wrap">
-  <h1>🎡 גור זכה בגלגל ההפתעות</h1>
+  <h1>🎡 זכייה בגלגל ההפתעות</h1>
   <p class="sub">אחרי אימונים קשים באנגלית</p>
   <div class="card"><div class="ph" id="slot">טוען את הזכייה…</div></div>
   <div class="row" id="acts" hidden>
@@ -81,7 +81,7 @@ const id = (new URLSearchParams(location.search).get('i') || '').replace(/[^A-Za
     const dl = document.getElementById('dl');
     dl.href = o.d; dl.download = 'win-' + id + '.png';
     document.getElementById('acts').hidden = false;
-    if (o.name) document.querySelector('h1').textContent = `🎡 ${o.name} זכה בגלגל ההפתעות`;
+    if (o.name) document.querySelector('h1').textContent = `🎡 ${o.name} ${o.g === 'f' ? 'זכתה' : 'זכה'} בגלגל ההפתעות`;
   } catch (e) { slot.textContent = 'אין חיבור. נסו שוב.'; }
 })();
 </script>
