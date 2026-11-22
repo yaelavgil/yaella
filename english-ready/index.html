@@ -1912,14 +1912,19 @@ const GIRL = () => ((KID && KID.settings) || {}).gender === 'f';
 const STAR_PASS = 0.7;
 // the stars journey has 3 grades: bronze (stars 1-9), silver (10-18), gold (19-26). Each grade asks for more right answers and more steps
 const starTier = s => !isStars(s) ? 0 : isPP(s) ? ((ppSt(s, jour(s).n) || {}).k === 'boss' ? 3 : 2) : Math.min(3, 1 + Math.floor(Math.min(jour(s).n, JOUR_N - 1) / 9));
-const TIER = ['', '🥉 ארד', '🥈 כסף', '🥇 זהב'], TIER_PASS = [0, 0.75, 0.85, 0.9], TIER_PASS_SHORT = [0, 0.6, 0.7, 0.8];
-const tierNeed = (s, n) => (n >= 8 ? TIER_PASS : TIER_PASS_SHORT)[starTier(s)] || 0;
+// A stage counts with a few mistakes: bronze 3, silver 2, gold 1 (a short round one less, never below 1).
+// And every mistake is fixed before the stage closes: the closing round asks it again until it is answered
+// right on its own (no hint, no explanation). Explanations are there for whoever wants them.
+const TIER = ['', '🥉 ארד', '🥈 כסף', '🥇 זהב'], TIER_ERR = [99, 3, 2, 1], TIER_ERR_SHORT = [99, 2, 1, 1];
+const tierErr = (s, n) => (n >= 8 ? TIER_ERR : TIER_ERR_SHORT)[starTier(s)];
+const errWord = k => k === 1 ? 'טעות אחת' : `${k} טעויות`;
+const tierRule = (s, n) => `בדרגת ${TIER[starTier(s)]} מותרות עד <b>${errWord(tierErr(s, n))}</b> בשלב, וכל טעות מתקנים בסוף השלב.`;
 const WK_NEED = [0, 0.7, 0.85, 0.9];
 const wkTimes = s => starTier(s) >= 3 ? 2 : 1;
 function recWord(en, ok) { const s = load(), W = (s.wk = s.wk || {}), r = (W[en] = W[en] || [0, 0, '']); r[1]++; if (ok) { r[0]++; r[2] = today(); } save(s); }
 const wordKnown = (s, en) => ((s.wk || {})[en] || [0])[0] >= wkTimes(s);
 function starMastery(s) { const k = Math.min(jour(s).n, JOUR_N - 1), ws = starWords(k), have = ws.filter(w => wordKnown(s, w.en)).length, need = Math.ceil(ws.length * (WK_NEED[starTier(s)] || 0)); return { have, need, all: ws.length, ok: have >= need }; }
-const starPassOK = (s, score, n) => !isStars(s) || !n || score / n >= tierNeed(s, n) - 1e-9;
+const starPassOK = (s, score, n) => !isStars(s) || !n || n - score <= tierErr(s, n);
 // every explanation is a short list: one idea per line
 const blt = (items, cls = '') => `<ul class="pts${cls ? ' ' + cls : ''}">${items.filter(Boolean).map(x => `<li>${x}</li>`).join('')}</ul>`;
 const lines = (...a) => a.filter(Boolean).join('<br>');
@@ -4852,7 +4857,7 @@ function journeyCardHTML(G, st) {
     ${blt([
       isPP(st) ? `<b>המטרה:</b> לאסוף ${JOUR_N} חותמות בדרכון 🛂` : '<b>המטרה:</b> לאסוף 26 כוכבים ⭐',
       curJ(st).desc,
-      isPP(st) ? `כל תחנה = <b>${G.steps} שלבים</b> 👣. בכל תחנה מחכה משהו מיוחד, ותחנת הבוס 👑 קשה יותר.` : `כל כוכב = <b>${G.steps} שלבים</b> 👣. שלב נספר רק עם <b>${Math.round(TIER_PASS[starTier(st)] * 100)}%</b> ומעלה, וכוכב רק כשיודעים את המילים שלו 💪`,
+      isPP(st) ? `כל תחנה = <b>${G.steps} שלבים</b> 👣. בכל תחנה מחכה משהו מיוחד, ותחנת הבוס 👑 קשה יותר.` : `כל כוכב = <b>${G.steps} שלבים</b> 👣. שלב נספר עם עד <b>${errWord(TIER_ERR[starTier(st)])}</b>, אחרי שמתקנים אותן, וכוכב רק כשיודעים את המילים שלו 💪`,
       st.wheel ? (isPP(st) ? 'גלגל ההפתעות היומי ממשיך, ובמפה יש עוד גלגלי אקסטרה 🎁' : 'גלגל ההפתעות ממשיך כרגיל 🎡') : ''], 'gsub')}
     ${action}
     ${wait}
@@ -5029,7 +5034,7 @@ function stageQuiz() {
 let WARMUP = false, LAST_CLEAN = false;
 const sentLen = it => it.s.split(' ').length;
 const sentsFor = () => { const L = lvl === 'easy' ? SENTENCES.filter(x => sentLen(x) <= 4) : lvl === 'hard' ? SENTENCES.filter(x => sentLen(x) >= 5) : SENTENCES; return freshFirst(L.length >= 4 ? L : SENTENCES, sentKeys); };
-function stageFinish(score, n) {
+function stageFinish(score, n, unfixed = 0) {
   if (WARMUP) { // the easy warm-up: no step, straight on to the real rounds
     WARMUP = false; sfx(score / n >= 0.75 ? 'ok' : 'no');
     app.innerHTML = `${top('תרגול קל')}
@@ -5041,7 +5046,7 @@ function stageFinish(score, n) {
     $('#more').onclick = () => go(stageQuiz); $('#words').onclick = () => go(learnView, true);
     return;
   }
-  const s0 = load(), J0 = jour(s0), ST = isStars(s0), pass = starPassOK(s0, score, n);
+  const s0 = load(), J0 = jour(s0), ST = isStars(s0), pass = starPassOK(s0, score, n) && !unfixed;
   J0.cr = (J0.cr || 0) + 1; if (pass) addStep(s0);
   { const dd = day(s0); dd.rs = [...(dd.rs || []), { k: J0.n, sc: score, of: n, ok: pass ? 1 : 0, st: ST ? 1 : 0, at: Date.now() }].slice(-20); }
   let LVUP = '';
@@ -5054,11 +5059,11 @@ function stageFinish(score, n) {
   sfx(pass ? 'ok' : 'no');
   const need = stageSteps(s0), have = curSteps(s0), rest = restNow(), L = ST ? '⭐' : (ALPHA[J0.n] || 'z').toUpperCase();
   if (!pass) {
-    app.innerHTML = `${top(`${curJ(load()).name} · ${jUnit(load(), J0.n)}`)}
+    app.innerHTML = `${top(ST ? `${curJ(load()).name} · ${jUnit(load(), J0.n)}` : `המסע · האות ${(ALPHA[J0.n] || 'z').toUpperCase()}`)}
     <section class="result stk">
       <div class="score">${score}/${n}</div>
       <h2>כמעט! 💪</h2>
-      ${blt([`בדרגת ${TIER[starTier(s0)]} שלב נספר רק מ־<b>${Math.ceil(n * tierNeed(s0, n) - 1e-9)}/${n}</b> ומעלה.`, starTier(s0) >= 2 ? 'בדרגה הזאת כל טעות חשובה.' : 'זה מסע של אלופים, הוא אמור להיות קשה.', 'עוד שלב, ואתה שם!'])}
+      ${blt(unfixed ? [unfixed === 1 ? 'נשארה טעות אחת שעוד לא תוקנה.' : `נשארו ${unfixed} טעויות שעוד לא תוקנו.`, 'שלב נספר רק כשמתקנים את כל הטעויות.', unfixed === 1 ? 'היא תחכה לך בשלב הבא 🔁' : 'הן יחכו לך בשלב הבא 🔁'] : [`היו ${errWord(n - score)} בשלב.`, ST ? tierRule(s0, n) : '', starTier(s0) >= 2 ? 'בדרגה הזאת כל טעות חשובה.' : 'זה מסע של אלופים, הוא אמור להיות קשה.', 'עוד שלב, ואתה שם!'])}
       <div class="row center"><button class="btn" id="words">📖 לחזור על המילים</button></div>
       <div class="jstep">${stepsHTML(have, need, false, '⭐')}</div>
       ${ST ? (() => { const M = starMastery(s0); return `<p class="wkline">📖 מילים של הכוכב שאתה כבר יודע: <b>${M.have}/${M.all}</b>${M.ok ? ' ✅' : ` · צריך <b>${M.need}</b>${wkTimes(s0) > 1 ? ' (בדרגת זהב: כל מילה פעמיים נכון, בלי רמז)' : ' (נכון בפעם הראשונה, בלי רמז)'}`}</p>`; })() : ''}
@@ -5306,7 +5311,8 @@ function celebrateAll() {
 const SECS = { sounds:'צלילים', letters:'גדולות וקטנות', sentences:'קריאת משפטים', stories:'הבנת הנקרא', numbers:'מספרים עד 12' };
 function runQuiz(mod, title, qs, again) {
   if (mod !== 'stage' && restNow()) { restView(); return; }
-  let i = 0, score = 0, closing = false, missed = 0; const wrong = [], secs = {}; let CLOSE = [];
+  let i = 0, score = 0, closing = false, missed = 0; const wrong = [], secs = {}; let CLOSE = []; const FIX = new Set();
+  const cid = q => q.vw ? 'w:' + q.vw.en : 'k:' + String(q.key).split('#')[0];
   STAGE_W = null; FREE_T = false;
   const nBase = () => qs.filter(x => !x.extra).length; // the score is out of the round's own questions; the second chances never lower it
   let tries = 0, hintUsed = false, closed = false, hintLv = 0;
@@ -5323,7 +5329,7 @@ function runQuiz(mod, title, qs, again) {
     app.innerHTML = `${top(title, 'home', `<span class="mtag ${mod === 'mock' ? 'test' : 'practice'}">${mod === 'mock' ? 'מבחן' : mod === 'stage' ? 'שלב' : 'תרגול · ' + LEVELS[lvl]}</span><span class="qstars" id="qstars">✓ <b>${score}</b></span><span class="qnum">${i + 1} / ${qs.length}</span>`)}
       <div class="bar" aria-hidden="true"><i style="width:${(i / qs.length) * 100}%"></i></div>
       ${q.story ? storyHTML(q.story) : ''}
-      <section class="qcard stk h${q.hue || 2}">${q.prompt}${sayBtns}<div id="hintbox" class="hintbox" hidden></div>${hintsLeft(q) || (q.vw && mod !== 'mock') ? `<div class="row center prehint">${hintsLeft(q) ? `<button class="btn sm" id="phint">💡 רמז${hintList(q).length > 1 ? ' (1 מתוך 2)' : ''}</button>` : ''}${q.vw && mod !== 'mock' ? '<button class="btn sm" id="dunno">🤔 לא מכיר את המילה</button>' : ''}</div>` : ''}</section>
+      <section class="qcard stk h${q.hue || 2}">${q.prompt}${sayBtns}<div id="hintbox" class="hintbox" hidden></div>${hintsLeft(q) || (q.vw && mod !== 'mock') ? `<div class="row center prehint">${hintsLeft(q) ? `<button class="btn sm" id="phint">💡 רמז${hintList(q).length > 1 ? ' (1 מתוך 2)' : ''}</button>` : ''}${q.vw && mod !== 'mock' ? `<button class="btn sm" id="dunno">${q.close ? '📖 הסבר על המילה' : '🤔 לא מכיר את המילה'}</button>` : ''}</div>` : ''}</section>
       ${q.tiles ? `<div class="bword en" dir="ltr" aria-live="polite">${[...q.answer].map(() => '<i></i>').join('')}</div><div class="btiles" dir="ltr">${q.tiles.map((c, k) => `<button class="btile h${q.hue || 2}" data-t="${k}">${c}</button>`).join('')}</div><div class="row center"><button class="btn sm" id="bundo">↩ למחוק אות</button></div>` : ''}
       <div class="opts ${q.layout}">${q.options.map((o, k) => {
         const b = `<button class="opt h${q.hue || 2}" data-k="${k}">${o.html}${o.label ? `<span class="lab" hidden>${o.label}</span>` : ''}</button>`;
@@ -5339,31 +5345,41 @@ function runQuiz(mod, title, qs, again) {
   function tally(ok) {
     const q = qs[i];
     if (ok && hintUsed && q.vw && mod !== 'mock') { if (!q.extra) score++; addStar(); recWord(q.vw.en, false); if (q.sec) { secs[q.sec] = secs[q.sec] || [0, 0]; secs[q.sec][1]++; secs[q.sec][0]++; } return; }
-    if (ok) { if (!q.extra) score++; addStar(); flyStar($('.opt.okpick, .opt:focus') || $('.qcard')); if (q.vw) CLOSE = CLOSE.filter(x => x.vw.en !== q.vw.en); }
+    if (ok) { if (!q.extra) score++; addStar(); flyStar($('.opt.okpick, .opt:focus') || $('.qcard')); if (!q.close) CLOSE = CLOSE.filter(x => cid(x) !== cid(q)); }
     else { missed++; if (!q.extra && !wrong.includes(q.rv)) wrong.push(q.rv); miss(q); }
     if (q.lt) recordLetter(q.lt, q.sk, ok);
     if (q.vw && mod !== 'mock') recWord(q.vw.en, ok);
     if (q.sec) { secs[q.sec] = secs[q.sec] || [0, 0]; secs[q.sec][1]++; if (ok) secs[q.sec][0]++; }
   }
-  // a miss: once more later in this round, as another type of question; still wrong -> the closing round.
-  // Wrong in the closing round too: no loop. recWord has it, and the 🔁 stations and review take it from s.wk.
+  // a miss: a word comes once more later in this round, as another type of question; anything still wrong -> the closing round.
+  // There it comes back until it is answered right on its own (up to 4 times; then it waits for the next stage, which won't count this one).
   function miss(q) {
-    if (mod === 'mock' || !q.vw || q.close) return;
-    if (!q.again && !q.retry && !q.taught && qs.length - i > 2) {
+    if (mod === 'mock' || q.close) return;
+    if (q.vw && !q.again && !q.retry && !q.taught && qs.length - i > 2) {
       const n = qOther(q); if (n) { qs.splice(Math.min(qs.length, i + 3 + rint(0, 1)), 0, Object.assign(n, { retry: true, extra: true, key: n.key + '#r' })); return; }
     }
-    if (!CLOSE.some(x => x.vw.en === q.vw.en)) CLOSE.push(q);
+    if (!CLOSE.some(x => cid(x) === cid(q))) CLOSE.push(q);
+  }
+  const reAsk = q => { // the same mistake once more: another kind of question when there is one, else the same one with its options shuffled
+    const n = (q.vw && qOther(q)) || Object.assign({}, q, { options: shuffle(q.options.slice()) });
+    return Object.assign(n, { close: true, extra: true, ca: (q.ca || 1) + 1, key: String(n.key).split('#')[0] + '#c' + ((q.ca || 1) + 1) });
+  };
+  function closeDone(q, clean) { // a closing-round card is over: fixed, or once more at the end
+    if (clean) { FIX.delete(cid(q)); return ''; }
+    if ((q.ca || 1) < 4) { qs.push(reAsk(q)); return '<br><small>🔁 נחזור לזה עוד רגע, כדי לתקן.</small>'; }
+    return '';
   }
   function closingRound() { // short, kind, and off the clock
     closing = true;
-    const add = CLOSE.slice(0, 5).map(q => { const n = qOther(q) || Object.assign({}, q); return Object.assign(n, { close: true, extra: true, key: n.key + '#c' }); });
+    const add = CLOSE.map(q => { const n = (q.vw && qOther(q)) || Object.assign({}, q, { options: shuffle(q.options.slice()) }); return Object.assign(n, { close: true, extra: true, ca: 1, key: String(n.key).split('#')[0] + '#c' }); });
+    add.forEach(q => FIX.add(cid(q)));
     qs.push(...add); FREE_T = true;
     const N = add.length;
     app.innerHTML = `${top(title)}
       <section class="result stk">
         <div class="score">🏁</div>
-        <h2>עוד ${N === 1 ? 'מילה אחת' : N + ' מילים'} ונסגור את השלב 💪</h2>
-        ${blt(['המילים שהיו קצת קשות, עוד פעם אחת.', 'הסוללה לא יורדת עכשיו 🔋'])}
+        <h2>${N === 1 ? 'מתקנים טעות אחת' : `מתקנים ${N} טעויות`} ונסגור את השלב 💪</h2>
+        ${blt(['מה שהיה קשה, עוד פעם. כל טעות מתקנים, כדי שהשלב ייספר.', 'תשובה שגויה? היא תחזור עוד רגע. אפשר לבקש הסבר 📖', 'הסוללה לא יורדת עכשיו 🔋'])}
         <div class="row center"><button class="btn primary" id="cgo">▶ קדימה</button></div>
       </section>`;
     $('#cgo').onclick = () => { window.scrollTo(0, 0); step(); };
@@ -5371,6 +5387,7 @@ function runQuiz(mod, title, qs, again) {
   let sayT = 0;
   function close(msgHTML, good) {
     const q = qs[i]; closed = true;
+    if (q.close && mod !== 'mock') msgHTML += closeDone(q, good && tries === 0 && !hintUsed);
     const gp = $('u.gap', app); if (gp && typeof q.answer === 'string' && q.answer.split(' ').length <= 3) { gp.textContent = q.answer; gp.className = 'gap fill'; }
     $$('.opt', app).forEach((b, j) => {
       b.disabled = true;
@@ -5464,7 +5481,7 @@ function runQuiz(mod, title, qs, again) {
     const tv = $('#triv'); if (tv) tv.onclick = () => { tv.remove(); $('.wltriv', app).hidden = false; };
     $('#gotit').onclick = () => { hush(); $('#fb').innerHTML = ''; const f = $('.opt:not(:disabled), .btile:not(:disabled)', app); if (f) f.focus(); };
     $('#fb').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-    if (qs.length - i > 3 && !q.again) qs.splice(Math.min(qs.length, i + 3 + rint(0, 2)), 0, Object.assign({}, q, { again: true, key: q.key + '#2' }));
+    if (!q.close && qs.length - i > 3 && !q.again) qs.splice(Math.min(qs.length, i + 3 + rint(0, 2)), 0, Object.assign({}, q, { again: true, key: q.key + '#2' }));
   }
   function hintCosts() { // silver / gold of the stars journey: the answer-hint makes the answer not count
     return hintUsed && mod !== 'mock' && starTier(load()) >= 2;
@@ -5486,7 +5503,7 @@ function runQuiz(mod, title, qs, again) {
   function finish() {
     if (mod !== 'mock' && !closing && CLOSE.length) return closingRound();
     FREE_T = false; LAST_CLEAN = mod !== 'mock' && !missed;
-    if (mod === 'stage') { markDone('stage'); return stageFinish(score, nBase()); }
+    if (mod === 'stage') { markDone('stage'); return stageFinish(score, nBase(), FIX.size); }
     const pct = Math.round((score / nBase()) * 100);
     markDone(mod, pct);
     const isMock = mod === 'mock';
@@ -5496,7 +5513,7 @@ function runQuiz(mod, title, qs, again) {
     let firstGift = false;
     { const s0 = load(); if (!s0.firstGift && s0.wheel !== false) { s0.firstGift = today(); s0.giftSpins = (s0.giftSpins || 0) + 1; save(s0); firstGift = true; } }
     let stepNote = '';
-    { const s1 = load(); if ((s1.goal || {}).type === 'journey' && jour(s1).n < JOUR_N) { if (!starPassOK(s1, score, nBase())) stepNote = `<div class="jstep"><b>⭐ בדרגת ${TIER[starTier(s1)]} שלב נספר רק מ־${Math.ceil(nBase() * tierNeed(s1, nBase()) - 1e-9)}/${nBase()}.</b><span>עוד שלב, ואתה שם!</span></div>`; else if (addStep(s1)) { save(s1); if (!stopReached(s1)) stepNote = stepNoteHTML(s1); } } }
+    { const s1 = load(); if ((s1.goal || {}).type === 'journey' && jour(s1).n < JOUR_N) { if (!starPassOK(s1, score, nBase()) || FIX.size) stepNote = `<div class="jstep"><b>⭐ ${FIX.size ? 'שלב נספר רק כשמתקנים את כל הטעויות.' : `היו ${errWord(nBase() - score)}. ${tierRule(s1, nBase())}`}</b><span>עוד שלב, ואתה שם!</span></div>`; else if (addStep(s1)) { save(s1); if (!stopReached(s1)) stepNote = stepNoteHTML(s1); } } }
     const msg = pct >= 90 ? 'מעולה! אתה מוכן!' : pct >= 70 ? 'יפה מאוד!<br>עוד קצת תרגול ואתה שם.' : 'כל שלב מקדם אותך.<br>ננסה שוב?';
     app.innerHTML = `${top(title)}
       <section class="result stk">
@@ -6591,7 +6608,7 @@ function wordPool(lo, hi) { return WORDS.filter(x => /^[a-z]+$/.test(x.w) && x.w
 function practiceDone(mod, title, score, n, again) {
   const pct = Math.round(score / n * 100); markDone(mod, pct);
   let stepNote = '';
-  { const s1 = load(); if ((s1.goal || {}).type === 'journey' && jour(s1).n < JOUR_N) { if (!starPassOK(s1, score, n)) stepNote = `<div class="jstep"><b>⭐ בדרגת ${TIER[starTier(s1)]} שלב נספר רק מ־${Math.ceil(n * tierNeed(s1, n) - 1e-9)}/${n}.</b><span>עוד שלב, ואתה שם!</span></div>`; else if (addStep(s1)) { save(s1); if (!stopReached(s1)) stepNote = stepNoteHTML(s1); } } }
+  { const s1 = load(); if ((s1.goal || {}).type === 'journey' && jour(s1).n < JOUR_N) { if (!starPassOK(s1, score, n)) stepNote = `<div class="jstep"><b>⭐ היו ${errWord(n - score)}. ${tierRule(s1, n)}</b><span>עוד שלב, ואתה שם!</span></div>`; else if (addStep(s1)) { save(s1); if (!stopReached(s1)) stepNote = stepNoteHTML(s1); } } }
   sfx(pct >= 70 ? 'win' : 'ok');
   app.innerHTML = `${top(title)}
     <section class="result stk">
