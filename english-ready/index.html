@@ -3415,7 +3415,7 @@ function pzWire(root, ctx) {
     ul.innerHTML = ctx.lists[key].map((t, i) => {
       const r = pzParse(t), u = ctx.art[r.en.trim()];
       return `<li class="pzrow" data-i="${i}">
-        <button type="button" class="pzth" data-act="pic" aria-label="תמונה להפתעה">${u ? `<img src="${u}" alt="">` : `<span class="pzem">${r.em}</span>`}<i class="pzedit" aria-hidden="true">✎</i></button>
+        <button type="button" class="pzth" data-act="pic" aria-label="תמונה להפתעה">${u || bCard(t) ? `<img src="${u || bCard(t)}" alt="">` : `<span class="pzem">${r.em}</span>`}<i class="pzedit" aria-hidden="true">✎</i></button>
         <div class="pztx">
           <input class="pzin pzen en" data-f="en" dir="ltr" lang="en" value="${esc(r.en)}" placeholder="חסר תרגום לאנגלית" aria-label="שם ההפתעה באנגלית" autocomplete="off">
           <input class="pzin pzfe en" data-f="fe" dir="ltr" lang="en" maxlength="60" value="${esc(r.fe)}" placeholder="${r.fh ? 'חסר תרגום לאנגלית' : ''}" aria-label="אותיות קטנות באנגלית" autocomplete="off"${r.fe || r.fh ? '' : ' hidden'}>
@@ -3859,8 +3859,17 @@ function wheelView(preview) {
       ctx.font = `${Math.round(fs)}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.shadowColor = 'rgba(0,0,0,.18)'; ctx.shadowBlur = 4; ctx.shadowOffsetY = 2;
-      const im = artImage(ART[textOf(prizes[k])]) || artImage(bIcon(prizes[k])) || illImage(emojiOf(prizes[k])), ex = C + Math.cos(mid) * er, ey = C + Math.sin(mid) * er;
-      if (im && im.complete && im.naturalWidth) { const d = fs * 1.25; ctx.drawImage(im, ex - d / 2, ey - d / 2, d, d); }
+      const own = artImage(ART[textOf(prizes[k])]) || artImage(kidCard(prizes[k])); // a parent's picture, or the kid's own drawn card
+      const im = own || artImage(bIcon(prizes[k])) || illImage(emojiOf(prizes[k])), ex = C + Math.cos(mid) * er, ey = C + Math.sin(mid) * er;
+      if (im && im.complete && im.naturalWidth) {
+        const d = fs * 1.25;
+        if (own && im === own) { // a whole picture: the middle of it, in a round frame, so a wide card does not get squashed
+          const w = im.naturalWidth, h = im.naturalHeight, sd = Math.min(w, h), sx = (w - sd) / 2, sy = h > w ? (h - sd) * .75 : 0, D = d * 1.12;
+          ctx.save(); ctx.beginPath(); ctx.arc(ex, ey, D / 2, 0, Math.PI * 2); ctx.closePath(); ctx.fillStyle = '#fff'; ctx.fill(); ctx.clip();
+          ctx.drawImage(im, sx, sy, sd, sd, ex - D / 2, ey - D / 2, D, D); ctx.restore();
+          ctx.beginPath(); ctx.arc(ex, ey, D / 2, 0, Math.PI * 2); ctx.lineWidth = Math.max(2, D * .05); ctx.strokeStyle = '#fff'; ctx.stroke();
+        } else ctx.drawImage(im, ex - d / 2, ey - d / 2, d, d);
+      }
       else ctx.fillText(emojiOf(prizes[k]), ex, ey);
       ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
     }
