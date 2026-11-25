@@ -1746,6 +1746,7 @@ const SETTING_KEYS = ['goal', 'prizes', 'megaPrizes', 'wheel', 'level', 'testLev
 const defaultSettings = () => { const f = fresh(); return Object.fromEntries(SETTING_KEYS.map(k => [k, f[k]])); };
 // KID is set when the app is opened from a parent's link: settings come from the parent, progress is saved to the cloud
 let KID = null, KID_RESTORED = false; // KID_RESTORED: this device remembered the child, no ?k= in the address
+let ORPH_HIDE = false, ORPH_MSG = ''; // the offer to claim practice saved on this device under nobody
 // A record written long ago can still carry progress fields inside `settings` (Gur's, for one,
 // holds settings.jour = {n:0} from the version that put it there). Settings are never progress:
 // left in, that stale `jour` becomes the fallback the moment progress.jour is missing, and the
@@ -2177,6 +2178,7 @@ function home() {
   if (TRACK() === 'k5' && typeof k5Home === 'function') return k5Home();
   if (TRACK() === 'g7' && !isStars(load())) startStars(2, true); // grade 7 starts straight on the words journey
   const st = load(), td = today(), G = goalState(st), G4 = TRACK() === 'g4';
+  const ORPH = KID && !ORPH_HIDE ? orphanWork() : null;
   const m = st.mock;
   const weak = m ? Object.keys(SECS).filter(k => m.secs[k] && m.secs[k][0] < m.secs[k][1]) : [];
   const mockLine = m
@@ -2192,6 +2194,15 @@ function home() {
     <div class="pills">${G4 ? `<span class="pill due">${countdown()}</span>` : ''}<span class="pill">${isPP(st) ? `🛂 ${jour(st).n}/${JOUR_N} חותמות` : isStars(st) ? `⭐ ${jour(st).n}/26 כוכבים` : `🔤 ${jour(st).n}/26 אותיות`}</span></div>
   </header>
 
+  ${ORPH_MSG ? `<section class="stk pbox orph"><h2>✓ התרגול שויך ל${esc(KID.name)}</h2>${blt([ORPH_MSG, 'הוא נשמר לחשבון שלו ועלה לענן.', 'המקום במסע לא השתנה — הוא ממשיך מאיפה שהיה.'])}</section>` : ''}
+  ${ORPH ? `<section class="stk pbox orph">
+    <h2>🧩 להורים: תרגול שנשמר על המכשיר הזה בלבד</h2>
+    ${blt([`על המכשיר הזה נשמר תרגול שלא שויך לאף ילד: <b>${ORPH.days.length}</b> ${ORPH.days.length === 1 ? 'יום תרגול' : 'ימי תרגול'}, <b>${ORPH.stars}</b> תשובות נכונות${ORPH.wins ? `, <b>${ORPH.wins}</b> ${ORPH.wins === 1 ? 'זכייה בגלגל' : 'זכיות בגלגל'}` : ''}${ORPH.last ? ` (אחרון: ${ddmm(ORPH.last)})` : ''}.`,
+      'זה קרה בכניסה לאפליקציה בלי הקישור האישי, ולכן התרגול הזה לא הגיע לחשבון בענן.',
+      `אם זה ${esc(KID.name)} — אפשר לשייך את זה אליו עכשיו. הכוכבים, ימי התרגול, הזכיות והמילים יתווספו למה שיש לו.`,
+      '<b>המקום במסע לא יזוז.</b> הוא ימשיך לעמוד בדיוק איפה שהוא עומד.'], 'zdesc')}
+    <div class="row"><button class="btn primary" id="orphgo">לשייך ל${esc(KID.name)}</button><button class="btn" id="orphno">לא עכשיו</button></div>
+  </section>` : ''}
   ${KID && KID.mode === 'test' ? '' : journeyCardHTML(G, st)}
 
   ${(KID && KID.mode === 'learn') || !G4 ? '' : `<section class="zone test">
@@ -2233,6 +2244,13 @@ function home() {
   $$('.goal [data-lt]', app).forEach(x => { x.onclick = () => letterCard(x.dataset.lt); x.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); letterCard(x.dataset.lt); } }; });
 
   const pk = $('#peek'); if (pk) pk.onclick = () => go(wheelView);
+  const og = $('#orphgo'); if (og) og.onclick = () => {
+    const O = ORPH; og.disabled = true;
+    if (claimOrphan()) { ORPH_MSG = `נוספו <b>${O.days.length}</b> ${O.days.length === 1 ? 'יום תרגול' : 'ימי תרגול'} ו-<b>${O.stars}</b> תשובות נכונות${O.wins ? `, ועוד ${O.wins === 1 ? 'זכייה' : `${O.wins} זכיות`} בגלגל` : ''}.`; sfx('win'); }
+    go(home);
+  };
+  const onn = $('#orphno'); if (onn) onn.onclick = () => { ORPH_HIDE = true; go(home); };
+  ORPH_MSG = '';
 }
 
 /* ---------- cloud: parent accounts (Google) and kid links ---------- */
@@ -2347,6 +2365,55 @@ function lastKid() {
   } catch (e) {}
   return null;
 }
+/* ---------- practice that was saved on this device under nobody ----------
+   While the app needed ?k= on every visit, a child who opened it without his link practised into
+   an unnamed on-device profile. That work never reached the cloud: the parent's page said "has not
+   practised today" about practice she had watched him do. It is still on the device, so it is
+   offered back to the child it belongs to instead of being left to rot in localStorage. */
+const ORPH_BK = KEY + ':orphan';
+function orphanWork() {
+  try {
+    const s = JSON.parse(localStorage.getItem(KEY)); if (!s) return null;
+    const days = [...new Set((s.days || []).map(dnorm))].sort(), stars = +s.stars || 0, wins = (s.wins || []).length;
+    const lts = Object.keys(s.lt || {}).length, wks = Object.keys(s.wk || {}).length;
+    if (!days.length && !stars && !wins) return null;
+    return { s, days, stars, wins, lts, wks, J: s.jour || {}, last: days[days.length - 1] || '' };
+  } catch (e) { return null; }
+}
+// Everything adds up and nothing is thrown away. The one thing that never moves is the journey:
+// he goes on standing where he really stands, so a stray letters profile can never pull him back.
+function claimOrphan() {
+  const O = orphanWork(); if (!O || !KID) return false;
+  const s = load(), o = dateMigrate(JSON.parse(JSON.stringify(O.s)));
+  s.stars = (+s.stars || 0) + (+o.stars || 0);
+  s.days = [...new Set([...(s.days || []), ...(o.days || [])].map(dnorm))].sort();
+  const seen = new Set();
+  s.wins = [...(s.wins || []), ...(o.wins || [])].map(w => Object.assign({}, w, { date: dnorm(w.date) }))
+    .sort((a, b) => a.date < b.date ? 1 : a.date > b.date ? -1 : 0)
+    .filter(w => { const k = w.date + '|' + w.prize; if (seen.has(k)) return false; seen.add(k); return true; }).slice(0, 60);
+  s.best = s.best || {}; Object.keys(o.best || {}).forEach(k => { s.best[k] = Math.max(s.best[k] || 0, o.best[k] || 0); });
+  s.done = s.done || {}; Object.keys(o.done || {}).forEach(k => { if (!s.done[k] || o.done[k] > s.done[k]) s.done[k] = o.done[k]; });
+  s.lt = s.lt || {};
+  Object.keys(o.lt || {}).forEach(c => {
+    const a = s.lt[c] = s.lt[c] || {}, b = o.lt[c] || {};
+    LT_SKILLS.forEach(([k]) => { if (b[k]) { a[k] = a[k] || [0, 0]; a[k][0] += b[k][0] || 0; a[k][1] += b[k][1] || 0; } });
+    if (b.last && (!a.last || b.last > a.last)) a.last = b.last;
+  });
+  s.wk = s.wk || {};
+  Object.keys(o.wk || {}).forEach(w => {
+    const b = o.wk[w]; if (!Array.isArray(b)) return;
+    const a = s.wk[w] = s.wk[w] || [0, 0, ''];
+    a[0] += b[0] || 0; a[1] += b[1] || 0; if (b[2] && b[2] > (a[2] || '')) a[2] = b[2];
+  });
+  if (o.td && o.td.date === today()) { // the minutes and the spin he already had today are real
+    const d = day(s);
+    d.ms = Math.max(d.ms || 0, o.td.ms || 0); d.stars = (d.stars || 0) + (o.td.stars || 0);
+    if (o.td.jw) d.jw = Math.max(d.jw || 0, o.td.jw);
+  }
+  try { localStorage.setItem(ORPH_BK, JSON.stringify(O.s)); localStorage.removeItem(KEY); } catch (e) {}
+  save(s); try { cloudFlush(); } catch (e) {}
+  return true;
+}
 async function bootKid(id, mode) {
   app.innerHTML = '<p class="loading">טוען…</p>';
   try {
@@ -2392,8 +2459,10 @@ async function bootKid(id, mode) {
 }
 
 // --- parent side
-const LINK_V = 3; // bump when the link preview changes: WhatsApp caches a preview per exact URL
-const kidLink = (id, mode) => `${location.origin}${location.pathname}?k=${id}&m=${mode}&v=${LINK_V}${DEMO ? '&demo' : ''}`;
+// A kid link carries no version. The version never decided which code the child ran — the page is
+// always served fresh from the address — it only pushed WhatsApp to rebuild its cached preview.
+// One address per child means the link in his chat keeps working and every fix reaches him at once.
+const kidLink = (id, mode) => `${location.origin}${location.pathname}?k=${id}&m=${mode}${DEMO ? '&demo' : ''}`;
 /* ---------- the parent's strip at the top of the home screen ----------
    Getting in used to mean scrolling past everything a child sees to a link at the very
    bottom. The way in now sits above the page, and once a parent is in, each child's day
