@@ -1745,15 +1745,20 @@ const PROGRESS_KEYS = ['stars', 'days', 'done', 'best', 'td', 'mock', 'mocks', '
 const SETTING_KEYS = ['goal', 'prizes', 'megaPrizes', 'wheel', 'level', 'testLevel', 'allowLevelUp', 'pack', 'prizeArt', 'kidPrize'];
 const defaultSettings = () => { const f = fresh(); return Object.fromEntries(SETTING_KEYS.map(k => [k, f[k]])); };
 // KID is set when the app is opened from a parent's link: settings come from the parent, progress is saved to the cloud
-let KID = null;
+let KID = null, KID_RESTORED = false; // KID_RESTORED: this device remembered the child, no ?k= in the address
+// A record written long ago can still carry progress fields inside `settings` (Gur's, for one,
+// holds settings.jour = {n:0} from the version that put it there). Settings are never progress:
+// left in, that stale `jour` becomes the fallback the moment progress.jour is missing, and the
+// child is dropped back to letter 0 of a journey he finished. Progress comes from `progress` only.
+const settingsOnly = s => { const o = Object.assign({}, s || {}); PROGRESS_KEYS.forEach(k => { if (k !== 'level') delete o[k]; }); return o; };
 function load() {
   if (KID) {
-    const st = abcMigrate(Object.assign(fresh(), KID.settings));
+    const st = abcMigrate(Object.assign(fresh(), settingsOnly(KID.settings)));
     Object.assign(st, Object.fromEntries(PROGRESS_KEYS.filter(k => KID.progress[k] !== undefined && k !== 'level').map(k => [k, KID.progress[k]])));
     if (KID.settings.allowLevelUp && KID.progress.level) st.level = KID.progress.level;
-    return JSON.parse(JSON.stringify(st));
+    return dateMigrate(JSON.parse(JSON.stringify(st)));
   }
-  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s) return abcMigrate(Object.assign(fresh(), s)); } catch (e) {} return fresh();
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s) return dateMigrate(abcMigrate(Object.assign(fresh(), s))); } catch (e) {} return fresh();
 }
 // kids set up before the alphabet road carry the old default of 25 stars a day, which was
 // about four minutes of work. Treat that untouched default as the new road; a parent who
@@ -1772,7 +1777,33 @@ function save(s) {
   }
   try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {}
 }
-function today() { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; }
+/* ---------- one date form, everywhere: YYYY-MM-DD ----------
+   Days used to be written as `y-m-d` with no zero padding ("2026-1-5"). That only looks like
+   a real date when the month and the day are both two digits, so it would have come apart in
+   the first nine days of a month: ISO-shaped comparisons, lexical ordering and the status
+   script would all have missed those days. Every day is written padded now, and dnorm() pads
+   whatever a record saved earlier, so old and new values still compare equal. */
+const ymd = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const dnorm = v => { // "2026-1-5" -> "2026-01-05"; anything else comes back as it was
+  if (typeof v !== 'string') return v;
+  const m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(v);
+  return m ? `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}` : v;
+};
+function today() { return ymd(new Date()); }
+// every day kept in a record, rewritten once into the padded form
+function dateMigrate(st) {
+  if (st.td && st.td.date) st.td.date = dnorm(st.td.date);
+  if (Array.isArray(st.days)) st.days = [...new Set(st.days.map(dnorm))];
+  if (Array.isArray(st.wins)) st.wins.forEach(w => { if (w && w.date) w.date = dnorm(w.date); });
+  if (st.done) for (const k of Object.keys(st.done)) st.done[k] = dnorm(st.done[k]);
+  if (st.mock && st.mock.date) st.mock.date = dnorm(st.mock.date);
+  if (Array.isArray(st.mocks)) st.mocks.forEach(m => { if (m && m.date) m.date = dnorm(m.date); });
+  if (st.lt) for (const c of Object.keys(st.lt)) { const r = st.lt[c]; if (r && r.last) r.last = dnorm(r.last); }
+  if (st.wk) for (const w of Object.keys(st.wk)) { const r = st.wk[w]; if (Array.isArray(r) && r[2]) r[2] = dnorm(r[2]); }
+  ['allGreen', 'allGreenSeen', 'firstGift', 'noMic'].forEach(k => { if (st[k]) st[k] = dnorm(st[k]); });
+  if (st.goal) ['xe', 'xs'].forEach(k => { if (st.goal[k] && st.goal[k].d) st.goal[k].d = dnorm(st.goal[k].d); });
+  return st;
+}
 function day(s) { const t = today(); if (!s.td || s.td.date !== t) s.td = { date: t, stars: 0, ms: 0, spins: 0, letters: 0 }; if (s.td.letters == null) s.td.letters = 0; return s.td; }
 // The alphabet road to the wheel: 26 letters, one per finished round of practice, two for
 // a round at 90% or better. A letter costs a whole round rather than a single right answer,
@@ -1965,7 +1996,7 @@ function stepNoteHTML(s1) {
   return `<div class="jstep"><b>👣 עוד שלב במסע!</b>${stepsHTML(n, need, true, L)}<span>${need - n === 1 ? 'עוד שלב אחד' : `עוד ${need - n} שלבים`} ופותחים את האות <b class="en">${L}</b></span></div>`;
 }
 const dayMax = s => { const v = (s.goal || {}).max; return v == null ? 60 : +v; };      // after this many minutes, no more practice today (0 = no limit)
-const xeGrant = s => { const x = (s.goal || {}).xe; return x && x.d === today() ? x : null; };
+const xeGrant = s => { const x = (s.goal || {}).xe; return x && dnorm(x.d) === today() ? x : null; };
 const xeToday = s => { const x = xeGrant(s); return x ? +x.m || 0 : 0; };
 const xeFree = s => { const x = xeGrant(s); return !!(x && x.u); };
 const dayMaxToday = s => { const m = dayMax(s); return m && !xeFree(s) ? m + xeToday(s) : 0; };
@@ -2027,7 +2058,7 @@ function dailyTarget(s) {
   const m = dayMax(s) || 60;
   return Math.min(leftAtStart, Math.max(1, Math.floor(m / (stageSteps(s) * STEP_MIN))));
 }
-const xsGrant = s => { const x = (s.goal || {}).xs; return x && x.d === today() ? x : null; };
+const xsGrant = s => { const x = (s.goal || {}).xs; return x && dnorm(x.d) === today() ? x : null; };
 function xsState(s, d) { // null | {pend, open}
   const x = xsGrant(s), b = d.xsb; if (!x || !b || b.at !== x.at) return null;
   if ((d.jw || 0) > b.jw) return null; // used
@@ -2037,6 +2068,7 @@ function xsApply() { // first time this device sees a grant: remember where he s
   if (!KID) return; const s = load(), x = xsGrant(s); if (!x) return; const d = day(s);
   if (d.xsb && d.xsb.at === x.at) return; d.xsb = { at: x.at, ms: d.ms || 0, jw: d.jw || 0 }; save(s);
 }
+const wonToday = s => (s.wins || []).some(w => w && dnorm(w.date) === today()); // a spin always leaves a win behind
 function st_wheelToday(s, d) { const X = xsState(s, d); if (X) return X.open;
   const k = (d.jw || 0) + 1, jl = d.jl || 0;
   return k <= wheelPerDay(s) && jl >= k && (jour(s).n < JOUR_N || jl > k) && Math.floor((d.ms || 0) / 60000) >= wheelMin(s) * k; }
@@ -2045,13 +2077,24 @@ function goalState(s) {
   if ((s.goal || {}).type === 'journey') {
     const d = day(s), J = jour(s), T = dailyTarget(s), todayN = d.jl || 0, mins = Math.floor((d.ms || 0) / 60000);
     const stops = [], reached = 0, owed = 0, minM = 0, maxM = dayMaxToday(s);
-    const XS = xsState(s, d), spunToday = (d.jw || 0) >= wheelPerDay(s) && !XS;
+    const XS = xsState(s, d);
+    // "already spun today" is only ever said when there is a win from today to point at — the very
+    // same record the child sees under "במה זכיתי". A counter on its own was enough to claim a spin
+    // that left no trace anywhere, and a child who never spun was told the wheel was used up.
+    const spunToday = (d.jw || 0) >= wheelPerDay(s) && wonToday(s) && !XS;
     const xw = ppXW(s), avail = (st_wheelToday(s, d) ? 1 : 0) + xw, almost = wheelAlmost(s, d);
     const capped = J.n < JOUR_N && !!maxM && mins >= maxM;
+    // what the next spin is actually waiting for, so the locked wheel names it instead of
+    // always saying "one more letter" (which was wrong on every journey past the letters)
+    const kk = (d.jw || 0) + 1, needS = Math.max(0, kk - (d.jl || 0)), needM = Math.max(0, wheelMin(s) * kk - mins);
+    const sUnit = isPP(s) ? 'חותמות' : isStars(s) ? 'כוכבים' : 'אותיות', sUnit1 = isPP(s) ? 'חותמת' : isStars(s) ? 'כוכב' : 'אות';
+    const lock = needS > 0 ? { left: needS, unit: needS === 1 ? sUnit1 : sUnit, pct: wheelMin(s) ? Math.min(100, mins / (wheelMin(s) * kk) * 100) : 0 }
+      : needM > 0 ? { left: needM, unit: needM === 1 ? 'דקה' : 'דקות', pct: Math.min(100, mins / (wheelMin(s) * kk) * 100) }
+      : { left: 1, unit: sUnit1, pct: 100 };
     return { d, g: s.goal, mins, journey: true, J, stops, value: J.n, earned: reached, owed, avail, waiting: owed && !spunToday && !avail ? minM - mins : 0,
       mega: J.n >= JOUR_N && !J.mega, megaWait: 0,
       target: T, todayN, capped, spunToday, almost, bonusPend: !!(XS && XS.pend), nextDay: 0, lmin: letterMin(s), cmin: curLetterMin(s), steps: stageSteps(s), csp: curSteps(s), minM, maxM, lesson: letterMin(s),
-      left: 1, unit: 'אות', pct: Math.min(100, (J.n / JOUR_N) * 100), xw };
+      left: lock.left, unit: lock.unit, pct: lock.pct, xw };
   }
   const d = day(s), g = s.goal, mins = Math.floor(d.ms / 60000);
   if (g.type === 'lvl' || g.type === 'abc') { // letters that moved up today; after all 26, the review list
@@ -2174,6 +2217,7 @@ function home() {
   </section>`}
   <button class="btn myprog" id="myprog">📈 ההתקדמות שלי</button>
   <div class="tip"${G4 ? '' : ' hidden'}><b>המורה ביקשה:</b>${blt(['לקרוא בקול.', 'לחזור על הצלילים והאותיות.', 'לתרגל קצת בכל יום.'])}</div>
+  ${KID_RESTORED ? `<div class="parentrow"><a class="link parentlink" href="${location.pathname}?p=1">אזור ההורים</a></div>` : ''}
   ${KID || CLOUD_OK ? '' : '<div class="parentrow"><button class="link parentlink" id="parent">הגדרות במכשיר הזה</button></div>'}
   <p class="credit">האיורים: <a href="https://openmoji.org" target="_blank" rel="noopener">OpenMoji</a> · רישיון <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a></p>`;
   $$('.tile', app).forEach(b => b.onclick = () => MODS[+b.dataset.m].run());
@@ -2285,11 +2329,33 @@ async function cloudFlush() {
 document.addEventListener('visibilitychange', () => { if (KID) { if (document.visibilityState === 'hidden') cloudFlush(); else if (cloudDirty) cloudFlush(); } });
 window.addEventListener('pagehide', () => { if (KID) cloudFlush(); });
 window.addEventListener('online', () => { if (KID && cloudDirty) { cloudFails = 0; cloudFlush(); } });
+/* ---------- whose device is this ----------
+   The app used to need the ?k= link on every single visit. Opening it from the hub, from a
+   bookmark or from a shortcut that lost its query took the child to a brand-new on-device
+   profile: journey back at 0 of 26, every stage blank, the mock test offered again — and a
+   wheel counting whatever that stray profile had done. From the child's side that is simply
+   "everything I did is gone". So the device remembers the last link opened on it and goes
+   back to that child. ?p=1 skips the restore, for a parent on a shared phone. */
+const LAST_K = KEY + ':last';
+const rememberKid = (id, mode) => { try { localStorage.setItem(LAST_K, JSON.stringify({ id, mode, at: Date.now() })); } catch (e) {} };
+function lastKid() {
+  try { const o = JSON.parse(localStorage.getItem(LAST_K)); if (o && o.id) return o; } catch (e) {}
+  // nothing remembered, but the device may still hold exactly one child's saved progress
+  try {
+    const pre = KEY + ':', ids = Object.keys(localStorage).filter(k => k.startsWith(pre) && k !== LAST_K).map(k => k.slice(pre.length));
+    if (ids.length === 1) return { id: ids[0], mode: 'learn' };
+  } catch (e) {}
+  return null;
+}
 async function bootKid(id, mode) {
   app.innerHTML = '<p class="loading">טוען…</p>';
   try {
     const k = await (await api()).getKid(id);
-    if (!k) { app.innerHTML = '<section class="stk pbox"><h2>הקישור לא נמצא</h2><ul class="pts"><li>ייתכן שההורה מחק אותו.</li><li>בקשו מההורה קישור חדש.</li></ul></section>'; return; }
+    if (!k) {
+      if (KID_RESTORED) { KID_RESTORED = false; try { localStorage.removeItem(LAST_K); } catch (e) {} home(); return; } // a stale memory must never block the app
+      app.innerHTML = '<section class="stk pbox"><h2>הקישור לא נמצא</h2><ul class="pts"><li>ייתכן שההורה מחק אותו.</li><li>בקשו מההורה קישור חדש.</li></ul></section>'; return;
+    }
+    rememberKid(id, MODES[mode] ? mode : 'all');
     let local = null; try { local = JSON.parse(localStorage.getItem(KEY + ':' + id)); } catch (e) {}
     // a parent's reset beats this device's copy only if he hasn't practised on it since the reset (work done after it is never thrown away)
     const cp = k.progress || {}, resetWins = local && (cp.resetAt || 0) > (local.resetAt || 0) && (cp.resetAt || 0) > (local.updatedAt || 0);
@@ -2333,7 +2399,7 @@ const kidLink = (id, mode) => `${location.origin}${location.pathname}?k=${id}&m=
    bottom. The way in now sits above the page, and once a parent is in, each child's day
    and a one-tap link are there with it. */
 let PAPI = null, PUSER = null, PKIDS = [], PKIDS_LOADED = null; const PDASH_K = 'english-ready-pdash';
-const kidDay = k => { const p = k.progress || {}; return (p.td && p.td.date === today()) ? p.td : { stars: 0, ms: 0, letters: 0, spins: 0 }; };
+const kidDay = k => { const p = k.progress || {}; return (p.td && dnorm(p.td.date) === today()) ? p.td : { stars: 0, ms: 0, letters: 0, spins: 0 }; };
 const kidMode = k => ((k.settings || {}).linkMode) || 'learn';
 const GIRL_K = k => ((k && k.settings) || {}).gender === 'f';
 const KCOL = ['#6E56CF', '#D9662B', '#13917E', '#C2417A', '#2F7FD1'];
@@ -2377,15 +2443,15 @@ function watchParentKids(A) { // each kid's card follows his progress live
 const KOPEN = {};
 const MOD_HE = { stageQuiz: 'המסע', learnView: 'לימוד המילים', talkView: 'שיחה באנגלית', speakView: 'אומרים בקול', quizMock: 'מבחן ניסיון', writeView: 'כתיבת אותיות', wordWriteView: 'כתיבת מילים', k5Learn: 'מילים חדשות', k5Game: 'משחק מילים', k5Abc: 'אותיות', k5AbcGame: 'משחק אותיות', k5Sing: 'שירים', k5Do: 'תעשי כמוני' };
 const ddmm = t => t.split('-').slice(1).reverse().join('.');
-function kidState(k) { const st = abcMigrate(Object.assign(fresh(), JSON.parse(JSON.stringify(k.settings || {})))); const p = JSON.parse(JSON.stringify(k.progress || {})); PROGRESS_KEYS.forEach(x => { if (p[x] !== undefined && x !== 'level') st[x] = p[x]; }); st.td = JSON.parse(JSON.stringify(kidDay(k))); st.td.date = today(); return st; }
+function kidState(k) { const st = abcMigrate(Object.assign(fresh(), settingsOnly(JSON.parse(JSON.stringify(k.settings || {}))))); const p = JSON.parse(JSON.stringify(k.progress || {})); PROGRESS_KEYS.forEach(x => { if (p[x] !== undefined && x !== 'level') st[x] = p[x]; }); st.td = JSON.parse(JSON.stringify(kidDay(k))); st.td.date = today(); return dateMigrate(st); }
 /* ---------- the daily status: one line per kid that reads at a glance, the details a tap away ----------
    Only what the app really records: minutes (time between taps, gaps over 90s not counted), stages with
    their score, wins with their date, practice days, the place on the journey, and for each word how often
    it was answered and how often right (recorded since 20.11). Levels are said inside the kid's own track,
    never as a number that could be compared between kids. */
-const dayKey = t => { const d = new Date(t); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; }; // the same form as today()
+const dayKey = t => ymd(new Date(t)); // the same form as today()
 function streakOf(days) { // days in a row up to today (or up to yesterday, if today is still open)
-  const D = new Set(days || []); let n = 0, t = Date.now();
+  const D = new Set((days || []).map(dnorm)); let n = 0, t = Date.now();
   if (!D.has(dayKey(t))) t -= 864e5;
   while (D.has(dayKey(t))) { n++; t -= 864e5; }
   return n;
@@ -2408,7 +2474,7 @@ function kidHardWords(k, n = 5) { // answered wrong more than right, the most-mi
 function kidStatusLine(k) {
   const d = kidDay(k), p = k.progress || {}, st = k.settings || {}, g = GIRL_K(k), mins = Math.floor((d.ms || 0) / 60000), rs = d.rs || [];
   const did = mins > 0 || rs.length || (d.stars || 0) > 0;
-  const wins = (p.wins || []).filter(w => w.date === today());
+  const wins = (p.wins || []).filter(w => dnorm(w.date) === today());
   const mx = ((st.goal || {}).max == null ? 60 : +(st.goal || {}).max) ? dayMaxToday(Object.assign({}, st, { goal: Object.assign({ max: 60 }, st.goal || {}) })) : 0;
   const left = mx ? Math.max(0, mx - mins) : null, sk = streakOf(p.days);
   const bits = [did ? `<b class="kson">✅ ${g ? 'תרגלה' : 'תרגל'} היום</b>` : `<b class="ksoff">⚪ עוד לא ${g ? 'תרגלה' : 'תרגל'} היום</b>`];
@@ -2423,8 +2489,8 @@ function kidDetail(k, key) {
   const L = a => blt(a.filter(Boolean));
   if (key === 'status') {
     const d = kidDay(k), mins = Math.floor((d.ms || 0) / 60000), rs = d.rs || [], g = GIRL_K(k), Lv = kidLevel(k), sk = streakOf(p.days), H = kidHardWords(k);
-    const wins = (p.wins || []).filter(w => w.date === today()), mx = dayMaxToday(S);
-    const last7 = [...Array(7)].map((_, i) => dayKey(Date.now() - (6 - i) * 864e5)), D = new Set(p.days || []);
+    const wins = (p.wins || []).filter(w => dnorm(w.date) === today()), mx = dayMaxToday(S);
+    const last7 = [...Array(7)].map((_, i) => dayKey(Date.now() - (6 - i) * 864e5)), D = new Set((p.days || []).map(dnorm));
     return `<h4>📋 הסטטוס של ${nm} היום</h4>
       <ul class="kdbars">
         <li><span>זמן תרגול היום</span><b>${mins} דק׳</b></li>
@@ -2481,7 +2547,7 @@ function kidDetail(k, key) {
       ${rs.length ? `<p class="kdnext">👉 ${rs.filter(r => r.ok).length} מתוך ${rs.length} שלבים הצליחו ונספרו.</p>` : ''}`;
   }
   if (key === 'days') {
-    const set = new Set(S.days || []), back = [...Array(14)].map((_, i) => { const t = new Date(); t.setDate(t.getDate() - (13 - i)); return `${t.getFullYear()}-${t.getMonth() + 1}-${t.getDate()}`; });
+    const set = new Set((S.days || []).map(dnorm)), back = [...Array(14)].map((_, i) => { const t = new Date(); t.setDate(t.getDate() - (13 - i)); return ymd(t); });
     let streak = 0; for (let i = 13; i >= 0; i--) { if (set.has(back[i])) streak++; else if (i === 13) continue; else break; }
     return `<h4>📅 ימי תרגול: שבועיים אחרונים</h4><div class="kddays">${back.map(t => `<span class="${set.has(t) ? 'on' : ''}" title="${ddmm(t)}">${t.split('-')[2]}</span>`).join('')}</div>
       <p class="kdnext">👉 ${streak >= 2 ? `רצף של ${streak} ימים ברציפות! 🔥` : streak === 1 ? 'תרגל אתמול או היום. מחר אפשר להתחיל רצף.' : 'אין רצף כרגע. תרגול קצר מחר יתחיל אחד.'} סך הכול ${set.size} ימים.</p>`;
@@ -3060,7 +3126,7 @@ function kidSettingsOld(A, u, k) {
     </section>
     <section class="stk pbox">
       <h2>התקדמות</h2>
-      <p>היום: ⭐ ${p.td && p.td.date === today() ? p.td.stars : 0} · ⏱ ${p.td && p.td.date === today() ? Math.floor(p.td.ms / 60000) : 0} דקות · ימי תרגול: ${(p.days || []).length} · סך הכול ⭐ ${p.stars || 0}</p>
+      <p>היום: ⭐ ${p.td && dnorm(p.td.date) === today() ? p.td.stars : 0} · ⏱ ${p.td && dnorm(p.td.date) === today() ? Math.floor(p.td.ms / 60000) : 0} דקות · ימי תרגול: ${(p.days || []).length} · סך הכול ⭐ ${p.stars || 0}</p>
       ${m ? `<p>מבחן ניסיון אחרון (${m.date.split('-').slice(1).reverse().join('.')}): <b>${m.score}/${m.n}</b></p>${secTable(m.secs).replace(/<button[^>]*>לתרגל<\/button>/g, '')}` : '<p class="hint">עוד לא עשה מבחן ניסיון.</p>'}
       <h3>זכיות בגלגל</h3>
       ${(p.wins || []).length ? `<ul class="wins">${p.wins.slice(0, 15).map(w => `<li><span class="en">${esc(enPart(w.prize))}</span> · ${w.date.split('-').slice(1).reverse().join('.')}</li>`).join('')}</ul>` : '<p class="hint">עוד אין.</p>'}
@@ -3096,17 +3162,26 @@ function kidSettingsOld(A, u, k) {
 /* ---------- my progress (kid) ---------- */
 function progressView() {
   const st = load(), G = goalState(st), fmt = d => d.split('-').slice(1).reverse().join('.');
-  const last7 = [...Array(7)].map((_, i) => { const d = new Date(); d.setDate(d.getDate() - 6 + i); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; });
+  const last7 = [...Array(7)].map((_, i) => { const d = new Date(); d.setDate(d.getDate() - 6 + i); return ymd(d); });
   const DAYS = ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'ש׳'];
   const mocks = st.mocks || (st.mock ? [st.mock] : []);
   app.innerHTML = `${top('ההתקדמות שלי')}
     <section class="stk pbox">
       <h2>היום</h2>
-      ${G.journey ? `<p class="bignum">🔤 ${G.J.n} <small>/ 26 אותיות</small> · 👣 ${G.csp} <small>/ ${G.steps} שלבים לאות</small></p>
-      <p class="gleft">${G.todayN ? `היום פתחת ${G.todayN === 1 ? 'אות אחת' : `${G.todayN} אותיות`} 🔓` : 'האות הראשונה של היום עוד מחכה לך'}</p>`
+      ${G.journey ? (() => {
+        // This page used to say "🔤 n / 26 אותיות" on every journey. A child who had finished all
+        // 26 letters and moved on to the stars read his own progress page as "2 of 26 letters" —
+        // his finished stage, shown back to him as barely started. It names the journey he is on.
+        const PP_ = isPP(st), ST_ = isStars(st);
+        const ic = PP_ ? '🛂' : ST_ ? '⭐' : '🔤', un = PP_ ? 'חותמות' : ST_ ? 'כוכבים' : 'אותיות';
+        const un1 = PP_ ? 'חותמת אחת' : ST_ ? 'כוכב אחד' : 'אות אחת', stepFor = PP_ ? 'שלבים לתחנה' : ST_ ? 'שלבים לכוכב' : 'שלבים לאות';
+        const none = PP_ ? 'החותמת הראשונה של היום עוד מחכה לך' : ST_ ? 'הכוכב הראשון של היום עוד מחכה לך' : 'האות הראשונה של היום עוד מחכה לך';
+        return `<p class="bignum">${ic} ${G.J.n} <small>/ ${JOUR_N} ${un}</small> · 👣 ${G.csp} <small>/ ${G.steps} ${stepFor}</small></p>
+      <p class="gleft">${G.todayN ? `היום ${PP_ ? 'קיבלת' : 'פתחת'} ${G.todayN === 1 ? un1 : `${G.todayN} ${un}`} 🔓` : none}</p>`;
+      })()
       : `<p class="bignum">⭐ ${G.d.stars} <small>כוכבים</small></p>`}
-      <h2>מפת האותיות שלי</h2>
-      ${letterMapHTML(st, { click: true })}
+      ${isStars(st) && !Object.keys(st.lt || {}).length ? '' : `<h2>${isStars(st) ? 'מה אני יודע על האותיות' : 'מפת האותיות שלי'}</h2>
+      ${letterMapHTML(st, { click: true })}`}
       <h2>השבוע</h2>
       <div class="week">${last7.map(d => { const on = (st.days || []).includes(d); const wd = DAYS[new Date(d.split('-')[0], d.split('-')[1] - 1, d.split('-')[2]).getDay()]; return `<span class="wday ${on ? 'on' : ''}" title="${fmt(d)}">${on ? '✓' : ''}<small>${wd}</small></span>`; }).join('')}</div>
       <p>סך הכול: <b>${st.stars}</b> תשובות נכונות · <b>${(st.days || []).length}</b> ימי תרגול</p>
@@ -4624,7 +4699,7 @@ function qOther(q) {
 
 // questions already shown today on this device: new rounds take fresh ones first
 const SEEN_K = 'english-ready-seen';
-function seenToday() { try { const o = JSON.parse(localStorage.getItem(SEEN_K)); if (o && o.d === today()) return new Set(o.k); } catch (e) {} return new Set(); }
+function seenToday() { try { const o = JSON.parse(localStorage.getItem(SEEN_K)); if (o && dnorm(o.d) === today()) return new Set(o.k); } catch (e) {} return new Set(); }
 function markSeen(...keys) { try { const st = seenToday(); keys.forEach(k => st.add(k)); localStorage.setItem(SEEN_K, JSON.stringify({ d: today(), k: [...st].slice(-2000) })); } catch (e) {} }
 // shuffled, the ones not seen today first
 function freshFirst(list, keyOf) { const sn = seenToday(); const sh = shuffle(list); return sh.filter(x => !keyOf(x).some(k => sn.has(k))).concat(sh.filter(x => keyOf(x).some(k => sn.has(k)))); }
@@ -6899,6 +6974,7 @@ function tryWheel() {
   wheelView({ prizes });
 }
 if (QS.get('k') && CLOUD_OK) bootKid(QS.get('k'), QS.get('m') || 'all').then(tryWheel, tryWheel);
+else if (CLOUD_OK && !QS.has('p') && lastKid()) { const L = lastKid(); KID_RESTORED = true; bootKid(L.id, L.mode || 'learn').then(tryWheel, tryWheel); }
 else { home(); tryWheel(); }
 })();
 </script>
