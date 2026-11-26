@@ -183,6 +183,11 @@ table th.dim, table td.dim{opacity:.32}
 .best td:first-child{color:#fff; font-weight:700; box-shadow:inset 3px 0 0 var(--red)}
 .soft{color:var(--soft)} .save{color:var(--red); font-weight:700}
 td a{color:var(--ink); text-decoration:none; border-bottom:1px dotted var(--soft)}
+td a.alink{font-weight:700; border-bottom-color:rgba(255,255,255,.28); white-space:nowrap}
+td a.alink:hover{border-bottom-color:var(--red)}
+.fchk{display:block; margin-top:3px; font-size:.74rem; font-weight:300}
+.fchk a{color:var(--gold); border-bottom:1px solid rgba(255,210,74,.28); white-space:nowrap}
+.fchk a:hover{border-bottom-color:var(--gold)}
 
 /* ===== SHOUT ===== */
 .shout{margin-top:24px; border:1px solid var(--line); border-radius:18px; overflow:hidden; background:var(--panel2)}
@@ -456,12 +461,12 @@ footer a{color:#8a8a94}
   <div class="bg"><img src="img/hero-larnaca.jpg" alt="" style="object-position:50% 62%"></div>
   <div class="wrap">
   <h2 class="kick">למה לרנקה ולא אוסטרבה?</h2>
-  <p class="subh">אותו אדם. חצי מהטרחה.</p>
+  <p class="subh">אותו אדם.<br>חצי מהטרחה.</p>
 
   <div class="pts">
     <div class="pt">
       <b>בעצם באנו בשביל <i>רובי</i></b>
-      <span>16 במות היו רעיון יפה. <em>עכשיו יש מופע אחד.</em></span>
+      <span>16 במות היו רעיון יפה.<br><em>עכשיו יש מופע אחד.</em></span>
     </div>
     <div class="pt">
       <b>יש הרבה יותר סיכוי <i>לסבתא</i></b>
@@ -472,7 +477,7 @@ footer a{color:#8a8a94}
       <span>‎€175‎ לפסטיבל, <em>₪181 להופעה.</em></span>
     </div>
     <div class="pt">
-      <b><i>שעה</i> טיסה. שעה.</b>
+      <b><i>שעה</i> טיסה.<br>שעה.</b>
       <span>מול טיסה לקרקוב <em>ועוד שעתיים ברכב.</em></span>
     </div>
     <div class="pt">
@@ -493,8 +498,7 @@ footer a{color:#8a8a94}
     <div class="shout-t">✅ אנחנו כבר קנינו</div>
     <div class="shout-b">
       <div class="big">גולדן רינג<br>₪449</div>
-      <p class="cap"><b>שני כרטיסים, ₪898 לזוג</b>, דרך ההטבה של MAX. <a class="maplink" href="#venue-map">🗺 איפה זה במתחם</a><br><br>
-      הטבעת הצמודה לבמה — הכי קרוב שאפשר לעמוד. <b>פי 2.5 זול מהטריבונה, והרבה יותר קרוב.</b></p>
+      <p class="cap"><b>שני כרטיסים, ₪898 לזוג</b>, דרך ההטבה של MAX.<br><a class="maplink" href="#venue-map">🗺 איפה זה במתחם</a><br>הטבעת הצמודה לבמה — הכי קרוב שאפשר לעמוד.<br><b>פי 2.5 זול מהטריבונה, והרבה יותר קרוב.</b></p>
       <div class="buy">
         <a class="btn-buy" href="https://www.max.co.il/benefits/showsabroad/robbiewilliams" target="_blank" rel="noopener">לקנות ב-MAX · עד 29.11 ↗</a>
         <a class="btn-buy ghost" href="https://www.ticketmaster.cy/showEventInformation.html?changeLanguageTo=en&idEvent=8826" target="_blank" rel="noopener">טיקטמאסטר קפריסין ↗</a>
@@ -503,13 +507,13 @@ footer a{color:#8a8a94}
   </div>
 
   <div class="note"><b>שני מסלולי רכישה, והם לא שווים.</b><br>
-  🔴 <b>ההטבה של MAX</b> — ₪181 לדשא, ₪449 לגולדן רינג. דורשת כרטיס MAX, מוגבלת ל-2 כרטיסים לת״ז, <b>ונסגרת בראשון 29.11.</b><br>
+  🔴 <b>ההטבה של MAX</b> — ₪181 לדשא, ₪449 לגולדן רינג.<br>דורשת כרטיס MAX, מוגבלת ל-2 כרטיסים לת״ז, <b>ונסגרת בראשון 29.11.</b><br>
   ⚪ <b>טיקטמאסטר קפריסין</b> — פתוח לכולם וכל השנה, אבל במחיר מלא: ₪312 לדשא, ₪651 לגולדן רינג, ועוד עמלת המרה.</div>
 
   <details class="d" id="venue-map"><summary><span>🗺 איפה בדיוק עומדים · מפת המתחם</span></summary>
     <div class="dbody">
       <img src="img/venue-map.jpg" alt="מפת המתחם: הבמה למטה, גולדן רינג צמוד, ארנה מסביב, טריבונות בצדדים" style="border-radius:10px">
-      <p style="margin-top:14px; font-size:.89rem; color:var(--soft); font-weight:300">הבמה בתחתית. <b style="color:var(--ink)">גולדן רינג</b> היא הטבעת הצמודה לבמה. <b style="color:var(--ink)">ארנה</b> הוא כל השטח הירוק מסביב, עמידה חופשית. <b style="color:var(--ink)">הטריבונות</b> הן שני הגושים בצדדים — מאחור ובאלכסון. <b style="color:var(--ink)">VIP</b> בפינה, עם כניסה וחניה נפרדות.</p>
+      <p style="margin-top:14px; font-size:.89rem; color:var(--soft); font-weight:300">הבמה בתחתית.<br><b style="color:var(--ink)">גולדן רינג</b> היא הטבעת הצמודה לבמה.<br><b style="color:var(--ink)">ארנה</b> הוא כל השטח הירוק מסביב, עמידה חופשית.<br><b style="color:var(--ink)">הטריבונות</b> הן שני הגושים בצדדים — מאחור ובאלכסון.<br><b style="color:var(--ink)">VIP</b> בפינה, עם כניסה וחניה נפרדות.</p>
     </div></details>
 
   <details class="d"><summary><span>💰 כל המחירים · טיקטמאסטר מול MAX</span></summary>
@@ -523,7 +527,7 @@ footer a{color:#8a8a94}
           <tr><td><a href="#venue-map">פרימיום 1–11</a></td><td class="n">€361.19</td><td class="n soft">₪1,336</td><td class="n">₪1,260</td><td class="n soft">6%</td></tr>
           <tr><td><a href="#venue-map">VIP</a></td><td class="n">€501.23</td><td class="n soft">₪1,854</td><td class="n">₪1,780</td><td class="n soft">4%</td></tr>
         </tbody></table></div>
-      <p class="note" style="margin-top:14px">המרה לפי שער בנק ישראל ‎€1 = ₪3.6981‎. <b>ההנחה של MAX אמיתית רק בשתי השורות העליונות</b> — בטריבונות ובVIP היא ₪75 שטוחים.</p>
+      <p class="note" style="margin-top:14px">המרה לפי שער בנק ישראל ‎€1 = ₪3.6981‎.<br><b>ההנחה של MAX אמיתית רק בשתי השורות העליונות</b> — בטריבונות ובVIP היא ₪75 שטוחים.</p>
     </div></details>
 </div></section>
 
@@ -545,14 +549,18 @@ footer a{color:#8a8a94}
       <div class="tscroll"><table>
         <thead><tr><th>חברה</th><th>יציאה · ו׳ 23.7</th><th id="thback">חזרה · א׳ 25.7</th><th class="c2">2 לילות</th><th class="c3">3 לילות</th></tr></thead>
         <tbody id="ftab">
-          <tr data-f2="856" data-f3="856"><td>Cyprus Airways</td><td class="n">15:35</td><td class="n">13:30</td><td class="n c2">₪856</td><td class="n c3">₪856</td></tr>
-          <tr data-f2="704" data-f3="704"><td>Aegean</td><td class="n">05:20</td><td class="n soft">—</td><td class="n c2">₪704</td><td class="n c3">₪704</td></tr>
-          <tr data-f2="1130" data-f3="1260"><td>Wizz Air</td><td class="n">13:40 / 17:35</td><td class="n soft">—</td><td class="n c2">₪1,130</td><td class="n c3">₪1,260</td></tr>
-          <tr data-f2="1321" data-f3="942"><td>אל על · סאן דור</td><td class="n">12:50 / 15:15</td><td class="n soft">—</td><td class="n c2">₪1,321</td><td class="n c3">₪942</td></tr>
-          <tr data-f2="1400" data-f3="0"><td>ארקיע</td><td class="n">06:00 / 19:30</td><td class="n soft">—</td><td class="n c2">₪1,400</td><td class="n c3 soft">—</td></tr>
-          <tr data-f2="2028" data-f3="2028"><td>ישראייר</td><td class="n">09:55 / 15:45</td><td class="n soft">—</td><td class="n c2">₪2,028</td><td class="n c3">₪2,028</td></tr>
+          <tr data-f2="856" data-f3="856"><td><a class="alink" href="https://www.cyprusairways.com/" target="_blank" rel="noopener">Cyprus Airways ↗</a><small class="fchk"><a data-gf="1" target="_blank" rel="noopener">🔎 מחיר חי</a></small></td><td class="n">15:35</td><td class="n">13:30</td><td class="n c2">₪856</td><td class="n c3">₪856</td></tr>
+          <tr data-f2="704" data-f3="704"><td><a class="alink" href="https://en.aegeanair.com/" target="_blank" rel="noopener">Aegean ↗</a><small class="fchk"><a data-gf="1" target="_blank" rel="noopener">🔎 מחיר חי</a></small></td><td class="n">05:20</td><td class="n soft"><a data-gf="1" target="_blank" rel="noopener" style="color:var(--gold); border-bottom:1px solid rgba(255,210,74,.28)">לבדוק ↗</a></td><td class="n c2">₪704</td><td class="n c3">₪704</td></tr>
+          <tr data-f2="1130" data-f3="1260"><td><a class="alink" href="https://wizzair.com/" target="_blank" rel="noopener">Wizz Air ↗</a><small class="fchk"><a data-gf="1" target="_blank" rel="noopener">🔎 מחיר חי</a></small></td><td class="n">13:40 / 17:35</td><td class="n soft"><a data-gf="1" target="_blank" rel="noopener" style="color:var(--gold); border-bottom:1px solid rgba(255,210,74,.28)">לבדוק ↗</a></td><td class="n c2">₪1,130</td><td class="n c3">₪1,260</td></tr>
+          <tr data-f2="1321" data-f3="942"><td><a class="alink" href="https://www.elal.com/" target="_blank" rel="noopener">אל על · סאן דור ↗</a><small class="fchk"><a data-gf="1" target="_blank" rel="noopener">🔎 מחיר חי</a></small></td><td class="n">12:50 / 15:15</td><td class="n soft"><a data-gf="1" target="_blank" rel="noopener" style="color:var(--gold); border-bottom:1px solid rgba(255,210,74,.28)">לבדוק ↗</a></td><td class="n c2">₪1,321</td><td class="n c3">₪942</td></tr>
+          <tr data-f2="1400" data-f3="0"><td><a class="alink" href="https://www.arkia.com/" target="_blank" rel="noopener">ארקיע ↗</a><small class="fchk"><a data-gf="1" target="_blank" rel="noopener">🔎 מחיר חי</a></small></td><td class="n">06:00 / 19:30</td><td class="n soft"><a data-gf="1" target="_blank" rel="noopener" style="color:var(--gold); border-bottom:1px solid rgba(255,210,74,.28)">לבדוק ↗</a></td><td class="n c2">₪1,400</td><td class="n c3 soft">—</td></tr>
+          <tr data-f2="2028" data-f3="2028"><td><a class="alink" href="https://www.israir.co.il/" target="_blank" rel="noopener">ישראייר ↗</a><small class="fchk"><a data-gf="1" target="_blank" rel="noopener">🔎 מחיר חי</a></small></td><td class="n">09:55 / 15:45</td><td class="n soft"><a data-gf="1" target="_blank" rel="noopener" style="color:var(--gold); border-bottom:1px solid rgba(255,210,74,.28)">לבדוק ↗</a></td><td class="n c2">₪2,028</td><td class="n c3">₪2,028</td></tr>
         </tbody></table></div>
-      <p class="note" style="margin-top:14px">Aegean זולה ב-₪152 אבל ממריאה ב-05:20 — קמים ב-03:00.<br><b>רוצים 3 לילות?</b> אותה טיסה בשישי, חזרה בשני 26.7 באותו מחיר.</p>
+      <p class="note" style="margin-top:14px"><b>🔴 למה חסרה שעת חזרה ברוב השורות.</b><br>
+      <b>לכל הטיסות האלה יש חזרה</b> — המחיר עצמו הוא הלוך ושוב.<br>
+      מה שחסר הוא <b>השעה</b>: בדקנו עד הסוף רק את Cyprus Airways, ואצל השאר יש כמה שעות חזרה לבחירה ולא רשמנו אותן.<br>
+      לכן בעמודה הזאת יש קישור ״לבדוק״ שפותח את החזרה האמיתית לאותם תאריכים.<br><br>
+      <b>מאיפה המחירים, ואיפה הם תקפים.</b> כל המחירים הם <b>הלוך ושוב לאדם מתל אביב (TLV) ללרנקה (LCA)</b>, לתאריכים שבחרתם למעלה, ונבדקו ב-<b>26.11.2026</b>.<br><b>לא שמרנו את שם הסוכנות שבה נראה כל מחיר</b>, ולכן ליד כל חברה יש שני קישורים: <b>↗ לאתר החברה עצמה</b>, ו-<b>🔎 ״מחיר חי״</b> שפותח בדיקה חיה לאותו מסלול ולאותם תאריכים ומראה מי מוכר אותו ובכמה.<br><b>מחירי טיסות זזים — מה שתראו שם הוא מה שקובע.</b><br>Aegean זולה ב-₪152 אבל ממריאה ב-05:20 — קמים ב-03:00.<br><b>ב-3 לילות</b> אותה טיסה בשישי, חזרה בשני 26.7.</p>
     </div></details>
 </section>
 
@@ -560,7 +568,7 @@ footer a{color:#8a8a94}
   <h2 class="kick">איפה ישנים</h2>
   <p class="subh">שלושה מלונות<br>לבחירה</p>
   <p class="sub2" style="margin-top:.6rem"><span style="color:#b7b7c2; font-size:.88rem">המלצה ראשונית של קלוד, מתוך מה שכבר פתח מחירים ליולי 2027 — <b style="color:var(--ink); font-weight:500">נעשה מחקר מקיף יותר בהמשך.</b></span></p>
-  <p class="sub2">לחצו על מלון לגלריה, למרחקים ולהזמנה. <b>״לטיילת״ = טיילת פיניקודס על קו החוף; העיר העתיקה היא מרכז אחר, פנימי יותר.</b> <b>כל המחירים הם מחירי בוקינג לחדר זוגי, סך הכול לכל הלילות</b> — בדיוק מה שתראו כשתלחצו.</p>
+  <p class="sub2">לחצו על מלון לגלריה, למרחקים ולהזמנה.<br><b>״לטיילת״ = טיילת פיניקודס על קו החוף; העיר העתיקה היא מרכז אחר, פנימי יותר.</b> <b>כל המחירים הם מחירי בוקינג לחדר זוגי, סך הכול לכל הלילות</b> — בדיוק מה שתראו כשתלחצו.</p>
 
   <div class="hgrid">
     <button class="hcard" data-h="mercure">
@@ -602,7 +610,7 @@ footer a{color:#8a8a94}
     </div>
     <span class="tag hl">הכי קרוב למופע</span> <span class="tag">חוף פרטי</span> <span class="tag">ספא</span> <span class="tag">9.1</span>
     <h3 class="mt">Mercure Larnaca Beach Resort</h3>
-    <p class="hline">ריזורט על החוף עם חוף פרטי משלו, בריכה חיצונית, ספא ומרכז כושר. <b>הדירוג הגבוה בבדיקה שלנו.</b></p>
+    <p class="hline">ריזורט על החוף עם חוף פרטי משלו, בריכה חיצונית, ספא ומרכז כושר.<br><b>הדירוג הגבוה בבדיקה שלנו.</b></p>
     <div class="specs">
       <div class="spec"><b>7 דק׳</b><span>למופע 🚗</span></div><div class="spec"><b>14 דק׳</b><span>לטיילת 🚗</span></div>
       <div class="spec"><b>24 דק׳</b><span>מהשדה 🚗</span></div><div class="spec"><b>0 דק׳</b><span>לחוף 🚶</span></div>
@@ -626,7 +634,7 @@ footer a{color:#8a8a94}
       <div class="spec"><b>8 דק׳</b><span>מהשדה 🚗</span></div><div class="spec"><b>18+</b><span>בלי ילדים</span></div>
     </div>
 <div class="howto"><div>🎤 <b>למופע: 14 דק׳ במונית.</b> הכי רחוק מהשלושה — אבל גם הכי קרוב לכל השאר.</div><div>🌴 <b>טיילת פיניקודס: 8 דק׳ הליכה.</b></div><div>⛪ <b>כנסיית לאזארוס: ~3 דק׳ הליכה</b> · ⛵ <b>המרינה: ~10 דק׳.</b></div><div>🍽 <b>מסעדות וחנויות: מתחת למלון.</b> העיר העתיקה מסביב.</div></div>
-    <p class="near">📍 <b>הוא לא ליד המרכז — הוא בתוכו.</b> ללרנקה יש שני מרכזים: <b>העיר העתיקה</b>, שבה המלון יושב, ו<b>טיילת פיניקודס</b> שעל קו החוף, 8 דקות הליכה משם. <b>זה המלון היחיד מהשלושה שבו הערב שאחרי ההופעה לא דורש נסיעה.</b></p>
+    <p class="near">📍 <b>הוא לא ליד המרכז — הוא בתוכו.</b> ללרנקה יש שני מרכזים: <b>העיר העתיקה</b>, שבה המלון יושב, ו<b>טיילת פיניקודס</b> שעל קו החוף, 8 דקות הליכה משם.<br><b>זה המלון היחיד מהשלושה שבו הערב שאחרי ההופעה לא דורש נסיעה.</b></p>
     <div class="hprice"><div><b>₪2,067</b><span>2 לילות · €559</span></div><div><b>₪3,084</b><span>3 לילות · €834</span></div></div>
     <a class="btn" data-bk="https://www.booking.com/hotel/cy/indigo-larnaca.html" href="https://www.booking.com/hotel/cy/indigo-larnaca.html?checkin=2027-07-23&checkout=2027-07-25&group_adults=2&no_rooms=1" target="_blank" rel="noopener">לבדוק זמינות ולהזמין ↗</a>
   </div>
@@ -638,13 +646,13 @@ footer a{color:#8a8a94}
     </div>
     <span class="tag hl">5 כוכבים</span> <span class="tag">בריכת גג</span> <span class="tag">ספא</span> <span class="tag">4 מסעדות</span>
     <h3 class="mt">Radisson Blu Hotel, Larnaca</h3>
-    <p class="hline">מלון חמישה כוכבים עם <b>בריכה על הגג שצופה לים</b>, ספא, מרכז כושר ו<b>ארבע מסעדות בתוך המלון</b>. הכי ״מלון״ מבין השלושה.</p>
+    <p class="hline">מלון חמישה כוכבים עם <b>בריכה על הגג שצופה לים</b>, ספא, מרכז כושר ו<b>ארבע מסעדות בתוך המלון</b>.<br>הכי ״מלון״ מבין השלושה.</p>
     <div class="specs">
       <div class="spec"><b>6 דק׳</b><span>למופע 🚗</span></div><div class="spec"><b>7 דק׳</b><span>לטיילת 🚗</span></div>
       <div class="spec"><b>18 דק׳</b><span>מהשדה 🚗</span></div><div class="spec"><b>8.5</b><span>דירוג</span></div>
     </div>
 <div class="howto"><div>🎤 <b>למופע: 6 דק׳ במונית — הכי קרוב מכולם.</b> 3.6 ק״מ.</div><div>🏖 <b>החוף ממול: ~3 דק׳ הליכה.</b></div><div>🌴 <b>טיילת פיניקודס: 21 דק׳ הליכה או 7 במונית.</b></div><div>🍽 <b>ארבע מסעדות בתוך המלון</b> — ולכן לא חייבים לצאת.</div></div>
-    <p class="near">📍 <b>הכי קרוב למופע, והכי עצמאי.</b> יושב בין העיר לכביש דקליה. לא יוצאים ממנו ברגל לעיר — אבל ארבע מסעדות, ספא ובריכת גג אומרים שאפשר פשוט להישאר.</p>
+    <p class="near">📍 <b>הכי קרוב למופע, והכי עצמאי.</b> יושב בין העיר לכביש דקליה.<br>לא יוצאים ממנו ברגל לעיר — אבל ארבע מסעדות, ספא ובריכת גג אומרים שאפשר פשוט להישאר.</p>
     <div class="hprice"><div><b>₪2,618</b><span>2 לילות · €708</span></div><div><b>₪3,979</b><span>3 לילות · €1,076</span></div></div>
     <a class="btn" data-bk="https://www.booking.com/hotel/cy/radisson-blu-larnaca.html" href="https://www.booking.com/hotel/cy/radisson-blu-larnaca.html?checkin=2027-07-23&checkout=2027-07-25&group_adults=2&no_rooms=1" target="_blank" rel="noopener">לבדוק זמינות ולהזמין ↗</a>
   </div>
@@ -652,13 +660,13 @@ footer a{color:#8a8a94}
   <div class="note">🚕 <b>ואיך מגיעים למופע בפועל:</b> משלושת המלונות זו נסיעה של 6–14 דקות, <b>ובכולם זו מונית.</b> למופע של 28,000 איש צפויות הסעות מאורגנות — <b>אבל זה עוד לא פורסם, אז בינתיים תכננו מונית לשני הכיוונים.</b></div>
 
   <div class="note">🔴 <b>רק חמישה מלונות 4–5 כוכבים בלרנקה בכלל פתחו מחירים ליולי 2027</b>, ובאותו ערב יהיו בעיר 28,000 איש נוספים.<br>
-  <b>ייפתחו עוד מלונות בחודשים הקרובים ונעדכן כאן</b> — אבל בינתיים כדאי לשריין משהו עם ביטול חינם. <b>מי שמזמין עכשיו בוחר; מי שמחכה מקבל את מה שנשאר.</b></div>
+  <b>ייפתחו עוד מלונות בחודשים הקרובים ונעדכן כאן</b> — אבל בינתיים כדאי לשריין משהו עם ביטול חינם.<br><b>מי שמזמין עכשיו בוחר; מי שמחכה מקבל את מה שנשאר.</b></div>
 </div></section>
 
 <section class="wrap" id="calc">
   <h2 class="kick">כמה זה עולה</h2>
   <p class="subh">תבחרו,<br>ותראו כמה יוצא</p>
-  <p class="sub2">כרטיסים + טיסות + מלון. בלי אוכל ומוניות, כי את זה כל אחד עושה אחרת.</p>
+  <p class="sub2">כרטיסים + טיסות + מלון.<br>בלי אוכל ומוניות, כי את זה כל אחד עושה אחרת.</p>
 
   <div class="calc">
     <div hidden><div class="crow">
@@ -719,7 +727,7 @@ footer a{color:#8a8a94}
     </div>
   </div>
 
-  <div class="note">🎁 <b>ושתי הטבות MAX שאנחנו יכולים לתרום:</b> ההטבה מוגבלת ל-2 כרטיסים לתעודת זהות, וניצלנו רק אחת משתי התעודות שלנו. <b>כלומר נשארו לנו שני כרטיסים במחיר ההטבה, למי שאין לו כרטיס MAX.</b> ראשון ראשון זוכה.</div>
+  <div class="note">🎁 <b>ושתי הטבות MAX שאנחנו יכולים לתרום:</b> ההטבה מוגבלת ל-2 כרטיסים לתעודת זהות, וניצלנו רק אחת משתי התעודות שלנו.<br><b>כלומר נשארו לנו שני כרטיסים במחיר ההטבה, למי שאין לו כרטיס MAX.</b> ראשון ראשון זוכה.</div>
 
 </section>
 
@@ -730,14 +738,14 @@ footer a{color:#8a8a94}
 
   <div class="grid2">
     <details class="spot"><summary><h4><span>🍷 ארוחה על המים</span></h4>
-      <p>שולחנות ממש מול הים, לא ברחוב שמאחור. <b>שלוש אפשרויות, שלושה אופי.</b></p></summary>
+      <p>שולחנות ממש מול הים, לא ברחוב שמאחור.<br><b>שלוש אפשרויות, שלושה אופי.</b></p></summary>
       <div class="sbody">
         <ul>
-          <li><b>Militzis</b> — מסעדה קפריסאית ותיקה על טיילת Piale Pasa, מול הים ממש. מטבח מסורתי, קלפטיקו ומזה. <b>הבחירה הקלאסית.</b></li>
-          <li><b>Mer Bleue</b> — טברנת דגים משפחתית באורוקליני, על קו החוף. <b>השולחנות הכי קרובים למים</b> מהשלוש — ובדרך חזרה מהמופע.</li>
-          <li><b>Agistri Seafood</b> — בתוך המרינה, דגים וים. יושבת בין הסירות.</li>
+          <li><b>Militzis</b> — מסעדה קפריסאית ותיקה על טיילת Piale Pasa, מול הים ממש.<br>מטבח מסורתי, קלפטיקו ומזה.<br><b>הבחירה הקלאסית.</b></li>
+          <li><b>Mer Bleue</b> — טברנת דגים משפחתית באורוקליני, על קו החוף.<br><b>השולחנות הכי קרובים למים</b> מהשלוש — ובדרך חזרה מהמופע.</li>
+          <li><b>Agistri Seafood</b> — בתוך המרינה, דגים וים.<br>יושבת בין הסירות.</li>
         </ul>
-        <p style="font-size:.82rem; color:#6a6a74">מבוסס על דירוגי גוגל וטריפאדוויזר, לא על ביקור שלנו. <b>ביולי כדאי להזמין מקום מראש.</b></p>
+        <p style="font-size:.82rem; color:#6a6a74">מבוסס על דירוגי גוגל וטריפאדוויזר, לא על ביקור שלנו.<br><b>ביולי כדאי להזמין מקום מראש.</b></p>
         <div class="slinks">
           <a href="https://maps.google.com/?q=Militzis+Restaurant+Larnaca" target="_blank" rel="noopener">Militzis ↗</a>
           <a href="https://maps.google.com/?q=Mer+Bleue+Restaurant+Oroklini" target="_blank" rel="noopener">Mer Bleue ↗</a>
@@ -748,7 +756,7 @@ footer a{color:#8a8a94}
     <details class="spot"><summary><h4><span>🌴 טיילת פיניקודס</span></h4>
       <p>הלב של העיר — דקלים, חוף דגל כחול, בתי קפה וברים.</p></summary>
       <div class="sbody">
-        <p>כ-600 מטר של טיילת לאורך החוף, עם שדרת דקלים ובתי קפה בשורה הראשונה. החוף עצמו רדוד ונוח, עם מטריות ומיטות שיזוף להשכרה. <b>ביולי מתמלא כבר מעשר בבוקר</b> — מי שרוצה מקום טוב מגיע מוקדם או אחרי חמש.</p>
+        <p>כ-600 מטר של טיילת לאורך החוף, עם שדרת דקלים ובתי קפה בשורה הראשונה.<br>החוף עצמו רדוד ונוח, עם מטריות ומיטות שיזוף להשכרה.<br><b>ביולי מתמלא כבר מעשר בבוקר</b> — מי שרוצה מקום טוב מגיע מוקדם או אחרי חמש.</p>
         <p style="font-size:.84rem">מהמלון: Indigo 8 דק׳ הליכה · Radisson 7 דק׳ במונית · מרקיור 14 דק׳ במונית.</p>
         <div class="slinks">
           <a href="https://maps.google.com/?q=Finikoudes+Beach+Larnaca" target="_blank" rel="noopener">במפה ↗</a>
@@ -759,8 +767,8 @@ footer a{color:#8a8a94}
     <details class="spot"><summary><h4><span>🍹 מקנזי ביץ׳</span></h4>
       <p>ביץ׳ קלאבים וברים ליד מסלול הנחיתה — <b>המטוסים עוברים מעל הראש.</b></p></summary>
       <div class="sbody">
-        <p>רצועת החוף שצמודה לשדה התעופה, ולכן המטוסים נוחתים ממש מעליה. שורה של ביץ׳ בארים שעובדים מהבוקר עד הלילה — <b>Ammos</b> הוא הוותיק והמוכר, <b>Rebuke</b> צעיר ורועש יותר.</p>
-        <p style="font-size:.84rem">שבע דקות במונית מהעיר, ושתים עשרה מהשדה. <b>הכי קרוב לכאן אם נוחתים ויש כמה שעות עד הצ׳ק-אין.</b></p>
+        <p>רצועת החוף שצמודה לשדה התעופה, ולכן המטוסים נוחתים ממש מעליה.<br>שורה של ביץ׳ בארים שעובדים מהבוקר עד הלילה — <b>Ammos</b> הוא הוותיק והמוכר, <b>Rebuke</b> צעיר ורועש יותר.</p>
+        <p style="font-size:.84rem">שבע דקות במונית מהעיר, ושתים עשרה מהשדה.<br><b>הכי קרוב לכאן אם נוחתים ויש כמה שעות עד הצ׳ק-אין.</b></p>
         <div class="slinks">
           <a href="https://maps.google.com/?q=Mackenzie+Beach+Larnaca" target="_blank" rel="noopener">החוף במפה ↗</a>
           <a href="https://maps.google.com/?q=Ammos+Beach+Bar+Larnaca" target="_blank" rel="noopener">Ammos ↗</a>
@@ -770,7 +778,7 @@ footer a{color:#8a8a94}
     <details class="spot"><summary><h4><span>🚶 Piale Pasa</span></h4>
       <p>הטיילת היפה בעיר, שני מפלסים צמודים ממש לים.</p></summary>
       <div class="sbody">
-        <p>טיילת שנבנתה בשני מפלסים — אחד גבוה ואחד ממש על הסלעים — ורצה דרומה מהמצודה. <b>הרבה פחות תיירים מפיניקודס</b>, ועליה יושבות כמה מהמסעדות הוותיקות של לרנקה, Militzis ביניהן.</p>
+        <p>טיילת שנבנתה בשני מפלסים — אחד גבוה ואחד ממש על הסלעים — ורצה דרומה מהמצודה.<br><b>הרבה פחות תיירים מפיניקודס</b>, ועליה יושבות כמה מהמסעדות הוותיקות של לרנקה, Militzis ביניהן.</p>
         <p style="font-size:.84rem"><b>מושלמת לבוקר האחרון לפני הטיסה</b> — הולכים, יושבים לקפה מול הים, וממשיכים לשדה.</p>
         <div class="slinks">
           <a href="https://maps.google.com/?q=Piale+Pasa+Larnaca" target="_blank" rel="noopener">במפה ↗</a>
@@ -781,8 +789,8 @@ footer a{color:#8a8a94}
     <details class="spot"><summary><h4><span>⛵ המרינה</span></h4>
       <p>סירות דיג שהוסבו למסעדות ויושבות על המים.</p></summary>
       <div class="sbody">
-        <p>המרינה הישנה בצפון הטיילת, בכיוון של המופע. <b>עוגנות בה גם סירות דיג עובדות</b>, ומסביבן מסעדות דגים שיושבות על הרציף עצמו.</p>
-        <p style="font-size:.84rem">מ-Indigo כעשר דקות הליכה. <b>המרינה החדשה והגדולה עדיין בבנייה</b> — זאת הקטנה והאותנטית.</p>
+        <p>המרינה הישנה בצפון הטיילת, בכיוון של המופע.<br><b>עוגנות בה גם סירות דיג עובדות</b>, ומסביבן מסעדות דגים שיושבות על הרציף עצמו.</p>
+        <p style="font-size:.84rem">מ-Indigo כעשר דקות הליכה.<br><b>המרינה החדשה והגדולה עדיין בבנייה</b> — זאת הקטנה והאותנטית.</p>
         <div class="slinks">
           <a href="https://maps.google.com/?q=Larnaca+Marina" target="_blank" rel="noopener">במפה ↗</a>
           <a href="https://maps.google.com/?q=Voula%27s+Garden+Larnaca" target="_blank" rel="noopener">Voula's Garden ↗</a>
@@ -790,14 +798,14 @@ footer a{color:#8a8a94}
       </div></details>
 
     <details class="spot"><summary><h4><span>🍽 איפה אוכלים באמת</span></h4>
-      <p>השורה הראשונה בטיילת תיירותית. <b>צעד אחד אחורה והכול משתנה.</b></p></summary>
+      <p>השורה הראשונה בטיילת תיירותית.<br><b>צעד אחד אחורה והכול משתנה.</b></p></summary>
       <div class="sbody">
         <ul>
-          <li><b>Kazani</b> — טברנה קפריסאית למזה: שתים עשרה עד עשרים צלחות קטנות שמגיעות אחת אחרי השנייה. <b>באים רעבים ולא מזמינים מנה ראשונה.</b></li>
+          <li><b>Kazani</b> — טברנה קפריסאית למזה: שתים עשרה עד עשרים צלחות קטנות שמגיעות אחת אחרי השנייה.<br><b>באים רעבים ולא מזמינים מנה ראשונה.</b></li>
           <li><b>Fish Spot</b> — דגים ותמנון על הגריל, פשוט וטרי.</li>
           <li><b>Hobos Steak House</b> — ממול לפיניקודס, למי שבא לבשר ולא לדגים.</li>
         </ul>
-        <p style="font-size:.84rem; color:#6a6a74">מזה קפריסאי הוא ארוחה של שעתיים. <b>לא לתכנן אותה לערב של ההופעה.</b></p>
+        <p style="font-size:.84rem; color:#6a6a74">מזה קפריסאי הוא ארוחה של שעתיים.<br><b>לא לתכנן אותה לערב של ההופעה.</b></p>
         <div class="slinks">
           <a href="https://maps.google.com/?q=Kazani+Traditional+Tavern+Larnaca" target="_blank" rel="noopener">Kazani ↗</a>
           <a href="https://maps.google.com/?q=Hobos+Steak+House+Larnaca" target="_blank" rel="noopener">Hobos ↗</a>
@@ -808,9 +816,9 @@ footer a{color:#8a8a94}
       <p>כנסייה מהמאה התשיעית, מצודה, ומסגד על גדת אגם מלח.</p></summary>
       <div class="sbody">
         <ul>
-          <li><b>כנסיית אגיוס לאזארוס</b> — מהמאה התשיעית, במרכז העיר העתיקה. כניסה חופשית, לבוש צנוע.</li>
-          <li><b>מצודת לרנקה</b> — בקצה הדרומי של פיניקודס, במעבר ל-Piale Pasa. כניסה סמלית.</li>
-          <li><b>חאלה סולטן תקה</b> — מסגד על גדת אגם המלח, עשר דקות במונית. <b>ביולי האגם יבש ולבן</b>, והפלמינגו מגיעים רק בחורף.</li>
+          <li><b>כנסיית אגיוס לאזארוס</b> — מהמאה התשיעית, במרכז העיר העתיקה.<br>כניסה חופשית, לבוש צנוע.</li>
+          <li><b>מצודת לרנקה</b> — בקצה הדרומי של פיניקודס, במעבר ל-Piale Pasa.<br>כניסה סמלית.</li>
+          <li><b>חאלה סולטן תקה</b> — מסגד על גדת אגם המלח, עשר דקות במונית.<br><b>ביולי האגם יבש ולבן</b>, והפלמינגו מגיעים רק בחורף.</li>
         </ul>
         <div class="slinks">
           <a href="https://maps.google.com/?q=Church+of+Saint+Lazarus+Larnaca" target="_blank" rel="noopener">לאזארוס ↗</a>
@@ -829,14 +837,14 @@ footer a{color:#8a8a94}
   </a>
   <div class="wrap">
   <h2>אנחנו בפנים.<br><a href="#rsvp"><em>מי בא?</em></a></h2>
-  <p>שני כרטיסי גולדן רינג כבר בכיס. הטיסות פתוחות, והמלונות עם ביטול חינם — <b>כלומר להזמין עכשיו לא עולה כלום.</b></p>
+  <p>שני כרטיסי גולדן רינג כבר בכיס.<br>הטיסות פתוחות, והמלונות עם ביטול חינם — <b>כלומר להזמין עכשיו לא עולה כלום.</b></p>
   <a class="goform" href="#rsvp">לסמן שאנחנו באים ✈</a>
 </div></section>
 
 <section class="band" id="rsvp"><div class="wrap">
   <h2 class="kick">אני בא!</h2>
   <p class="subh">סמנו, ואנחנו נדע.</p>
-  <p class="sub2">שחקו למעלה עם האזור, המלון ומספר הלילות — ואז תשאירו שם. <b>מה שתבחרו נשלח אלינו בדיוק כמו שהוא.</b></p>
+  <p class="sub2">שחקו למעלה עם האזור, המלון ומספר הלילות — ואז תשאירו שם.<br><b>מה שתבחרו נשלח אלינו בדיוק כמו שהוא.</b></p>
 
   <div class="calc">
     <div class="crow">
@@ -962,6 +970,11 @@ footer a{color:#8a8a94}
         a.href = a.dataset.bk + '?checkin=2027-07-23&checkout=' + co + '&group_adults=2&no_rooms=1';
       });
       if(G('thback')) G('thback').textContent = (d === 3) ? 'חזרה · ב׳ 26.7' : 'חזרה · א׳ 25.7';
+      // the live flight check opens on the same dates that are chosen here
+      var back = (d === 3) ? '2027-07-26' : '2027-07-25';
+      var gf = 'https://www.google.com/travel/flights?q=' +
+               encodeURIComponent('Flights from TLV to LCA on 2027-07-23 through ' + back);
+      Array.prototype.forEach.call(document.querySelectorAll('a[data-gf]'), function(a){ a.href = gf; });
       if(typeof syncFlights === 'function') syncFlights();
       if(typeof renderSum === 'function') renderSum();
       G('brk').textContent = n + ' כרטיסים ' + ils(tk) + '   ·   ' + n + ' טיסות ' + ils(fl) +
@@ -1002,6 +1015,10 @@ footer a{color:#8a8a94}
 
   // ---------- flight table as picker ----------
   var ftab = G('ftab');
+  function carrier(row){
+    var a = row.cells[0].querySelector('a.alink');
+    return (a ? a.textContent : row.cells[0].textContent).replace(/[↗🔎]/g,'').trim();
+  }
   function syncFlights(){
     var d = +pick(G('d')).dataset.d;
     var cur = pick(G('f'));
@@ -1018,13 +1035,14 @@ footer a{color:#8a8a94}
     var row = ftab && ftab.querySelector('tr[aria-selected="true"]');
     var price = +(d === 3 ? cur.dataset.f3 : cur.dataset.f2);
     if(G('fbig')) G('fbig').textContent = price > 0 ? ils(price) : '—';
-    var name = row ? row.cells[0].textContent.trim() : label(cur);
+    var name = row ? carrier(row) : label(cur);
     var out  = row ? row.cells[1].textContent.trim() : '';
     var back = row ? row.cells[2].textContent.trim() : '';
+    if(!/\d:\d/.test(back)) back = '';   // the cell holds a check link, not a time
     curFlight = {name:name, out:out, back:back, price:price};
     if(G('fcap') && row){
       G('fcap').innerHTML = '<b>' + name + '</b> · יציאה ' + out +
-        (back && back !== '—' ? ', חזרה ' + back : '') +
+        (back ? ', חזרה ' + back : '') +
         ' · <b>' + d + ' לילות</b>, לאדם הלוך ושוב.';
     }
     if(G('ftit')) G('ftit').textContent = (curKey === '856/856') ? '★ המסלול שנתפר לזה' : '✈ הטיסה שבחרתם';
@@ -1033,7 +1051,7 @@ footer a{color:#8a8a94}
       G('fsel').innerHTML =
         '<span><span class="fn">' + name + '</span>' +
         '<span class="ft">יציאה ו׳ 23.7 ' + (out || '—') +
-        (back && back !== '—' ? ' · חזרה ' + (d === 3 ? 'ב׳ 26.7 ' : 'א׳ 25.7 ') + back : '') +
+        (back ? ' · חזרה ' + (d === 3 ? 'ב׳ 26.7 ' : 'א׳ 25.7 ') + back : '') +
         '</span></span>' +
         '<span class="fp"><b>' + (price > 0 ? ils(price) : '—') + '</b><span>לאדם · הלוך ושוב</span></span>';
     }
@@ -1050,7 +1068,7 @@ footer a{color:#8a8a94}
           target = document.createElement('button');
           target.className = 'copt';
           target.dataset.f2 = r.dataset.f2; target.dataset.f3 = r.dataset.f3;
-          target.textContent = r.cells[0].textContent.trim();
+          target.textContent = carrier(r);
           G('f').appendChild(target);
         }
         Array.prototype.forEach.call(G('f').querySelectorAll('.copt'), function(b){ b.setAttribute('aria-pressed','false'); });
