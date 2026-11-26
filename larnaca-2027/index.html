@@ -218,6 +218,8 @@ details.d[open]>summary::after{content:"–"}
 .note{margin-top:18px; border-inline-start:3px solid var(--red); background:var(--panel2);
   border-radius:0 12px 12px 0; padding:14px 18px; font-size:.88rem; color:var(--soft); font-weight:300}
 .note b{color:var(--ink); font-weight:500}
+.note.gift{border-inline-start-color:var(--gold); background:#161208}
+.note.gift b{color:var(--gold); font-weight:700}
 
 /* ===== CALC ===== */
 .calc{background:var(--panel2); border:1px solid var(--line); border-radius:18px;
@@ -354,6 +356,22 @@ body.locked{overflow:hidden}
 .spot a{font-size:.79rem; display:inline-block; text-decoration:none;
   color:var(--gold); border:1px solid rgba(255,210,74,.28); border-radius:999px; padding:5px 12px}
 .spot a:hover{border-color:var(--gold)}
+
+/* ===== WHO IS COMING ===== */
+.whos{margin-top:26px; border:1px solid var(--line); border-radius:16px; background:var(--panel2); overflow:hidden}
+.whos-t{background:#0f0f13; border-bottom:1px solid var(--line); padding:11px 17px;
+  font-size:.78rem; font-weight:700; letter-spacing:.09em; color:var(--gold)}
+.whos-list{display:grid}
+.who{display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  padding:12px 17px; border-bottom:1px solid var(--line)}
+.who:last-child{border-bottom:0}
+.who b{font-size:1rem; font-weight:700}
+.who b .us{display:inline-block; font-size:.64rem; font-weight:700; letter-spacing:.06em;
+  background:var(--red); color:#fff; border-radius:5px; padding:2px 7px; margin-inline-start:8px;
+  vertical-align:middle}
+.who span{font-size:.84rem; color:var(--soft); font-weight:300}
+.whos-note{margin:0; padding:11px 17px; border-top:1px solid var(--line); background:#0f0f13;
+  font-size:.8rem; color:#6a6a74; font-weight:300}
 
 /* ===== RSVP ===== */
 .inp{width:100%; background:#0f0f13; border:1px solid var(--line); border-radius:11px;
@@ -505,6 +523,8 @@ footer a{color:#8a8a94}
       </div>
     </div>
   </div>
+
+  <div class="note gift">🎁 <b>ויש לנו שני כרטיסים בהטבה לתת.</b><br>ההטבה מוגבלת ל-2 כרטיסים לתעודת זהות, <b>וניצלנו רק אחת משתי התעודות שלנו.</b><br>כלומר מי שאין לו כרטיס MAX עדיין יכול לקנות דרכנו ב-<b>₪449 במקום ₪651</b>, או ב-<b>₪181 במקום ₪312</b> לדשא.<br><b>שני כרטיסים, ראשון ראשון זוכה, ועד ראשון 29.11.</b></div>
 
   <div class="note"><b>שני מסלולי רכישה, והם לא שווים.</b><br>
   🔴 <b>ההטבה של MAX</b> — ₪181 לדשא, ₪449 לגולדן רינג.<br>דורשת כרטיס MAX, מוגבלת ל-2 כרטיסים לת״ז, <b>ונסגרת בראשון 29.11.</b><br>
@@ -727,8 +747,6 @@ footer a{color:#8a8a94}
     </div>
   </div>
 
-  <div class="note">🎁 <b>ושתי הטבות MAX שאנחנו יכולים לתרום:</b> ההטבה מוגבלת ל-2 כרטיסים לתעודת זהות, וניצלנו רק אחת משתי התעודות שלנו.<br><b>כלומר נשארו לנו שני כרטיסים במחיר ההטבה, למי שאין לו כרטיס MAX.</b> ראשון ראשון זוכה.</div>
-
 </section>
 
 <section class="band shot"><div class="bg"><img src="img/lx-street.jpg" alt="" style="object-position:50% 86%"></div><div class="wrap">
@@ -845,6 +863,14 @@ footer a{color:#8a8a94}
   <h2 class="kick">אני בא!</h2>
   <p class="subh">סמנו, ואנחנו נדע.</p>
   <p class="sub2">שחקו למעלה עם האזור, המלון ומספר הלילות — ואז תשאירו שם.<br><b>מה שתבחרו נשלח אלינו בדיוק כמו שהוא.</b></p>
+
+  <div class="whos">
+    <div class="whos-t">🙋 מי כבר בא</div>
+    <div class="whos-list" id="whos">
+      <div class="who"><b>יעל ורועי<span class="us">אנחנו</span></b><span>2 נוסעים · 2 לילות · גולדן רינג · מרקיור</span></div>
+    </div>
+    <p class="whos-note" id="whosNote">מי שמסמן למטה מצטרף לרשימה.</p>
+  </div>
 
   <div class="calc">
     <div class="crow">
@@ -1191,6 +1217,63 @@ footer a{color:#8a8a94}
       'מלון: ' + c.hotel + '\n' +
       'סה״כ משוער: ' + c.total;
   }
+  // ---------- who is already coming ----------
+  // Yael and Roi are written into the page itself, so the list is never empty
+  // and shows the same on the public copy, which has no database.
+  function esc(t){
+    return String(t == null ? '' : t).replace(/[&<>"]/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];
+    });
+  }
+  function rowsFrom(res){
+    // the shape differs between runtimes, so accept the ones we might get
+    var list = [];
+    if(!res) return list;
+    var arr = Array.isArray(res) ? res : (res.docs || res.documents || res.items || []);
+    Array.prototype.forEach.call(arr, function(d){
+      if(!d) return;
+      var v = (typeof d.data === 'function') ? d.data() : (d.data || d);
+      if(v && (v.name || v.zone)) list.push(v);
+    });
+    return list;
+  }
+  function paintWhos(res){
+    var box = G('whos'); if(!box) return;
+    var list = rowsFrom(res);
+    Array.prototype.forEach.call(box.querySelectorAll('.who[data-db]'), function(el){ el.remove(); });
+    list.sort(function(a,b){ return String(a.at||'') < String(b.at||'') ? -1 : 1; });
+    list.forEach(function(c){
+      var bits = [];
+      if(c.people) bits.push(c.people + ' נוסעים');
+      if(c.nights) bits.push(c.nights + ' לילות');
+      if(c.zone)   bits.push(c.zone);
+      if(c.hotel)  bits.push(c.hotel);
+      var el = document.createElement('div');
+      el.className = 'who';
+      el.setAttribute('data-db', '1');
+      el.innerHTML = '<b>' + esc(c.name || 'מישהו') + '</b><span>' + esc(bits.join(' · ')) + '</span>';
+      box.appendChild(el);
+    });
+    var note = G('whosNote');
+    if(note) note.textContent = list.length
+      ? (list.length === 1 ? 'עוד אחד סימן. מי שמסמן למטה מצטרף לרשימה.'
+                           : 'עוד ' + list.length + ' סימנו. מי שמסמן למטה מצטרף לרשימה.')
+      : 'מי שמסמן למטה מצטרף לרשימה.';
+  }
+  async function loadWhos(){
+    try{
+      var db = await claude.use('db');
+      if(!db) return;
+      var col = db.collection('rsvp');
+      if(col.onSnapshot){
+        col.onSnapshot(function(snap){ try{ paintWhos(snap); }catch(e){} });
+      }else if(col.get){
+        paintWhos(await col.get());
+      }
+    }catch(e){ /* the public copy has no database — the seeded row stands alone */ }
+  }
+  loadWhos();
+
   var rgo = G('rgo'), rname = G('rname'), rmsg = G('rmsg');
   if(rgo && rname){
     rgo.addEventListener('click', async function(){
@@ -1213,7 +1296,8 @@ footer a{color:#8a8a94}
       }catch(e){ saved = false; }
       if(saved){
         rmsg.className = 'rmsg ok';
-        rmsg.textContent = '✅ קיבלנו, ' + name + '. מחכים לכם בלרנקה.';
+        rmsg.textContent = '✅ קיבלנו, ' + name + '. אתם ברשימה למעלה.';
+        try{ await loadWhos(); }catch(e){}
       }else{
         rmsg.className = 'rmsg';
         rmsg.innerHTML = '🎉 <b>מעולה, ' + name.replace(/</g,'') + '!</b> נשאר רק לשלוח לנו את זה בוואטסאפ:' +
