@@ -398,7 +398,7 @@ body.locked{overflow:hidden}
 
 /* ===== CTA ===== */
 .cta{position:relative; text-align:center; border-top:1px solid var(--line);
-  padding-top:clamp(250px,42vw,430px)}
+  padding-top:clamp(210px,36vw,380px)}
 .cta h2{font-size:clamp(2rem,8vw,3.4rem)}
 .cta h2 a{text-decoration:none}
 .cta h2 em{color:var(--red); font-style:normal;
@@ -408,9 +408,10 @@ body.locked{overflow:hidden}
 .cta .goform{display:inline-block; margin-top:20px; background:var(--red); color:#fff !important;
   text-decoration:none; font-weight:900; font-size:1rem; padding:14px 30px; border-radius:999px}
 /* round sticker — lands like a rubber stamp when it scrolls into view */
-.sticker{position:absolute; z-index:3; text-decoration:none;
-  top:clamp(82px,8vw,100px); inset-inline-end:clamp(14px,4.5vw,60px);
-  width:clamp(112px,21vw,150px); aspect-ratio:1; border-radius:50%;
+.sticker{position:fixed; z-index:45; text-decoration:none;
+  bottom:calc(16px + env(safe-area-inset-bottom,0px));
+  inset-inline-end:max(14px, env(safe-area-inset-left,0px));
+  width:clamp(100px,16vw,132px); aspect-ratio:1; border-radius:50%;
   background:var(--gold); color:#09090b !important;
   display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; line-height:1;
   box-shadow:0 12px 34px rgba(0,0,0,.65);
@@ -853,9 +854,6 @@ footer a{color:#8a8a94}
 
 <section class="cta shot">
   <div class="bg"><img src="img/rw-a.jpg" alt="" style="object-position:50% 6%"></div>
-  <a class="sticker" href="https://www.max.co.il/benefits/showsabroad/robbiewilliams" target="_blank" rel="noopener" aria-label="ההטבה של MAX נסגרת ביום ראשון 29.11">
-    <span>⏳</span><b>עד ראשון</b><i>29.11</i><span class="sl">הטבת MAX</span>
-  </a>
   <div class="wrap">
   <h2>אנחנו בפנים.<br><a href="#rsvp"><em>מי בא?</em></a></h2>
   <p>שני כרטיסי גולדן רינג כבר בכיס.<br>הטיסות פתוחות, והמלונות עם ביטול חינם — <b>כלומר להזמין עכשיו לא עולה כלום.</b></p>
@@ -885,6 +883,10 @@ footer a{color:#8a8a94}
     <div class="rmsg" id="rmsg"></div>
   </div>
 </div></section>
+
+<a class="sticker" href="https://www.max.co.il/benefits/showsabroad/robbiewilliams" target="_blank" rel="noopener" aria-label="ההטבה של MAX נסגרת ביום ראשון 29.11">
+    <span>⏳</span><b>עד ראשון</b><i>29.11</i><span class="sl">הטבת MAX</span>
+  </a>
 
 <div class="mdl" id="mdl" hidden>
   <div class="mdl-bg" data-close></div>
@@ -1409,6 +1411,7 @@ footer a{color:#8a8a94}
   // the stamp lands when it reaches the viewport — rect based, with a heartbeat,
   // so it can never stay invisible even where an observer misbehaves
   var st = document.querySelector('.sticker');
+  if(st && new Date() > new Date('2026-11-30T00:00:00+02:00')){ st.remove(); st = null; }
   if(st && !calm){
     st.classList.add('armed');
     var sbeat = null;
