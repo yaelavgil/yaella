@@ -6,17 +6,18 @@
 <title>רובי ויליאמס · לרנקה 2027</title>
 <meta name="description" content="24 ביולי 2027, לרנקה. שעה טיסה מהבית, סוף שבוע אחד. כל הפרטים, המחירים והמלונות — ואפשר לסמן מי בא.">
 <meta name="theme-color" content="#09090b">
-<link rel="icon" href="../favicon.svg" type="image/svg+xml">
-<link rel="icon" href="../favicon-32.png" sizes="32x32">
-<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="he_IL">
 <meta property="og:site_name" content="לרנקה 2027">
 <meta property="og:title" content="רובי ויליאמס · לרנקה · 24.7.2027">
 <meta property="og:description" content="שעה טיסה מהבית, סוף שבוע אחד, ו-28,000 איש. כל הפרטים, המחירים והמלונות — ואפשר לסמן מי בא.">
 <meta property="og:image" content="https://yaelavgil.github.io/yaella/larnaca-2027/og.jpg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
+<meta property="og:image:width" content="800">
+<meta property="og:image:height" content="420">
+<meta property="og:image:alt" content="רובי ויליאמס בלרנקה, 24 ביולי 2027">
 <meta property="og:url" content="https://yaelavgil.github.io/yaella/larnaca-2027/">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -448,7 +449,7 @@ footer a{color:#8a8a94}
       <button class="copt" data-d="3">3 לילות<small>ו׳ 23.7 → ב׳ 26.7</small></button>
     </div>
   </div>
-  <a class="nb-tot" href="#calc" title="לפירוט המלא"><span>סה״כ</span><b id="sumtop">₪4,474</b></a>
+  <a class="nb-tot" href="#calc" title="לפירוט המלא"><span id="sumwhat">סה״כ</span><b id="sumtop">₪4,474</b></a>
 </div></div>
 
 <section class="shot">
@@ -669,6 +670,13 @@ footer a{color:#8a8a94}
       </div>
     </div></div>
     <div class="crow">
+      <div class="clab"><span>🌙 כמה לילות</span><span style="font-weight:300; letter-spacing:0">אותה בחירה שבסרגל למעלה</span></div>
+      <div class="copts" data-mirror="d">
+        <button class="copt" data-d="2">2 לילות<small>ו׳ 23.7 → א׳ 25.7</small></button>
+        <button class="copt" data-d="3">3 לילות<small>ו׳ 23.7 → ב׳ 26.7</small></button>
+      </div>
+    </div>
+    <div class="crow">
       <div class="clab"><span>🎫 איפה עומדים</span><a class="maplink" href="#venue-map">🗺 במפה</a></div>
       <div class="copts" id="z">
         <button class="copt" data-max="181" data-full="312">ארנה · דשא<small class="zp"></small></button>
@@ -681,8 +689,9 @@ footer a{color:#8a8a94}
     <div class="crow">
       <div class="clab"><span>👥 כמה נוסעים</span></div>
       <div class="copts" id="n">
-        <button class="copt" data-n="1">1</button><button class="copt" data-n="2" aria-pressed="true">2</button>
-        <button class="copt" data-n="3">3</button><button class="copt" data-n="4">4</button>
+        <button class="copt" data-n="2" aria-pressed="true">2<small>נוסעים</small></button>
+        <button class="copt" data-n="3">3<small>נוסעים</small></button>
+        <button class="copt" data-n="4">4<small>לנועזים 😅</small></button>
       </div>
     </div>
     <div class="crow">
@@ -886,6 +895,33 @@ footer a{color:#8a8a94}
     });
   });
 
+  // ---------- mirrored controls: ONE state, several views ----------
+  // A mirror never holds state of its own. It forwards the click to the single
+  // source group, and its own pressed look is repainted from that source.
+  var mirrors = Array.prototype.slice.call(document.querySelectorAll('[data-mirror]'));
+  mirrors.forEach(function(mg){
+    var srcId = mg.getAttribute('data-mirror'), key = 'data-' + srcId;
+    Array.prototype.forEach.call(mg.querySelectorAll('.copt'), function(b){
+      b.setAttribute('aria-pressed', 'false');
+      b.addEventListener('click', function(){
+        var src = G(srcId); if(!src) return;
+        var want = b.getAttribute(key);
+        var target = src.querySelector('.copt[' + key + '="' + want + '"]');
+        if(target) target.click();
+      });
+    });
+  });
+  function paintMirrors(){
+    mirrors.forEach(function(mg){
+      var srcId = mg.getAttribute('data-mirror'), key = 'data-' + srcId;
+      var src = G(srcId); if(!src) return;
+      var cur = pick(src).getAttribute(key);
+      Array.prototype.forEach.call(mg.querySelectorAll('.copt'), function(b){
+        b.setAttribute('aria-pressed', b.getAttribute(key) === cur ? 'true' : 'false');
+      });
+    });
+  }
+
   function calc(){
     try{
       var z = pick(G('z')), n = +pick(G('n')).dataset.n, m = +pick(G('m')).dataset.m,
@@ -916,8 +952,10 @@ footer a{color:#8a8a94}
       Array.prototype.forEach.call(document.querySelectorAll('.pn'), function(x){
         x.textContent = d + ' לילות';
       });
+      paintMirrors();
       G('sum').textContent = ils(tot);
       if(G('sumtop')) G('sumtop').textContent = ils(tot);
+      if(G('sumwhat')) G('sumwhat').textContent = n + (n === 1 ? ' נוסע · ' : ' נוסעים · ') + d + ' לילות';
       // booking links follow the night count
       var co = (d === 3) ? '2027-07-26' : '2027-07-25';
       Array.prototype.forEach.call(document.querySelectorAll('a[data-bk]'), function(a){

@@ -40,17 +40,18 @@ HEAD = '''<!doctype html>
 <title>רובי ויליאמס · לרנקה 2027</title>
 <meta name="description" content="24 ביולי 2027, לרנקה. שעה טיסה מהבית, סוף שבוע אחד. כל הפרטים, המחירים והמלונות — ואפשר לסמן מי בא.">
 <meta name="theme-color" content="#09090b">
-<link rel="icon" href="../favicon.svg" type="image/svg+xml">
-<link rel="icon" href="../favicon-32.png" sizes="32x32">
-<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="he_IL">
 <meta property="og:site_name" content="לרנקה 2027">
 <meta property="og:title" content="רובי ויליאמס · לרנקה · 24.7.2027">
 <meta property="og:description" content="שעה טיסה מהבית, סוף שבוע אחד, ו-28,000 איש. כל הפרטים, המחירים והמלונות — ואפשר לסמן מי בא.">
 <meta property="og:image" content="https://yaelavgil.github.io/yaella/larnaca-2027/og.jpg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
+<meta property="og:image:width" content="800">
+<meta property="og:image:height" content="420">
+<meta property="og:image:alt" content="רובי ויליאמס בלרנקה, 24 ביולי 2027">
 <meta property="og:url" content="https://yaelavgil.github.io/yaella/larnaca-2027/">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
