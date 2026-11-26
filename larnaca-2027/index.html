@@ -409,8 +409,10 @@ body.locked{overflow:hidden}
   text-decoration:none; font-weight:900; font-size:1rem; padding:14px 30px; border-radius:999px}
 /* round sticker — lands like a rubber stamp when it scrolls into view */
 .sticker{position:fixed; z-index:45; text-decoration:none;
-  bottom:calc(16px + env(safe-area-inset-bottom,0px));
+  /* starts up in the hero, over empty photo, and only then docks to the corner */
+  top:clamp(18px,3vw,36px); bottom:auto;
   inset-inline-end:max(14px, env(safe-area-inset-left,0px));
+  transition:top .3s ease, bottom .3s ease;
   width:clamp(100px,16vw,132px); aspect-ratio:1; border-radius:50%;
   background:var(--gold); color:#09090b !important;
   display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; line-height:1;
@@ -431,6 +433,7 @@ body.locked{overflow:hidden}
 .sticker i{font-style:normal; font-family:'Anton',sans-serif; font-weight:400;
   font-size:clamp(1.2rem,3.8vw,1.55rem); line-height:1.1}
 .sticker .sl{font-size:clamp(.56rem,1.7vw,.67rem); font-weight:700; letter-spacing:.07em; opacity:.74; margin-top:2px}
+.sticker.dock{top:auto; bottom:calc(16px + env(safe-area-inset-bottom,0px))}
 .sticker:hover{filter:brightness(1.08)}
 @keyframes breathe{0%,100%{box-shadow:0 12px 34px rgba(0,0,0,.65), 0 0 0 0 rgba(255,210,74,.5)}
   55%{box-shadow:0 12px 34px rgba(0,0,0,.65), 0 0 0 16px rgba(255,210,74,0)}}
@@ -1428,6 +1431,16 @@ footer a{color:#8a8a94}
     window.addEventListener('scroll', land, {passive: true});
     requestAnimationFrame(land);
     setTimeout(function(){ st.classList.add('in'); if(sbeat) clearInterval(sbeat); }, 12000);
+
+    // it rides the hero at first, then gets out of the way of the page
+    var hero = document.querySelector('.hero');
+    function dock(){
+      var h = hero ? hero.offsetHeight : 600;
+      st.classList.toggle('dock', (window.scrollY || 0) > h - 150);
+    }
+    window.addEventListener('scroll', dock, {passive: true});
+    window.addEventListener('resize', dock);
+    dock();
   }
 
   Array.prototype.forEach.call(document.querySelectorAll('a[href="#venue-map"]'), function(a){
