@@ -385,9 +385,11 @@ body.locked{overflow:hidden}
   background:var(--gold); color:#09090b !important;
   display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; line-height:1;
   box-shadow:0 12px 34px rgba(0,0,0,.65);
-  opacity:0; transform:rotate(-26deg) scale(2.3)}
-.sticker.in{animation:stamp .5s cubic-bezier(.18,1.5,.4,1) forwards,
-                      breathe 2.6s ease-in-out .62s infinite}
+  transform:rotate(-11deg); animation:breathe 2.6s ease-in-out infinite}
+/* the script arms it; without the script it simply shows */
+.sticker.armed{opacity:0; transform:rotate(-26deg) scale(2.3); animation:none}
+.sticker.armed.in{animation:stamp .5s cubic-bezier(.18,1.5,.4,1) forwards,
+                            breathe 2.6s ease-in-out .62s infinite}
 @keyframes stamp{
   0%{opacity:0; transform:rotate(-26deg) scale(2.3)}
   45%{opacity:1}
@@ -1248,18 +1250,25 @@ footer a{color:#8a8a94}
     }
   }
 
-  // the stamp lands when it reaches the viewport
+  // the stamp lands when it reaches the viewport — rect based, with a heartbeat,
+  // so it can never stay invisible even where an observer misbehaves
   var st = document.querySelector('.sticker');
-  if(st){
-    if(!('IntersectionObserver' in window)){ st.classList.add('in'); }
-    else{
-      var io = new IntersectionObserver(function(entries){
-        entries.forEach(function(e){
-          if(e.isIntersecting){ st.classList.add('in'); io.disconnect(); }
-        });
-      }, {threshold: 0.6});
-      io.observe(st);
-    }
+  if(st && !calm){
+    st.classList.add('armed');
+    var sbeat = null;
+    var land = function(){
+      var r = st.getBoundingClientRect();
+      var vh = window.innerHeight || 800;
+      if(r.top < vh * 0.9 && r.bottom > 0){
+        st.classList.add('in');
+        window.removeEventListener('scroll', land);
+        if(sbeat) clearInterval(sbeat);
+      }
+    };
+    sbeat = setInterval(land, 220);
+    window.addEventListener('scroll', land, {passive: true});
+    requestAnimationFrame(land);
+    setTimeout(function(){ st.classList.add('in'); if(sbeat) clearInterval(sbeat); }, 12000);
   }
 
   Array.prototype.forEach.call(document.querySelectorAll('a[href="#venue-map"]'), function(a){
