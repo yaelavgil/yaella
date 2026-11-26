@@ -1,0 +1,1274 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>רובי ויליאמס · לרנקה 2027</title>
+<meta name="description" content="24 ביולי 2027, לרנקה. שעה טיסה מהבית, סוף שבוע אחד. כל הפרטים, המחירים והמלונות — ואפשר לסמן מי בא.">
+<meta name="theme-color" content="#09090b">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="he_IL">
+<meta property="og:site_name" content="לרנקה 2027">
+<meta property="og:title" content="רובי ויליאמס · לרנקה · 24.7.2027">
+<meta property="og:description" content="שעה טיסה מהבית, סוף שבוע אחד, ו-28,000 איש. כל הפרטים, המחירים והמלונות — ואפשר לסמן מי בא.">
+<meta property="og:image" content="https://yaelavgil.github.io/yaella/larnaca-2027/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://yaelavgil.github.io/yaella/larnaca-2027/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Heebo:wght@300;400;500;700;900&display=swap">
+<style>
+*{box-sizing:border-box}
+html,body{background:#09090b}
+img{display:block; max-width:100%}
+[hidden]{display:none !important}
+</style>
+<style>
+:root{
+  --bg:#09090b; --panel:#131317; --panel2:#1a1a21;
+  --ink:#f5f5f7; --soft:#9b9ba6; --line:#2a2a33;
+  --red:#e8232a; --gold:#ffd24a;
+  --shadow:0 2px 8px rgba(0,0,0,.5), 0 20px 60px rgba(0,0,0,.6);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0; background:var(--bg); color:var(--ink); direction:rtl;
+  font-family:'Heebo',system-ui,-apple-system,Arial,sans-serif; font-size:16px; line-height:1.6;
+  -webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{margin:0; line-height:1.12; text-wrap:balance; font-weight:900; letter-spacing:-.025em}
+img{display:block; max-width:100%}
+a{color:var(--ink)}
+.wrap{max-width:900px; margin:0 auto;
+  padding-left:max(18px,env(safe-area-inset-left,0px));
+  padding-right:max(18px,env(safe-area-inset-right,0px))}
+.anton{font-family:'Anton',Impact,sans-serif; font-weight:400; letter-spacing:.01em; line-height:.95}
+
+/* ===== HERO ===== */
+.hero{position:relative; background:#000; overflow:hidden}
+.hero>img{width:100%; height:clamp(480px,88vh,760px); object-fit:cover; object-position:50% 38%;
+  filter:grayscale(1) contrast(1.32) brightness(.72)}
+.hero::after{content:""; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(120% 60% at 50% 100%, rgba(232,35,42,.30) 0%, rgba(232,35,42,.10) 38%, transparent 68%)}
+.hero-in{position:absolute; inset:0; z-index:2; display:flex; flex-direction:column; justify-content:flex-end;
+  background:linear-gradient(to top,#09090b 1%,rgba(9,9,11,.88) 24%,rgba(9,9,11,.10) 64%,rgba(9,9,11,.6))}
+.hero h1{text-shadow:0 0 60px rgba(0,0,0,.9)}
+.hero-in .wrap{width:100%; padding-block:clamp(26px,5vw,46px)}
+.strike{display:inline-flex; align-items:center; gap:9px; font-size:.78rem; letter-spacing:.1em;
+  color:var(--soft); border:1px solid var(--line); background:rgba(0,0,0,.45);
+  padding:6px 13px; border-radius:999px; margin-bottom:20px}
+.strike s{color:#5d5d68}
+.hero h1{font-size:clamp(2.6rem,11.5vw,5.6rem); color:#fff}
+.hero .live{font-size:clamp(2.1rem,9.5vw,4.6rem); color:var(--red); margin-top:-.06em}
+.rule{height:2px; background:var(--red); width:74px; margin:22px 0 18px}
+.hero .when{font-size:clamp(1.02rem,3.2vw,1.35rem); font-weight:500}
+.hero .sub{color:var(--soft); font-weight:300; margin-top:5px; font-size:clamp(.92rem,2.6vw,1.05rem)}
+
+/* ===== STRIP ===== */
+.nums{display:grid; grid-template-columns:1fr 1fr; border-block:1px solid var(--line); background:var(--panel)}
+@media(min-width:620px){ .nums{grid-template-columns:1fr 1fr 2fr} }
+.num{padding:clamp(15px,3.2vw,24px) 6px; text-align:center; border-inline-start:1px solid var(--line)}
+.num:first-child{border-inline-start:0}
+.num .cap2{display:block; font-size:clamp(.62rem,1.8vw,.72rem); color:#6a6a74; margin-top:2px}
+.duo{grid-column:1 / -1; padding:clamp(15px,3.2vw,24px) 6px; text-align:center;
+  border-top:1px solid var(--line); border-inline-start:1px solid var(--line)}
+@media(min-width:620px){ .duo{grid-column:auto; border-top:0} }
+.orwrap{display:flex; align-items:center; justify-content:center; gap:clamp(10px,2.4vw,20px)}
+.opt{display:block; text-align:center}
+.opt b{display:block; font-family:'Anton',sans-serif; font-weight:400;
+  font-size:clamp(1.1rem,4.2vw,1.8rem); color:#fff; letter-spacing:0; line-height:1.1}
+.opt small{display:block; font-size:clamp(.64rem,1.9vw,.78rem); color:var(--soft); margin-top:3px}
+.orsep{font-style:normal; font-size:clamp(.68rem,2vw,.82rem); color:#6a6a74; font-weight:700;
+  border:1px solid var(--line); border-radius:999px; padding:3px 9px; white-space:nowrap}
+.num b, .duo b{display:block; font-family:'Anton',sans-serif; font-weight:400;
+  font-size:clamp(1.1rem,4.2vw,1.8rem); color:#fff; letter-spacing:0}
+.num:nth-child(2) b{font-family:'Heebo',sans-serif; font-weight:900; letter-spacing:-.02em}
+.num span, .duo span{display:block; font-size:clamp(.66rem,2vw,.8rem); color:var(--soft); margin-top:4px}
+
+/* ===== NIGHT BAR ===== */
+.nightbar{position:sticky; top:0; z-index:40; background:rgba(9,9,11,.93);
+  backdrop-filter:blur(10px); border-bottom:1px solid var(--line)}
+.nb-in{display:flex; align-items:center; justify-content:space-between; gap:10px; padding-block:9px}
+.nb-left{display:flex; align-items:center; gap:13px; min-width:0}
+.nb-lab{font-size:.74rem; font-weight:700; letter-spacing:.1em; color:var(--soft); white-space:nowrap}
+.nb-in .copts{flex:0 1 auto}
+.nb-tot{display:flex; flex-direction:column; align-items:center; text-decoration:none; white-space:nowrap;
+  border:1px solid var(--line); border-radius:10px; padding:4px 12px; background:#0f0f13; flex:0 0 auto}
+.nb-tot:hover{border-color:var(--red)}
+.nb-tot span{font-size:.58rem; letter-spacing:.12em; color:var(--soft)}
+.nb-tot b{font-family:'Anton',sans-serif; font-weight:400; font-size:1.06rem; color:#fff;
+  letter-spacing:0; font-variant-numeric:tabular-nums; line-height:1.15}
+@media(max-width:600px){ .nb-lab{display:none} }
+
+/* ===== REASONS (minimal) ===== */
+.pts{margin-top:28px; border-top:1px solid var(--line)}
+.pt{display:grid; grid-template-columns:1fr; gap:2px; padding:14px 0; border-bottom:1px solid var(--line)}
+@media(min-width:620px){ .pt{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr); gap:24px; align-items:baseline} }
+.pt b{font-size:clamp(1.05rem,3.4vw,1.3rem); font-weight:900; letter-spacing:-.02em}
+.pt b i{color:var(--red); font-style:normal}
+.pt span{color:var(--soft); font-size:.94rem; font-weight:300}
+.pt span em{color:var(--ink); font-style:normal; font-weight:500}
+
+/* ===== SECTIONS ===== */
+section{padding-block:clamp(40px,7vw,72px)}
+.band{background:var(--panel)}
+.band.shot{background:transparent}
+h2{font-size:clamp(1.7rem,6vw,2.7rem)}
+h2.kick{font-size:clamp(1.9rem,6.6vw,3rem); font-weight:900; letter-spacing:-.03em;
+  color:var(--red); margin:0 0 10px}
+.subh{font-size:clamp(1.05rem,3vw,1.4rem); font-weight:700; color:var(--ink);
+  letter-spacing:-.015em; margin:0; line-height:1.25}
+.sub2{color:var(--soft); margin:.85rem 0 0; font-size:1.03rem; max-width:56ch; font-weight:300}
+
+/* ===== REASONS ===== */
+.whys{display:grid; gap:9px; margin-top:28px}
+@media(min-width:720px){ .whys{grid-template-columns:1fr 1fr} }
+.why{border:1px solid var(--line); border-radius:13px; background:var(--panel2); overflow:hidden; min-width:0}
+.why summary{list-style:none; cursor:pointer; padding:15px 18px; font-size:1rem; font-weight:700;
+  display:flex; justify-content:space-between; align-items:center; gap:12px; line-height:1.3}
+.why summary::-webkit-details-marker{display:none}
+.why summary::after{content:"+"; color:var(--red); font-size:1.25rem; font-weight:400}
+.why[open] summary::after{content:"–"}
+.why summary em{color:var(--red); font-style:normal}
+.why p{margin:0; padding:0 18px 17px; color:var(--soft); font-size:.95rem; font-weight:300}
+.why p b{color:var(--ink); font-weight:500}
+
+/* ===== BACKGROUND SHOTS ===== */
+.shot{position:relative; isolation:isolate; overflow:hidden}
+.shot>.bg{position:absolute; inset:0; z-index:-1;
+  /* feathered edges — the photo dissolves into the page instead of ending on a line */
+  -webkit-mask-image:radial-gradient(125% 118% at 50% 44%, #000 34%, rgba(0,0,0,.62) 68%, rgba(0,0,0,.18) 88%, transparent 99%);
+  mask-image:radial-gradient(125% 118% at 50% 44%, #000 34%, rgba(0,0,0,.62) 68%, rgba(0,0,0,.18) 88%, transparent 99%)}
+/* taller than its frame, so it has room to drift while you scroll */
+.shot>.bg img{position:absolute; inset-inline:0; top:-14%; width:100%; height:128%;
+  object-fit:cover; object-position:50% 42%;
+  filter:grayscale(.35) contrast(1.08) brightness(.82); will-change:transform}
+.shot>.bg::after{content:""; position:absolute; inset:0;
+  background:linear-gradient(to bottom, rgba(9,9,11,.54) 0%, rgba(9,9,11,.34) 42%, rgba(9,9,11,.78) 100%)}
+/* a soft veil only where the words are — the edges stay photographic */
+.shot>.bg::before{content:""; position:absolute; inset:0; z-index:1;
+  background:radial-gradient(86% 70% at 50% 52%, rgba(9,9,11,.80) 0%, rgba(9,9,11,.52) 52%, rgba(9,9,11,.12) 80%, transparent 94%)}
+/* keep text legible over a brighter photo */
+.shot h2, .shot .subh, .shot .pt b{text-shadow:0 2px 18px rgba(0,0,0,.9)}
+.shot .sub2, .shot .pt span, .shot .spot p{color:#cdcdd6;
+  text-shadow:0 1px 4px #09090b, 0 1px 14px rgba(0,0,0,.95)}
+.shot .pt{border-bottom-color:rgba(255,255,255,.16)}
+.shot .pts{border-top-color:rgba(255,255,255,.16)}
+
+/* ===== SCROLL REVEAL (classes are added by script, so no-JS stays visible) ===== */
+.rv{opacity:0; transform:translateY(20px);
+  transition:opacity .62s ease, transform .62s cubic-bezier(.22,.78,.28,1)}
+.rv.on{opacity:1; transform:none}
+@media (prefers-reduced-motion:reduce){ .rv{opacity:1; transform:none; transition:none} }
+
+/* ===== TABLES ===== */
+.tscroll{overflow-x:auto; border:1px solid var(--line); border-radius:12px; margin-top:20px}
+table{width:100%; border-collapse:collapse; font-size:.9rem; min-width:470px; background:var(--panel2)}
+th,td{padding:10px 13px; text-align:right; border-bottom:1px solid var(--line)}
+th{font-size:.73rem; letter-spacing:.06em; color:var(--soft); background:#0f0f13; white-space:nowrap; font-weight:700}
+tr:last-child td{border-bottom:0}
+td.n{font-variant-numeric:tabular-nums; white-space:nowrap}
+.best td{background:rgba(232,35,42,.1)}
+#ftab tr{cursor:pointer}
+#ftab tr:hover td{background:rgba(255,255,255,.04)}
+#ftab tr[aria-selected="true"] td{background:rgba(232,35,42,.16)}
+#ftab tr[aria-selected="true"] td:first-child{color:#fff; font-weight:700; box-shadow:inset 3px 0 0 var(--red)}
+#ftab tr.off{opacity:.38; cursor:not-allowed}
+table th.dim, table td.dim{opacity:.32}
+.best td:first-child{color:#fff; font-weight:700; box-shadow:inset 3px 0 0 var(--red)}
+.soft{color:var(--soft)} .save{color:var(--red); font-weight:700}
+td a{color:var(--ink); text-decoration:none; border-bottom:1px dotted var(--soft)}
+
+/* ===== SHOUT ===== */
+.shout{margin-top:24px; border:1px solid var(--line); border-radius:18px; overflow:hidden; background:var(--panel2)}
+.shout-t{background:var(--red); color:#fff; padding:8px 18px; font-size:.78rem; font-weight:700; letter-spacing:.09em}
+.shout-b{padding:clamp(20px,4vw,28px)}
+.shout .big{font-family:'Anton',sans-serif; font-weight:400; font-size:clamp(2rem,8vw,3.2rem); color:#fff; line-height:1}
+.shout .cap{color:var(--soft); font-size:.96rem; margin:12px 0 0; font-weight:300}
+.shout .cap b{color:var(--ink); font-weight:500}
+.buy{display:flex; gap:9px; flex-wrap:wrap; margin-top:20px}
+.btn-buy{display:inline-block; background:var(--red); color:#fff !important; text-decoration:none;
+  font-weight:700; font-size:.88rem; padding:12px 22px; border-radius:999px}
+.btn-buy.ghost{background:transparent; color:var(--ink) !important; border:1px solid var(--line)}
+.maplink{text-decoration:none; font-size:.84em; color:var(--gold) !important; white-space:nowrap}
+:target{scroll-margin-top:78px}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
+
+/* ===== DETAILS ===== */
+details.d{margin-top:14px; border:1px solid var(--line); border-radius:13px; background:var(--panel2); overflow:hidden}
+details.d>summary{list-style:none; cursor:pointer; padding:14px 18px; font-weight:700; font-size:.92rem;
+  display:flex; justify-content:space-between; align-items:center; gap:10px; color:var(--gold)}
+details.d>summary::-webkit-details-marker{display:none}
+details.d>summary::after{content:"+"; font-size:1.2rem; font-weight:400}
+details.d[open]>summary::after{content:"–"}
+.dbody{padding:0 18px 18px}
+
+/* ===== NOTE ===== */
+.note{margin-top:18px; border-inline-start:3px solid var(--red); background:var(--panel2);
+  border-radius:0 12px 12px 0; padding:14px 18px; font-size:.88rem; color:var(--soft); font-weight:300}
+.note b{color:var(--ink); font-weight:500}
+
+/* ===== CALC ===== */
+.calc{background:var(--panel2); border:1px solid var(--line); border-radius:18px;
+  padding:clamp(16px,3vw,24px); margin-top:26px}
+.crow{margin-bottom:14px}
+.crow:last-of-type{margin-bottom:0}
+.clab{display:flex; justify-content:space-between; align-items:baseline; gap:10px;
+  font-size:.73rem; font-weight:700; letter-spacing:.09em; color:var(--soft); margin-bottom:7px}
+.copts{display:flex; flex-wrap:nowrap; overflow-x:auto; border:1px solid var(--line);
+  border-radius:11px; background:#0f0f13; scrollbar-width:none}
+.copts::-webkit-scrollbar{display:none}
+.copt{flex:1 1 auto; min-width:max-content; background:transparent; border:0;
+  border-inline-start:1px solid var(--line); padding:8px 14px; cursor:pointer; color:var(--soft);
+  white-space:nowrap; text-align:center; font-family:inherit; font-size:.85rem; line-height:1.3}
+.copt:first-child{border-inline-start:0}
+.copt small{display:block; font-size:.71rem; opacity:.75; font-variant-numeric:tabular-nums}
+.copt[aria-pressed="true"]{background:var(--red); color:#fff; font-weight:700}
+.fsel{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  background:#0f0f13; border:1px solid var(--line); border-radius:11px; padding:11px 14px}
+.fsel .fn{font-weight:700; font-size:.96rem; line-height:1.3}
+.fsel .ft{display:block; font-size:.78rem; color:var(--soft); font-weight:300; margin-top:2px;
+  font-variant-numeric:tabular-nums}
+.fsel .fp{text-align:center; font-variant-numeric:tabular-nums}
+.fsel .fp b{display:block; font-family:'Anton',sans-serif; font-weight:400; font-size:1.2rem; color:#fff}
+.fsel .fp span{display:block; font-size:.68rem; color:var(--soft)}
+.ctot{margin-top:20px; padding-top:16px; border-top:1px solid var(--line); text-align:center}
+.ctot .lab{font-size:.74rem; letter-spacing:.14em; color:var(--soft)}
+.ctot .sum{font-family:'Anton',sans-serif; font-weight:400; font-size:clamp(2.2rem,9vw,3.4rem);
+  color:#fff; line-height:1.05; font-variant-numeric:tabular-nums; margin-top:4px}
+.ctot .brk{font-size:.84rem; color:var(--soft); margin-top:8px; font-variant-numeric:tabular-nums; font-weight:300}
+
+/* ===== HOTELS ===== */
+.hgrid{display:grid; gap:12px; margin-top:26px}
+@media(min-width:620px){ .hgrid{grid-template-columns:repeat(3,1fr)} }
+.hcard{display:block; width:100%; text-align:right; padding:0; cursor:pointer; min-width:0;
+  background:var(--panel2); border:1px solid var(--line); border-radius:15px; overflow:hidden;
+  font-family:inherit; color:inherit; transition:border-color .12s}
+.hcard:hover{border-color:var(--red)}
+.hcard>img{width:100%; height:clamp(135px,19vw,160px); object-fit:cover}
+.hcb{padding:13px 15px}
+.hcb h3{font-size:1.04rem; margin:7px 0 3px}
+.hmeta{margin:0 0 9px; font-size:.82rem; color:var(--soft); font-weight:300; line-height:1.4}
+.hcp b{font-family:'Anton',sans-serif; font-weight:400; font-size:1.2rem; color:#fff}
+.hcp span{display:block; font-size:.74rem; color:var(--soft)}
+.more{display:block; margin-top:9px; font-size:.76rem; color:var(--red); font-weight:700}
+.tag{display:inline-block; font-size:.68rem; font-weight:700; letter-spacing:.05em; padding:3px 9px;
+  border-radius:5px; background:#0f0f13; color:var(--soft); border:1px solid var(--line)}
+.tag.hl{background:var(--red); color:#fff; border-color:var(--red)}
+.specs{display:grid; grid-template-columns:repeat(4,1fr); border:1px solid var(--line);
+  border-radius:10px; overflow:hidden; margin:14px 0}
+.spec{padding:10px 4px; text-align:center; border-inline-start:1px solid var(--line); background:#0f0f13}
+.spec:first-child{border-inline-start:0}
+.spec b{display:block; font-size:.95rem; color:#fff}
+.spec span{font-size:.67rem; color:var(--soft)}
+.howto{display:grid; gap:7px; margin:0 0 14px}
+.howto div{font-size:.87rem; color:var(--soft); font-weight:300; background:#0f0f13;
+  border-inline-start:2px solid var(--red); border-radius:0 9px 9px 0; padding:9px 13px}
+.howto b{color:var(--ink); font-weight:600}
+.near{font-size:.87rem; color:var(--soft); background:#0f0f13; border-radius:10px;
+  padding:11px 14px; margin:0 0 14px; font-weight:300}
+.near b{color:var(--ink); font-weight:500}
+.hprice{display:flex; gap:9px; flex-wrap:wrap; margin-bottom:14px; font-variant-numeric:tabular-nums}
+.hprice div{background:#0f0f13; border:1px solid var(--line); border-radius:10px; padding:8px 14px}
+.hprice b{font-family:'Anton',sans-serif; font-weight:400; font-size:1.05rem; color:#fff}
+.hprice span{display:block; font-size:.72rem; color:var(--soft)}
+.btn{display:inline-block; background:var(--red); color:#fff !important; text-decoration:none;
+  font-weight:700; font-size:.87rem; padding:11px 22px; border-radius:999px}
+.hline{color:var(--soft); font-size:.94rem; margin:0 0 13px; font-weight:300}
+.hline b{color:var(--ink); font-weight:500}
+
+/* ===== MODAL ===== */
+.mdl{position:fixed; inset:0; z-index:90; display:flex; align-items:flex-end; justify-content:center}
+@media(min-width:620px){ .mdl{align-items:center} }
+.mdl-bg{position:absolute; inset:0; background:rgba(0,0,0,.8)}
+.mdl-in{position:relative; background:var(--panel); width:100%; max-width:620px; max-height:92vh;
+  overflow-y:auto; border:1px solid var(--line); border-radius:20px 20px 0 0;
+  padding:20px max(18px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px));
+  box-shadow:var(--shadow)}
+@media(min-width:620px){ .mdl-in{border-radius:20px; max-height:88vh} }
+.mdl-x{position:sticky; top:0; float:left; background:var(--panel2); border:1px solid var(--line);
+  border-radius:50%; width:34px; height:34px; cursor:pointer; color:var(--ink); font-size:1rem; z-index:2}
+.mdl-in h3.mt{font-size:1.32rem; margin:11px 0 6px}
+.gal{display:grid; grid-template-columns:1fr 1fr; gap:3px; border-radius:11px; overflow:hidden; margin-bottom:16px}
+.gal img{width:100%; height:clamp(105px,21vw,145px); object-fit:cover}
+.gal img:first-child{grid-column:1 / -1; height:clamp(165px,31vw,225px)}
+body.locked{overflow:hidden}
+.gal img{cursor:zoom-in}
+.lb{position:fixed; inset:0; z-index:120; background:rgba(0,0,0,.95); display:flex;
+  flex-direction:column; align-items:center; justify-content:center; gap:14px;
+  padding:max(14px,env(safe-area-inset-top,0px)) max(14px,env(safe-area-inset-right,0px))
+          calc(14px + env(safe-area-inset-bottom,0px))}
+.lb-view{width:100%; max-width:1080px; overflow:hidden; direction:ltr}
+.lb-track{display:flex; will-change:transform;
+  transition:transform .42s cubic-bezier(.22,.78,.28,1)}
+.lb-track.drag{transition:none}
+.lb-track figure{flex:0 0 100%; margin:0; display:flex; align-items:center; justify-content:center}
+.lb-track img{max-width:100%; max-height:72vh; object-fit:contain; border-radius:10px;
+  user-select:none; -webkit-user-drag:none}
+.lb-dots{display:flex; gap:7px; justify-content:center}
+.lb-dot{width:7px; height:7px; border-radius:50%; background:#44444e; border:0; padding:0; cursor:pointer;
+  transition:background .2s, transform .2s}
+.lb-dot[aria-current="true"]{background:var(--red); transform:scale(1.35)}
+@media (prefers-reduced-motion:reduce){ .lb-track{transition:none} }
+.lb-x{position:absolute; top:max(14px,env(safe-area-inset-top,0px)); inset-inline-start:16px;
+  background:var(--panel2); border:1px solid var(--line); border-radius:50%; width:38px; height:38px;
+  color:var(--ink); font-size:1.05rem; cursor:pointer; z-index:2}
+.lb-nav{position:absolute; top:50%; transform:translateY(-50%); background:rgba(0,0,0,.55);
+  border:1px solid var(--line); color:#fff; width:44px; height:62px; border-radius:11px;
+  font-size:1.7rem; cursor:pointer; line-height:1}
+.lb-prev{inset-inline-end:10px} .lb-next{inset-inline-start:10px}
+.lb-foot{display:flex; align-items:center; gap:14px; flex-wrap:wrap; justify-content:center}
+.lb-count{font-size:.85rem; color:var(--soft); font-variant-numeric:tabular-nums}
+
+/* ===== DAY ===== */
+.grid2{display:grid; gap:10px; margin-top:24px}
+@media(min-width:620px){ .grid2{grid-template-columns:1fr 1fr} }
+.spot{background:var(--panel2); border:1px solid var(--line); border-radius:12px; padding:0; min-width:0;
+  align-self:start; transition:border-color .12s}
+.spot:hover{border-color:#3b3b47}
+.spot>summary{list-style:none; cursor:pointer; padding:15px 17px; display:block}
+.spot>summary::-webkit-details-marker{display:none}
+.spot h4{margin:0 0 5px; font-size:.98rem; font-weight:700;
+  display:flex; justify-content:space-between; align-items:center; gap:10px}
+.spot h4::after{content:"+"; color:var(--red); font-weight:400; font-size:1.25rem; line-height:1}
+.spot[open] h4::after{content:"–"}
+.spot p{margin:0; font-size:.89rem; color:var(--soft); font-weight:300}
+.spot p b{color:var(--ink); font-weight:500}
+.sbody{padding:0 17px 15px}
+.sbody p{margin-top:10px}
+.sbody ul{margin:10px 0 0; padding-inline-start:18px; font-size:.87rem; color:var(--soft); font-weight:300}
+.sbody li{margin-bottom:5px}
+.sbody li b{color:var(--ink); font-weight:600}
+.slinks{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px}
+.spot a{font-size:.79rem; display:inline-block; text-decoration:none;
+  color:var(--gold); border:1px solid rgba(255,210,74,.28); border-radius:999px; padding:5px 12px}
+.spot a:hover{border-color:var(--gold)}
+
+/* ===== RSVP ===== */
+.inp{width:100%; background:#0f0f13; border:1px solid var(--line); border-radius:11px;
+  padding:12px 15px; color:var(--ink); font-family:inherit; font-size:1rem}
+.inp:focus{outline:2px solid var(--red); outline-offset:1px}
+.rsum{margin-top:16px; background:#0f0f13; border:1px solid var(--line); border-radius:12px;
+  padding:14px 16px; font-size:.9rem; color:var(--soft); line-height:1.9; font-weight:300}
+.rsum b{color:var(--ink); font-weight:600}
+.rgo{margin-top:16px; width:100%; background:var(--red); color:#fff; border:0; border-radius:999px;
+  padding:14px 22px; font-family:inherit; font-weight:900; font-size:1rem; cursor:pointer}
+.rgo:disabled{opacity:.45; cursor:default}
+.rmsg{margin-top:14px; font-size:.9rem; color:var(--soft); font-weight:300}
+.rmsg.ok{color:#5ddb8a}
+.rmsg textarea{width:100%; margin-top:10px; background:#0f0f13; border:1px solid var(--line);
+  border-radius:11px; padding:12px; color:var(--ink); font-family:inherit; font-size:.88rem; min-height:132px}
+.rcopy{margin-top:10px; width:100%; background:transparent; color:var(--ink); border:1px solid var(--line);
+  border-radius:999px; padding:11px 20px; font-family:inherit; font-weight:700; font-size:.9rem; cursor:pointer}
+.rcopy:hover{border-color:var(--red)}
+
+/* ===== CTA ===== */
+.cta{position:relative; text-align:center; border-top:1px solid var(--line);
+  padding-top:clamp(230px,40vw,420px)}
+.cta h2{font-size:clamp(2rem,8vw,3.4rem)}
+.cta h2 a{text-decoration:none}
+.cta h2 em{color:var(--red); font-style:normal;
+  border-bottom:3px solid rgba(232,35,42,.35); padding-bottom:2px}
+.cta h2 a:hover em{border-bottom-color:var(--red)}
+.cta p{color:var(--soft); max-width:46ch; margin:1rem auto 0; font-weight:300}
+.cta .goform{display:inline-block; margin-top:20px; background:var(--red); color:#fff !important;
+  text-decoration:none; font-weight:900; font-size:1rem; padding:14px 30px; border-radius:999px}
+/* round sticker — lands like a rubber stamp when it scrolls into view */
+.sticker{position:absolute; z-index:3; text-decoration:none;
+  top:clamp(16px,3.6vw,42px); inset-inline-end:clamp(8px,4.5vw,60px);
+  width:clamp(112px,21vw,150px); aspect-ratio:1; border-radius:50%;
+  background:var(--gold); color:#09090b !important;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; line-height:1;
+  box-shadow:0 12px 34px rgba(0,0,0,.65);
+  opacity:0; transform:rotate(-26deg) scale(2.3)}
+.sticker.in{animation:stamp .5s cubic-bezier(.18,1.5,.4,1) forwards,
+                      breathe 2.6s ease-in-out .62s infinite}
+@keyframes stamp{
+  0%{opacity:0; transform:rotate(-26deg) scale(2.3)}
+  45%{opacity:1}
+  58%{transform:rotate(-7deg) scale(.9)}
+  78%{transform:rotate(-13.5deg) scale(1.05)}
+  100%{opacity:1; transform:rotate(-11deg) scale(1)}
+}
+.sticker b{font-size:clamp(.72rem,2.2vw,.88rem); font-weight:900}
+.sticker i{font-style:normal; font-family:'Anton',sans-serif; font-weight:400;
+  font-size:clamp(1.2rem,3.8vw,1.55rem); line-height:1.1}
+.sticker .sl{font-size:clamp(.56rem,1.7vw,.67rem); font-weight:700; letter-spacing:.07em; opacity:.74; margin-top:2px}
+.sticker:hover{filter:brightness(1.08)}
+@keyframes breathe{0%,100%{box-shadow:0 12px 34px rgba(0,0,0,.65), 0 0 0 0 rgba(255,210,74,.5)}
+  55%{box-shadow:0 12px 34px rgba(0,0,0,.65), 0 0 0 16px rgba(255,210,74,0)}}
+.tick{display:inline-block; font-size:1.15em; animation:flip 2s steps(1,end) infinite; transform-origin:50% 50%}
+@keyframes flip{0%,49%{transform:rotate(0deg)} 50%,100%{transform:rotate(180deg)}}
+@media (prefers-reduced-motion:reduce){
+  .sticker,.sticker.in,.tick{animation:none}
+  .sticker{opacity:1; transform:rotate(-11deg) scale(1)}
+}
+footer{padding-block:26px; text-align:center; font-size:.76rem; color:#6a6a74; line-height:1.9}
+footer a{color:#8a8a94}
+</style>
+</head>
+<body>
+<header class="hero">
+  <img src="img/rw-hero.jpg" alt="רובי ויליאמס על הבמה בתוך קרני לייזר">
+  <div class="hero-in"><div class="wrap">
+    <span class="strike">✈ עדכון מסלול &nbsp;·&nbsp; <s>אוסטרבה</s> &nbsp;→&nbsp; לרנקה</span>
+    <h1 class="anton">ROBBIE WILLIAMS</h1>
+    <div class="anton live">LIVE 2027</div>
+    <div class="rule"></div>
+    <p class="when">מוצ״ש <b>24 ביולי 2027</b> · Land of Tomorrow, לרנקה</p>
+    <p class="sub">שעה טיסה מהבית · סוף שבוע אחד · 28,000 איש</p>
+  </div></div>
+</header>
+
+<div class="nums">
+  <div class="num"><b>60 דק׳</b><span>טיסה ישירה</span></div>
+  <div class="num"><b>סופ״ש אחד</b><span class="cap2">2–3 לילות</span></div>
+  <div class="num duo">
+    <div class="orwrap">
+      <span class="opt"><b>₪449</b><small>גולדן רינג</small></span>
+      <i class="orsep">או</i>
+      <span class="opt"><b>₪181</b><small>ארנה · דשא</small></span>
+    </div>
+    <span class="cap2">מחיר כרטיס לאדם</span>
+  </div>
+</div>
+
+<div class="nightbar"><div class="wrap nb-in">
+  <div class="nb-left">
+    <span class="nb-lab">🌙 כמה לילות</span>
+    <div class="copts" id="d">
+      <button class="copt" data-d="2" aria-pressed="true">2 לילות<small>ו׳ 23.7 → א׳ 25.7</small></button>
+      <button class="copt" data-d="3">3 לילות<small>ו׳ 23.7 → ב׳ 26.7</small></button>
+    </div>
+  </div>
+  <a class="nb-tot" href="#calc" title="לפירוט המלא"><span>סה״כ</span><b id="sumtop">₪4,474</b></a>
+</div></div>
+
+<section class="shot">
+  <div class="bg"><img src="img/hero-larnaca.jpg" alt="" style="object-position:50% 62%"></div>
+  <div class="wrap">
+  <h2 class="kick">למה לרנקה ולא אוסטרבה?</h2>
+  <p class="subh">אותו אדם. חצי מהטרחה.</p>
+
+  <div class="pts">
+    <div class="pt">
+      <b>בעצם באנו בשביל <i>רובי</i></b>
+      <span>16 במות היו רעיון יפה. <em>עכשיו יש מופע אחד.</em></span>
+    </div>
+    <div class="pt">
+      <b>יש הרבה יותר סיכוי <i>לסבתא</i></b>
+      <span>שניים-שלושה לילות, <em>לא חמישה.</em></span>
+    </div>
+    <div class="pt">
+      <b><i>שליש</i> מהמחיר</b>
+      <span>‎€175‎ לפסטיבל, <em>₪181 להופעה.</em></span>
+    </div>
+    <div class="pt">
+      <b><i>שעה</i> טיסה. שעה.</b>
+      <span>מול טיסה לקרקוב <em>ועוד שעתיים ברכב.</em></span>
+    </div>
+    <div class="pt">
+      <b>ועוד <i>מקום לברוח אליו</i></b>
+      <span><em>50 דקות מהבית</em>, לא פעם בחיים.</span>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<section class="band"><div class="wrap">
+  <h2 class="kick">הכרטיסים</h2>
+  <p class="subh">איפה עומדים,<br>וכמה זה עולה</p>
+  <p class="sub2">ההופעה ב-21:00, המתחם מכיל 28,000 איש, ויש בו חמישה אזורים.</p>
+
+  <div class="shout">
+    <div class="shout-t">✅ אנחנו כבר קנינו</div>
+    <div class="shout-b">
+      <div class="big">גולדן רינג<br>₪449</div>
+      <p class="cap"><b>שני כרטיסים, ₪898 לזוג</b>, דרך ההטבה של MAX. <a class="maplink" href="#venue-map">🗺 איפה זה במתחם</a><br><br>
+      הטבעת הצמודה לבמה — הכי קרוב שאפשר לעמוד. <b>פי 2.5 זול מהטריבונה, והרבה יותר קרוב.</b></p>
+      <div class="buy">
+        <a class="btn-buy" href="https://www.max.co.il/benefits/showsabroad/robbiewilliams" target="_blank" rel="noopener">לקנות ב-MAX · עד 29.11 ↗</a>
+        <a class="btn-buy ghost" href="https://www.ticketmaster.cy/showEventInformation.html?changeLanguageTo=en&idEvent=8826" target="_blank" rel="noopener">טיקטמאסטר קפריסין ↗</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="note"><b>שני מסלולי רכישה, והם לא שווים.</b><br>
+  🔴 <b>ההטבה של MAX</b> — ₪181 לדשא, ₪449 לגולדן רינג. דורשת כרטיס MAX, מוגבלת ל-2 כרטיסים לת״ז, <b>ונסגרת בראשון 29.11.</b><br>
+  ⚪ <b>טיקטמאסטר קפריסין</b> — פתוח לכולם וכל השנה, אבל במחיר מלא: ₪312 לדשא, ₪651 לגולדן רינג, ועוד עמלת המרה.</div>
+
+  <details class="d" id="venue-map"><summary><span>🗺 איפה בדיוק עומדים · מפת המתחם</span></summary>
+    <div class="dbody">
+      <img src="img/venue-map.jpg" alt="מפת המתחם: הבמה למטה, גולדן רינג צמוד, ארנה מסביב, טריבונות בצדדים" style="border-radius:10px">
+      <p style="margin-top:14px; font-size:.89rem; color:var(--soft); font-weight:300">הבמה בתחתית. <b style="color:var(--ink)">גולדן רינג</b> היא הטבעת הצמודה לבמה. <b style="color:var(--ink)">ארנה</b> הוא כל השטח הירוק מסביב, עמידה חופשית. <b style="color:var(--ink)">הטריבונות</b> הן שני הגושים בצדדים — מאחור ובאלכסון. <b style="color:var(--ink)">VIP</b> בפינה, עם כניסה וחניה נפרדות.</p>
+    </div></details>
+
+  <details class="d"><summary><span>💰 כל המחירים · טיקטמאסטר מול MAX</span></summary>
+    <div class="dbody">
+      <div class="tscroll"><table>
+        <thead><tr><th>אזור</th><th>רשמי</th><th>בשקלים</th><th>MAX</th><th>חיסכון</th></tr></thead>
+        <tbody>
+          <tr><td><a href="#venue-map">ארנה · דשא</a></td><td class="n">€84.50</td><td class="n soft">₪312</td><td class="n"><b>₪181</b></td><td class="n save">42%</td></tr>
+          <tr class="best"><td><a href="#venue-map">גולדן רינג</a></td><td class="n">€176.03</td><td class="n soft">₪651</td><td class="n"><b>₪449</b></td><td class="n save">31%</td></tr>
+          <tr><td><a href="#venue-map">טריבונה 12–24</a></td><td class="n">€321.18</td><td class="n soft">₪1,188</td><td class="n">₪1,115</td><td class="n soft">6%</td></tr>
+          <tr><td><a href="#venue-map">פרימיום 1–11</a></td><td class="n">€361.19</td><td class="n soft">₪1,336</td><td class="n">₪1,260</td><td class="n soft">6%</td></tr>
+          <tr><td><a href="#venue-map">VIP</a></td><td class="n">€501.23</td><td class="n soft">₪1,854</td><td class="n">₪1,780</td><td class="n soft">4%</td></tr>
+        </tbody></table></div>
+      <p class="note" style="margin-top:14px">המרה לפי שער בנק ישראל ‎€1 = ₪3.6981‎. <b>ההנחה של MAX אמיתית רק בשתי השורות העליונות</b> — בטריבונות ובVIP היא ₪75 שטוחים.</p>
+    </div></details>
+</div></section>
+
+<section class="wrap" id="flights">
+  <h2 class="kick">הטיסות</h2>
+  <p class="subh">יוצאים שישי.<br>חוזרים ראשון.</p>
+
+  <div class="shout">
+    <div class="shout-t" id="ftit">★ המסלול שנתפר לזה</div>
+    <div class="shout-b">
+      <div class="big" id="fbig">₪856</div>
+      <p class="cap" id="fcap"><b>Cyprus Airways</b> · שישי 15:35 החוצה, ראשון 13:30 חזרה.<br>
+      <b>בוקר רגוע ליד הבריכה במקום לקום לפנות בוקר.</b></p>
+    </div>
+  </div>
+
+  <details class="d" open><summary><span>✈️ בחרו טיסה · כל המחירים</span></summary>
+    <div class="dbody">
+      <div class="tscroll"><table>
+        <thead><tr><th>חברה</th><th>יציאה · ו׳ 23.7</th><th id="thback">חזרה · א׳ 25.7</th><th class="c2">2 לילות</th><th class="c3">3 לילות</th></tr></thead>
+        <tbody id="ftab">
+          <tr data-f2="856" data-f3="856"><td>Cyprus Airways</td><td class="n">15:35</td><td class="n">13:30</td><td class="n c2">₪856</td><td class="n c3">₪856</td></tr>
+          <tr data-f2="704" data-f3="704"><td>Aegean</td><td class="n">05:20</td><td class="n soft">—</td><td class="n c2">₪704</td><td class="n c3">₪704</td></tr>
+          <tr data-f2="1130" data-f3="1260"><td>Wizz Air</td><td class="n">13:40 / 17:35</td><td class="n soft">—</td><td class="n c2">₪1,130</td><td class="n c3">₪1,260</td></tr>
+          <tr data-f2="1321" data-f3="942"><td>אל על · סאן דור</td><td class="n">12:50 / 15:15</td><td class="n soft">—</td><td class="n c2">₪1,321</td><td class="n c3">₪942</td></tr>
+          <tr data-f2="1400" data-f3="0"><td>ארקיע</td><td class="n">06:00 / 19:30</td><td class="n soft">—</td><td class="n c2">₪1,400</td><td class="n c3 soft">—</td></tr>
+          <tr data-f2="2028" data-f3="2028"><td>ישראייר</td><td class="n">09:55 / 15:45</td><td class="n soft">—</td><td class="n c2">₪2,028</td><td class="n c3">₪2,028</td></tr>
+        </tbody></table></div>
+      <p class="note" style="margin-top:14px">Aegean זולה ב-₪152 אבל ממריאה ב-05:20 — קמים ב-03:00.<br><b>רוצים 3 לילות?</b> אותה טיסה בשישי, חזרה בשני 26.7 באותו מחיר.</p>
+    </div></details>
+</section>
+
+<section class="band shot"><div class="bg"><img src="img/lx-old.jpg" alt="" style="object-position:50% 58%"></div><div class="wrap">
+  <h2 class="kick">איפה ישנים</h2>
+  <p class="subh">שלושה מלונות<br>לבחירה</p>
+  <p class="sub2" style="margin-top:.6rem"><span style="color:#b7b7c2; font-size:.88rem">המלצה ראשונית של קלוד, מתוך מה שכבר פתח מחירים ליולי 2027 — <b style="color:var(--ink); font-weight:500">נעשה מחקר מקיף יותר בהמשך.</b></span></p>
+  <p class="sub2">לחצו על מלון לגלריה, למרחקים ולהזמנה. <b>״לטיילת״ = טיילת פיניקודס על קו החוף; העיר העתיקה היא מרכז אחר, פנימי יותר.</b> <b>כל המחירים הם מחירי בוקינג לחדר זוגי, סך הכול לכל הלילות</b> — בדיוק מה שתראו כשתלחצו.</p>
+
+  <div class="hgrid">
+    <button class="hcard" data-h="mercure">
+      <img src="img/mercure-a.jpg" alt="החוף הפרטי של מרקיור לרנקה">
+      <div class="hcb">
+        <span class="tag hl">הכי קרוב למופע</span>
+        <h3>Mercure</h3>
+        <p class="hmeta">חוף פרטי · 7 דק׳ למופע · 9.1</p>
+        <div class="hcp"><b data-p2="1864" data-p3="2648">₪1,864</b><span class="pn">2 לילות</span></div>
+        <span class="more">לפרטים ולעוד תמונות ⌄</span>
+      </div>
+    </button>
+    <button class="hcard" data-h="indigo">
+      <img src="img/indigo-d.jpg" alt="חזית מלון Indigo לרנקה בערב">
+      <div class="hcb">
+        <span class="tag hl">בלב העיר · 18+</span>
+        <h3>Hotel Indigo</h3>
+        <p class="hmeta">בריכת גג · בעיר העתיקה · 8.8</p>
+        <div class="hcp"><b data-p2="2067" data-p3="3084">₪2,067</b><span class="pn">2 לילות</span></div>
+        <span class="more">לפרטים ולעוד תמונות ⌄</span>
+      </div>
+    </button>
+    <button class="hcard" data-h="radisson">
+      <img src="img/rad-a.jpg" alt="Radisson Blu לרנקה — בריכה על הגג מול הים">
+      <div class="hcb">
+        <span class="tag hl">5 כוכבים · ספא</span>
+        <h3>Radisson Blu</h3>
+        <p class="hmeta">בריכת גג · 4 מסעדות · 6 דק׳ למופע</p>
+        <div class="hcp"><b data-p2="2618" data-p3="3979">₪2,618</b><span class="pn">2 לילות</span></div>
+        <span class="more">לפרטים ולעוד תמונות ⌄</span>
+      </div>
+    </button>
+  </div>
+
+  <div hidden id="hd-mercure">
+    <div class="gal">
+      <img src="img/mercure-a.jpg" alt="החוף הפרטי עם שמשיות קש"><img src="img/mercure-b.jpg" alt="סוויטה עם נוף לים">
+      <img src="img/mercure-c.jpg" alt="חדר עם חיפוי עץ"><img src="img/mercure-d.jpg" alt="חדר הרחצה">
+    </div>
+    <span class="tag hl">הכי קרוב למופע</span> <span class="tag">חוף פרטי</span> <span class="tag">ספא</span> <span class="tag">9.1</span>
+    <h3 class="mt">Mercure Larnaca Beach Resort</h3>
+    <p class="hline">ריזורט על החוף עם חוף פרטי משלו, בריכה חיצונית, ספא ומרכז כושר. <b>הדירוג הגבוה בבדיקה שלנו.</b></p>
+    <div class="specs">
+      <div class="spec"><b>7 דק׳</b><span>למופע 🚗</span></div><div class="spec"><b>14 דק׳</b><span>לטיילת 🚗</span></div>
+      <div class="spec"><b>24 דק׳</b><span>מהשדה 🚗</span></div><div class="spec"><b>0 דק׳</b><span>לחוף 🚶</span></div>
+    </div>
+<div class="howto"><div>🎤 <b>למופע: 7 דק׳ במונית.</b> כ-3 ק״מ על אותו כביש — <b>רחוק מדי ללכת.</b></div><div>🏖 <b>החוף הפרטי: 0 דק׳</b> — הוא של המלון.</div><div>🍽 <b>מסעדות אורקליני: ~10 דק׳ הליכה.</b></div><div>🌴 <b>טיילת פיניקודס: 14 דק׳ במונית.</b> לא הליכה.</div></div>
+    <p class="near">📍 <b>מי שבוחר אותו בוחר ים ולא טיילת.</b> יוצאים מהלובי ישר לחוף, ומגיעים למופע בלי לתכנן — אבל לערב בעיר צריך מונית.</p>
+    <div class="hprice"><div><b>₪1,864</b><span>2 לילות · €504</span></div><div><b>₪2,648</b><span>3 לילות · €716</span></div></div>
+    <a class="btn" data-bk="https://www.booking.com/hotel/cy/mercure-larnaca-beach-resort.html" href="https://www.booking.com/hotel/cy/mercure-larnaca-beach-resort.html?checkin=2027-07-23&checkout=2027-07-25&group_adults=2&no_rooms=1" target="_blank" rel="noopener">לבדוק זמינות ולהזמין ↗</a>
+  </div>
+
+  <div hidden id="hd-indigo">
+    <div class="gal">
+      <img src="img/indigo-d.jpg" alt="החזית עם התריסים הכחולים בערב"><img src="img/indigo-a.jpg" alt="חזית המלון ביום">
+      <img src="img/indigo-b.jpg" alt="חדר עם מקלחת זכוכית"><img src="img/indigo-c.jpg" alt="לובי עם קשת אבן">
+    </div>
+    <span class="tag hl">מבוגרים בלבד</span> <span class="tag">בריכת גג</span> <span class="tag">בלב העיר</span> <span class="tag">8.8</span>
+    <h3 class="mt">Hotel Indigo Larnaca by IHG</h3>
+    <p class="hline">בוטיק עיצובי ל-18+ <b>בתוך העיר העתיקה עצמה</b>, עם <b>בריכה על הגג שצופה לים התיכון</b> ובר צמוד אליה.</p>
+    <div class="specs">
+      <div class="spec"><b>14 דק׳</b><span>למופע 🚗</span></div><div class="spec"><b>8 דק׳</b><span>לטיילת 🚶</span></div>
+      <div class="spec"><b>8 דק׳</b><span>מהשדה 🚗</span></div><div class="spec"><b>18+</b><span>בלי ילדים</span></div>
+    </div>
+<div class="howto"><div>🎤 <b>למופע: 14 דק׳ במונית.</b> הכי רחוק מהשלושה — אבל גם הכי קרוב לכל השאר.</div><div>🌴 <b>טיילת פיניקודס: 8 דק׳ הליכה.</b></div><div>⛪ <b>כנסיית לאזארוס: ~3 דק׳ הליכה</b> · ⛵ <b>המרינה: ~10 דק׳.</b></div><div>🍽 <b>מסעדות וחנויות: מתחת למלון.</b> העיר העתיקה מסביב.</div></div>
+    <p class="near">📍 <b>הוא לא ליד המרכז — הוא בתוכו.</b> ללרנקה יש שני מרכזים: <b>העיר העתיקה</b>, שבה המלון יושב, ו<b>טיילת פיניקודס</b> שעל קו החוף, 8 דקות הליכה משם. <b>זה המלון היחיד מהשלושה שבו הערב שאחרי ההופעה לא דורש נסיעה.</b></p>
+    <div class="hprice"><div><b>₪2,067</b><span>2 לילות · €559</span></div><div><b>₪3,084</b><span>3 לילות · €834</span></div></div>
+    <a class="btn" data-bk="https://www.booking.com/hotel/cy/indigo-larnaca.html" href="https://www.booking.com/hotel/cy/indigo-larnaca.html?checkin=2027-07-23&checkout=2027-07-25&group_adults=2&no_rooms=1" target="_blank" rel="noopener">לבדוק זמינות ולהזמין ↗</a>
+  </div>
+
+  <div hidden id="hd-radisson">
+    <div class="gal">
+      <img src="img/rad-a.jpg" alt="החזית והבריכה על הגג מול הים"><img src="img/rad-b.jpg" alt="חדר רחצה עם אמבטיה חופשית">
+      <img src="img/rad-c.jpg" alt="הלובי עם קיר אמנות"><img src="img/rad-d.jpg" alt="הלובי">
+    </div>
+    <span class="tag hl">5 כוכבים</span> <span class="tag">בריכת גג</span> <span class="tag">ספא</span> <span class="tag">4 מסעדות</span>
+    <h3 class="mt">Radisson Blu Hotel, Larnaca</h3>
+    <p class="hline">מלון חמישה כוכבים עם <b>בריכה על הגג שצופה לים</b>, ספא, מרכז כושר ו<b>ארבע מסעדות בתוך המלון</b>. הכי ״מלון״ מבין השלושה.</p>
+    <div class="specs">
+      <div class="spec"><b>6 דק׳</b><span>למופע 🚗</span></div><div class="spec"><b>7 דק׳</b><span>לטיילת 🚗</span></div>
+      <div class="spec"><b>18 דק׳</b><span>מהשדה 🚗</span></div><div class="spec"><b>8.5</b><span>דירוג</span></div>
+    </div>
+<div class="howto"><div>🎤 <b>למופע: 6 דק׳ במונית — הכי קרוב מכולם.</b> 3.6 ק״מ.</div><div>🏖 <b>החוף ממול: ~3 דק׳ הליכה.</b></div><div>🌴 <b>טיילת פיניקודס: 21 דק׳ הליכה או 7 במונית.</b></div><div>🍽 <b>ארבע מסעדות בתוך המלון</b> — ולכן לא חייבים לצאת.</div></div>
+    <p class="near">📍 <b>הכי קרוב למופע, והכי עצמאי.</b> יושב בין העיר לכביש דקליה. לא יוצאים ממנו ברגל לעיר — אבל ארבע מסעדות, ספא ובריכת גג אומרים שאפשר פשוט להישאר.</p>
+    <div class="hprice"><div><b>₪2,618</b><span>2 לילות · €708</span></div><div><b>₪3,979</b><span>3 לילות · €1,076</span></div></div>
+    <a class="btn" data-bk="https://www.booking.com/hotel/cy/radisson-blu-larnaca.html" href="https://www.booking.com/hotel/cy/radisson-blu-larnaca.html?checkin=2027-07-23&checkout=2027-07-25&group_adults=2&no_rooms=1" target="_blank" rel="noopener">לבדוק זמינות ולהזמין ↗</a>
+  </div>
+
+  <div class="note">🚕 <b>ואיך מגיעים למופע בפועל:</b> משלושת המלונות זו נסיעה של 6–14 דקות, <b>ובכולם זו מונית.</b> למופע של 28,000 איש צפויות הסעות מאורגנות — <b>אבל זה עוד לא פורסם, אז בינתיים תכננו מונית לשני הכיוונים.</b></div>
+
+  <div class="note">🔴 <b>רק חמישה מלונות 4–5 כוכבים בלרנקה בכלל פתחו מחירים ליולי 2027</b>, ובאותו ערב יהיו בעיר 28,000 איש נוספים.<br>
+  <b>ייפתחו עוד מלונות בחודשים הקרובים ונעדכן כאן</b> — אבל בינתיים כדאי לשריין משהו עם ביטול חינם. <b>מי שמזמין עכשיו בוחר; מי שמחכה מקבל את מה שנשאר.</b></div>
+</div></section>
+
+<section class="wrap" id="calc">
+  <h2 class="kick">כמה זה עולה</h2>
+  <p class="subh">תבחרו,<br>ותראו כמה יוצא</p>
+  <p class="sub2">כרטיסים + טיסות + מלון. בלי אוכל ומוניות, כי את זה כל אחד עושה אחרת.</p>
+
+  <div class="calc">
+    <div hidden><div class="crow">
+      <div class="clab"><span>✈️ טיסה</span><span style="font-weight:300; letter-spacing:0">לאדם, הלוך ושוב</span></div>
+      <div class="copts" id="f">
+        <button class="copt" data-f2="704" data-f3="704">Aegean<small>₪704 · 05:20</small></button>
+        <button class="copt" data-f2="856" data-f3="856" aria-pressed="true">Cyprus Airways<small>₪856 · 15:35</small></button>
+        <button class="copt" data-f2="1130" data-f3="1260">Wizz Air<small>₪1,130 · 13:40</small></button>
+      </div>
+    </div></div>
+    <div class="crow">
+      <div class="clab"><span>🎫 איפה עומדים</span><a class="maplink" href="#venue-map">🗺 במפה</a></div>
+      <div class="copts" id="z">
+        <button class="copt" data-max="181" data-full="312">ארנה · דשא<small class="zp"></small></button>
+        <button class="copt" data-max="449" data-full="651" aria-pressed="true">גולדן רינג<small class="zp"></small></button>
+        <button class="copt" data-max="1115" data-full="1188">טריבונה 12–24<small class="zp"></small></button>
+        <button class="copt" data-max="1260" data-full="1336">פרימיום 1–11<small class="zp"></small></button>
+        <button class="copt" data-max="1780" data-full="1854">VIP<small class="zp"></small></button>
+      </div>
+    </div>
+    <div class="crow">
+      <div class="clab"><span>👥 כמה נוסעים</span></div>
+      <div class="copts" id="n">
+        <button class="copt" data-n="1">1</button><button class="copt" data-n="2" aria-pressed="true">2</button>
+        <button class="copt" data-n="3">3</button><button class="copt" data-n="4">4</button>
+      </div>
+    </div>
+    <div class="crow">
+      <div class="clab"><span>💳 כרטיס MAX</span><span style="font-weight:300; letter-spacing:0">משנה את מחירי הכרטיסים</span></div>
+      <div class="copts" id="m">
+        <button class="copt" data-m="1" aria-pressed="true">כן</button><button class="copt" data-m="0">לא</button>
+      </div>
+    </div>
+    <div class="crow">
+      <div class="clab"><span>✈️ הטיסה שבחרתם</span><a class="maplink" href="#flights">↑ לשנות טיסה</a></div>
+      <div class="fsel" id="fsel"></div>
+    </div>
+    <div class="crow">
+      <div class="clab"><span>🏨 מלון</span><span style="font-weight:300; letter-spacing:0">לחדר זוגי</span></div>
+      <div class="copts" id="h">
+        <button class="copt" data-h2="1864" data-h3="2648" aria-pressed="true">מרקיור<small>חוף פרטי</small></button>
+        <button class="copt" data-h2="2067" data-h3="3084">Indigo<small>בלב העיר</small></button>
+        <button class="copt" data-h2="2618" data-h3="3979">Radisson<small>5 כוכבים</small></button>
+      </div>
+    </div>
+    <div class="ctot">
+      <div class="lab">סה״כ</div>
+      <div class="sum" id="sum">₪4,474</div>
+      <div class="brk" id="brk"></div>
+    </div>
+  </div>
+
+  <div class="note">🎁 <b>ושתי הטבות MAX שאנחנו יכולים לתרום:</b> ההטבה מוגבלת ל-2 כרטיסים לתעודת זהות, וניצלנו רק אחת משתי התעודות שלנו. <b>כלומר נשארו לנו שני כרטיסים במחיר ההטבה, למי שאין לו כרטיס MAX.</b> ראשון ראשון זוכה.</div>
+
+</section>
+
+<section class="band shot"><div class="bg"><img src="img/lx-street.jpg" alt="" style="object-position:50% 86%"></div><div class="wrap">
+  <h2 class="kick">היום הנוסף</h2>
+  <p class="subh">ולרנקה עצמה<br>לא רעה בכלל.</p>
+  <p class="sub2">קטנה, והכול בה קרוב — את רובה אפשר לעשות ברגל, ביום אחד, בלי רכב שכור.</p>
+
+  <div class="grid2">
+    <details class="spot"><summary><h4><span>🍷 ארוחה על המים</span></h4>
+      <p>שולחנות ממש מול הים, לא ברחוב שמאחור. <b>שלוש אפשרויות, שלושה אופי.</b></p></summary>
+      <div class="sbody">
+        <ul>
+          <li><b>Militzis</b> — מסעדה קפריסאית ותיקה על טיילת Piale Pasa, מול הים ממש. מטבח מסורתי, קלפטיקו ומזה. <b>הבחירה הקלאסית.</b></li>
+          <li><b>Mer Bleue</b> — טברנת דגים משפחתית באורוקליני, על קו החוף. <b>השולחנות הכי קרובים למים</b> מהשלוש — ובדרך חזרה מהמופע.</li>
+          <li><b>Agistri Seafood</b> — בתוך המרינה, דגים וים. יושבת בין הסירות.</li>
+        </ul>
+        <p style="font-size:.82rem; color:#6a6a74">מבוסס על דירוגי גוגל וטריפאדוויזר, לא על ביקור שלנו. <b>ביולי כדאי להזמין מקום מראש.</b></p>
+        <div class="slinks">
+          <a href="https://maps.google.com/?q=Militzis+Restaurant+Larnaca" target="_blank" rel="noopener">Militzis ↗</a>
+          <a href="https://maps.google.com/?q=Mer+Bleue+Restaurant+Oroklini" target="_blank" rel="noopener">Mer Bleue ↗</a>
+          <a href="https://maps.google.com/?q=Agistri+Seafood+Larnaca+Marina" target="_blank" rel="noopener">Agistri ↗</a>
+        </div>
+      </div></details>
+
+    <details class="spot"><summary><h4><span>🌴 טיילת פיניקודס</span></h4>
+      <p>הלב של העיר — דקלים, חוף דגל כחול, בתי קפה וברים.</p></summary>
+      <div class="sbody">
+        <p>כ-600 מטר של טיילת לאורך החוף, עם שדרת דקלים ובתי קפה בשורה הראשונה. החוף עצמו רדוד ונוח, עם מטריות ומיטות שיזוף להשכרה. <b>ביולי מתמלא כבר מעשר בבוקר</b> — מי שרוצה מקום טוב מגיע מוקדם או אחרי חמש.</p>
+        <p style="font-size:.84rem">מהמלון: Indigo 8 דק׳ הליכה · Radisson 7 דק׳ במונית · מרקיור 14 דק׳ במונית.</p>
+        <div class="slinks">
+          <a href="https://maps.google.com/?q=Finikoudes+Beach+Larnaca" target="_blank" rel="noopener">במפה ↗</a>
+          <a href="https://www.visitcyprus.com/discover-cyprus/larnaka/" target="_blank" rel="noopener">תיירות קפריסין ↗</a>
+        </div>
+      </div></details>
+
+    <details class="spot"><summary><h4><span>🍹 מקנזי ביץ׳</span></h4>
+      <p>ביץ׳ קלאבים וברים ליד מסלול הנחיתה — <b>המטוסים עוברים מעל הראש.</b></p></summary>
+      <div class="sbody">
+        <p>רצועת החוף שצמודה לשדה התעופה, ולכן המטוסים נוחתים ממש מעליה. שורה של ביץ׳ בארים שעובדים מהבוקר עד הלילה — <b>Ammos</b> הוא הוותיק והמוכר, <b>Rebuke</b> צעיר ורועש יותר.</p>
+        <p style="font-size:.84rem">שבע דקות במונית מהעיר, ושתים עשרה מהשדה. <b>הכי קרוב לכאן אם נוחתים ויש כמה שעות עד הצ׳ק-אין.</b></p>
+        <div class="slinks">
+          <a href="https://maps.google.com/?q=Mackenzie+Beach+Larnaca" target="_blank" rel="noopener">החוף במפה ↗</a>
+          <a href="https://maps.google.com/?q=Ammos+Beach+Bar+Larnaca" target="_blank" rel="noopener">Ammos ↗</a>
+        </div>
+      </div></details>
+
+    <details class="spot"><summary><h4><span>🚶 Piale Pasa</span></h4>
+      <p>הטיילת היפה בעיר, שני מפלסים צמודים ממש לים.</p></summary>
+      <div class="sbody">
+        <p>טיילת שנבנתה בשני מפלסים — אחד גבוה ואחד ממש על הסלעים — ורצה דרומה מהמצודה. <b>הרבה פחות תיירים מפיניקודס</b>, ועליה יושבות כמה מהמסעדות הוותיקות של לרנקה, Militzis ביניהן.</p>
+        <p style="font-size:.84rem"><b>מושלמת לבוקר האחרון לפני הטיסה</b> — הולכים, יושבים לקפה מול הים, וממשיכים לשדה.</p>
+        <div class="slinks">
+          <a href="https://maps.google.com/?q=Piale+Pasa+Larnaca" target="_blank" rel="noopener">במפה ↗</a>
+          <a href="https://maps.google.com/?q=Larnaca+Castle" target="_blank" rel="noopener">המצודה בקצה ↗</a>
+        </div>
+      </div></details>
+
+    <details class="spot"><summary><h4><span>⛵ המרינה</span></h4>
+      <p>סירות דיג שהוסבו למסעדות ויושבות על המים.</p></summary>
+      <div class="sbody">
+        <p>המרינה הישנה בצפון הטיילת, בכיוון של המופע. <b>עוגנות בה גם סירות דיג עובדות</b>, ומסביבן מסעדות דגים שיושבות על הרציף עצמו.</p>
+        <p style="font-size:.84rem">מ-Indigo כעשר דקות הליכה. <b>המרינה החדשה והגדולה עדיין בבנייה</b> — זאת הקטנה והאותנטית.</p>
+        <div class="slinks">
+          <a href="https://maps.google.com/?q=Larnaca+Marina" target="_blank" rel="noopener">במפה ↗</a>
+          <a href="https://maps.google.com/?q=Voula%27s+Garden+Larnaca" target="_blank" rel="noopener">Voula's Garden ↗</a>
+        </div>
+      </div></details>
+
+    <details class="spot"><summary><h4><span>🍽 איפה אוכלים באמת</span></h4>
+      <p>השורה הראשונה בטיילת תיירותית. <b>צעד אחד אחורה והכול משתנה.</b></p></summary>
+      <div class="sbody">
+        <ul>
+          <li><b>Kazani</b> — טברנה קפריסאית למזה: שתים עשרה עד עשרים צלחות קטנות שמגיעות אחת אחרי השנייה. <b>באים רעבים ולא מזמינים מנה ראשונה.</b></li>
+          <li><b>Fish Spot</b> — דגים ותמנון על הגריל, פשוט וטרי.</li>
+          <li><b>Hobos Steak House</b> — ממול לפיניקודס, למי שבא לבשר ולא לדגים.</li>
+        </ul>
+        <p style="font-size:.84rem; color:#6a6a74">מזה קפריסאי הוא ארוחה של שעתיים. <b>לא לתכנן אותה לערב של ההופעה.</b></p>
+        <div class="slinks">
+          <a href="https://maps.google.com/?q=Kazani+Traditional+Tavern+Larnaca" target="_blank" rel="noopener">Kazani ↗</a>
+          <a href="https://maps.google.com/?q=Hobos+Steak+House+Larnaca" target="_blank" rel="noopener">Hobos ↗</a>
+        </div>
+      </div></details>
+
+    <details class="spot"><summary><h4><span>🏛 ואם בא קצת תרבות</span></h4>
+      <p>כנסייה מהמאה התשיעית, מצודה, ומסגד על גדת אגם מלח.</p></summary>
+      <div class="sbody">
+        <ul>
+          <li><b>כנסיית אגיוס לאזארוס</b> — מהמאה התשיעית, במרכז העיר העתיקה. כניסה חופשית, לבוש צנוע.</li>
+          <li><b>מצודת לרנקה</b> — בקצה הדרומי של פיניקודס, במעבר ל-Piale Pasa. כניסה סמלית.</li>
+          <li><b>חאלה סולטן תקה</b> — מסגד על גדת אגם המלח, עשר דקות במונית. <b>ביולי האגם יבש ולבן</b>, והפלמינגו מגיעים רק בחורף.</li>
+        </ul>
+        <div class="slinks">
+          <a href="https://maps.google.com/?q=Church+of+Saint+Lazarus+Larnaca" target="_blank" rel="noopener">לאזארוס ↗</a>
+          <a href="https://maps.google.com/?q=Hala+Sultan+Tekke" target="_blank" rel="noopener">חאלה סולטן ↗</a>
+        </div>
+      </div></details>
+  </div>
+
+  <div class="note">לשופינג: <b>Zenon Kitieos</b> ו<b>ארמניאס</b> בעיר העתיקה לחנויות קטנות, <b>Metropolis Mall</b> בכניסה ללרנקה לקניון אמיתי.</div>
+</div></section>
+
+<section class="cta shot">
+  <div class="bg"><img src="img/rw-a.jpg" alt="" style="object-position:50% 6%"></div>
+  <a class="sticker" href="https://www.max.co.il/benefits/showsabroad/robbiewilliams" target="_blank" rel="noopener" aria-label="ההטבה של MAX נסגרת ביום ראשון 29.11">
+    <span>⏳</span><b>עד ראשון</b><i>29.11</i><span class="sl">הטבת MAX</span>
+  </a>
+  <div class="wrap">
+  <h2>אנחנו בפנים.<br><a href="#rsvp"><em>מי בא?</em></a></h2>
+  <p>שני כרטיסי גולדן רינג כבר בכיס. הטיסות פתוחות, והמלונות עם ביטול חינם — <b>כלומר להזמין עכשיו לא עולה כלום.</b></p>
+  <a class="goform" href="#rsvp">לסמן שאנחנו באים ✈</a>
+</div></section>
+
+<section class="band" id="rsvp"><div class="wrap">
+  <h2 class="kick">אני בא!</h2>
+  <p class="subh">סמנו, ואנחנו נדע.</p>
+  <p class="sub2">שחקו למעלה עם האזור, המלון ומספר הלילות — ואז תשאירו שם. <b>מה שתבחרו נשלח אלינו בדיוק כמו שהוא.</b></p>
+
+  <div class="calc">
+    <div class="crow">
+      <div class="clab"><span>👤 השם שלכם</span></div>
+      <input id="rname" class="inp" type="text" placeholder="איך לקרוא לכם" autocomplete="name" maxlength="60">
+    </div>
+    <div class="rsum" id="rsum"></div>
+    <button class="rgo" id="rgo">שלחו לנו את הבחירה ✈</button>
+    <div class="rmsg" id="rmsg"></div>
+  </div>
+</div></section>
+
+<div class="mdl" id="mdl" hidden>
+  <div class="mdl-bg" data-close></div>
+  <div class="mdl-in" role="dialog" aria-modal="true" aria-label="פרטי המלון">
+    <button class="mdl-x" data-close aria-label="סגירה">✕</button>
+    <div id="mdl-body"></div>
+  </div>
+</div>
+
+<div class="lb" id="lb" hidden>
+  <button class="lb-x" data-lbclose aria-label="סגירה">✕</button>
+  <button class="lb-nav lb-prev" id="lbPrev" aria-label="הקודמת">‹</button>
+  <div class="lb-view"><div class="lb-track" id="lbTrack"></div></div>
+  <button class="lb-nav lb-next" id="lbNext" aria-label="הבאה">›</button>
+  <div class="lb-dots" id="lbDots"></div>
+  <div class="lb-foot">
+    <span class="lb-count" id="lbCount"></span>
+    <a class="btn-buy" id="lbBook" target="_blank" rel="noopener">להזמין בבוקינג ↗</a>
+  </div>
+</div>
+
+<footer class="wrap">
+  כל המחירים נבדקו ב-<b>26.11.2026</b> · המרה לפי שער בנק ישראל ‎€1 = ₪3.6981‎<br>
+  מחירי טיסות ומלונות משתנים — כל הקישורים מובילים לבדיקה חיה אצל הספק.<br>
+  צילומי ההופעה: <a href="https://www.flickr.com/photos/7979599@N05/49732712843/" target="_blank" rel="noopener">erintheredmc</a>, <a href="https://creativecommons.org/licenses/by/2.0" target="_blank" rel="noopener">CC BY 2.0</a> · נופי לרנקה: Pexels
+</footer>
+
+<script>
+(function(){
+  var ids = ['z','n','m','f','h','d'];
+  var curFlight = {};
+  function G(id){ return document.getElementById(id); }
+  function pick(g){ return g.querySelector('[aria-pressed="true"]') || g.querySelector('.copt'); }
+  function ils(n){ return '₪' + Math.round(n).toLocaleString('he-IL'); }
+
+  ids.forEach(function(id){
+    var g = G(id); if(!g) return;
+    Array.prototype.forEach.call(g.querySelectorAll('.copt'), function(b){
+      if(!b.hasAttribute('aria-pressed')) b.setAttribute('aria-pressed','false');
+      b.addEventListener('click', function(){
+        Array.prototype.forEach.call(g.querySelectorAll('.copt'), function(x){ x.setAttribute('aria-pressed','false'); });
+        b.setAttribute('aria-pressed','true');
+        calc();
+      });
+    });
+  });
+
+  function calc(){
+    try{
+      var z = pick(G('z')), n = +pick(G('n')).dataset.n, m = +pick(G('m')).dataset.m,
+          f = pick(G('f')), h = pick(G('h')), d = +pick(G('d')).dataset.d;
+      // a flight that does not fly on the chosen nights falls back to the default
+      if(+(d === 3 ? f.dataset.f3 : f.dataset.f2) <= 0){
+        var def = null;
+        Array.prototype.forEach.call(G('f').querySelectorAll('.copt'), function(b){
+          b.setAttribute('aria-pressed','false');
+          if(b.dataset.f2 === '856') def = b;
+        });
+        def = def || G('f').querySelector('.copt');
+        def.setAttribute('aria-pressed','true');
+        f = def;
+      }
+      Array.prototype.forEach.call(G('z').querySelectorAll('.copt'), function(b){
+        var el = b.querySelector('.zp');
+        if(el) el.textContent = ils(m ? +b.dataset.max : +b.dataset.full);
+      });
+      var tk = (m ? +z.dataset.max : +z.dataset.full) * n;
+      var fl = (d === 3 ? +f.dataset.f3 : +f.dataset.f2) * n;
+      var rooms = Math.ceil(n / 2);
+      var ht = (d === 3 ? +h.dataset.h3 : +h.dataset.h2) * rooms;
+      var tot = tk + fl + ht;
+      Array.prototype.forEach.call(document.querySelectorAll('[data-p2]'), function(b){
+        b.textContent = ils(d === 3 ? +b.dataset.p3 : +b.dataset.p2);
+      });
+      Array.prototype.forEach.call(document.querySelectorAll('.pn'), function(x){
+        x.textContent = d + ' לילות';
+      });
+      G('sum').textContent = ils(tot);
+      if(G('sumtop')) G('sumtop').textContent = ils(tot);
+      // booking links follow the night count
+      var co = (d === 3) ? '2027-07-26' : '2027-07-25';
+      Array.prototype.forEach.call(document.querySelectorAll('a[data-bk]'), function(a){
+        a.href = a.dataset.bk + '?checkin=2027-07-23&checkout=' + co + '&group_adults=2&no_rooms=1';
+      });
+      if(G('thback')) G('thback').textContent = (d === 3) ? 'חזרה · ב׳ 26.7' : 'חזרה · א׳ 25.7';
+      if(typeof syncFlights === 'function') syncFlights();
+      if(typeof renderSum === 'function') renderSum();
+      G('brk').textContent = n + ' כרטיסים ' + ils(tk) + '   ·   ' + n + ' טיסות ' + ils(fl) +
+        '   ·   ' + (rooms > 1 ? rooms + ' חדרים ' : 'מלון ') + ils(ht) +
+        (n > 1 ? '   ←   ' + ils(tot / n) + ' לאדם' : '');
+    }catch(e){}
+  }
+
+  var mdl = G('mdl'), mdlBody = G('mdl-body');
+  function openHotel(key){
+    var src = document.getElementById('hd-' + key);
+    if(!src || !mdl) return;
+    mdlBody.innerHTML = src.innerHTML;
+    mdl.hidden = false;
+    document.body.classList.add('locked');
+    mdl.querySelector('.mdl-in').scrollTop = 0;
+    var book = mdlBody.querySelector('a.btn');
+    var bookUrl = book ? book.href : '';
+    var imgs = Array.prototype.map.call(mdlBody.querySelectorAll('.gal img'), function(im){
+      return {src: im.src, alt: im.alt};
+    });
+    Array.prototype.forEach.call(mdlBody.querySelectorAll('.gal img'), function(im, i){
+      im.addEventListener('click', function(){ lbOpen(imgs, i, bookUrl); });
+    });
+  }
+  function closeHotel(){ if(!mdl) return; mdl.hidden = true; document.body.classList.remove('locked'); mdlBody.innerHTML = ''; }
+  Array.prototype.forEach.call(document.querySelectorAll('.hcard'), function(c){
+    c.addEventListener('click', function(){ openHotel(c.dataset.h); });
+  });
+  if(mdl){ Array.prototype.forEach.call(mdl.querySelectorAll('[data-close]'), function(x){ x.addEventListener('click', closeHotel); }); }
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){ if(lb && !lb.hidden){ lbClose(); } else { closeHotel(); } }
+    else if(lb && !lb.hidden){
+      if(e.key === 'ArrowLeft') lbGo(lbI + 1);
+      if(e.key === 'ArrowRight') lbGo(lbI - 1);
+    }
+  });
+
+  // ---------- flight table as picker ----------
+  var ftab = G('ftab');
+  function syncFlights(){
+    var d = +pick(G('d')).dataset.d;
+    var cur = pick(G('f'));
+    var curKey = cur.dataset.f2 + '/' + cur.dataset.f3;
+    Array.prototype.forEach.call(ftab ? ftab.rows : [], function(r){
+      var avail = +(d === 3 ? r.dataset.f3 : r.dataset.f2) > 0;
+      r.classList.toggle('off', !avail);
+      r.setAttribute('aria-selected', (r.dataset.f2 + '/' + r.dataset.f3) === curKey ? 'true' : 'false');
+    });
+    // dim the column that is not in play
+    Array.prototype.forEach.call(document.querySelectorAll('.c2'), function(x){ x.classList.toggle('dim', d === 3); });
+    Array.prototype.forEach.call(document.querySelectorAll('.c3'), function(x){ x.classList.toggle('dim', d === 2); });
+    // headline follows the selection
+    var row = ftab && ftab.querySelector('tr[aria-selected="true"]');
+    var price = +(d === 3 ? cur.dataset.f3 : cur.dataset.f2);
+    if(G('fbig')) G('fbig').textContent = price > 0 ? ils(price) : '—';
+    var name = row ? row.cells[0].textContent.trim() : label(cur);
+    var out  = row ? row.cells[1].textContent.trim() : '';
+    var back = row ? row.cells[2].textContent.trim() : '';
+    curFlight = {name:name, out:out, back:back, price:price};
+    if(G('fcap') && row){
+      G('fcap').innerHTML = '<b>' + name + '</b> · יציאה ' + out +
+        (back && back !== '—' ? ', חזרה ' + back : '') +
+        ' · <b>' + d + ' לילות</b>, לאדם הלוך ושוב.';
+    }
+    if(G('ftit')) G('ftit').textContent = (curKey === '856/856') ? '★ המסלול שנתפר לזה' : '✈ הטיסה שבחרתם';
+    // the same flight, spelled out inside the calculator
+    if(G('fsel')){
+      G('fsel').innerHTML =
+        '<span><span class="fn">' + name + '</span>' +
+        '<span class="ft">יציאה ו׳ 23.7 ' + (out || '—') +
+        (back && back !== '—' ? ' · חזרה ' + (d === 3 ? 'ב׳ 26.7 ' : 'א׳ 25.7 ') + back : '') +
+        '</span></span>' +
+        '<span class="fp"><b>' + (price > 0 ? ils(price) : '—') + '</b><span>לאדם · הלוך ושוב</span></span>';
+    }
+  }
+  if(ftab){
+    Array.prototype.forEach.call(ftab.rows, function(r){
+      r.addEventListener('click', function(){
+        if(r.classList.contains('off')) return;
+        var target = null;
+        Array.prototype.forEach.call(G('f').querySelectorAll('.copt'), function(b){
+          if(b.dataset.f2 === r.dataset.f2 && b.dataset.f3 === r.dataset.f3) target = b;
+        });
+        if(!target){
+          target = document.createElement('button');
+          target.className = 'copt';
+          target.dataset.f2 = r.dataset.f2; target.dataset.f3 = r.dataset.f3;
+          target.textContent = r.cells[0].textContent.trim();
+          G('f').appendChild(target);
+        }
+        Array.prototype.forEach.call(G('f').querySelectorAll('.copt'), function(b){ b.setAttribute('aria-pressed','false'); });
+        target.setAttribute('aria-pressed','true');
+        calc();
+      });
+    });
+  }
+
+  // ---------- lightbox slider ----------
+  var lb = G('lb'), lbTrack = G('lbTrack'), lbDots = G('lbDots'),
+      lbCount = G('lbCount'), lbBook = G('lbBook');
+  var lbList = [], lbI = 0;
+
+  function lbRender(){
+    lbTrack.innerHTML = lbList.map(function(im){
+      return '<figure><img src="' + im.src + '" alt="' + (im.alt || '').replace(/"/g,'&quot;') + '"></figure>';
+    }).join('');
+    lbDots.innerHTML = lbList.map(function(_, i){
+      return '<button class="lb-dot" data-i="' + i + '" aria-label="תמונה ' + (i+1) + '"></button>';
+    }).join('');
+    Array.prototype.forEach.call(lbDots.querySelectorAll('.lb-dot'), function(d){
+      d.addEventListener('click', function(){ lbGo(+d.dataset.i); });
+    });
+  }
+  function lbGo(i, instant){
+    if(!lbList.length) return;
+    lbI = (i + lbList.length) % lbList.length;
+    lbTrack.classList.toggle('drag', !!instant);
+    lbTrack.style.transform = 'translateX(' + (-lbI * 100) + '%)';
+    if(instant) requestAnimationFrame(function(){ lbTrack.classList.remove('drag'); });
+    lbCount.textContent = (lbI + 1) + ' / ' + lbList.length;
+    Array.prototype.forEach.call(lbDots.querySelectorAll('.lb-dot'), function(d, k){
+      d.setAttribute('aria-current', k === lbI ? 'true' : 'false');
+    });
+  }
+  function lbOpen(imgs, idx, bookUrl){
+    lbList = imgs;
+    if(lbBook){ lbBook.href = bookUrl || '#'; lbBook.hidden = !bookUrl; }
+    lbRender();
+    lb.hidden = false;
+    document.body.classList.add('locked');
+    lbGo(idx, true);
+  }
+  function lbClose(){
+    if(!lb) return;
+    lb.hidden = true;
+    if(!mdl || mdl.hidden) document.body.classList.remove('locked');
+  }
+
+  if(lb){
+    Array.prototype.forEach.call(lb.querySelectorAll('[data-lbclose]'), function(x){ x.addEventListener('click', lbClose); });
+    lb.addEventListener('click', function(e){ if(e.target === lb || e.target.classList.contains('lb-view')) lbClose(); });
+    G('lbPrev').addEventListener('click', function(){ lbGo(lbI - 1); });
+    G('lbNext').addEventListener('click', function(){ lbGo(lbI + 1); });
+
+    // swipe / drag
+    var x0 = null, dx = 0, w = 1;
+    lbTrack.addEventListener('pointerdown', function(e){
+      x0 = e.clientX; dx = 0; w = lbTrack.offsetWidth || 1;
+      lbTrack.classList.add('drag');
+      lbTrack.setPointerCapture && lbTrack.setPointerCapture(e.pointerId);
+    });
+    lbTrack.addEventListener('pointermove', function(e){
+      if(x0 === null) return;
+      dx = e.clientX - x0;
+      lbTrack.style.transform = 'translateX(calc(' + (-lbI * 100) + '% + ' + dx + 'px))';
+    });
+    function endDrag(){
+      if(x0 === null) return;
+      lbTrack.classList.remove('drag');
+      if(Math.abs(dx) > Math.min(70, w * 0.16)) lbGo(lbI + (dx < 0 ? 1 : -1));
+      else lbGo(lbI);
+      x0 = null; dx = 0;
+    }
+    lbTrack.addEventListener('pointerup', endDrag);
+    lbTrack.addEventListener('pointercancel', endDrag);
+    lbTrack.addEventListener('pointerleave', endDrag);
+  }
+
+  // ---------- RSVP ----------
+  function label(btn){
+    if(!btn) return '';
+    var c = btn.cloneNode(true), sm = c.querySelector('small');
+    if(sm) sm.remove();
+    return c.textContent.trim();
+  }
+  function choice(){
+    return {
+      zone:   label(pick(G('z'))),
+      people: +pick(G('n')).dataset.n,
+      hasMax: +pick(G('m')).dataset.m ? 'כן' : 'לא',
+      flight: (curFlight.name || label(pick(G('f')))) +
+              (curFlight.out ? ' · ' + curFlight.out : '') +
+              (curFlight.price ? ' · ' + ils(curFlight.price) + ' לאדם' : ''),
+      hotel:  label(pick(G('h'))),
+      nights: +pick(G('d')).dataset.d,
+      total:  G('sum') ? G('sum').textContent : ''
+    };
+  }
+  function renderSum(){
+    var c = choice(), el = G('rsum');
+    if(!el) return;
+    el.innerHTML =
+      '👥 <b>' + c.people + '</b> נוסעים &nbsp;·&nbsp; 🌙 <b>' + c.nights + '</b> לילות<br>' +
+      '🎫 <b>' + c.zone + '</b> &nbsp;·&nbsp; כרטיס MAX: <b>' + c.hasMax + '</b><br>' +
+      '✈️ <b>' + c.flight + '</b> &nbsp;·&nbsp; 🏨 <b>' + c.hotel + '</b><br>' +
+      '💰 סה״כ <b>' + c.total + '</b>';
+  }
+  function asText(name){
+    var c = choice();
+    return 'אנחנו באים ללרנקה! 🎤\n' +
+      'שם: ' + name + '\n' +
+      'כמה אנשים: ' + c.people + '\n' +
+      'כמה לילות: ' + c.nights + '\n' +
+      'איפה בהופעה: ' + c.zone + '\n' +
+      'כרטיס MAX: ' + c.hasMax + '\n' +
+      'טיסה: ' + c.flight + '\n' +
+      'מלון: ' + c.hotel + '\n' +
+      'סה״כ משוער: ' + c.total;
+  }
+  var rgo = G('rgo'), rname = G('rname'), rmsg = G('rmsg');
+  if(rgo && rname){
+    rgo.addEventListener('click', async function(){
+      var name = rname.value.trim();
+      if(!name){ rmsg.className='rmsg'; rmsg.textContent='רק תשאירו שם, ואנחנו נדע מי בא 🙂'; rname.focus(); return; }
+      rgo.disabled = true; rmsg.className='rmsg'; rmsg.textContent='שולח…';
+      var c = choice();
+      c.name = name;
+      c.at = new Date().toISOString();
+      var saved = false;
+      try{
+        var db = await claude.use('db');
+        if(db){
+          var u = null;
+          try{ var usr = await claude.use('user'); if(usr) u = await usr.id(); }catch(e){}
+          var id = u || ('g_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7));
+          await db.collection('rsvp').doc(id).set(c);
+          saved = true;
+        }
+      }catch(e){ saved = false; }
+      if(saved){
+        rmsg.className = 'rmsg ok';
+        rmsg.textContent = '✅ קיבלנו, ' + name + '. מחכים לכם בלרנקה.';
+      }else{
+        rmsg.className = 'rmsg';
+        rmsg.innerHTML = '🎉 <b>מעולה, ' + name.replace(/</g,'') + '!</b> נשאר רק לשלוח לנו את זה בוואטסאפ:' +
+          '<textarea readonly></textarea>' +
+          '<button class="rcopy" type="button">להעתיק את ההודעה 📋</button>';
+        var ta = rmsg.querySelector('textarea');
+        ta.value = asText(name);
+        ta.focus(); ta.select();
+        var cp = rmsg.querySelector('.rcopy');
+        cp.addEventListener('click', function(){
+          ta.focus(); ta.select();
+          var done = function(){ cp.textContent = '✅ הועתק — עכשיו להדביק בוואטסאפ'; };
+          try{
+            navigator.clipboard.writeText(ta.value).then(done, function(){
+              try{ document.execCommand('copy'); done(); }catch(e){ cp.textContent = 'סמנו והעתיקו ידנית ☝'; }
+            });
+          }catch(e){
+            try{ document.execCommand('copy'); done(); }catch(e2){ cp.textContent = 'סמנו והעתיקו ידנית ☝'; }
+          }
+        });
+      }
+      rgo.disabled = false;
+    });
+  }
+
+  // ---------- parallax + scroll reveal ----------
+  var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if(!calm){
+    // 1. the background photos drift slower than the page
+    var layers = Array.prototype.map.call(document.querySelectorAll('.shot > .bg > img'), function(img){
+      return {img: img, sec: img.parentNode.parentNode, amp: 9};
+    });
+    var heroImg = document.querySelector('.hero > img');
+    if(heroImg) layers.push({img: heroImg, sec: heroImg.parentNode, amp: 5});
+
+    var ticking = false;
+    function paint(){
+      ticking = false;
+      var vh = window.innerHeight || 800;
+      layers.forEach(function(L){
+        var r = L.sec.getBoundingClientRect();
+        if(r.bottom < -160 || r.top > vh + 160) return;
+        var p = (vh - r.top) / (vh + r.height);        // 0 leaving at the top … 1 entering at the bottom
+        var shift = (0.5 - Math.max(0, Math.min(1, p))) * 2 * L.amp;
+        L.img.style.transform = 'translate3d(0,' + shift.toFixed(2) + '%,0)';
+      });
+    }
+    function onScroll(){ if(!ticking){ ticking = true; requestAnimationFrame(paint); } }
+    window.addEventListener('scroll', onScroll, {passive: true});
+    window.addEventListener('resize', onScroll);
+    paint();
+
+    // 2. every block rises into place as it enters the viewport
+    if('IntersectionObserver' in window){
+      var blocks = [];
+      Array.prototype.forEach.call(document.querySelectorAll('section'), function(sec){
+        if(sec.classList.contains('hero')) return;
+        var wrap = sec.classList.contains('wrap') ? sec : sec.querySelector('.wrap');
+        if(!wrap) return;
+        var i = 0;
+        Array.prototype.forEach.call(wrap.children, function(el){
+          if(el.classList.contains('bg') || el.hasAttribute('hidden')) return;
+          el.classList.add('rv');
+          el.style.transitionDelay = Math.min(i, 4) * 70 + 'ms';
+          blocks.push(el);
+          i++;
+        });
+      });
+      var rio = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          if(e.isIntersecting){ e.target.classList.add('on'); rio.unobserve(e.target); }
+        });
+      }, {rootMargin: '0px 0px -60px 0px', threshold: 0});
+      blocks.forEach(function(b){ rio.observe(b); });
+      // safety net: nothing may ever stay invisible, whatever the observer misses
+      function sweep(){
+        var vh = window.innerHeight || 800;
+        for(var i = blocks.length - 1; i >= 0; i--){
+          var r = blocks[i].getBoundingClientRect();
+          if(r.top < vh && r.bottom > -40){ blocks[i].classList.add('on'); blocks.splice(i, 1); }
+        }
+      }
+      window.addEventListener('scroll', sweep, {passive: true});
+      requestAnimationFrame(sweep);
+      // and a slow heartbeat, so a missed scroll event can never leave a block blank
+      var beat = setInterval(function(){
+        sweep();
+        if(!blocks.length) clearInterval(beat);
+      }, 220);
+    }
+  }
+
+  // the stamp lands when it reaches the viewport
+  var st = document.querySelector('.sticker');
+  if(st){
+    if(!('IntersectionObserver' in window)){ st.classList.add('in'); }
+    else{
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          if(e.isIntersecting){ st.classList.add('in'); io.disconnect(); }
+        });
+      }, {threshold: 0.6});
+      io.observe(st);
+    }
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('a[href="#venue-map"]'), function(a){
+    a.addEventListener('click', function(){ var v = G('venue-map'); if(v) v.open = true; });
+  });
+
+  calc();
+})();
+</script>
+
+</body>
+</html>
