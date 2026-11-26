@@ -242,15 +242,24 @@ details.d[open]>summary::after{content:"–"}
 .copt:first-child{border-inline-start:0}
 .copt small{display:block; font-size:.71rem; opacity:.75; font-variant-numeric:tabular-nums}
 .copt[aria-pressed="true"]{background:var(--red); color:#fff; font-weight:700}
-.fdrop{width:100%; margin-bottom:9px; background:#0f0f13; border:1px solid var(--line);
-  border-radius:11px; padding:11px 38px 11px 14px; color:var(--ink); font-family:inherit;
-  font-size:.92rem; font-weight:500; cursor:pointer; appearance:none; -webkit-appearance:none;
-  background-image:linear-gradient(45deg,transparent 50%,var(--soft) 50%),
-                   linear-gradient(135deg,var(--soft) 50%,transparent 50%);
-  background-position:16px calc(50% - 2px), 21px calc(50% - 2px);
-  background-size:5px 5px, 5px 5px; background-repeat:no-repeat}
-.fdrop:focus{outline:2px solid var(--red); outline-offset:1px}
-.fdrop option{background:#131317; color:var(--ink)}
+.fdd{position:relative; margin-bottom:9px}
+.fdd-btn{width:100%; background:#0f0f13; border:1px solid var(--line); border-radius:11px;
+  padding:11px 14px; color:var(--ink); font-family:inherit; font-size:.92rem; font-weight:500;
+  cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:10px; text-align:start}
+.fdd-btn:hover{border-color:var(--red)}
+.fdd-btn .caret{color:var(--soft); font-size:.78rem; transition:transform .18s}
+.fdd-btn[aria-expanded="true"] .caret{transform:rotate(180deg)}
+.fdd-list{position:absolute; z-index:60; inset-inline:0; top:calc(100% + 6px);
+  background:var(--panel2); border:1px solid var(--line); border-radius:13px;
+  box-shadow:var(--shadow); max-height:min(56vh,330px); overflow-y:auto; overscroll-behavior:contain}
+.fdd-opt{display:flex; width:100%; align-items:baseline; justify-content:space-between; gap:12px;
+  background:transparent; border:0; border-bottom:1px solid var(--line); padding:11px 14px;
+  color:var(--ink); font-family:inherit; font-size:.9rem; cursor:pointer; text-align:start}
+.fdd-opt:last-child{border-bottom:0}
+.fdd-opt:hover:not(:disabled){background:rgba(232,35,42,.16)}
+.fdd-opt[aria-selected="true"]{background:var(--red); color:#fff; font-weight:700}
+.fdd-opt:disabled{opacity:.42; cursor:not-allowed}
+.fdd-opt .p{font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:700}
 .fsel{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
   background:#0f0f13; border:1px solid var(--line); border-radius:11px; padding:11px 14px}
 .fsel .fn{font-weight:700; font-size:.96rem; line-height:1.3}
@@ -545,9 +554,7 @@ footer a{color:#8a8a94}
 
   <div class="note gift">🎁 <b>ויש לנו שני כרטיסים בהטבה לתת, לכל הקודם.</b><br>ההטבה מוגבלת ל-2 כרטיסים לתעודת זהות, <b>וניצלנו רק אחת משתי התעודות שלנו.</b><br>כלומר מי שאין לו כרטיס MAX עדיין יכול לקנות דרכנו ב-<b>₪449 במקום ₪651</b>, או ב-<b>₪181 במקום ₪312</b> לדשא.<br>⏳ <b>שימו לב: ההטבה נסגרת ביום ראשון הקרוב, 29.11.</b></div>
 
-  <div class="note"><b>שני מסלולי רכישה, והם לא שווים.</b><br>
-  🔴 <b>ההטבה של MAX</b> — ₪181 לדשא, ₪449 לגולדן רינג.<br>דורשת כרטיס MAX, מוגבלת ל-2 כרטיסים לת״ז, <b>ונסגרת בראשון 29.11.</b><br>
-  ⚪ <b>טיקטמאסטר קפריסין</b> — פתוח לכולם וכל השנה, אבל במחיר מלא: ₪312 לדשא, ₪651 לגולדן רינג, ועוד עמלת המרה.</div>
+  <div class="note">⚪ <b>ואפשר גם בלי MAX:</b> טיקטמאסטר קפריסין פתוח לכולם וכל השנה, אבל במחיר מלא — <b>₪312 לדשא, ₪651 לגולדן רינג</b>, ועוד עמלת המרה.</div>
 
   <details class="d" id="venue-map"><summary><span>🗺 איפה בדיוק עומדים · מפת המתחם</span></summary>
     <div class="dbody">
@@ -588,14 +595,14 @@ footer a{color:#8a8a94}
       <div class="tscroll"><table>
         <thead><tr><th>חברה</th><th>יציאה · ו׳ 23.7</th><th id="thback">חזרה · ב׳ 26.7</th><th class="c2">2 לילות</th><th class="c3">3 לילות</th></tr></thead>
         <tbody id="ftab">
-          <tr data-f2="846" data-f3="846"><td><a class="alink" href="https://en.aegeanair.com/" target="_blank" rel="noopener">Aegean ↗</a><small class="fchk"><a data-gf="1" target="_blank" rel="noopener">🔎 מחיר חי</a></small></td><td class="n">05:20 → 06:20</td><td class="n soft"><span class="bk"><a data-gf="1" target="_blank" rel="noopener" style="color:var(--gold); border-bottom:1px solid rgba(255,210,74,.28)">לבדוק ↗</a></span></td><td class="n c2">₪846</td><td class="n c3">₪846</td></tr>
-          <tr data-f2="944" data-f3="871"><td><a class="alink" href="https://www.cyprusairways.com/" target="_blank" rel="noopener">Cyprus Airways ↗</a><small class="fchk"><a data-gf="1" target="_blank" rel="noopener">🔎 מחיר חי</a></small></td><td class="n">15:35 → 16:40</td><td class="n soft"><span class="bk"><a data-gf="1" target="_blank" rel="noopener" style="color:var(--gold); border-bottom:1px solid rgba(255,210,74,.28)">לבדוק ↗</a></span></td><td class="n c2">₪944</td><td class="n c3">₪871</td></tr>
-          <tr data-f2="1164" data-f3="1089"><td><a class="alink" href="https://wizzair.com/" target="_blank" rel="noopener">Wizz Air ↗</a><small class="fchk"><a data-gf="1" target="_blank" rel="noopener">🔎 מחיר חי</a></small></td><td class="n">13:40 → 14:45</td><td class="n soft"><span class="bk"><a data-gf="1" target="_blank" rel="noopener" style="color:var(--gold); border-bottom:1px solid rgba(255,210,74,.28)">לבדוק ↗</a></span></td><td class="n c2">₪1,164</td><td class="n c3">₪1,089</td></tr>
-          <tr data-f2="1164" data-f3="1089"><td><a class="alink" href="https://wizzair.com/" target="_blank" rel="noopener">Wizz Air ↗</a><small class="fchk"><a data-gf="1" target="_blank" rel="noopener">🔎 מחיר חי</a></small></td><td class="n">17:35 → 18:40</td><td class="n soft"><span class="bk"><a data-gf="1" target="_blank" rel="noopener" style="color:var(--gold); border-bottom:1px solid rgba(255,210,74,.28)">לבדוק ↗</a></span></td><td class="n c2">₪1,164</td><td class="n c3">₪1,089</td></tr>
-          <tr data-f2="1314" data-f3="1106" data-rec="1" data-back2="18:30 → 19:35"><td><a class="alink" href="https://www.elal.com/" target="_blank" rel="noopener">אל על · סאן דור ↗</a><small class="fchk"><a data-gf="1" target="_blank" rel="noopener">🔎 מחיר חי</a></small><small class="fsite">ב-lastminute.co.il · ₪1,444 ישירות</small></td><td class="n">15:15 → 16:25</td><td class="n"><span class="bk">18:30 → 19:35</span></td><td class="n c2">₪1,314</td><td class="n c3">₪1,106</td></tr>
-          <tr data-f2="1476" data-f3="1148"><td><a class="alink" href="https://www.elal.com/" target="_blank" rel="noopener">אל על · סאן דור ↗</a><small class="fchk"><a data-gf="1" target="_blank" rel="noopener">🔎 מחיר חי</a></small></td><td class="n">15:50 → 17:00</td><td class="n soft"><span class="bk"><a data-gf="1" target="_blank" rel="noopener" style="color:var(--gold); border-bottom:1px solid rgba(255,210,74,.28)">לבדוק ↗</a></span></td><td class="n c2">₪1,476</td><td class="n c3">₪1,148</td></tr>
-          <tr data-f2="0" data-f3="1239"><td><a class="alink" href="https://www.arkia.com/" target="_blank" rel="noopener">ארקיע · Electra ↗</a><small class="fchk"><a data-gf="1" target="_blank" rel="noopener">🔎 מחיר חי</a></small></td><td class="n">20:05 → 21:05</td><td class="n soft"><span class="bk"><a data-gf="1" target="_blank" rel="noopener" style="color:var(--gold); border-bottom:1px solid rgba(255,210,74,.28)">לבדוק ↗</a></span></td><td class="n c2 soft">—</td><td class="n c3">₪1,239</td></tr>
-          <tr data-f2="1988" data-f3="1392"><td><a class="alink" href="https://www.israir.co.il/" target="_blank" rel="noopener">ישראייר ↗</a><small class="fchk"><a data-gf="1" target="_blank" rel="noopener">🔎 מחיר חי</a></small></td><td class="n">09:55 / 15:45 / 18:40</td><td class="n soft"><span class="bk"><a data-gf="1" target="_blank" rel="noopener" style="color:var(--gold); border-bottom:1px solid rgba(255,210,74,.28)">לבדוק ↗</a></span></td><td class="n c2">₪1,988</td><td class="n c3">₪1,392</td></tr>
+          <tr data-id="r0" data-f2="846" data-f3="846"><td><a class="alink" data-air="Aegean" href="#" target="_blank" rel="noopener">Aegean ↗</a></td><td class="n">05:20 → 06:20</td><td class="n soft"><span class="bk"><a data-gf="1" target="_blank" rel="noopener" style="color:var(--gold); border-bottom:1px solid rgba(255,210,74,.28)">לבדוק ↗</a></span></td><td class="n c2">₪846</td><td class="n c3">₪846</td></tr>
+          <tr data-id="r1" data-f2="944" data-f3="871"><td><a class="alink" data-air="Cyprus Airways" href="#" target="_blank" rel="noopener">Cyprus Airways ↗</a></td><td class="n">15:35 → 16:40</td><td class="n soft"><span class="bk"><a data-gf="1" target="_blank" rel="noopener" style="color:var(--gold); border-bottom:1px solid rgba(255,210,74,.28)">לבדוק ↗</a></span></td><td class="n c2">₪944</td><td class="n c3">₪871</td></tr>
+          <tr data-id="r2" data-f2="1164" data-f3="1089"><td><a class="alink" data-air="Wizz Air" href="#" target="_blank" rel="noopener">Wizz Air ↗</a></td><td class="n">13:40 → 14:45</td><td class="n soft"><span class="bk"><a data-gf="1" target="_blank" rel="noopener" style="color:var(--gold); border-bottom:1px solid rgba(255,210,74,.28)">לבדוק ↗</a></span></td><td class="n c2">₪1,164</td><td class="n c3">₪1,089</td></tr>
+          <tr data-id="r3" data-f2="1164" data-f3="1089"><td><a class="alink" data-air="Wizz Air" href="#" target="_blank" rel="noopener">Wizz Air ↗</a></td><td class="n">17:35 → 18:40</td><td class="n soft"><span class="bk"><a data-gf="1" target="_blank" rel="noopener" style="color:var(--gold); border-bottom:1px solid rgba(255,210,74,.28)">לבדוק ↗</a></span></td><td class="n c2">₪1,164</td><td class="n c3">₪1,089</td></tr>
+          <tr data-id="r4" data-f2="1314" data-f3="1106" data-rec="1" data-back2="18:30 → 19:35"><td><a class="alink" data-air="El Al" href="#" target="_blank" rel="noopener">אל על · סאן דור ↗</a><small class="fsite">ב-lastminute.co.il · ₪1,444 ישירות</small></td><td class="n">15:15 → 16:25</td><td class="n"><span class="bk">18:30 → 19:35</span></td><td class="n c2">₪1,314</td><td class="n c3">₪1,106</td></tr>
+          <tr data-id="r5" data-f2="1476" data-f3="1148"><td><a class="alink" data-air="El Al" href="#" target="_blank" rel="noopener">אל על · סאן דור ↗</a></td><td class="n">15:50 → 17:00</td><td class="n soft"><span class="bk"><a data-gf="1" target="_blank" rel="noopener" style="color:var(--gold); border-bottom:1px solid rgba(255,210,74,.28)">לבדוק ↗</a></span></td><td class="n c2">₪1,476</td><td class="n c3">₪1,148</td></tr>
+          <tr data-id="r6" data-f2="0" data-f3="1239"><td><a class="alink" data-air="Arkia" href="#" target="_blank" rel="noopener">ארקיע · Electra ↗</a></td><td class="n">20:05 → 21:05</td><td class="n soft"><span class="bk"><a data-gf="1" target="_blank" rel="noopener" style="color:var(--gold); border-bottom:1px solid rgba(255,210,74,.28)">לבדוק ↗</a></span></td><td class="n c2 soft">—</td><td class="n c3">₪1,239</td></tr>
+          <tr data-id="r7" data-f2="1988" data-f3="1988"><td><a class="alink" data-air="Israair" href="#" target="_blank" rel="noopener">ישראייר ↗</a></td><td class="n">09:55 / 15:45 / 18:40</td><td class="n soft"><span class="bk"><a data-gf="1" target="_blank" rel="noopener" style="color:var(--gold); border-bottom:1px solid rgba(255,210,74,.28)">לבדוק ↗</a></span></td><td class="n c2">₪1,988</td><td class="n c3">₪1,988</td></tr>
         </tbody></table></div>
       <p class="note" style="margin-top:14px"><b>הכול נבדק חי ב-26.11.2026 בגוגל פלייטס, בשקלים.</b><br>כל מחיר הוא <b>הלוך ושוב לאדם מתל אביב (TLV) ללרנקה (LCA)</b>, סופי וכולל מיסים ועמלות, <b>ומשתנה לפי מספר הלילות שבחרתם למעלה.</b><br><br><b>✈ המסלול המומלץ הוא אל על 15:15, והסיבה היא דווקא החזרה.</b><br>הוא חוזר בראשון ב-<b>18:30</b> ולא בצהריים — <b>כלומר נשאר לכם כל היום האחרון בלרנקה</b>, ולא רק בוקר.<br>זה ‎₪370‎ יותר לאדם מ-Cyprus Airways, <b>בשביל חמש שעות נוספות בים.</b><br><br><b>💰 ואיפה המחיר תקף.</b> אצל אל על בדקנו עד הסוף: <b>₪1,314 ב-lastminute.co.il</b>, מול <b>₪1,444 ישירות באתר אל על</b> — אותן טיסות בדיוק.<br>בשאר השורות המחיר הוא <b>הזול שגוגל מצא</b>, ושם הסוכנות מופיע במסך ההזמנה שנפתח מ-🔎 ״מחיר חי״.<br><br><b>Aegean זולה ב-₪98</b> אבל ממריאה ב-05:20 — קמים ב-03:00.<br><b>ארקיע לא טסה בכלל בחבילה של 2 לילות</b>, ולכן השורה שלה כבויה שם.<br>שעת החזרה רשומה רק אצל אל על, כי רק אותה אימתנו במסך ההזמנה. <b>בשאר — הקישור ״לבדוק״ פותח את החזרה האמיתית לאותם תאריכים.</b></p>
     </div></details>
@@ -709,9 +716,9 @@ footer a{color:#8a8a94}
     <div hidden><div class="crow">
       <div class="clab"><span>✈️ טיסה</span><span style="font-weight:300; letter-spacing:0">לאדם, הלוך ושוב</span></div>
       <div class="copts" id="f">
-        <button class="copt" data-f2="846" data-f3="846">Aegean<small>₪846 · 05:20</small></button>
-        <button class="copt" data-f2="944" data-f3="871">Cyprus Airways<small>₪944 · 15:35</small></button>
-        <button class="copt" data-f2="1314" data-f3="1106" aria-pressed="true">אל על · סאן דור<small>₪1,314 · 15:15</small></button>
+        <button class="copt" data-id="r0" data-f2="846" data-f3="846">Aegean<small>₪846 · 05:20</small></button>
+        <button class="copt" data-id="r1" data-f2="944" data-f3="871">Cyprus Airways<small>₪944 · 15:35</small></button>
+        <button class="copt" data-id="r4" data-f2="1314" data-f3="1106" aria-pressed="true">אל על · סאן דור<small>₪1,314 · 15:15</small></button>
       </div>
     </div></div>
     <div class="crow">
@@ -747,7 +754,12 @@ footer a{color:#8a8a94}
     </div>
     <div class="crow">
       <div class="clab"><span>✈️ הטיסה שבחרתם</span><a class="maplink" href="#flights">↑ לשנות טיסה</a></div>
-      <select class="fdrop" id="fpick" aria-label="בחירת טיסה"></select>
+      <div class="fdd" id="fdd">
+        <button type="button" class="fdd-btn" id="fddBtn" aria-haspopup="listbox" aria-expanded="false">
+          <span id="fddLabel">בחרו טיסה</span><span class="caret">▾</span>
+        </button>
+        <div class="fdd-list" id="fddList" role="listbox" hidden></div>
+      </div>
       <div class="fsel" id="fsel"></div>
     </div>
     <div class="crow">
@@ -984,7 +996,7 @@ footer a{color:#8a8a94}
         var def = null;
         Array.prototype.forEach.call(G('f').querySelectorAll('.copt'), function(b){
           b.setAttribute('aria-pressed','false');
-          if(b.dataset.f2 === '1314') def = b;
+          if(b.dataset.id === 'r4') def = b;
         });
         def = def || G('f').querySelector('.copt');
         def.setAttribute('aria-pressed','true');
@@ -1021,6 +1033,11 @@ footer a{color:#8a8a94}
       var gf = 'https://www.google.com/travel/flights?q=' +
                encodeURIComponent('Flights from TLV to LCA on 2027-07-23 through ' + back);
       window.__gf = gf;
+      Array.prototype.forEach.call(document.querySelectorAll('a[data-air]'), function(a){
+        a.href = 'https://www.google.com/travel/flights?hl=he&curr=ILS&q=' +
+          encodeURIComponent('Flights from TLV to LCA on 2027-07-23 through ' + back +
+                             ' on ' + a.getAttribute('data-air'));
+      });
       Array.prototype.forEach.call(document.querySelectorAll('a[data-gf]'), function(a){ a.href = gf; });
       if(typeof syncFlights === 'function') syncFlights();
       if(typeof renderSum === 'function') renderSum();
@@ -1081,10 +1098,12 @@ footer a{color:#8a8a94}
     });
     var cur = pick(G('f'));
     var curKey = cur.dataset.f2 + '/' + cur.dataset.f3;
+    var curId = cur.dataset.id || '';
     Array.prototype.forEach.call(ftab ? ftab.rows : [], function(r){
       var avail = +(d === 3 ? r.dataset.f3 : r.dataset.f2) > 0;
       r.classList.toggle('off', !avail);
-      r.setAttribute('aria-selected', (r.dataset.f2 + '/' + r.dataset.f3) === curKey ? 'true' : 'false');
+      var mine = curId ? (r.dataset.id === curId) : ((r.dataset.f2 + '/' + r.dataset.f3) === curKey);
+      r.setAttribute('aria-selected', mine ? 'true' : 'false');
     });
     // dim the column that is not in play
     Array.prototype.forEach.call(document.querySelectorAll('.c2'), function(x){ x.classList.toggle('dim', d === 3); });
@@ -1115,30 +1134,48 @@ footer a{color:#8a8a94}
         '<span class="fp"><b>' + (price > 0 ? ils(price) : '—') + '</b><span>לאדם · הלוך ושוב</span></span>';
     }
   }
-  var fpick = G('fpick');
-  if(fpick && ftab){
+  var fddBtn = G('fddBtn'), fddList = G('fddList'), fddLabel = G('fddLabel');
+  function fddOpen(v){
+    if(!fddList) return;
+    fddList.hidden = !v;
+    fddBtn.setAttribute('aria-expanded', v ? 'true' : 'false');
+  }
+  if(fddBtn && ftab){
     Array.prototype.forEach.call(ftab.rows, function(r, i){
-      var o = document.createElement('option');
-      o.value = String(i);
-      fpick.appendChild(o);
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'fdd-opt'; b.setAttribute('role', 'option');
+      b.dataset.i = String(i);
+      b.addEventListener('click', function(){
+        fddOpen(false);
+        if(!r.classList.contains('off')) r.click(); else calc();
+      });
+      fddList.appendChild(b);
     });
-    fpick.addEventListener('change', function(){
-      var r = ftab.rows[+fpick.value];
-      if(r && !r.classList.contains('off')) r.click();
-      else calc();
+    fddBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      fddOpen(fddList.hidden);
     });
+    document.addEventListener('click', function(e){
+      if(!fddList.hidden && !G('fdd').contains(e.target)) fddOpen(false);
+    });
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape') fddOpen(false); });
   }
   function paintPick(){
-    if(!fpick || !ftab) return;
+    if(!fddBtn || !ftab) return;
     var d = +pick(G('d')).dataset.d, cur = pick(G('f'));
     var curKey = cur.dataset.f2 + '/' + cur.dataset.f3;
+    var curId = cur.dataset.id || '';
     Array.prototype.forEach.call(ftab.rows, function(r, i){
       var price = +(d === 3 ? r.dataset.f3 : r.dataset.f2);
-      var o = fpick.options[i]; if(!o) return;
-      o.textContent = carrier(r) + ' · ' + r.cells[1].textContent.trim() +
-        (price > 0 ? ' · ' + ils(price) : ' · לא טסה ב-' + d + ' לילות');
+      var o = fddList.children[i]; if(!o) return;
+      var mine = curId ? (r.dataset.id === curId) : ((r.dataset.f2 + '/' + r.dataset.f3) === curKey);
+      o.innerHTML = '<span>' + carrier(r) + ' · ' + r.cells[1].textContent.trim() + '</span>' +
+                    '<span class="p">' + (price > 0 ? ils(price) : 'לא טסה') + '</span>';
       o.disabled = !(price > 0);
-      if((r.dataset.f2 + '/' + r.dataset.f3) === curKey && price > 0) fpick.value = String(i);
+      o.setAttribute('aria-selected', mine && price > 0 ? 'true' : 'false');
+      if(mine && price > 0){
+        fddLabel.textContent = carrier(r) + ' · ' + r.cells[1].textContent.trim() + ' · ' + ils(price);
+      }
     });
   }
 
@@ -1148,11 +1185,12 @@ footer a{color:#8a8a94}
         if(r.classList.contains('off')) return;
         var target = null;
         Array.prototype.forEach.call(G('f').querySelectorAll('.copt'), function(b){
-          if(b.dataset.f2 === r.dataset.f2 && b.dataset.f3 === r.dataset.f3) target = b;
+          if(b.dataset.id === r.dataset.id) target = b;
         });
         if(!target){
           target = document.createElement('button');
           target.className = 'copt';
+          target.dataset.id = r.dataset.id;
           target.dataset.f2 = r.dataset.f2; target.dataset.f3 = r.dataset.f3;
           target.textContent = carrier(r);
           G('f').appendChild(target);
