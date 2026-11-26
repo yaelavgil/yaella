@@ -48,7 +48,7 @@ HEAD = '''<!doctype html>
 <meta property="og:site_name" content="לרנקה 2027">
 <meta property="og:title" content="רובי ויליאמס · לרנקה · 24.7.2027">
 <meta property="og:description" content="₪181 בדשא | ₪449 לגולדן רינג. שעה טיסה מהבית, סוף שבוע אחד, 28,000 איש. כל הפרטים, המחירים והמלונות — ואפשר לסמן מי בא.">
-<meta property="og:image" content="https://yaelavgil.github.io/yaella/larnaca-2027/og3.jpg">
+<meta property="og:image" content="https://yaelavgil.github.io/yaella/larnaca-2027/og4.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="רובי ויליאמס בלרנקה, 24 ביולי 2027">
