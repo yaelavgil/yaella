@@ -407,21 +407,21 @@ body.locked{overflow:hidden}
 .cta p{color:var(--soft); max-width:46ch; margin:1rem auto 0; font-weight:300}
 .cta .goform{display:inline-block; margin-top:20px; background:var(--red); color:#fff !important;
   text-decoration:none; font-weight:900; font-size:1rem; padding:14px 30px; border-radius:999px}
-/* round sticker — lands like a rubber stamp when it scrolls into view */
-.sticker{position:fixed; z-index:45; text-decoration:none;
-  /* starts up in the hero, over empty photo, and only then docks to the corner */
-  top:clamp(18px,3vw,36px); bottom:auto;
+/* round stamp — travels with the scroll instead of snapping between anchors */
+.stickwrap{position:fixed; z-index:45; top:clamp(18px,3vw,36px);
   inset-inline-end:max(14px, env(safe-area-inset-left,0px));
-  transition:top .3s ease, bottom .3s ease;
-  width:clamp(100px,16vw,132px); aspect-ratio:1; border-radius:50%;
-  background:var(--gold); color:#09090b !important;
-  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; line-height:1;
-  box-shadow:0 12px 34px rgba(0,0,0,.65);
+  width:clamp(112px,16vw,132px); will-change:transform; pointer-events:none}
+.stickwrap > *{pointer-events:auto}
+.sticker{position:relative; display:flex; width:100%; aspect-ratio:1; border-radius:50%;
+  text-decoration:none; background:var(--gold); color:#09090b !important;
+  flex-direction:column; align-items:center; justify-content:center; gap:1px; line-height:1;
+  box-shadow:0 0 0 4px rgba(9,9,11,.55), 0 12px 34px rgba(0,0,0,.7);
   transform:rotate(-11deg); animation:breathe 2.6s ease-in-out infinite}
 /* the script arms it; without the script it simply shows */
 .sticker.armed{opacity:0; transform:rotate(-26deg) scale(2.3); animation:none}
-.sticker.armed.in{animation:stamp .5s cubic-bezier(.18,1.5,.4,1) forwards,
-                            breathe 2.6s ease-in-out .62s infinite}
+.sticker.armed.in{opacity:1; transform:rotate(-11deg);
+  animation:stamp .5s cubic-bezier(.18,1.5,.4,1),
+            breathe 2.6s ease-in-out .62s infinite}
 @keyframes stamp{
   0%{opacity:0; transform:rotate(-26deg) scale(2.3)}
   45%{opacity:1}
@@ -433,10 +433,11 @@ body.locked{overflow:hidden}
 .sticker i{font-style:normal; font-family:'Anton',sans-serif; font-weight:400;
   font-size:clamp(1.2rem,3.8vw,1.55rem); line-height:1.1}
 .sticker .sl{font-size:clamp(.56rem,1.7vw,.67rem); font-weight:700; letter-spacing:.07em; opacity:.74; margin-top:2px}
-.sticker.dock{top:auto; bottom:calc(16px + env(safe-area-inset-bottom,0px))}
 .sticker:hover{filter:brightness(1.08)}
-@keyframes breathe{0%,100%{box-shadow:0 12px 34px rgba(0,0,0,.65), 0 0 0 0 rgba(255,210,74,.5)}
-  55%{box-shadow:0 12px 34px rgba(0,0,0,.65), 0 0 0 16px rgba(255,210,74,0)}}
+.sticker:hover{filter:brightness(1.08)}
+@keyframes breathe{
+  0%,100%{box-shadow:0 0 0 4px rgba(9,9,11,.55), 0 12px 34px rgba(0,0,0,.7), 0 0 0 4px rgba(255,210,74,.5)}
+  55%{box-shadow:0 0 0 4px rgba(9,9,11,.55), 0 12px 34px rgba(0,0,0,.7), 0 0 0 20px rgba(255,210,74,0)}}
 .tick{display:inline-block; font-size:1.15em; animation:flip 2s steps(1,end) infinite; transform-origin:50% 50%}
 @keyframes flip{0%,49%{transform:rotate(0deg)} 50%,100%{transform:rotate(180deg)}}
 @media (prefers-reduced-motion:reduce){
@@ -887,9 +888,9 @@ footer a{color:#8a8a94}
   </div>
 </div></section>
 
-<a class="sticker" href="https://www.max.co.il/benefits/showsabroad/robbiewilliams" target="_blank" rel="noopener" aria-label="ההטבה של MAX נסגרת ביום ראשון 29.11">
-    <span>⏳</span><b>עד ראשון</b><i>29.11</i><span class="sl">הטבת MAX</span>
-  </a>
+<div class="stickwrap"><a class="sticker" href="https://www.max.co.il/benefits/showsabroad/robbiewilliams" target="_blank" rel="noopener" aria-label="ההטבה של MAX נסגרת ביום ראשון 29.11">
+    <span>⏳</span><b>הטבת MAX</b><i>29.11</i><span class="sl">עד ראשון</span>
+  </a></div>
 
 <div class="mdl" id="mdl" hidden>
   <div class="mdl-bg" data-close></div>
@@ -1432,15 +1433,21 @@ footer a{color:#8a8a94}
     requestAnimationFrame(land);
     setTimeout(function(){ st.classList.add('in'); if(sbeat) clearInterval(sbeat); }, 12000);
 
-    // it rides the hero at first, then gets out of the way of the page
-    var hero = document.querySelector('.hero');
-    function dock(){
-      var h = hero ? hero.offsetHeight : 600;
-      st.classList.toggle('dock', (window.scrollY || 0) > h - 150);
+    // it glides down with the scroll, from the hero to the corner, and never snaps
+    var wrap = st.parentElement, hero = document.querySelector('.hero');
+    function place(){
+      var heroH = hero ? hero.offsetHeight : 600;
+      var startTop = parseFloat(getComputedStyle(wrap).top) || 24;
+      var pad = 16;
+      var travel = Math.max(0, (window.innerHeight || 700) - startTop - wrap.offsetHeight - pad);
+      var span = Math.max(1, heroH - startTop - 120);
+      var p = Math.min(1, Math.max(0, (window.scrollY || 0) / span));
+      wrap.style.transform = 'translate3d(0,' + (p * travel).toFixed(1) + 'px,0)';
     }
-    window.addEventListener('scroll', dock, {passive: true});
-    window.addEventListener('resize', dock);
-    dock();
+    window.addEventListener('scroll', place, {passive: true});
+    window.addEventListener('resize', place);
+    setInterval(place, 400);   // a safety net where rAF or a scroll event is throttled
+    place();
   }
 
   Array.prototype.forEach.call(document.querySelectorAll('a[href="#venue-map"]'), function(a){
