@@ -408,9 +408,9 @@ body.locked{overflow:hidden}
 .cta .goform{display:inline-block; margin-top:20px; background:var(--red); color:#fff !important;
   text-decoration:none; font-weight:900; font-size:1rem; padding:14px 30px; border-radius:999px}
 /* round stamp — travels with the scroll instead of snapping between anchors */
-.stickwrap{position:fixed; z-index:45; top:clamp(18px,3vw,36px);
-  inset-inline-end:max(14px, env(safe-area-inset-left,0px));
-  width:clamp(112px,16vw,132px); will-change:transform; pointer-events:none}
+.stickwrap{position:fixed; z-index:45; top:clamp(84px,9vw,100px);
+  inset-inline-end:max(22px, env(safe-area-inset-left,0px));
+  width:clamp(112px,16vw,132px); pointer-events:none}
 .stickwrap > *{pointer-events:auto}
 .sticker{position:relative; display:flex; width:100%; aspect-ratio:1; border-radius:50%;
   text-decoration:none; background:var(--gold); color:#09090b !important;
@@ -501,8 +501,8 @@ footer a{color:#8a8a94}
       <span>שניים-שלושה לילות, <em>לא חמישה.</em></span>
     </div>
     <div class="pt">
-      <b><i>שליש</i> מהמחיר</b>
-      <span>‎€175‎ לפסטיבל, <em>₪181 להופעה.</em></span>
+      <b><i>חצי</i> מהמחיר. ועם ההטבה, <i>שליש</i></b>
+      <span>‎₪647‎ לפסטיבל מול <em>₪312 להופעה</em>, ו-<em>₪181 עם הטבת MAX.</em></span>
     </div>
     <div class="pt">
       <b><i>שעה</i> טיסה.<br>שעה.</b>
@@ -1433,21 +1433,6 @@ footer a{color:#8a8a94}
     requestAnimationFrame(land);
     setTimeout(function(){ st.classList.add('in'); if(sbeat) clearInterval(sbeat); }, 12000);
 
-    // it glides down with the scroll, from the hero to the corner, and never snaps
-    var wrap = st.parentElement, hero = document.querySelector('.hero');
-    function place(){
-      var heroH = hero ? hero.offsetHeight : 600;
-      var startTop = parseFloat(getComputedStyle(wrap).top) || 24;
-      var pad = 16;
-      var travel = Math.max(0, (window.innerHeight || 700) - startTop - wrap.offsetHeight - pad);
-      var span = Math.max(1, heroH - startTop - 120);
-      var p = Math.min(1, Math.max(0, (window.scrollY || 0) / span));
-      wrap.style.transform = 'translate3d(0,' + (p * travel).toFixed(1) + 'px,0)';
-    }
-    window.addEventListener('scroll', place, {passive: true});
-    window.addEventListener('resize', place);
-    setInterval(place, 400);   // a safety net where rAF or a scroll event is throttled
-    place();
   }
 
   Array.prototype.forEach.call(document.querySelectorAll('a[href="#venue-map"]'), function(a){
