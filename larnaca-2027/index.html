@@ -44,14 +44,14 @@ body{margin:0; background:var(--bg); color:var(--ink); direction:rtl;
 h1,h2,h3,h4{margin:0; line-height:1.12; text-wrap:balance; font-weight:900; letter-spacing:-.025em}
 img{display:block; max-width:100%}
 a{color:var(--ink)}
-.wrap{max-width:900px; margin:0 auto;
+.wrap{max-width:1040px; margin:0 auto;
   padding-left:max(18px,env(safe-area-inset-left,0px));
   padding-right:max(18px,env(safe-area-inset-right,0px))}
 .anton{font-family:'Anton',Impact,sans-serif; font-weight:400; letter-spacing:.01em; line-height:.95}
 
 /* ===== HERO ===== */
 .hero{position:relative; background:#000; overflow:hidden}
-.hero>img{width:100%; height:clamp(480px,88vh,760px); object-fit:cover; object-position:50% 38%;
+.hero>img{width:100%; height:clamp(480px,88vh,820px); object-fit:cover; object-position:50% 34%;
   filter:grayscale(1) contrast(1.32) brightness(.72)}
 .hero::after{content:""; position:absolute; inset:0; pointer-events:none;
   background:radial-gradient(120% 60% at 50% 100%, rgba(232,35,42,.30) 0%, rgba(232,35,42,.10) 38%, transparent 68%)}
@@ -69,8 +69,12 @@ a{color:var(--ink)}
 .hero .when{font-size:clamp(1.02rem,3.2vw,1.35rem); font-weight:500}
 .hero .sub{color:var(--soft); font-weight:300; margin-top:5px; font-size:clamp(.92rem,2.6vw,1.05rem)}
 
+@media(min-width:1500px){ .hero>img{object-position:50% 46%} }
+
 /* ===== STRIP ===== */
-.nums{display:grid; grid-template-columns:1fr 1fr; border-block:1px solid var(--line); background:var(--panel)}
+.numsband{border-block:1px solid var(--line); background:var(--panel)}
+.numsband .wrap{padding-inline:0}
+.nums{display:grid; grid-template-columns:1fr 1fr}
 @media(min-width:620px){ .nums{grid-template-columns:1fr 1fr 2fr} }
 .num{padding:clamp(15px,3.2vw,24px) 6px; text-align:center; border-inline-start:1px solid var(--line)}
 .num:first-child{border-inline-start:0}
@@ -451,7 +455,7 @@ footer a{color:#8a8a94}
   </div></div>
 </header>
 
-<div class="nums">
+<div class="numsband"><div class="wrap"><div class="nums">
   <div class="num"><b>60 דק׳</b><span>טיסה ישירה</span></div>
   <div class="num"><b>סופ״ש אחד</b><span class="cap2">2–3 לילות</span></div>
   <div class="num duo">
@@ -462,7 +466,7 @@ footer a{color:#8a8a94}
     </div>
     <span class="cap2">מחיר כרטיס לאדם · בהטבת MAX</span>
   </div>
-</div>
+</div></div></div>
 
 <div class="nightbar"><div class="wrap nb-in">
   <div class="nb-left">
