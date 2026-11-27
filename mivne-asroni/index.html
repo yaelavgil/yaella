@@ -128,6 +128,8 @@ input:disabled{opacity:1}
 .heroart .eq{font-size:1.8rem; font-weight:900; color:var(--soft)}
 .heroart .num{font-size:3.1rem; font-weight:900; color:var(--gold); letter-spacing:.02em;
   font-variant-numeric:tabular-nums}
+.coin{width:52px; height:auto; vertical-align:-16px; margin-inline-end:9px}
+@media(max-width:420px){.coin{width:42px; vertical-align:-13px}}
 .art{display:block; margin:0 auto 10px; max-width:100%}
 .hero-art{width:min(100%,460px); margin:14px auto 0}
 .part-art{width:min(100%,330px); margin:2px auto 12px}
@@ -1240,11 +1242,11 @@ function buildCoins(q){
       return {ok:false, why:'כמה צריך להוסיף ל-34 כדי להגיע ל-50 ? זה העודף.'};
     }});
 
-  var art=el('div'); art.innerHTML=ART.coins(); q._ui.body.appendChild(rows); q._ui.body.appendChild(art);
+  q._ui.body.appendChild(rows);
   var rows2=el('div','rows');
   var vals=[1,2,5,10], ins=[];
   vals.forEach(function(v){
-    var m=mkRow(rows2,'כמה מטבעות של <b>'+v+'</b> ' + (v===1?'שקל':'שקלים'));
+    var m=mkRow(rows2,'<img class="coin" src="coin-'+v+'.png" alt="">'+'כמה מטבעות של <b>'+v+'</b> ' + (v===1?'שקל':'שקלים'));
     var inp=mkInput('num'); m.row.appendChild(inp); finishRow(m);
     ins.push(inp);
     addSlot({q:q, el:inp, group:m.g, read:reader(inp), sol:'', scored:(v===1),
