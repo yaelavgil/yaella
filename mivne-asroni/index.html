@@ -1184,73 +1184,95 @@ function build4(q){
 
 function build5(q){
   digitPad(q, q._ui.body, q.cards, 2, false);
-  var rows=el('div','rows'), pool=[16,19,61,69,91,96];
+  var POOL=[16,19,61,69,91,96], COL=['#d63a4a','#0f8a52','#2f7fd4'];
+  var rows=el('div','rows'); q._nums=[];
   for(var i=0;i<3;i++){
     (function(idx){
       var m=mkRow(rows,'מספר '+(idx+1));
       var inp=mkInput('num'); m.row.appendChild(inp); finishRow(m);
+      q._nums[idx]=inp; q._grp=q._grp||[]; q._grp[idx]=m.g;
       addSlot({q:q, el:inp, group:m.g, label:'מספר '+(idx+1),
         read:function(){ return String(inp.value).trim()+'|'+(q._pins[idx]==null?'':q._pins[idx]) },
         write:function(v){ var pp=String(v).split('|'); inp.value=pp[0]||'';
           q._pins[idx]=(pp[1]===''||pp[1]==null)?null:+pp[1]; if(q._redraw) q._redraw(); },
         sol:'',
-        failFn:function(){ return 'אפשר: <b>16 · 19 · 61 · 69 · 91 · 96</b> — שלושה מהם, כל אחד עם קו למקומו על הישר.' },
+        failFn:function(){ return 'אפשר: <b>16 · 19 · 61 · 69 · 91 · 96</b> — שלושה שונים, כל אחד עם קו למקומו.' },
         ev:function(ctx){
           var v=String(inp.value).trim();
           if(!isNum(v)) return {ok:false, why:'כאן כותבים מספר.'};
           var n=+v;
           if(String(n).length!==2) return {ok:false, why:'״'+n+'״ איננו דו‑ספרתי.'};
-          if(pool.indexOf(n)<0) return {ok:false, why:'״'+n+'״ לא בנוי משתיים מהספרות 1, 6 ו‑9.'};
-          for(var j=0;j<idx;j++){ var o=String(ctx.vals[j]).split('|')[0];
-            if(isNum(o)&&+o===n) return {ok:false, why:'<b>'+n+'</b> כבר נכתב. צריך שלושה מספרים <b>שונים</b>.'} }
+          if(POOL.indexOf(n)<0) return {ok:false, why:'״'+n+'״ לא בנוי משתיים מהספרות 1, 6 ו‑9.'};
+          for(var j=0;j<3;j++){ if(j===idx) continue;
+            var o=String(ctx.vals[j]).split('|')[0];
+            if(isNum(o)&&+o===n) return {ok:false, why:'<b>'+n+'</b> כבר נכתב בשורה אחרת. צריך שלושה מספרים <b>שונים</b>.'} }
           var pin=q._pins[idx];
-          if(pin==null) return {ok:false, why:'המספר נכון — נשאר <b>למתוח ממנו קו</b> אל המקום שלו על הישר.'};
-          if(Math.abs(pin-n)>6) return {ok:false, why:'הקו שמתחת מ-<b>'+n+'</b> מגיע למקום רחוק מדי. בדקו בין אילו שני קווים (עשרות) המספר נמצא.'};
+          if(pin==null) return {ok:false, why:'המספר נכון — נשאר <b>לגרור אותו אל מקומו</b> על הישר.'};
+          if(Math.abs(pin-n)>6) return {ok:false, why:'הסימון של <b>'+n+'</b> רחוק מדי. בדקו בין אילו שני קווים (עשרות) הוא נמצא.'};
           return {ok:true};
         }});
-      q._nums = q._nums || []; q._nums[idx]=inp;
     })(i);
   }
   q._ui.body.appendChild(rows);
 
-  var W=600,H=236,L=40,R=W-40,AY=180,HY=40;
-  var HX=[110,300,490];
-  var COL=['#d63a4a','#0f8a52','#2f7fd4'];
+  var W=620,H=250,L=46,R=W-46,AY=190,PY=44;
+  var PX=[150,310,470];
   var nl=el('div','nl');
-  nl.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="מתיחת קו מכל מספר אל ישר המספרים"></svg>';
-  nl.appendChild(el('div','cap','גוררים מכל עיגול קו אל המקום שלו על הישר. גרירה נוספת מאותו עיגול מתקנת.'));
+  nl.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="גוררים כל מספר אל מקומו על ישר המספרים"></svg>';
+  nl.appendChild(el('div','cap','גוררים כל עיגול אל המקום שלו על הישר, ואפשר להזיז אותו שוב כמה פעמים שרוצים. לחיצה על ״בדוק״ קובעת.'));
   q._ui.body.appendChild(nl);
   var svg=nl.querySelector('svg');
   q._pins=[null,null,null];
 
-  function val2x(v){ return L+(R-L)*v/100 }
-  function x2val(x){ return Math.max(0,Math.min(100,Math.round((x-L)/(R-L)*100))) }
+  function num(i){ var v=String(q._nums[i].value).trim(); return isNum(v)?+v:null }
+  /* a number that repeats another row gets no marker at all — it simply cannot be placed */
+  function usable(i){
+    var n=num(i); if(n===null || String(n).length!==2) return false;
+    for(var j=0;j<i;j++) if(num(j)===n) return false;
+    return true;
+  }
+  function dup(i){
+    var n=num(i); if(n===null) return false;
+    for(var j=0;j<3;j++) if(j!==i && num(j)===n) return true;
+    return false;
+  }
+  function v2x(v){ return L+(R-L)*v/100 }
+  function x2v(x){ return Math.max(0,Math.min(100,Math.round((x-L)/(R-L)*100))) }
   function pt(ev){
     var r=svg.getBoundingClientRect();
-    var cx=(ev.touches?ev.touches[0].clientX:ev.clientX), cy=(ev.touches?ev.touches[0].clientY:ev.clientY);
+    var cx=(ev.touches&&ev.touches[0]?ev.touches[0].clientX:ev.clientX);
+    var cy=(ev.touches&&ev.touches[0]?ev.touches[0].clientY:ev.clientY);
     return {x:(cx-r.left)/r.width*W, y:(cy-r.top)/r.height*H};
   }
-  function paint(temp){
-    var out='';
-    out+='<line x1="'+L+'" y1="'+AY+'" x2="'+R+'" y2="'+AY+'" stroke="var(--soft)" stroke-width="2.5"/>';
+  function marker(i,cx,cy,ghost){
+    var n=num(i);
+    return '<g class="hnd" data-i="'+i+'" style="cursor:grab"'+(ghost?' opacity=".55"':'')+'>'+
+      '<circle cx="'+cx+'" cy="'+cy+'" r="21" fill="var(--panel)" stroke="'+COL[i]+'" stroke-width="4"/>'+
+      '<text x="'+cx+'" y="'+(cy+7)+'" text-anchor="middle" font-size="18" font-weight="900" fill="'+COL[i]+'">'+(n===null?'?':n)+'</text></g>';
+  }
+  function paint(tmp){
+    var o='';
+    o+='<line x1="'+L+'" y1="'+AY+'" x2="'+R+'" y2="'+AY+'" stroke="var(--soft)" stroke-width="2.5"/>';
     for(var t=0;t<=100;t+=10){
-      var x=val2x(t), big=(t%20===0);
-      out+='<line x1="'+x+'" y1="'+(AY-(big?12:8))+'" x2="'+x+'" y2="'+(AY+(big?12:8))+'" stroke="var(--soft)" stroke-width="2.5"/>';
-      if(big) out+='<text x="'+x+'" y="'+(AY+30)+'" text-anchor="middle" font-size="14" font-weight="800" fill="var(--soft)">'+t+'</text>';
+      var x=v2x(t), big=(t%20===0);
+      o+='<line x1="'+x+'" y1="'+(AY-(big?12:8))+'" x2="'+x+'" y2="'+(AY+(big?12:8))+'" stroke="var(--soft)" stroke-width="2.5"/>';
+      if(big) o+='<text x="'+x+'" y="'+(AY+32)+'" text-anchor="middle" font-size="14" font-weight="800" fill="var(--soft)">'+t+'</text>';
     }
     for(var i=0;i<3;i++){
-      var v=q._pins[i];
-      if(v!=null) out+='<line x1="'+HX[i]+'" y1="'+(HY+22)+'" x2="'+val2x(v)+'" y2="'+(AY-4)+'" stroke="'+COL[i]+'" stroke-width="4" stroke-linecap="round"/>'+
-                       '<circle cx="'+val2x(v)+'" cy="'+AY+'" r="7" fill="'+COL[i]+'"/>';
-      var num=(q._nums&&q._nums[i]&&String(q._nums[i].value).trim())||'?';
-      out+='<g class="hnd" data-i="'+i+'" style="cursor:grab">'+
-           '<circle cx="'+HX[i]+'" cy="'+HY+'" r="22" fill="var(--panel)" stroke="'+COL[i]+'" stroke-width="4"/>'+
-           '<text x="'+HX[i]+'" y="'+(HY+7)+'" text-anchor="middle" font-size="19" font-weight="900" fill="'+COL[i]+'">'+num+'</text></g>';
+      if(!usable(i)){ q._pins[i]=null; continue }
+      if(tmp && tmp.i===i) continue;
+      if(q._pins[i]!=null){
+        var x=v2x(q._pins[i]);
+        o+='<line x1="'+x+'" y1="'+(AY-26)+'" x2="'+x+'" y2="'+AY+'" stroke="'+COL[i]+'" stroke-width="4" stroke-linecap="round"/>';
+        o+=marker(i,x,AY-46,false);
+      }else{
+        o+=marker(i,PX[i],PY,true);
+      }
     }
-    if(temp) out+='<line x1="'+HX[temp.i]+'" y1="'+(HY+22)+'" x2="'+temp.x+'" y2="'+temp.y+'" stroke="'+COL[temp.i]+'" stroke-width="4" stroke-dasharray="7 6" stroke-linecap="round"/>';
-    svg.innerHTML=out;
+    if(tmp) o+=marker(tmp.i,tmp.x,tmp.y,false);
+    svg.innerHTML=o;
   }
-  q._redraw=paint;
+  q._redraw=function(){ paint() };
   paint();
 
   var drag=null;
@@ -1258,94 +1280,36 @@ function build5(q){
     var g=ev.target.closest&&ev.target.closest('.hnd'); if(!g) return;
     var i=+g.getAttribute('data-i');
     if(q._slots[i] && q._slots[i].locked) return;
-    drag={i:i}; ev.preventDefault();
+    drag={i:i}; paint(); ev.preventDefault();
   }
-  function move(ev){ if(!drag) return; var o=pt(ev); paint({i:drag.i,x:o.x,y:o.y}); ev.preventDefault(); }
+  function move(ev){ if(!drag) return; var o=pt(ev); paint({i:drag.i,x:o.x,y:o.y}); ev.preventDefault() }
   function up(ev){
     if(!drag) return;
-    var o=pt(ev);
-    if(o.y > AY-50) { q._pins[drag.i]=x2val(o.x); saveProgress(); }
-    drag=null; paint();
+    var o=pt(ev), i=drag.i; drag=null;
+    if(o.y>AY-105 && o.x>L-30 && o.x<R+30) q._pins[i]=x2v(o.x);
+    else q._pins[i]=null;
+    saveProgress(); paint();
   }
   svg.addEventListener('mousedown',down); svg.addEventListener('touchstart',down,{passive:false});
   window.addEventListener('mousemove',move); window.addEventListener('touchmove',move,{passive:false});
-  window.addEventListener('mouseup',up);   window.addEventListener('touchend',up);
-  Array.prototype.forEach.call(q._ui.body.querySelectorAll('input'),function(i){
-    i.addEventListener('input', function(){ paint() });
+  window.addEventListener('mouseup',up); window.addEventListener('touchend',up);
+
+  /* the same number twice is refused on the spot */
+  q._nums.forEach(function(inp,i){
+    inp.addEventListener('input', function(){
+      for(var k=0;k<3;k++){
+        var g=q._grp[k];
+        if(!g||!g.hint||q._slots[k].locked) continue;
+        if(dup(k)){
+          g.hint.hidden=false; g.hint.className='rhint';
+          g.hint.innerHTML='<b>'+num(k)+'</b> כבר נכתב בשורה אחרת. שלושת המספרים צריכים להיות <b>שונים</b>, ולכן אי אפשר לגרור אותו לישר.';
+        }else if(g.hint.innerHTML.indexOf('כבר נכתב בשורה אחרת')>-1){
+          g.hint.hidden=true; g.hint.innerHTML='';
+        }
+      }
+      paint();
+    });
   });
-}
-function buildCoins(q){
-  var say1=el('div','qstory');
-  say1.innerHTML='<b>א.</b> שרה קנתה כדור במחיר של 34 שקלים.<br>'+
-                 'היא שילמה בשטר של 50 שקלים.<br><b>כמה עודף קיבלה שרה ?</b>';
-  q._ui.body.appendChild(say1);
-
-  var rows=el('div','rows');
-  var mc=mkRow(rows,'חָשֵׁב :');
-  var calc=mkInput('wide'); calc.setAttribute('inputmode','text'); calc.dataset.free='1';
-  calc.placeholder='התרגיל שעשית';
-  mc.row.appendChild(calc); finishRow(mc);
-  addSlot({q:q, el:calc, group:mc.g, read:reader(calc), sol:'50 − 34', label:'חשב',
-    failFn:function(){ return 'התרגיל שמוביל לתשובה הוא <b dir="ltr">50 − 34</b>.' },
-    ev:function(){
-      var v=String(calc.value); var d=v.replace(/[^\d]/g,' ').split(/\s+/).filter(Boolean);
-      if(d.indexOf('50')>-1 && d.indexOf('34')>-1) return {ok:true};
-      return {ok:false, why:'כאן כותבים את <b>התרגיל</b> עצמו — מאיזה מספר מורידים, וכמה. שני המספרים מופיעים בשאלה.'};
-    }});
-
-  var ma=mkRow(rows,'תשובה :');
-  var chg=mkInput('num'); ma.row.appendChild(chg);
-  ma.row.appendChild(el('span','unit','שקלים'));
-  finishRow(ma);
-  addSlot({q:q, el:chg, group:ma.g, read:reader(chg), sol:'16', label:'העודף',
-    failFn:function(v){ return diffLine(v,'16') },
-    ev:function(){
-      var v=String(chg.value).trim();
-      if(!isNum(v)) return {ok:false, why:'כאן כותבים מספר.'};
-      if(+v===16) return {ok:true};
-      if(+v===84) return {ok:false, why:'חיברת במקום לחסר. היא <b>שילמה</b> 50 וקנתה ב-34 — העודף הוא ההפרש.'};
-      return {ok:false, why:'כמה צריך להוסיף ל-34 כדי להגיע ל-50 ? זה העודף.'};
-    }});
-  q._ui.body.appendChild(rows);
-
-  var say2=el('div','qstory');
-  say2.innerHTML='<b>ב.</b> בקופה של המוכר נמצאים סוגי המטבעות הבאים :';
-  q._ui.body.appendChild(say2);
-
-  var shelf=el('div','coinshelf');
-  [10,5,2,1].forEach(function(v){
-    shelf.innerHTML += '<figure><img src="coin-'+v+'.png" alt=""><figcaption>מטבעות של<br>'+
-      (v===1?'שקל אחד':v+' שקלים')+'</figcaption></figure>';
-  });
-  q._ui.body.appendChild(shelf);
-
-  var say3=el('div','qstory');
-  say3.innerHTML='הציעו אפשרויות לעודף ששרה יכולה לקבל :<br>'+
-                 '<b>שימו לב — לא חייבים להשתמש בכל סוגי המטבעות</b>';
-  q._ui.body.appendChild(say3);
-
-  var rows2=el('div','rows');
-  var vals=[1,2,5,10], ins=[];
-  vals.forEach(function(v,k){
-    var m=mkRow(rows2, null);
-    var inp=mkInput('num'); m.row.appendChild(inp);
-    m.row.appendChild(el('span','lbl','מטבעות של ' + (v===1?'שקל אחד':v+' שקלים') + (k<3?',':'.')));
-    finishRow(m);
-    ins.push(inp);
-    addSlot({q:q, el:inp, group:m.g, read:reader(inp), sol:'', scored:(v===1),
-      label:'מטבעות של '+(v===1?'שקל אחד':v+' שקלים'),
-      failFn:function(){ return 'סכום כל המטבעות חייב להיות בדיוק <b>העודף</b>. למשל מטבע אחד של 10 ושלושה של 2 — יחד 16.' },
-      ev:function(){
-        var all=ins.map(function(x){ return String(x.value).trim() });
-        if(!all.every(isNum)) return {ok:false, why:'בכל שורה כותבים מספר — ומותר <b>0</b> במטבע שלא משתמשים בו.'};
-        var sum=all[0]*1+all[1]*2+all[2]*5+all[3]*10;
-        var want=String(chg.value).trim();
-        if(!isNum(want)) return {ok:false, why:'קודם מלאו את <b>התשובה</b> בסעיף א.'};
-        if(sum===+want) return {ok:true};
-        return {ok:false, why:'המטבעות שכתבת מסתכמות ב-<b>'+sum+'</b> שקלים, והעודף הוא <b>'+(+want)+'</b>.'};
-      }});
-  });
-  q._ui.body.appendChild(rows2);
 }
 
 /* ============ render ============ */
