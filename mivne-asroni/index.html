@@ -768,8 +768,10 @@ function render(){
         e.preventDefault();
         var all = Array.prototype.filter.call(q._ui.body.querySelectorAll('input'), function(i){ return !i.disabled });
         var at = all.indexOf(e.target);
-        if(at > -1 && at < all.length - 1){ all[at+1].focus(); all[at+1].select(); }
-        else onCheck(q);
+        if(at > -1 && at < all.length - 1){ all[at+1].focus(); all[at+1].select(); return }
+        var empty = all.filter(function(i){ return !String(i.value).trim() })[0];
+        if(empty){ empty.focus(); return }   /* still gaps — go fill them, don't spend a try */
+        onCheck(q);
       });
     });
     app.appendChild(sec);
@@ -805,6 +807,26 @@ function buildAsc(q){
 function onCheck(q){
   var s = state[q.id];
   if(s.done) return;
+  /* an unfinished question never costs a try — just point at what is still empty */
+  var fields = Array.prototype.filter.call(q._ui.body.querySelectorAll('input'), function(i){ return !i.disabled });
+  var gaps = fields.filter(function(i){ return !String(i.value).trim() });
+  if(fields.length && gaps.length){
+    q._ui.note.innerHTML = '';
+    var w = el('div','note hint');
+    w.innerHTML = '<span class="t">רגע — יש שורות ריקות</span>נשארו <b>' + gaps.length + '</b> שדות למלא. <b>זה לא נחשב ניסיון</b>, אז אפשר בשקט להשלים ואז ללחוץ בדוק.';
+    q._ui.note.appendChild(w);
+    setMark(q, '', '');
+    gaps[0].focus();
+    return;
+  }
+  if(q.id === 'q4e' && (q._pins || []).length < 3){
+    q._ui.note.innerHTML = '';
+    var w2 = el('div','note hint');
+    w2.innerHTML = '<span class="t">רגע — נשאר לסמן על הציר</span>כתבת את המספרים. עכשיו <b>לחץ על הציר שלוש פעמים</b>, פעם לכל מספר. <b>זה לא נחשב ניסיון.</b>';
+    q._ui.note.appendChild(w2);
+    setMark(q, '', '');
+    return;
+  }
   var res;
   if(q.kind === 'num' || q.kind === 'words' || q.kind === 'mixed') res = checkItems(q, q.items);
   else if(q.kind === 'set') res = checkSet(q);
