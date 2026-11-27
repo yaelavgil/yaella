@@ -1329,6 +1329,79 @@ function build5(q){
   });
 }
 
+function buildCoins(q){
+  var say1=el('div','qstory');
+  say1.innerHTML='<b>א.</b> שרה קנתה כדור במחיר של 34 שקלים.<br>'+
+                 'היא שילמה בשטר של 50 שקלים.<br><b>כמה עודף קיבלה שרה ?</b>';
+  q._ui.body.appendChild(say1);
+
+  var rows=el('div','rows');
+  var mc=mkRow(rows,'חָשֵׁב :');
+  var calc=mkInput('wide'); calc.setAttribute('inputmode','text'); calc.dataset.free='1';
+  calc.placeholder='התרגיל שעשית';
+  mc.row.appendChild(calc); finishRow(mc);
+  addSlot({q:q, el:calc, group:mc.g, read:reader(calc), sol:'50 − 34', label:'חשב',
+    failFn:function(){ return 'התרגיל שמוביל לתשובה הוא <b dir="ltr">50 − 34</b>.' },
+    ev:function(){
+      var d=String(calc.value).replace(/[^0-9]/g,' ').split(/\s+/).filter(Boolean);
+      if(d.indexOf('50')>-1 && d.indexOf('34')>-1) return {ok:true};
+      return {ok:false, why:'כאן כותבים את <b>התרגיל</b> עצמו — מאיזה מספר מורידים, וכמה. שני המספרים מופיעים בשאלה.'};
+    }});
+
+  var ma=mkRow(rows,'תשובה :');
+  var chg=mkInput('num'); ma.row.appendChild(chg);
+  ma.row.appendChild(el('span','unit','שקלים'));
+  finishRow(ma);
+  addSlot({q:q, el:chg, group:ma.g, read:reader(chg), sol:'16', label:'העודף',
+    failFn:function(v){ return diffLine(v,'16') },
+    ev:function(){
+      var v=String(chg.value).trim();
+      if(!isNum(v)) return {ok:false, why:'כאן כותבים מספר.'};
+      if(+v===16) return {ok:true};
+      if(+v===84) return {ok:false, why:'חיברת במקום לחסר. היא <b>שילמה</b> 50 וקנתה ב-34 — העודף הוא ההפרש.'};
+      return {ok:false, why:'כמה צריך להוסיף ל-34 כדי להגיע ל-50 ? זה העודף.'};
+    }});
+  q._ui.body.appendChild(rows);
+
+  var say2=el('div','qstory');
+  say2.innerHTML='<b>ב.</b> בקופה של המוכר נמצאים סוגי המטבעות הבאים :';
+  q._ui.body.appendChild(say2);
+
+  var shelf=el('div','coinshelf');
+  [10,5,2,1].forEach(function(v){
+    shelf.innerHTML += '<figure><img src="coin-'+v+'.png" alt=""><figcaption>מטבעות של<br>'+
+      (v===1?'שקל אחד':v+' שקלים')+'</figcaption></figure>';
+  });
+  q._ui.body.appendChild(shelf);
+
+  var say3=el('div','qstory');
+  say3.innerHTML='הציעו אפשרויות לעודף ששרה יכולה לקבל :<br>'+
+                 '<b>שימו לב — לא חייבים להשתמש בכל סוגי המטבעות</b>';
+  q._ui.body.appendChild(say3);
+
+  var rows2=el('div','rows'), vals=[1,2,5,10], ins=[];
+  vals.forEach(function(v,k){
+    var m=mkRow(rows2, null);
+    var inp=mkInput('num'); m.row.appendChild(inp);
+    m.row.appendChild(el('span','lbl','מטבעות של ' + (v===1?'שקל אחד':v+' שקלים') + (k<3?',':'.')));
+    finishRow(m);
+    ins.push(inp);
+    addSlot({q:q, el:inp, group:m.g, read:reader(inp), sol:'', scored:(v===1),
+      label:'מטבעות של '+(v===1?'שקל אחד':v+' שקלים'),
+      failFn:function(){ return 'סכום כל המטבעות חייב להיות בדיוק <b>העודף</b>. למשל מטבע אחד של 10 ושלושה של 2 — יחד 16.' },
+      ev:function(){
+        var all=ins.map(function(x){ return String(x.value).trim() });
+        if(!all.every(isNum)) return {ok:false, why:'בכל שורה כותבים מספר — ומותר <b>0</b> במטבע שלא משתמשים בו.'};
+        var sum=all[0]*1+all[1]*2+all[2]*5+all[3]*10;
+        var want=String(chg.value).trim();
+        if(!isNum(want)) return {ok:false, why:'קודם מלאו את <b>התשובה</b> בסעיף א.'};
+        if(sum===+want) return {ok:true};
+        return {ok:false, why:'המטבעות שכתבת מסתכמות ב-<b>'+sum+'</b> שקלים, והעודף הוא <b>'+(+want)+'</b>.'};
+      }});
+  });
+  q._ui.body.appendChild(rows2);
+}
+
 /* ============ render ============ */
 function render(){
   var app=document.getElementById('app');
