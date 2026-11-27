@@ -142,6 +142,11 @@ input:disabled{opacity:1}
 .kbd-tog{font:inherit; font-size:.8rem; font-weight:700; cursor:pointer; color:var(--blue);
   background:transparent; border:2px solid var(--line); border-radius:9px; padding:4px 11px}
 
+.sheets{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:14px;
+  background:var(--panel); border:2px solid var(--line); border-radius:14px; padding:11px 14px; font-size:.88rem}
+.sheets span{font-weight:700; color:var(--soft)}
+.sheets a{color:var(--blue); font-weight:700; text-decoration:none; border-bottom:2px solid rgba(91,63,214,.3)}
+.sheets a:hover{border-bottom-color:var(--blue)}
 #restored{background:var(--greenbg); color:var(--green); border:2px solid rgba(15,138,82,.25);
   border-radius:12px; padding:10px 14px; margin-top:14px; font-size:.9rem}
 .share{display:flex; gap:9px; justify-content:center; flex-wrap:wrap; margin-top:16px}
@@ -219,7 +224,14 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--line); colo
   </div>
 </div>
 
-<div class="wrap"><div id="restored" hidden></div></div>
+<div class="wrap">
+  <div id="restored" hidden></div>
+  <div class="sheets">
+    <span>📄 דפי העבודה המקוריים, לפתיחה או להדפסה:</span>
+    <a href="worksheet-riki-amar.pdf" target="_blank" rel="noopener">מבנה עשרוני · ריקי עמר (3 עמודים)</a>
+    <a href="worksheet-sadot.pdf" target="_blank" rel="noopener">משימה במתמטיקה · שדות בת חפר (6 עמודים)</a>
+  </div>
+</div>
 <div class="wrap" id="app"></div>
 
 <div class="wrap">
@@ -419,7 +431,7 @@ var PARTS = [
    hint:'״עוקב״ זה <b>המספר שבא מיד אחרי</b> — ועוד 1. ושימו לב מה קורה כאן: גם האחדות וגם העשרות מלאות ב‑9, אז שתיהן מתאפסות <b>והמאות עולות באחת</b>.'},
 
   {id:'q4b', kind:'choice', title:'שאלה 2 · מי מבין המספרים הבאים שווה ל‑9 יחידות ועוד 50 עשרות ?',
-   sub:'בחרו תשובה אחת.', opts:[59,950,509,590], a:509,
+   sub:'בחרו תשובה אחת.', opts:[59,950,509,590], a:509, solNote:'50 עשרות הן 500, ועוד 9 יחידות.',
    why:function(v){
      if(+v===59)  return 'ספרת את 50 העשרות כאילו הן 50 יחידות. <b>עשרה אחת שווה 10</b>, אז 50 עשרות זה הרבה יותר מ‑50.';
      if(+v===590) return 'חישבת 50 עשרות + 9 <b>עשרות</b>. אבל כתוב 9 <b>יחידות</b> — והן נכנסות למקום הימני ביותר.';
@@ -447,7 +459,40 @@ var PARTS = [
   {id:'q4f', kind:'mixed', title:'שאלה 6',
    items:[{l:'א. השלימו את המספר החסר: &nbsp;<b dir="ltr">17 + 40 = 27 +</b>', kind:'num', a:30}],
    hint:'אל תחשבו את 40 + 17. <b>השוו את שני הצדדים זה לזה:</b> 27 גדול מ‑17 ב‑10 בדיוק. אם צד אחד גדל ב‑10 והתוצאה צריכה להישאר אותה תוצאה — מה חייב לקרות למספר השני?',
-   after:'<b>ב. ולמה אפשר למצוא את המספר החסר מבלי לחשב את 40 + 17:</b> 27 גדול מ‑17 בעשר, ולכן המספר השני חייב להיות <b>קטן בעשר</b> מ‑40.'}
+   after:'<b>ב. ולמה אפשר למצוא את המספר החסר מבלי לחשב את 40 + 17:</b> 27 גדול מ‑17 בעשר, ולכן המספר השני חייב להיות <b>קטן בעשר</b> מ‑40.'},
+
+  {id:'q4g', kind:'num', title:'שאלה 7 · פתרו את התרגילים בדרך הנוחה לכם',
+   items:[
+    {l:'א. &nbsp;<b dir="ltr">304 + 170 =</b>', a:474},
+    {l:'ב. &nbsp;<b dir="ltr">54 − 13 =</b>', a:41},
+    {l:'ג. &nbsp;<b dir="ltr">9 + 67 + 21 =</b>', a:97},
+    {l:'ד. &nbsp;<b dir="ltr">92 − 25 =</b>', a:67},
+    {l:'ה. &nbsp;<b dir="ltr">430 + 75 =</b>', a:505}
+   ],
+   hint:'״הדרך הנוחה״ היא <b>לפרק לפי המקומות</b>. ב-304 + 170 חברו מאות עם מאות ועשרות עם עשרות. ב-9 + 67 + 21 שווה לחפש קודם שני מספרים שמשלימים לעשרת עגולה — <b>9 ו-21 נותנים 30</b>, ורק אז להוסיף את 67. ובחיסורים עם פריטה (92 − 25) שווה להוריד קודם עד העשרת העגולה ואז את השאר.'},
+
+  {id:'q4h', kind:'num', title:'שאלה 8 · השלימו את המספרים החסרים',
+   items:[
+    {l:'א. &nbsp;<b dir="ltr">25 + ____ = 70</b>', a:45},
+    {l:'ב. &nbsp;<b dir="ltr">76 − ____ = 46</b>', a:30},
+    {l:'ג. &nbsp;<b dir="ltr">____ − 42 = 40</b>', a:82}
+   ],
+   hint:'<b>כל תרגיל כזה הופכים לתרגיל רגיל.</b> אם 25 ועוד משהו זה 70 — אז המשהו הוא 70 פחות 25. אם 76 פחות משהו זה 46 — המשהו הוא 76 פחות 46. ובסעיף ג דווקא <b>מחברים</b>: המספר החסר הוא 40 ועוד 42, כי ממנו הורידו.'},
+
+  {id:'q4i', kind:'choice', title:'שאלה 9 · בכמה ישתנה הערך של המספר 59 אם נחליף את הספרה 5 בספרה 7 ?',
+   sub:'הקיפו את האפשרות הנכונה.',
+   opts:['יגדל ב-2','יגדל ב-7','יגדל ב-20','יגדל ב-70'], a:'יגדל ב-20',
+   why:function(v){
+     if(v==='יגדל ב-2') return 'השווית בין <b>הספרות</b> 5 ו-7, וההפרש ביניהן הוא 2. אבל הספרה הזו יושבת במקום <b>העשרות</b> — ולכן שינוי של 2 שם שווה הרבה יותר מ-2.';
+     if(v==='יגדל ב-7') return 'לקחת את הספרה החדשה כמו שהיא. השאלה היא <b>בכמה גדל המספר השלם</b> — אז פשוט חשבו כמה הוא היה וכמה הוא יהיה.';
+     if(v==='יגדל ב-70') return 'קרוב לדרך הנכונה, אבל 7 במקום העשרות שווה 70 ו-5 שם שווה 50 — <b>וצריך את ההפרש ביניהם</b>, לא את הערך החדש לבדו.';
+     return '';
+   },
+   hint:'הכי בטוח כאן זה פשוט <b>לכתוב את שני המספרים</b>: לפני השינוי 59, אחרי השינוי 79. ועכשיו — כמה 79 גדול מ-59?'},
+
+  {id:'q4j', kind:'coins', title:'שאלה 10 · שרה קנתה כדור במחיר של 34 שקלים, ושילמה בשטר של 50 שקלים.',
+   sub:'א. כמה עודף קיבלה שרה ?  ב. בקופה של המוכר יש מטבעות של 10, 5, 2 ו-1. הציעו אפשרות לעודף — <b>לא חייבים להשתמש בכל סוגי המטבעות.</b>',
+   hint:'קודם <b>העודף</b>: כמה צריך להוסיף ל-34 כדי להגיע ל-50. ואז המטבעות — כל צירוף שמסתכם בדיוק בעודף נכון, ומותר לכתוב <b>0</b> במטבע שלא משתמשים בו. דרך נוחה: להתחיל מהמטבע הגדול ביותר שנכנס, ולהשלים בקטנים.'}
  ]
 }
 ];
@@ -806,6 +851,18 @@ ART.p4 = function(){
   return s+'</svg>';
 };
 
+ART.coins = function(){
+  var s='<svg class="art part-art" viewBox="0 0 300 96" role="img" aria-label="מטבעות של 10, 5, 2 ו-1 שקלים">';
+  [[10,'var(--soft)',34],[5,'var(--gold)',31],[2,'var(--mint)',28],[1,'var(--pink)',24]].forEach(function(c,i){
+    var x=46+i*70, y=42;
+    s+='<circle cx="'+x+'" cy="'+y+'" r="'+c[2]+'" fill="var(--panel)" stroke="'+c[1]+'" stroke-width="4"/>'+
+       '<circle cx="'+x+'" cy="'+y+'" r="'+(c[2]-7)+'" fill="none" stroke="'+c[1]+'" stroke-width="1.6" opacity=".55"/>'+
+       '<text x="'+x+'" y="'+(y+9)+'" text-anchor="middle" font-size="24" font-weight="900" fill="'+c[1]+'">'+c[0]+'</text>'+
+       '<text x="'+x+'" y="90" text-anchor="middle" font-size="10" font-weight="800" fill="var(--soft)">'+(c[0]===1?'שקל':'שקלים')+'</text>';
+  });
+  return s+'</svg>';
+};
+
 /* ============ the on-screen keyboard ============ */
 var HE_KEYS = ['א','ב','ג','ד','ה','ו','ז','ח','ט','י','כ','ל','מ','נ','ס','ע','פ','צ','ק','ר','ש','ת','ך','ם','ן','ף','ץ'];
 var NUM_KEYS = ['1','2','3','4','5','6','7','8','9','0'];
@@ -967,11 +1024,11 @@ function buildChoice(q){
   function rd(){ var s=chips.querySelector('.chip[aria-pressed="true"]'); return s?s.dataset.v:'' }
   function wr(v){ var b=chips.querySelector('.chip[data-v="'+v+'"]'); if(b) b.setAttribute('aria-pressed','true') }
   addSlot({q:q, el:null, group:m.g, read:rd, write:wr, label:'התשובה שנבחרה', sol:String(q.a),
-    failFn:function(v){ return 'הנכון: <b>'+q.a+'</b> — 50 עשרות הן 500, ועוד 9 יחידות.' },
+    failFn:function(v){ return 'הנכון: <b>'+esc(q.a)+'</b>' + (q.solNote ? ' — ' + q.solNote : '') },
     ev:function(){
       var v=rd();
       if(!v) return {ok:false, why:'לא בחרת תשובה.'};
-      if(+v===q.a) return {ok:true};
+      if(String(v)===String(q.a)) return {ok:true};
       return {ok:false, why:q.why?q.why(v):''};
     }});
   q.lockExtras=function(){ Array.prototype.forEach.call(chips.querySelectorAll('.chip'),function(x){ x.disabled=true }) };
@@ -1197,6 +1254,43 @@ function drawPins(q,svgEl,W,L,R){
   g.innerHTML=s;
 }
 
+function buildCoins(q){
+  var rows=el('div','rows');
+  var m0=mkRow(rows,'א. כמה עודף קיבלה שרה ? &nbsp;<span style="color:var(--soft)">(בשקלים)</span>');
+  var chg=mkInput('num'); m0.row.appendChild(chg); finishRow(m0);
+  addSlot({q:q, el:chg, group:m0.g, read:reader(chg), sol:'16', label:'העודף',
+    failFn:function(v){ return diffLine(v,'16') + ' &nbsp;·&nbsp; 50 פחות 34' },
+    ev:function(){
+      var v=String(chg.value).trim();
+      if(!isNum(v)) return {ok:false, why:'כאן כותבים מספר.'};
+      if(+v===16) return {ok:true};
+      if(+v===84) return {ok:false, why:'חיברת במקום לחסר. היא <b>שילמה</b> 50 וקנתה ב-34 — העודף הוא ההפרש.'};
+      return {ok:false, why:'כמה צריך להוסיף ל-34 כדי להגיע ל-50 ? זה העודף.'};
+    }});
+
+  var art=el('div'); art.innerHTML=ART.coins(); q._ui.body.appendChild(rows); q._ui.body.appendChild(art);
+  var rows2=el('div','rows');
+  var vals=[1,2,5,10], ins=[];
+  vals.forEach(function(v){
+    var m=mkRow(rows2,'ב. &nbsp;כמה מטבעות של <b>'+v+'</b> ' + (v===1?'שקל':'שקלים'));
+    var inp=mkInput('num'); m.row.appendChild(inp); finishRow(m);
+    ins.push(inp);
+    addSlot({q:q, el:inp, group:m.g, read:reader(inp), sol:'', scored:(v===1),
+      label:'מטבעות של '+v,
+      failFn:function(){ return 'הסכום של כל המטבעות חייב להיות בדיוק <b>העודף</b>. למשל: מטבע אחד של 10, שלושה של 2 — יחד 16.' },
+      ev:function(){
+        var all=ins.map(function(x){ return String(x.value).trim() });
+        if(!all.every(isNum)) return {ok:false, why:'בכל שורה כותבים מספר — ומותר לכתוב <b>0</b> במטבע שלא משתמשים בו.'};
+        var sum=all[0]*1 + all[1]*2 + all[2]*5 + all[3]*10;
+        var want=+String(chg.value).trim();
+        if(!isNum(String(chg.value).trim())) return {ok:false, why:'קודם מלאו את <b>העודף</b> בסעיף א.'};
+        if(sum===want) return {ok:true};
+        return {ok:false, why:'המטבעות שכתבת מסתכמות ב-<b>'+sum+'</b> שקלים, והעודף הוא <b>'+want+'</b>.'};
+      }});
+  });
+  q._ui.body.appendChild(rows2);
+}
+
 /* ============ render ============ */
 function render(){
   var app=document.getElementById('app');
@@ -1228,13 +1322,25 @@ function render(){
       else if(q.kind==='id') buildId(q);
       else if(q.kind==='four') build4(q);
       else if(q.kind==='line') build5(q);
+      else if(q.kind==='coins') buildCoins(q);
       if(p.box) digitPad(q, q._ui.body, p.box, 5, true);
       buildKbd(q);
       q._part=p;
       q._ui.btn.addEventListener('click',function(){ onCheck(q) });
       Array.prototype.forEach.call(q._ui.body.querySelectorAll('input'),function(i){
         i.addEventListener('focus',function(){ setActive(q,i) });
-        i.addEventListener('input', saveProgress);
+        /* a box for numbers takes only digits; a box for words takes only Hebrew */
+        i.addEventListener('input',function(){
+          var isT = i.getAttribute('inputmode')==='text';
+          var was = i.value;
+          var now = isT ? was.replace(/[0-9A-Za-z]/g,'') : was.replace(/[^0-9]/g,'');
+          if(now!==was){
+            var at=i.selectionStart;
+            i.value=now;
+            try{ i.setSelectionRange(Math.max(0,at-1), Math.max(0,at-1)) }catch(e){}
+          }
+          saveProgress();
+        });
       });
       q._ui.body.addEventListener('keydown',function(e){
         if(e.key!=='Enter') return;
