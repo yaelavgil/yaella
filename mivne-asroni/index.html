@@ -138,6 +138,10 @@ input:disabled{opacity:1}
 .exprpack .expr{font-size:1.06rem; font-weight:900; white-space:nowrap;
   font-variant-numeric:tabular-nums; letter-spacing:.01em}
 .exprpack input{width:104px; flex:none; text-align:center}
+.blanks{display:flex; direction:rtl; align-items:center; gap:14px; justify-content:center;
+  flex-wrap:wrap; margin:4px 0 6px}
+.blanks input{width:118px; border-width:3px}
+.blanks .sep2{font-weight:900; color:var(--soft); font-size:1.1rem}
 .qstory{margin:4px 0 10px; line-height:1.75}
 .qstory b{font-weight:900}
 .unit{font-weight:700; color:var(--soft)}
@@ -485,8 +489,7 @@ var PARTS = [
   {id:'q4d', kind:'four', title:'שאלה 4',
    hint:'בסעיף א יש <b>תשובה אחת בלבד</b> — מה צריך להוריד מ‑13 כדי להישאר עם 6. בסעיפים ב ו‑ג יש <b>הרבה תשובות נכונות</b>: כל מספר שיגרום לתוצאה להיות <b>קטנה מ‑6</b>, כלומר כל מספר <b>גדול</b> מזה שבסעיף א. ושתי התשובות צריכות להיות שונות זו מזו.'},
 
-  {id:'q4e', kind:'line', title:'שאלה 5 · נתונות הספרות 1, 6, 9',
-   sub:'<span>א. כתבו באמצעותן שלושה מספרים דו‑ספרתיים.</span><span>ב. מתחו קו מכל אחד מהמספרים שכתבתם אל המקום המתאים (בערך) על ישר המספרים.</span>',
+  {id:'q4e', kind:'line', title:'שאלה 5',
    cards:[1,6,9],
    hint:'מספר דו‑ספרתי בנוי משתי ספרות מתוך השלוש — למשל 16 או 61. <b>ולסימון על הציר:</b> הציר מ‑0 עד 100 והקווים הקטנים הם כל 10. מצאו קודם בין איזה שני קווים המספר נמצא, ואז סמנו בערך ביניהם.'},
 
@@ -1214,15 +1217,26 @@ function build4(q){
 }
 
 function build5(q){
+  var COL=['#d63a4a','#0f8a52','#2f7fd4'], POOL=[16,19,61,69,91,96];
+
+  var t1=el('div','qstory');
+  t1.innerHTML='<b>א.</b> נתונות הספרות 1, 6, 9<br>כתבו באמצעותן שלושה מספרים דו‑ספרתיים :';
+  q._ui.body.appendChild(t1);
+
   digitPad(q, q._ui.body, q.cards, 2, false);
-  var POOL=[16,19,61,69,91,96], COL=['#d63a4a','#0f8a52','#2f7fd4'];
-  var rows=el('div','rows'); q._nums=[];
+
+  /* three blanks on one line, right to left — the way the sheet prints them */
+  var line=el('div','blanks'); q._nums=[]; q._grp=[];
+  var holder=el('div','row'); holder.style.justifyContent='center';
   for(var i=0;i<3;i++){
     (function(idx){
-      var m=mkRow(rows,'מספר '+(idx+1));
-      var inp=mkInput('num'); m.row.appendChild(inp); finishRow(m);
-      q._nums[idx]=inp; q._grp=q._grp||[]; q._grp[idx]=m.g;
-      addSlot({q:q, el:inp, group:m.g, label:'מספר '+(idx+1),
+      if(idx) line.appendChild(el('span','sep2',','));
+      var inp=mkInput('num'); inp.style.borderColor=COL[idx];
+      line.appendChild(inp);
+      q._nums[idx]=inp;
+      var g={mark:el('span','rmark',''), hint:null};
+      q._grp[idx]=g;
+      addSlot({q:q, el:inp, group:g, label:'מספר '+(idx+1),
         read:function(){ return String(inp.value).trim()+'|'+(q._pins[idx]==null?'':q._pins[idx]) },
         write:function(v){ var pp=String(v).split('|'); inp.value=pp[0]||'';
           q._pins[idx]=(pp[1]===''||pp[1]==null)?null:+pp[1]; if(q._redraw) q._redraw(); },
@@ -1236,71 +1250,74 @@ function build5(q){
           if(POOL.indexOf(n)<0) return {ok:false, why:'״'+n+'״ לא בנוי משתיים מהספרות 1, 6 ו‑9.'};
           for(var j=0;j<3;j++){ if(j===idx) continue;
             var o=String(ctx.vals[j]).split('|')[0];
-            if(isNum(o)&&+o===n) return {ok:false, why:'<b>'+n+'</b> כבר נכתב בשורה אחרת. צריך שלושה מספרים <b>שונים</b>.'} }
+            if(isNum(o)&&+o===n) return {ok:false, why:'<b>'+n+'</b> כבר נכתב. שלושת המספרים צריכים להיות <b>שונים</b>.'} }
           var pin=q._pins[idx];
-          if(pin==null) return {ok:false, why:'המספר נכון — נשאר <b>לגרור אותו אל מקומו</b> על הישר.'};
-          if(Math.abs(pin-n)>6) return {ok:false, why:'הסימון של <b>'+n+'</b> רחוק מדי. בדקו בין אילו שני קווים (עשרות) הוא נמצא.'};
+          if(pin==null) return {ok:false, why:'המספר נכון — נשאר <b>למתוח ממנו קו</b> אל מקומו על הישר.'};
+          if(Math.abs(pin-n)>6) return {ok:false, why:'הקו של <b>'+n+'</b> מגיע למקום רחוק מדי. בדקו בין אילו שני קווים הוא נמצא.'};
           return {ok:true};
         }});
     })(i);
   }
-  q._ui.body.appendChild(rows);
+  holder.appendChild(line);
+  var marks=el('div','bmarks');
+  q._grp.forEach(function(g){ marks.appendChild(g.mark) });
+  q._ui.body.appendChild(holder);
+  var hintbox=el('div','rhint'); hintbox.hidden=true;
+  q._grp.forEach(function(g){ g.hint=hintbox });
+  q._ui.body.appendChild(hintbox);
 
-  var W=620,H=250,L=46,R=W-46,AY=190,PY=44;
-  var PX=[150,310,470];
+  /* the number line, between the two parts, exactly as on the sheet */
+  var W=620,H=250,L=46,R=W-46,AY=186,PY=44,PX=[150,310,470];
   var nl=el('div','nl');
-  nl.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="גוררים כל מספר אל מקומו על ישר המספרים"></svg>';
-  nl.appendChild(el('div','cap','גוררים כל עיגול אל המקום שלו על הישר, ואפשר להזיז אותו שוב כמה פעמים שרוצים. לחיצה על ״בדוק״ קובעת.'));
+  nl.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="ישר המספרים מאפס עד מאה"></svg>';
   q._ui.body.appendChild(nl);
   var svg=nl.querySelector('svg');
   q._pins=[null,null,null];
 
+  var t2=el('div','qstory');
+  t2.innerHTML='<b>ב.</b> מתחו קו מכל אחד מהמספרים שכתבתם אל המקום המתאים (בערך) על ישר המספרים.';
+  q._ui.body.appendChild(t2);
+  q._ui.body.appendChild(el('div','cap','גוררים כל עיגול אל מקומו על הישר. אפשר להזיז שוב כמה פעמים שרוצים.'));
+
   function num(i){ var v=String(q._nums[i].value).trim(); return isNum(v)?+v:null }
-  /* a number that repeats another row gets no marker at all — it simply cannot be placed */
   function usable(i){
-    var n=num(i); if(n===null || String(n).length!==2) return false;
+    var n=num(i); if(n===null||String(n).length!==2) return false;
     for(var j=0;j<i;j++) if(num(j)===n) return false;
     return true;
   }
-  function dup(i){
-    var n=num(i); if(n===null) return false;
-    for(var j=0;j<3;j++) if(j!==i && num(j)===n) return true;
-    return false;
-  }
   function v2x(v){ return L+(R-L)*v/100 }
   function x2v(x){ return Math.max(0,Math.min(100,Math.round((x-L)/(R-L)*100))) }
-  function pt(ev){
+  function pos(ev){
     var r=svg.getBoundingClientRect();
     var cx=(ev.touches&&ev.touches[0]?ev.touches[0].clientX:ev.clientX);
     var cy=(ev.touches&&ev.touches[0]?ev.touches[0].clientY:ev.clientY);
     return {x:(cx-r.left)/r.width*W, y:(cy-r.top)/r.height*H};
   }
-  function marker(i,cx,cy,ghost){
+  function mk(i,cx,cy,ghost){
     var n=num(i);
-    return '<g class="hnd" data-i="'+i+'" style="cursor:grab"'+(ghost?' opacity=".55"':'')+'>'+
+    return '<g class="hnd" data-i="'+i+'" style="cursor:grab"'+(ghost?' opacity=".5"':'')+'>'+
       '<circle cx="'+cx+'" cy="'+cy+'" r="21" fill="var(--panel)" stroke="'+COL[i]+'" stroke-width="4"/>'+
       '<text x="'+cx+'" y="'+(cy+7)+'" text-anchor="middle" font-size="18" font-weight="900" fill="'+COL[i]+'">'+(n===null?'?':n)+'</text></g>';
   }
   function paint(tmp){
     var o='';
-    o+='<line x1="'+L+'" y1="'+AY+'" x2="'+R+'" y2="'+AY+'" stroke="var(--soft)" stroke-width="2.5"/>';
+    o+='<line x1="'+L+'" y1="'+AY+'" x2="'+(R+14)+'" y2="'+AY+'" stroke="var(--ink)" stroke-width="3"/>';
+    o+='<path d="M'+(R+14)+' '+AY+' l-11 -6 v12 z" fill="var(--ink)"/>';
     for(var t=0;t<=100;t+=10){
       var x=v2x(t), big=(t%20===0);
-      o+='<line x1="'+x+'" y1="'+(AY-(big?12:8))+'" x2="'+x+'" y2="'+(AY+(big?12:8))+'" stroke="var(--soft)" stroke-width="2.5"/>';
-      if(big) o+='<text x="'+x+'" y="'+(AY+32)+'" text-anchor="middle" font-size="14" font-weight="800" fill="var(--soft)">'+t+'</text>';
+      o+='<line x1="'+x+'" y1="'+(AY-(big?15:10))+'" x2="'+x+'" y2="'+(AY+(big?15:10))+'" stroke="var(--ink)" stroke-width="3"/>';
+      if(big) o+='<text x="'+x+'" y="'+(AY+36)+'" text-anchor="middle" font-size="15" font-weight="900" fill="var(--ink)">'+t+'</text>';
     }
     for(var i=0;i<3;i++){
       if(!usable(i)){ q._pins[i]=null; continue }
       if(tmp && tmp.i===i) continue;
       if(q._pins[i]!=null){
         var x=v2x(q._pins[i]);
-        o+='<line x1="'+x+'" y1="'+(AY-26)+'" x2="'+x+'" y2="'+AY+'" stroke="'+COL[i]+'" stroke-width="4" stroke-linecap="round"/>';
-        o+=marker(i,x,AY-46,false);
-      }else{
-        o+=marker(i,PX[i],PY,true);
-      }
+        o+='<line x1="'+x+'" y1="'+(AY-26)+'" x2="'+x+'" y2="'+(AY-2)+'" stroke="'+COL[i]+'" stroke-width="4" stroke-linecap="round"/>';
+        o+=mk(i,x,AY-47,false);
+      }else o+=mk(i,PX[i],PY,true);
     }
-    if(tmp) o+=marker(tmp.i,tmp.x,tmp.y,false);
+    if(tmp) o+=mk(tmp.i,tmp.x,tmp.y,false);
     svg.innerHTML=o;
   }
   q._redraw=function(){ paint() };
@@ -1310,34 +1327,28 @@ function build5(q){
   function down(ev){
     var g=ev.target.closest&&ev.target.closest('.hnd'); if(!g) return;
     var i=+g.getAttribute('data-i');
-    if(q._slots[i] && q._slots[i].locked) return;
+    if(q._slots[i]&&q._slots[i].locked) return;
     drag={i:i}; paint(); ev.preventDefault();
   }
-  function move(ev){ if(!drag) return; var o=pt(ev); paint({i:drag.i,x:o.x,y:o.y}); ev.preventDefault() }
+  function move(ev){ if(!drag) return; var o=pos(ev); paint({i:drag.i,x:o.x,y:o.y}); ev.preventDefault() }
   function up(ev){
     if(!drag) return;
-    var o=pt(ev), i=drag.i; drag=null;
-    if(o.y>AY-105 && o.x>L-30 && o.x<R+30) q._pins[i]=x2v(o.x);
-    else q._pins[i]=null;
+    var o=pos(ev), i=drag.i; drag=null;
+    if(o.y>AY-105 && o.x>L-30 && o.x<R+30) q._pins[i]=x2v(o.x); else q._pins[i]=null;
     saveProgress(); paint();
   }
   svg.addEventListener('mousedown',down); svg.addEventListener('touchstart',down,{passive:false});
   window.addEventListener('mousemove',move); window.addEventListener('touchmove',move,{passive:false});
   window.addEventListener('mouseup',up); window.addEventListener('touchend',up);
 
-  /* the same number twice is refused on the spot */
-  q._nums.forEach(function(inp,i){
+  q._nums.forEach(function(inp){
     inp.addEventListener('input', function(){
-      for(var k=0;k<3;k++){
-        var g=q._grp[k];
-        if(!g||!g.hint||q._slots[k].locked) continue;
-        if(dup(k)){
-          g.hint.hidden=false; g.hint.className='rhint';
-          g.hint.innerHTML='<b>'+num(k)+'</b> כבר נכתב בשורה אחרת. שלושת המספרים צריכים להיות <b>שונים</b>, ולכן אי אפשר לגרור אותו לישר.';
-        }else if(g.hint.innerHTML.indexOf('כבר נכתב בשורה אחרת')>-1){
-          g.hint.hidden=true; g.hint.innerHTML='';
-        }
-      }
+      var d=null;
+      for(var k=0;k<3;k++){ var n=num(k); if(n===null) continue;
+        for(var j=0;j<3;j++) if(j!==k && num(j)===n) d=n; }
+      if(d!==null){ hintbox.hidden=false; hintbox.className='rhint';
+        hintbox.innerHTML='<b>'+d+'</b> נכתב פעמיים. שלושת המספרים צריכים להיות <b>שונים</b>, ולכן אי אפשר למתוח ממנו קו.'; }
+      else if(hintbox.innerHTML.indexOf('נכתב פעמיים')>-1){ hintbox.hidden=true; hintbox.innerHTML=''; }
       paint();
     });
   });
