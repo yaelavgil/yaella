@@ -93,6 +93,11 @@ input.wide{flex:1; min-width:170px}
 input.good{border-color:var(--green); background:var(--greenbg)}
 input.wrong{border-color:var(--red); background:var(--redbg)}
 input:disabled{opacity:1}
+.rmark{flex:none; width:26px; text-align:center; font-weight:900; font-size:1.12rem}
+.rmark.ok{color:var(--green)} .rmark.bad{color:var(--red)}
+.rhint{flex-basis:100%; width:100%; margin:-2px 0 2px; padding:7px 11px; border-radius:9px;
+  background:var(--amberbg); color:var(--amber); font-size:.86rem; line-height:1.45}
+.rhint b{font-weight:900}
 .chips{display:flex; gap:8px; flex-wrap:wrap}
 .chip{font:inherit; font-weight:700; cursor:pointer; background:var(--bg); color:var(--ink);
   border:2px solid var(--line); border-radius:10px; padding:8px 16px; transition:.15s}
@@ -398,6 +403,7 @@ function showDone(q, html){
 }
 function lock(q){
   q._ui.btn.disabled = true;
+  Array.prototype.forEach.call(q._ui.body.querySelectorAll('.rhint'), function(h){ h.hidden = true });
   Array.prototype.forEach.call(q._ui.body.querySelectorAll('input'), function(i){ i.disabled = true });
   Array.prototype.forEach.call(q._ui.body.querySelectorAll('.chip'), function(b){ b.disabled = true });
 }
@@ -416,14 +422,36 @@ function buildItems(q, items){
     inp.setAttribute('inputmode', (it.kind==='words'||q.kind==='words') ? 'text' : 'numeric');
     inp.dataset.i = i;
     r.appendChild(inp);
+    r.appendChild(el('span','rmark',''));
+    var rh = el('div','rhint',''); rh.hidden = true;
+    r.appendChild(rh);
     rows.appendChild(r);
   });
   q._ui.body.appendChild(rows);
 }
 
+/* one short, targeted line per row — says what went wrong, never the answer */
+function rowHint(it, v, isW){
+  if(!String(v).trim()) return 'עוד לא מילאת כאן.';
+  if(isW){
+    if(digits(v)) return 'כאן כותבים <b>במילים</b>, לא בספרות.';
+    return 'כמעט. קרא את המספר לפי המקומות — מאות, עשרות, אחדות — ובדוק את האיות.';
+  }
+  if(!isNum(v)) return 'כאן כותבים <b>ספרות בלבד</b>.';
+  var s = digits(String(+v)), t = String(it.a);
+  if(s.length > t.length) return 'יש כאן ' + s.length + ' ספרות במקום ' + t.length + '. <b>כל חלק במילים הוא ספרה אחת</b> — לא מדביקים את המספרים זה לזה.';
+  if(s.length < t.length) return 'חסרה ספרה. <b>מקום שלא הוזכר מקבל 0</b>, והוא תופס מקום.';
+  if(s === rev(t)) return 'הספרות נכונות — <b>אבל הסדר הפוך.</b> הימנית היא האחדות, השמאלית היא המאות.';
+  if(s.split('').sort().join('') === t.split('').sort().join('')) return 'כל הספרות נכונות, <b>רק לא במקומות הנכונים.</b> בדוק מה אמור לשבת במאות, מה בעשרות ומה באחדות.';
+  if(Math.abs(+v - +it.a) === 10 || Math.abs(+v - +it.a) === 100) return 'קרוב מאוד — <b>טעית במקום אחד</b> בדיוק. בדוק שוב את העשרות ואת המאות.';
+  return 'לא זה. <b>פרק את המספר לחלקים</b> — כמה מאות, כמה עשרות, כמה אחדות — וכתוב ספרה לכל מקום.';
+}
+
 function checkItems(q, items){
   var inputs = q._ui.body.querySelectorAll('input');
-  var wrong = 0, blank = 0, diag = '';
+  var marks = q._ui.body.querySelectorAll('.rmark');
+  var hints = q._ui.body.querySelectorAll('.rhint');
+  var wrong = 0, blank = 0;
   items.forEach(function(it, i){
     var v = inputs[i].value, isW = (it.kind==='words' || q.kind==='words');
     var good;
@@ -431,20 +459,18 @@ function checkItems(q, items){
     else if(isW){
       var a = Array.isArray(it.a) ? it.a : [it.a];
       good = a.some(function(x){ return nz(x) === nz(v) });
-      if(!good && digits(v)) diag = 'שים לב — בסעיף הזה צריך לכתוב <b>במילים</b>, לא בספרות.';
     }else{
       good = isNum(v) && (+v === +it.a);
-      if(!good && isNum(v)){
-        var s = digits(v), t = String(it.a);
-        if(s.length > t.length && !diag) diag = '״'+s+'״ ארוך מדי. כנראה כתבת כל חלק בנפרד והדבקת אותם — אבל כל חלק הוא <b>ספרה אחת</b>.';
-        else if(s === rev(t) && !diag) diag = 'הספרות נכונות אבל <b>הסדר הפוך</b>. בדוק מה במקום האחדות (הימני) ומה במקום המאות (השמאלי).';
-      }
     }
     inputs[i].className = inputs[i].className.replace(/ ?(good|wrong)/g,'') + (good ? ' good' : ' wrong');
+    if(marks[i]){ marks[i].className = 'rmark ' + (good ? 'ok' : 'bad'); marks[i].textContent = good ? '✓' : '✗' }
+    if(hints[i]){
+      if(good){ hints[i].hidden = true; hints[i].innerHTML = '' }
+      else{ hints[i].hidden = false; hints[i].innerHTML = rowHint(it, v, isW) }
+    }
     if(!good) wrong++;
   });
-  if(blank) diag = 'יש סעיפים ריקים — צריך למלא את כולם.';
-  return {wrong:wrong, diag:diag};
+  return {wrong:wrong, diag: blank ? 'יש שורות שעוד לא מילאת — ליד כל שורה כתוב מה חסר בה.' : 'ליד כל שורה מסומן ✓ או ✗, ותחת כל שורה שגויה כתוב מה בדיוק לא מסתדר בה.'};
 }
 
 function solItems(items, q){
@@ -505,28 +531,39 @@ function buildSeq(q){
       } else strip.appendChild(el('span','fix', String(c)));
     });
     wrapr.appendChild(strip);
+    var m = el('span','rmark',''); m.dataset.sm = s.l; wrapr.appendChild(m);
+    var rh = el('div','rhint',''); rh.hidden = true; rh.dataset.sh = s.l; wrapr.appendChild(rh);
     q._ui.body.appendChild(wrapr);
   });
 }
 function checkSeq(q){
-  var wrong = 0, diag = '';
+  var wrong = 0;
   q.seqs.forEach(function(s){
     var inputs = q._ui.body.querySelectorAll('input[data-seq="'+s.l+'"]');
+    var bad = 0, why = '', blank = 0;
+    var known = s.cells.filter(function(c){ return c !== null });
+    var step = known.length > 1 ? (known[1] - known[0]) : 10;   /* signed, left to right */
     Array.prototype.forEach.call(inputs, function(inp, i){
       var good = isNum(inp.value) && (+inp.value === s.ans[i]);
       inp.className = good ? 'good' : 'wrong';
-      if(!good){
-        wrong++;
-        if(!diag && isNum(inp.value)){
-          var d = Math.abs(+inp.value - s.ans[i]);
-          if(d === 20) diag = 'בסדרה '+s.l+' קפצת <b>פעמיים</b> במקום פעם אחת.';
-          else if(+inp.value === s.ans[i] - 2*(s.ans[i] - (s.cells.filter(function(c){return c!==null})[0]||0))) diag = '';
-        }
-      }
+      if(good) return;
+      bad++; wrong++;
+      if(!String(inp.value).trim()){ blank++; return }
+      if(!isNum(inp.value)){ why = why || 'כאן כותבים ספרות בלבד.'; return }
+      var v = +inp.value, d = v - s.ans[i];
+      if(v === s.ans[i] + 2*step || v === s.ans[i] - 2*step) why = why || 'קפצת <b>פעמיים</b> במקום פעם אחת.';
+      else if(Math.abs(d) === 2*Math.abs(step)) why = why || 'הלכת ל<b>כיוון ההפוך</b> של הקפיצה. בדוק אם המספרים כאן גדֵלים או קטֵנים.';
+      else if(Math.abs(d) % Math.abs(step) !== 0) why = why || 'גודל הקפיצה כאן הוא <b>' + Math.abs(step) + '</b>, והמספר שכתבת לא יושב עליו.';
+      else why = why || 'הקפיצה נכונה אבל <b>ספרת מקום אחד</b> יותר מדי או פחות מדי.';
     });
+    if(blank && !why) why = 'עוד לא מילאת כאן.';
+    if(!why && bad) why = 'בדוק את גודל הקפיצה ואת הכיוון שלה בסדרה הזו.';
+    var m = q._ui.body.querySelector('.rmark[data-sm="'+s.l+'"]');
+    var h = q._ui.body.querySelector('.rhint[data-sh="'+s.l+'"]');
+    if(m){ m.className = 'rmark ' + (bad ? 'bad' : 'ok'); m.textContent = bad ? '✗' : '✓' }
+    if(h){ h.hidden = !bad; h.innerHTML = bad ? why : '' }
   });
-  if(!diag) diag = 'בדוק שוב את <b>כיוון</b> הקפיצה בכל סדרה בנפרד — הן לא כולן באותו כיוון.';
-  return {wrong:wrong, diag:diag};
+  return {wrong:wrong, diag:'כל סדרה מסומנת בנפרד — תחת סדרה שגויה כתוב מה לא מסתדר בה.'};
 }
 function solSeq(q){
   return q.seqs.map(function(s){
@@ -725,7 +762,15 @@ function render(){
       else if(q.id === 'q4e'){ build5(q); pts = 3 }
       reg(q.id, pts);
       q._ui.btn.addEventListener('click', function(){ onCheck(q) });
-      q._ui.body.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); onCheck(q) } });
+      /* Enter moves down to the next field; on the last one it runs the check */
+      q._ui.body.addEventListener('keydown', function(e){
+        if(e.key !== 'Enter') return;
+        e.preventDefault();
+        var all = Array.prototype.filter.call(q._ui.body.querySelectorAll('input'), function(i){ return !i.disabled });
+        var at = all.indexOf(e.target);
+        if(at > -1 && at < all.length - 1){ all[at+1].focus(); all[at+1].select(); }
+        else onCheck(q);
+      });
     });
     app.appendChild(sec);
   });
