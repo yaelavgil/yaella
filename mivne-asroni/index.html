@@ -128,6 +128,18 @@ input:disabled{opacity:1}
 .heroart .eq{font-size:1.8rem; font-weight:900; color:var(--soft)}
 .heroart .num{font-size:3.1rem; font-weight:900; color:var(--gold); letter-spacing:.02em;
   font-variant-numeric:tabular-nums}
+.freebox{font:inherit; color:var(--ink); background:var(--bg); border:2px solid var(--line);
+  border-radius:11px; padding:8px 11px; flex:1; min-width:190px; resize:vertical; line-height:1.6}
+.freebox:focus{outline:none; border-color:var(--sky)}
+.freebox.active{border-color:var(--sky); box-shadow:0 0 0 3px rgba(47,127,212,.2)}
+.freebox.good{border-color:var(--green); background:var(--greenbg)}
+.qstory{margin:4px 0 10px; line-height:1.75}
+.qstory b{font-weight:900}
+.unit{font-weight:700; color:var(--soft)}
+.coinshelf{display:flex; justify-content:center; gap:14px; flex-wrap:wrap; margin:6px 0 12px}
+.coinshelf figure{margin:0; width:92px; text-align:center}
+.coinshelf img{display:block; width:72px; margin:0 auto 4px}
+.coinshelf figcaption{font-size:.76rem; font-weight:700; color:var(--soft); line-height:1.3}
 .coin{display:inline-block; width:52px; height:auto; vertical-align:-16px; margin-inline-end:9px}
 @media(max-width:420px){.coin{display:inline-block; width:42px; vertical-align:-13px}}
 .art{display:block; margin:0 auto 10px; max-width:100%}
@@ -463,12 +475,15 @@ var PARTS = [
    hint:'בסעיף א יש <b>תשובה אחת בלבד</b> — מה צריך להוריד מ‑13 כדי להישאר עם 6. בסעיפים ב ו‑ג יש <b>הרבה תשובות נכונות</b>: כל מספר שיגרום לתוצאה להיות <b>קטנה מ‑6</b>, כלומר כל מספר <b>גדול</b> מזה שבסעיף א. ושתי התשובות צריכות להיות שונות זו מזו.'},
 
   {id:'q4e', kind:'line', title:'שאלה 5 · נתונות הספרות 1, 6, 9',
-   sub:'<span>א. כתבו באמצעותן שלושה מספרים דו‑ספרתיים.</span><span>ב. סמנו כל אחד מהמספרים שכתבתם במקום המתאים (בערך) על ישר המספרים.</span>',
+   sub:'<span>א. כתבו באמצעותן שלושה מספרים דו‑ספרתיים.</span><span>ב. מתחו קו מכל אחד מהמספרים שכתבתם אל המקום המתאים (בערך) על ישר המספרים.</span>',
    cards:[1,6,9],
    hint:'מספר דו‑ספרתי בנוי משתי ספרות מתוך השלוש — למשל 16 או 61. <b>ולסימון על הציר:</b> הציר מ‑0 עד 100 והקווים הקטנים הם כל 10. מצאו קודם בין איזה שני קווים המספר נמצא, ואז סמנו בערך ביניהם.'},
 
   {id:'q4f', kind:'mixed', title:'שאלה 6',
-   items:[{l:'א. השלימו את המספר החסר: &nbsp;<b dir="ltr">17 + 40 = 27 +</b>', kind:'num', a:30}],
+   items:[
+     {l:'א. השלימו את המספר החסר: &nbsp;<b dir="ltr">17 + 40 = 27 +</b>', kind:'num', a:30},
+     {l:'ב. הסבירו איך אפשר למצוא את המספר החסר <b>מבלי</b> לחשב את התוצאה של התרגיל <b dir="ltr">40 + 17</b>.', kind:'free', rows:3, ph:'ההסבר שלכם'}
+   ],
    hint:'אל תחשבו את 40 + 17. <b>השוו את שני הצדדים זה לזה:</b> 27 גדול מ‑17 ב‑10 בדיוק. אם צד אחד גדל ב‑10 והתוצאה צריכה להישאר אותה תוצאה — מה חייב לקרות למספר השני?',
    after:'<b>ב. ולמה אפשר למצוא את המספר החסר מבלי לחשב את 40 + 17:</b> 27 גדול מ‑17 בעשר, ולכן המספר השני חייב להיות <b>קטן בעשר</b> מ‑40.'},
 
@@ -478,7 +493,8 @@ var PARTS = [
     {l:'ב. &nbsp;<b dir="ltr">54 − 13 =</b>', a:41},
     {l:'ג. &nbsp;<b dir="ltr">9 + 67 + 21 =</b>', a:97},
     {l:'ד. &nbsp;<b dir="ltr">92 − 25 =</b>', a:67},
-    {l:'ה. &nbsp;<b dir="ltr">430 + 75 =</b>', a:505}
+    {l:'ה. &nbsp;<b dir="ltr">430 + 75 =</b>', a:505},
+    {l:'<b>מקום לחישובים</b>', kind:'free', rows:4, ph:'אפשר לכתוב כאן את דרך החישוב'}
    ],
    hint:'״הדרך הנוחה״ היא <b>לפרק לפי המקומות</b>. ב-304 + 170 חברו מאות עם מאות ועשרות עם עשרות. ב-9 + 67 + 21 שווה לחפש קודם שני מספרים שמשלימים לעשרת עגולה — <b>9 ו-21 נותנים 30</b>, ורק אז להוסיף את 67. ובחיסורים עם פריטה (92 − 25) שווה להוריד קודם עד העשרת העגולה ואז את השאר.'},
 
@@ -501,8 +517,7 @@ var PARTS = [
    },
    hint:'הכי בטוח כאן זה פשוט <b>לכתוב את שני המספרים</b>: לפני השינוי 59, אחרי השינוי 79. ועכשיו — כמה 79 גדול מ-59?'},
 
-  {id:'q4j', kind:'coins', title:'שאלה 10 · שרה קנתה כדור במחיר של 34 שקלים, ושילמה בשטר של 50 שקלים.',
-   sub:'<span>א. כמה עודף קיבלה שרה ?</span><span>ב. בקופה של המוכר יש מטבעות של 10, 5, 2 ו-1. הציעו אפשרות לעודף — <b>לא חייבים להשתמש בכל סוגי המטבעות.</b></span>',
+  {id:'q4j', kind:'coins', title:'שאלה 10',
    hint:'קודם <b>העודף</b>: כמה צריך להוסיף ל-34 כדי להגיע ל-50. ואז המטבעות — כל צירוף שמסתכם בדיוק בעודף נכון, ומותר לכתוב <b>0</b> במטבע שלא משתמשים בו. דרך נוחה: להתחיל מהמטבע הגדול ביותר שנכנס, ולהשלים בקטנים.'}
  ]
 }
@@ -706,14 +721,14 @@ function onCheck(q){
 function focusInput(q, inp){ try{ inp.focus(); inp.select() }catch(e){} setActive(q, inp) }
 function setActive(q, inp){
   q._active = inp;
-  Array.prototype.forEach.call(q._ui.body.querySelectorAll('input'), function(i){
+  Array.prototype.forEach.call(q._ui.body.querySelectorAll('input,textarea'), function(i){
     i.className = String(i.className).replace(/ ?active/g,'');
   });
   if(inp && !inp.disabled) inp.className += ' active';
   renderKbd(q);
 }
 function firstOpen(q){
-  var all=Array.prototype.filter.call(q._ui.body.querySelectorAll('input'), function(i){ return !i.disabled });
+  var all=Array.prototype.filter.call(q._ui.body.querySelectorAll('input,textarea'), function(i){ return !i.disabled });
   return all[0] || null;
 }
 function mkInput(cls,w){
@@ -888,11 +903,23 @@ function buildItems(q, items){
   var rows=el('div','rows');
   items.forEach(function(it){
     var isW=(it.kind==='words'||q.kind==='words');
+    var isFree=(it.kind==='free');
     var m=mkRow(rows, it.l);
-    var inp=mkInput(isW||it.w==='wide'?'wide':'num', (it.w&&it.w!=='wide')?it.w:0);
-    if(isW) inp.setAttribute('inputmode','text');
+    var inp;
+    if(isFree){
+      inp=document.createElement('textarea'); inp.className='freebox'; inp.rows=it.rows||2;
+      inp.dataset.free='1'; if(it.ph) inp.placeholder=it.ph;
+    }else{
+      inp=mkInput(isW||it.w==='wide'?'wide':'num', (it.w&&it.w!=='wide')?it.w:0);
+      if(isW) inp.setAttribute('inputmode','text');
+    }
     m.row.appendChild(inp);
     finishRow(m);
+    if(isFree){
+      addSlot({q:q, el:inp, group:m.g, read:reader(inp), scored:false, label:txt(it.l), sol:'',
+        ev:function(){ return {ok:String(inp.value).trim().length>0, why:'כתבו כאן את ההסבר שלכם — כל ניסוח סביר מתקבל, והוא לא נספר לציון.'} }});
+      return;
+    }
     var sol=Array.isArray(it.a)?it.a[0]:it.a;
     addSlot({q:q, el:inp, group:m.g, read:reader(inp), sol:String(sol), label:txt(it.l),
       failFn:function(v){ return diffLine(v, sol) },
@@ -1164,76 +1191,114 @@ function build5(q){
       var inp=mkInput('num'); m.row.appendChild(inp); finishRow(m);
       addSlot({q:q, el:inp, group:m.g, label:'מספר '+(idx+1),
         read:function(){ return String(inp.value).trim()+'|'+(q._pins[idx]==null?'':q._pins[idx]) },
-        write:function(v){
-          var p=String(v).split('|');
-          inp.value=p[0]||'';
-          q._pins[idx] = (p[1]==='' || p[1]==null) ? null : +p[1];
-          if(q._redraw) q._redraw();
-        },
+        write:function(v){ var pp=String(v).split('|'); inp.value=pp[0]||'';
+          q._pins[idx]=(pp[1]===''||pp[1]==null)?null:+pp[1]; if(q._redraw) q._redraw(); },
         sol:'',
-        failFn:function(){ return 'אפשר: <b>16 · 19 · 61 · 69 · 91 · 96</b> — שלושה מהם, כל אחד מסומן במקומו על הציר.' },
+        failFn:function(){ return 'אפשר: <b>16 · 19 · 61 · 69 · 91 · 96</b> — שלושה מהם, כל אחד עם קו למקומו על הישר.' },
         ev:function(ctx){
           var v=String(inp.value).trim();
           if(!isNum(v)) return {ok:false, why:'כאן כותבים מספר.'};
           var n=+v;
           if(String(n).length!==2) return {ok:false, why:'״'+n+'״ איננו דו‑ספרתי.'};
           if(pool.indexOf(n)<0) return {ok:false, why:'״'+n+'״ לא בנוי משתיים מהספרות 1, 6 ו‑9.'};
-          for(var j=0;j<idx;j++){ var o=String(ctx.vals[j]).split('|')[0]; if(isNum(o)&&+o===n) return {ok:false, why:'<b>'+n+'</b> כבר נכתב. צריך שלושה מספרים <b>שונים</b>.'} }
+          for(var j=0;j<idx;j++){ var o=String(ctx.vals[j]).split('|')[0];
+            if(isNum(o)&&+o===n) return {ok:false, why:'<b>'+n+'</b> כבר נכתב. צריך שלושה מספרים <b>שונים</b>.'} }
           var pin=q._pins[idx];
-          if(pin==null) return {ok:false, why:'המספר נכון — נשאר <b>לסמן אותו על הציר</b>.'};
-          if(Math.abs(pin-n)>6) return {ok:false, why:'הסימון על הציר רחוק מדי מ‑<b>'+n+'</b>. מצא קודם בין אילו שני קווים (עשרות) הוא נמצא.'};
+          if(pin==null) return {ok:false, why:'המספר נכון — נשאר <b>למתוח ממנו קו</b> אל המקום שלו על הישר.'};
+          if(Math.abs(pin-n)>6) return {ok:false, why:'הקו שמתחת מ-<b>'+n+'</b> מגיע למקום רחוק מדי. בדקו בין אילו שני קווים (עשרות) המספר נמצא.'};
           return {ok:true};
         }});
+      q._nums = q._nums || []; q._nums[idx]=inp;
     })(i);
   }
   q._ui.body.appendChild(rows);
 
-  var nl=el('div','nl'), W=600,H=92,L=20,R=W-20;
-  var svg='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="ישר המספרים מאפס עד מאה">';
-  svg+='<line x1="'+L+'" y1="46" x2="'+R+'" y2="46" stroke="currentColor" stroke-width="2"/>';
-  for(var t=0;t<=100;t+=10){
-    var x=L+(R-L)*t/100, big=(t%20===0);
-    svg+='<line x1="'+x+'" y1="'+(big?34:38)+'" x2="'+x+'" y2="'+(big?58:54)+'" stroke="currentColor" stroke-width="2"/>';
-    if(big) svg+='<text x="'+x+'" y="76" text-anchor="middle" font-size="15" font-weight="700" fill="currentColor">'+t+'</text>';
-  }
-  svg+='<g id="pins-'+q.id+'"></g></svg>';
-  nl.innerHTML=svg;
-  nl.appendChild(el('div','cap','לוחצים על הציר כדי לסמן. הסימון הולך למספר הבא בתור — 1, אחר כך 2, אחר כך 3.'));
+  var W=600,H=236,L=40,R=W-40,AY=180,HY=40;
+  var HX=[110,300,490];
+  var COL=['#d63a4a','#0f8a52','#2f7fd4'];
+  var nl=el('div','nl');
+  nl.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="מתיחת קו מכל מספר אל ישר המספרים"></svg>';
+  nl.appendChild(el('div','cap','גוררים מכל עיגול קו אל המקום שלו על הישר. גרירה נוספת מאותו עיגול מתקנת.'));
   q._ui.body.appendChild(nl);
+  var svg=nl.querySelector('svg');
   q._pins=[null,null,null];
-  var svgEl=nl.querySelector('svg');
-  q._redraw=function(){ drawPins(q,svgEl,W,L,R) };
-  svgEl.addEventListener('click',function(ev){
-    var at=-1, i;
-    for(i=0;i<3;i++) if(!q._slots[i].locked && q._pins[i]==null){ at=i; break }
-    if(at<0) for(i=0;i<3;i++) if(!q._slots[i].locked){ at=i; break }
-    if(at<0) return;
-    var rr=svgEl.getBoundingClientRect();
-    var val=Math.round(((ev.clientX-rr.left)/rr.width*W-L)/(R-L)*100);
-    q._pins[at]=Math.max(0,Math.min(100,val));
-    drawPins(q,svgEl,W,L,R);
-    saveProgress();
-  });
-}
-function drawPins(q,svgEl,W,L,R){
-  var g=svgEl.querySelector('#pins-'+q.id), s='';
-  var cols=['#c02b3a','#117a4a','#2f7fd4'];
-  q._pins.forEach(function(v,i){
-    if(v==null) return;
-    var x=L+(R-L)*v/100;
-    s+='<g><line x1="'+x+'" y1="20" x2="'+x+'" y2="46" stroke="'+cols[i]+'" stroke-width="3"/>'+
-       '<circle cx="'+x+'" cy="18" r="9" fill="'+cols[i]+'"/>'+
-       '<text x="'+x+'" y="22" text-anchor="middle" font-size="11" font-weight="900" fill="#fff">'+(i+1)+'</text></g>';
-  });
-  g.innerHTML=s;
-}
 
+  function val2x(v){ return L+(R-L)*v/100 }
+  function x2val(x){ return Math.max(0,Math.min(100,Math.round((x-L)/(R-L)*100))) }
+  function pt(ev){
+    var r=svg.getBoundingClientRect();
+    var cx=(ev.touches?ev.touches[0].clientX:ev.clientX), cy=(ev.touches?ev.touches[0].clientY:ev.clientY);
+    return {x:(cx-r.left)/r.width*W, y:(cy-r.top)/r.height*H};
+  }
+  function paint(temp){
+    var out='';
+    out+='<line x1="'+L+'" y1="'+AY+'" x2="'+R+'" y2="'+AY+'" stroke="var(--soft)" stroke-width="2.5"/>';
+    for(var t=0;t<=100;t+=10){
+      var x=val2x(t), big=(t%20===0);
+      out+='<line x1="'+x+'" y1="'+(AY-(big?12:8))+'" x2="'+x+'" y2="'+(AY+(big?12:8))+'" stroke="var(--soft)" stroke-width="2.5"/>';
+      if(big) out+='<text x="'+x+'" y="'+(AY+30)+'" text-anchor="middle" font-size="14" font-weight="800" fill="var(--soft)">'+t+'</text>';
+    }
+    for(var i=0;i<3;i++){
+      var v=q._pins[i];
+      if(v!=null) out+='<line x1="'+HX[i]+'" y1="'+(HY+22)+'" x2="'+val2x(v)+'" y2="'+(AY-4)+'" stroke="'+COL[i]+'" stroke-width="4" stroke-linecap="round"/>'+
+                       '<circle cx="'+val2x(v)+'" cy="'+AY+'" r="7" fill="'+COL[i]+'"/>';
+      var num=(q._nums&&q._nums[i]&&String(q._nums[i].value).trim())||'?';
+      out+='<g class="hnd" data-i="'+i+'" style="cursor:grab">'+
+           '<circle cx="'+HX[i]+'" cy="'+HY+'" r="22" fill="var(--panel)" stroke="'+COL[i]+'" stroke-width="4"/>'+
+           '<text x="'+HX[i]+'" y="'+(HY+7)+'" text-anchor="middle" font-size="19" font-weight="900" fill="'+COL[i]+'">'+num+'</text></g>';
+    }
+    if(temp) out+='<line x1="'+HX[temp.i]+'" y1="'+(HY+22)+'" x2="'+temp.x+'" y2="'+temp.y+'" stroke="'+COL[temp.i]+'" stroke-width="4" stroke-dasharray="7 6" stroke-linecap="round"/>';
+    svg.innerHTML=out;
+  }
+  q._redraw=paint;
+  paint();
+
+  var drag=null;
+  function down(ev){
+    var g=ev.target.closest&&ev.target.closest('.hnd'); if(!g) return;
+    var i=+g.getAttribute('data-i');
+    if(q._slots[i] && q._slots[i].locked) return;
+    drag={i:i}; ev.preventDefault();
+  }
+  function move(ev){ if(!drag) return; var o=pt(ev); paint({i:drag.i,x:o.x,y:o.y}); ev.preventDefault(); }
+  function up(ev){
+    if(!drag) return;
+    var o=pt(ev);
+    if(o.y > AY-50) { q._pins[drag.i]=x2val(o.x); saveProgress(); }
+    drag=null; paint();
+  }
+  svg.addEventListener('mousedown',down); svg.addEventListener('touchstart',down,{passive:false});
+  window.addEventListener('mousemove',move); window.addEventListener('touchmove',move,{passive:false});
+  window.addEventListener('mouseup',up);   window.addEventListener('touchend',up);
+  Array.prototype.forEach.call(q._ui.body.querySelectorAll('input'),function(i){
+    i.addEventListener('input', function(){ paint() });
+  });
+}
 function buildCoins(q){
+  var say1=el('div','qstory');
+  say1.innerHTML='<b>א.</b> שרה קנתה כדור במחיר של 34 שקלים.<br>'+
+                 'היא שילמה בשטר של 50 שקלים.<br><b>כמה עודף קיבלה שרה ?</b>';
+  q._ui.body.appendChild(say1);
+
   var rows=el('div','rows');
-  var m0=mkRow(rows,'א. כמה עודף קיבלה שרה ? &nbsp;<span style="color:var(--soft)">(בשקלים)</span>');
-  var chg=mkInput('num'); m0.row.appendChild(chg); finishRow(m0);
-  addSlot({q:q, el:chg, group:m0.g, read:reader(chg), sol:'16', label:'העודף',
-    failFn:function(v){ return diffLine(v,'16') + ' &nbsp;·&nbsp; 50 פחות 34' },
+  var mc=mkRow(rows,'חָשֵׁב :');
+  var calc=mkInput('wide'); calc.setAttribute('inputmode','text'); calc.dataset.free='1';
+  calc.placeholder='התרגיל שעשית';
+  mc.row.appendChild(calc); finishRow(mc);
+  addSlot({q:q, el:calc, group:mc.g, read:reader(calc), sol:'50 − 34', label:'חשב',
+    failFn:function(){ return 'התרגיל שמוביל לתשובה הוא <b dir="ltr">50 − 34</b>.' },
+    ev:function(){
+      var v=String(calc.value); var d=v.replace(/[^\d]/g,' ').split(/\s+/).filter(Boolean);
+      if(d.indexOf('50')>-1 && d.indexOf('34')>-1) return {ok:true};
+      return {ok:false, why:'כאן כותבים את <b>התרגיל</b> עצמו — מאיזה מספר מורידים, וכמה. שני המספרים מופיעים בשאלה.'};
+    }});
+
+  var ma=mkRow(rows,'תשובה :');
+  var chg=mkInput('num'); ma.row.appendChild(chg);
+  ma.row.appendChild(el('span','unit','שקלים'));
+  finishRow(ma);
+  addSlot({q:q, el:chg, group:ma.g, read:reader(chg), sol:'16', label:'העודף',
+    failFn:function(v){ return diffLine(v,'16') },
     ev:function(){
       var v=String(chg.value).trim();
       if(!isNum(v)) return {ok:false, why:'כאן כותבים מספר.'};
@@ -1241,25 +1306,43 @@ function buildCoins(q){
       if(+v===84) return {ok:false, why:'חיברת במקום לחסר. היא <b>שילמה</b> 50 וקנתה ב-34 — העודף הוא ההפרש.'};
       return {ok:false, why:'כמה צריך להוסיף ל-34 כדי להגיע ל-50 ? זה העודף.'};
     }});
-
   q._ui.body.appendChild(rows);
+
+  var say2=el('div','qstory');
+  say2.innerHTML='<b>ב.</b> בקופה של המוכר נמצאים סוגי המטבעות הבאים :';
+  q._ui.body.appendChild(say2);
+
+  var shelf=el('div','coinshelf');
+  [10,5,2,1].forEach(function(v){
+    shelf.innerHTML += '<figure><img src="coin-'+v+'.png" alt=""><figcaption>מטבעות של<br>'+
+      (v===1?'שקל אחד':v+' שקלים')+'</figcaption></figure>';
+  });
+  q._ui.body.appendChild(shelf);
+
+  var say3=el('div','qstory');
+  say3.innerHTML='הציעו אפשרויות לעודף ששרה יכולה לקבל :<br>'+
+                 '<b>שימו לב — לא חייבים להשתמש בכל סוגי המטבעות</b>';
+  q._ui.body.appendChild(say3);
+
   var rows2=el('div','rows');
   var vals=[1,2,5,10], ins=[];
-  vals.forEach(function(v){
-    var m=mkRow(rows2,'<img class="coin" src="coin-'+v+'.png" alt="">'+'כמה מטבעות של <b>'+v+'</b> ' + (v===1?'שקל':'שקלים'));
-    var inp=mkInput('num'); m.row.appendChild(inp); finishRow(m);
+  vals.forEach(function(v,k){
+    var m=mkRow(rows2, null);
+    var inp=mkInput('num'); m.row.appendChild(inp);
+    m.row.appendChild(el('span','lbl','מטבעות של ' + (v===1?'שקל אחד':v+' שקלים') + (k<3?',':'.')));
+    finishRow(m);
     ins.push(inp);
     addSlot({q:q, el:inp, group:m.g, read:reader(inp), sol:'', scored:(v===1),
-      label:'מטבעות של '+v,
-      failFn:function(){ return 'הסכום של כל המטבעות חייב להיות בדיוק <b>העודף</b>. למשל: מטבע אחד של 10, שלושה של 2 — יחד 16.' },
+      label:'מטבעות של '+(v===1?'שקל אחד':v+' שקלים'),
+      failFn:function(){ return 'סכום כל המטבעות חייב להיות בדיוק <b>העודף</b>. למשל מטבע אחד של 10 ושלושה של 2 — יחד 16.' },
       ev:function(){
         var all=ins.map(function(x){ return String(x.value).trim() });
-        if(!all.every(isNum)) return {ok:false, why:'בכל שורה כותבים מספר — ומותר לכתוב <b>0</b> במטבע שלא משתמשים בו.'};
-        var sum=all[0]*1 + all[1]*2 + all[2]*5 + all[3]*10;
-        var want=+String(chg.value).trim();
-        if(!isNum(String(chg.value).trim())) return {ok:false, why:'קודם מלאו את <b>העודף</b> בסעיף א.'};
-        if(sum===want) return {ok:true};
-        return {ok:false, why:'המטבעות שכתבת מסתכמות ב-<b>'+sum+'</b> שקלים, והעודף הוא <b>'+want+'</b>.'};
+        if(!all.every(isNum)) return {ok:false, why:'בכל שורה כותבים מספר — ומותר <b>0</b> במטבע שלא משתמשים בו.'};
+        var sum=all[0]*1+all[1]*2+all[2]*5+all[3]*10;
+        var want=String(chg.value).trim();
+        if(!isNum(want)) return {ok:false, why:'קודם מלאו את <b>התשובה</b> בסעיף א.'};
+        if(sum===+want) return {ok:true};
+        return {ok:false, why:'המטבעות שכתבת מסתכמות ב-<b>'+sum+'</b> שקלים, והעודף הוא <b>'+(+want)+'</b>.'};
       }});
   });
   q._ui.body.appendChild(rows2);
@@ -1304,10 +1387,11 @@ function render(){
       buildKbd(q);
       q._part=p;
       q._ui.btn.addEventListener('click',function(){ onCheck(q) });
-      Array.prototype.forEach.call(q._ui.body.querySelectorAll('input'),function(i){
+      Array.prototype.forEach.call(q._ui.body.querySelectorAll('input,textarea'),function(i){
         i.addEventListener('focus',function(){ setActive(q,i) });
         /* a box for numbers takes only digits; a box for words takes only Hebrew */
         i.addEventListener('input',function(){
+          if(i.dataset.free){ saveProgress(); return }
           var isT = i.getAttribute('inputmode')==='text';
           var was = i.value;
           var now = isT ? was.replace(/[0-9A-Za-z]/g,'') : was.replace(/[^0-9]/g,'');
@@ -1322,7 +1406,7 @@ function render(){
       q._ui.body.addEventListener('keydown',function(e){
         if(e.key!=='Enter') return;
         e.preventDefault();
-        var all=Array.prototype.filter.call(q._ui.body.querySelectorAll('input'),function(i){ return !i.disabled });
+        var all=Array.prototype.filter.call(q._ui.body.querySelectorAll('input,textarea'),function(i){ return !i.disabled });
         var at=all.indexOf(e.target);
         if(at>-1&&at<all.length-1){ focusInput(q,all[at+1]); return }
         var empty=all.filter(function(i){ return !String(i.value).trim() })[0];
