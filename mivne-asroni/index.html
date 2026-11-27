@@ -150,10 +150,16 @@ input:disabled{opacity:1}
 .legend i{display:inline-block; width:12px; height:12px; border-radius:3px; margin-inline-end:5px; vertical-align:-1px}
 
 /* ---- the virtual keyboard ---- */
-.kbd{margin-top:12px; border-top:2px dashed var(--line); padding-top:10px}
-.kbd-h{display:flex; align-items:center; gap:8px; justify-content:space-between; margin-bottom:7px}
-.kbd-h span{font-size:.8rem; font-weight:700; color:var(--soft)}
-.kbd-keys{display:flex; flex-wrap:wrap; gap:6px; justify-content:center}
+.kbd{margin-top:14px; border-top:2px dashed var(--line); padding-top:12px}
+.kbd-panel{background:linear-gradient(180deg,rgba(91,63,214,.07),rgba(91,63,214,.03));
+  border:2px solid var(--line); border-radius:16px; padding:11px 12px 13px}
+.kbd-h{display:flex; align-items:center; gap:8px; justify-content:space-between; margin-bottom:9px}
+.kbd-h span{font-size:.82rem; color:var(--soft)}
+.kbd-h span b{color:var(--blue); font-weight:900}
+.kbd-keys.num{display:grid; direction:ltr; grid-template-columns:repeat(3,minmax(0,72px));
+  gap:7px; justify-content:center}
+.kbd-keys.he{display:flex; direction:rtl; flex-wrap:wrap; gap:6px; justify-content:center}
+.kbd-keys.num .key{min-width:0; width:100%; padding:11px 0; font-size:1.15rem}
 .key{font:inherit; font-weight:800; cursor:pointer; min-width:40px; padding:9px 10px;
   background:var(--panel); color:var(--ink); border:2px solid var(--line); border-bottom-width:4px;
   border-radius:10px; transition:.1s; font-size:1.02rem}
@@ -861,7 +867,7 @@ function buildKbd(q){
   var tog=el('button','kbd-tog','הסתר'); tog.type='button';
   h.appendChild(lbl); h.appendChild(tog);
   var keys=el('div','kbd-keys');
-  wrap.appendChild(h); wrap.appendChild(keys);
+  var panel=el('div','kbd-panel'); panel.appendChild(h); panel.appendChild(keys); wrap.appendChild(panel);
   q._kbd={wrap:wrap, keys:keys, lbl:lbl, open:true, mode:''};
   tog.addEventListener('click',function(){
     q._kbd.open=!q._kbd.open;
@@ -874,15 +880,25 @@ function buildKbd(q){
 function renderKbd(q){
   if(!q._kbd) return;
   var a=q._active;
-  var mode=(a && a.getAttribute('inputmode')==='text') ? 'he' : 'num';
+  var mode=(a && (a.tagName==='TEXTAREA' || a.getAttribute('inputmode')==='text')) ? 'he' : 'num';
   if(mode===q._kbd.mode) return;
   q._kbd.mode=mode;
-  var list = mode==='he' ? HE_KEYS : NUM_KEYS;
-  q._kbd.lbl.textContent = mode==='he' ? '⌨ אותיות — כאן התשובה במילים' : '⌨ מספרים';
+  q._kbd.lbl.innerHTML = mode==='he'
+    ? '⌨ <b>מקלדת אותיות</b> — כאן התשובה נכתבת במילים'
+    : '⌨ <b>מקלדת מספרים</b> — אפשר גם להקליד רגיל';
   var html='';
-  list.forEach(function(k){ html+='<button type="button" class="key" data-k="'+k+'">'+k+'</button>' });
-  if(mode==='he') html+='<button type="button" class="key wide" data-k=" ">רווח</button>';
-  html+='<button type="button" class="key del wide" data-k="DEL">מחק</button>';
+  if(mode==='he'){
+    q._kbd.keys.className='kbd-keys he';
+    HE_KEYS.forEach(function(k){ html+='<button type="button" class="key" data-k="'+k+'">'+k+'</button>' });
+    html+='<button type="button" class="key wide" data-k=" ">רווח</button>';
+    html+='<button type="button" class="key del" data-k="DEL">מחק</button>';
+  }else{
+    q._kbd.keys.className='kbd-keys num';
+    ['1','2','3','4','5','6','7','8','9'].forEach(function(k){ html+='<button type="button" class="key" data-k="'+k+'">'+k+'</button>' });
+    html+='<button type="button" class="key del" data-k="DEL">מחק</button>';
+    html+='<button type="button" class="key" data-k="0">0</button>';
+    html+='<span></span>';
+  }
   q._kbd.keys.innerHTML=html;
   Array.prototype.forEach.call(q._kbd.keys.querySelectorAll('.key'),function(b){
     b.addEventListener('mousedown',function(e){ e.preventDefault() });
@@ -893,6 +909,7 @@ function renderKbd(q){
       if(b.getAttribute('data-k')==='DEL') t.value=String(t.value).slice(0,-1);
       else t.value=String(t.value)+b.getAttribute('data-k');
       try{ t.focus() }catch(e){}
+      if(q._redraw) q._redraw();
       saveProgress();
     });
   });
@@ -1348,7 +1365,7 @@ function render(){
       else if(q.kind==='line') build5(q);
       else if(q.kind==='coins') buildCoins(q);
       if(p.box) digitPad(q, q._ui.body, p.box, 5, true);
-      buildKbd(q);
+      if(q._ui.body.querySelectorAll('input,textarea').length) buildKbd(q);
       q._part=p;
       q._ui.btn.addEventListener('click',function(){ onCheck(q) });
       Array.prototype.forEach.call(q._ui.body.querySelectorAll('input,textarea'),function(i){
