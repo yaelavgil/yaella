@@ -133,6 +133,11 @@ input:disabled{opacity:1}
 .freebox:focus{outline:none; border-color:var(--sky)}
 .freebox.active{border-color:var(--sky); box-shadow:0 0 0 3px rgba(47,127,212,.2)}
 .freebox.good{border-color:var(--green); background:var(--greenbg)}
+.exprpack{display:flex; direction:ltr; align-items:center; gap:10px;
+  margin-inline-start:auto; flex-wrap:nowrap}
+.exprpack .expr{font-size:1.06rem; font-weight:900; white-space:nowrap;
+  font-variant-numeric:tabular-nums; letter-spacing:.01em}
+.exprpack input{width:104px; flex:none; text-align:center}
 .qstory{margin:4px 0 10px; line-height:1.75}
 .qstory b{font-weight:900}
 .unit{font-weight:700; color:var(--soft)}
@@ -215,7 +220,7 @@ input:disabled{opacity:1}
 .note .w{text-decoration:line-through; opacity:.8}
 
 .nl{direction:ltr; margin:6px 0 2px; user-select:none}
-.nl svg{width:100%; height:92px; display:block; cursor:crosshair}
+.nl svg{width:100%; height:auto; display:block; cursor:crosshair; touch-action:none}
 .nl .cap{text-align:center; color:var(--soft); font-size:.85rem; margin-top:2px}
 
 .result{background:var(--panel); border:3px solid var(--gold); border-radius:18px; padding:24px 20px;
@@ -487,7 +492,7 @@ var PARTS = [
 
   {id:'q4f', kind:'mixed', title:'שאלה 6',
    items:[
-     {l:'א. השלימו את המספר החסר: &nbsp;<b dir="ltr">17 + 40 = 27 +</b>', kind:'num', a:30},
+     {l:'א. השלימו את המספר החסר:', expr:'17 + 40 = 27 +', kind:'num', a:30},
      {l:'ב. הסבירו איך אפשר למצוא את המספר החסר <b>מבלי</b> לחשב את התוצאה של התרגיל <b dir="ltr">40 + 17</b>.', kind:'free', rows:3, ph:'ההסבר שלכם'}
    ],
    hint:'אל תחשבו את 40 + 17. <b>השוו את שני הצדדים זה לזה:</b> 27 גדול מ‑17 ב‑10 בדיוק. אם צד אחד גדל ב‑10 והתוצאה צריכה להישאר אותה תוצאה — מה חייב לקרות למספר השני?',
@@ -495,20 +500,20 @@ var PARTS = [
 
   {id:'q4g', kind:'num', title:'שאלה 7 · פתרו את התרגילים בדרך הנוחה לכם',
    items:[
-    {l:'א. &nbsp;<b dir="ltr">304 + 170 =</b>', a:474},
-    {l:'ב. &nbsp;<b dir="ltr">54 − 13 =</b>', a:41},
-    {l:'ג. &nbsp;<b dir="ltr">9 + 67 + 21 =</b>', a:97},
-    {l:'ד. &nbsp;<b dir="ltr">92 − 25 =</b>', a:67},
-    {l:'ה. &nbsp;<b dir="ltr">430 + 75 =</b>', a:505},
+    {l:'א.', expr:'304 + 170 =', a:474},
+    {l:'ב.', expr:'54 − 13 =', a:41},
+    {l:'ג.', expr:'9 + 67 + 21 =', a:97},
+    {l:'ד.', expr:'92 − 25 =', a:67},
+    {l:'ה.', expr:'430 + 75 =', a:505},
     {l:'<b>מקום לחישובים</b>', kind:'free', rows:4, ph:'אפשר לכתוב כאן את דרך החישוב'}
    ],
    hint:'״הדרך הנוחה״ היא <b>לפרק לפי המקומות</b>. ב-304 + 170 חברו מאות עם מאות ועשרות עם עשרות. ב-9 + 67 + 21 שווה לחפש קודם שני מספרים שמשלימים לעשרת עגולה — <b>9 ו-21 נותנים 30</b>, ורק אז להוסיף את 67. ובחיסורים עם פריטה (92 − 25) שווה להוריד קודם עד העשרת העגולה ואז את השאר.'},
 
   {id:'q4h', kind:'num', title:'שאלה 8 · השלימו את המספרים החסרים',
    items:[
-    {l:'א. &nbsp;<b dir="ltr">25 + ____ = 70</b>', a:45},
-    {l:'ב. &nbsp;<b dir="ltr">76 − ____ = 46</b>', a:30},
-    {l:'ג. &nbsp;<b dir="ltr">____ − 42 = 40</b>', a:82}
+    {l:'א.', expr:'25 +', suf:'= 70', a:45},
+    {l:'ב.', expr:'76 −', suf:'= 46', a:30},
+    {l:'ג.', expr:'', suf:'− 42 = 40', a:82}
    ],
    hint:'<b>כל תרגיל כזה הופכים לתרגיל רגיל.</b> אם 25 ועוד משהו זה 70 — אז המשהו הוא 70 פחות 25. אם 76 פחות משהו זה 46 — המשהו הוא 76 פחות 46. ובסעיף ג דווקא <b>מחברים</b>: המספר החסר הוא 40 ועוד 42, כי ממנו הורידו.'},
 
@@ -922,6 +927,14 @@ function buildItems(q, items){
     var isW=(it.kind==='words'||q.kind==='words');
     var isFree=(it.kind==='free');
     var m=mkRow(rows, it.l);
+    var pack=null;
+    if(it.expr){
+      m.row.querySelector('.lbl').style.flex='none';
+      m.row.querySelector('.lbl').style.minWidth='22px';
+      pack=el('div','exprpack');
+      pack.appendChild(el('b','expr', it.expr));
+      m.row.appendChild(pack);
+    }
     var inp;
     if(isFree){
       inp=document.createElement('textarea'); inp.className='freebox'; inp.rows=it.rows||2;
@@ -930,7 +943,8 @@ function buildItems(q, items){
       inp=mkInput(isW||it.w==='wide'?'wide':'num', (it.w&&it.w!=='wide')?it.w:0);
       if(isW) inp.setAttribute('inputmode','text');
     }
-    m.row.appendChild(inp);
+    (pack||m.row).appendChild(inp);
+    if(pack && it.suf) pack.appendChild(el('b','expr', it.suf));
     finishRow(m);
     if(isFree){
       addSlot({q:q, el:inp, group:m.g, read:reader(inp), scored:false, label:txt(it.l), sol:'',
@@ -996,7 +1010,7 @@ function buildSeq(q){
     var m=mkRow(q._ui.body,'<b>'+s.l+'</b>');
     m.row.querySelector('.lbl').style.flex='none';
     m.row.querySelector('.lbl').style.minWidth='24px';
-    var strip=el('div','strip'); strip.style.flex='1';
+    var strip=el('div','strip'); strip.style.flex='1'; strip.style.direction='rtl';
     var inputs=[];
     s.cells.forEach(function(c,i){
       if(i) strip.appendChild(el('span','sep','·'));
