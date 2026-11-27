@@ -242,6 +242,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--line); colo
 
 <div class="wrap">
   <div class="result" id="result" hidden>
+    <img class="art" id="cheer" src="pencil.png" alt="" style="width:min(42%,150px); margin:0 auto 10px">
     <div class="grades">
       <div class="gcell"><div class="big" id="gradeFirst">—</div><span>אחרי הבדיקה</span></div>
       <div class="gcell fin"><div class="big" id="gradeFinal">—</div><span>אחרי התיקונים</span></div>
@@ -821,53 +822,15 @@ ART.p1 = function(){
   '<path d="M172 56 l-6 14 16 -14z" fill="var(--greenbg)" stroke="var(--green)" stroke-width="2.5" stroke-linejoin="round"/>'+
   '<text x="232" y="41" text-anchor="middle" font-size="14" font-weight="800" fill="var(--green)">שש מאות עשרים ושלוש</text></svg>';
 };
-ART.p2 = function(){
-  var s='<svg class="art part-art" viewBox="0 0 300 92" role="img" aria-label="שלושה קלפים מרכיבים מספרים">';
-  [[20,-7,'5','var(--pink)'],[88,4,'1','var(--mint)'],[156,-4,'6','var(--gold)']].forEach(function(c){
-    s+='<g transform="translate('+c[0]+',18) rotate('+c[1]+',26,33)">'+
-       '<rect x="0" y="0" width="52" height="66" rx="10" fill="var(--panel)" stroke="'+c[3]+'" stroke-width="3"/>'+
-       '<text x="26" y="46" text-anchor="middle" font-size="30" font-weight="900" fill="'+c[3]+'">'+c[2]+'</text></g>';
-  });
-  s+='<text x="258" y="58" text-anchor="middle" font-size="18" font-weight="900" fill="var(--soft)">→</text>';
-  return s+'</svg>';
-};
-ART.p3 = function(){
-  var s='<svg class="art part-art" viewBox="0 0 330 96" role="img" aria-label="חמש ספרות בחמישה מקומות">';
-  var names=['יחידות','עשרות','מאות','אלפים','עשרות אלפים'], d=['8','7','5','0','2'];
-  var cols=['var(--pink)','var(--mint)','var(--gold)','var(--sky)','var(--blue)'];
-  for(var i=0;i<5;i++){
-    var x=270-i*62;
-    s+='<rect x="'+x+'" y="12" width="56" height="48" rx="11" fill="var(--panel)" stroke="'+cols[i]+'" stroke-width="3"/>'+
-       '<text x="'+(x+28)+'" y="47" text-anchor="middle" font-size="26" font-weight="900" fill="'+cols[i]+'">'+d[i]+'</text>'+
-       '<text x="'+(x+28)+'" y="78" text-anchor="middle" font-size="9.5" font-weight="800" fill="var(--soft)">'+names[i]+'</text>';
-  }
-  return s+'</svg>';
-};
-ART.p4 = function(){
-  var s='<svg class="art part-art" viewBox="0 0 320 70" role="img" aria-label="ישר המספרים">';
-  s+='<line x1="16" y1="40" x2="304" y2="40" stroke="var(--soft)" stroke-width="2.5"/>';
-  for(var t=0;t<=10;t++){ var x=16+t*28.8, big=(t%2===0);
-    s+='<line x1="'+x+'" y1="'+(big?30:34)+'" x2="'+x+'" y2="'+(big?50:46)+'" stroke="var(--soft)" stroke-width="2.5"/>';
-    if(big) s+='<text x="'+x+'" y="64" text-anchor="middle" font-size="10" font-weight="800" fill="var(--soft)">'+(t*10)+'</text>';
-  }
-  [[16,'var(--pink)'],[19,'var(--mint)'],[61,'var(--gold)']].forEach(function(p){
-    var x=16+288*p[0]/100;
-    s+='<line x1="'+x+'" y1="16" x2="'+x+'" y2="40" stroke="'+p[1]+'" stroke-width="3"/><circle cx="'+x+'" cy="14" r="7" fill="'+p[1]+'"/>';
-  });
-  return s+'</svg>';
-};
+ART.p2 = function(){ return '<img class="art part-art" src="cards.png" alt="שלושה קלפים עם הספרות 5, 1 ו-6">' };
 
-ART.coins = function(){
-  var s='<svg class="art part-art" viewBox="0 0 300 96" role="img" aria-label="מטבעות של 10, 5, 2 ו-1 שקלים">';
-  [[10,'var(--soft)',34],[5,'var(--gold)',31],[2,'var(--mint)',28],[1,'var(--pink)',24]].forEach(function(c,i){
-    var x=46+i*70, y=42;
-    s+='<circle cx="'+x+'" cy="'+y+'" r="'+c[2]+'" fill="var(--panel)" stroke="'+c[1]+'" stroke-width="4"/>'+
-       '<circle cx="'+x+'" cy="'+y+'" r="'+(c[2]-7)+'" fill="none" stroke="'+c[1]+'" stroke-width="1.6" opacity=".55"/>'+
-       '<text x="'+x+'" y="'+(y+9)+'" text-anchor="middle" font-size="24" font-weight="900" fill="'+c[1]+'">'+c[0]+'</text>'+
-       '<text x="'+x+'" y="90" text-anchor="middle" font-size="10" font-weight="800" fill="var(--soft)">'+(c[0]===1?'שקל':'שקלים')+'</text>';
-  });
-  return s+'</svg>';
-};
+ART.p3 = function(){ return '<img class="art part-art" src="digits.png" alt="חמש הספרות, כל אחת בקוביה בצבע אחר">' };
+
+ART.p4 = function(){ return '<img class="art part-art" src="numberline.png" alt="ישר המספרים מ-0 עד 100 עם שלושה סימונים">' };
+
+
+ART.coins = function(){ return '<img class="art part-art" src="coins.png" alt="מטבעות של 10, 5, 2 ו-1 שקלים">' };
+
 
 /* ============ the on-screen keyboard ============ */
 var HE_KEYS = ['א','ב','ג','ד','ה','ו','ז','ח','ט','י','כ','ל','מ','נ','ס','ע','פ','צ','ק','ר','ש','ת','ך','ם','ן','ף','ץ'];
@@ -1068,6 +1031,7 @@ function buildAsc(q){
 }
 
 function buildId(q){
+  var ab=el('div'); ab.innerHTML='<img class="art part-art" src="abacus.png" alt="חשבונייה בת חמישה מוטות">'; q._ui.body.appendChild(ab);
   var rows=el('div','rows');
   var m0=mkRow(rows,'<b>המספר שבחרתי</b>');
   var pick=mkInput('num'); m0.row.appendChild(pick); finishRow(m0);
