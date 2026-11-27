@@ -753,7 +753,7 @@ footer a{color:#8a8a94}
       </div>
     </div>
     <div class="crow">
-      <div class="clab"><span>✈️ הטיסה שבחרתם</span><a class="maplink" href="#flights">↑ לשנות טיסה</a></div>
+      <div class="clab"><span>✈️ הטיסה שבחרתם</span><span style="display:flex; gap:12px; align-items:baseline"><a class="maplink" id="fgo" href="#" target="_blank" rel="noopener">🔎 לבדוק בגוגל ↗</a><a class="maplink" href="#flights">↑ לשנות</a></span></div>
       <div class="fdd" id="fdd">
         <button type="button" class="fdd-btn" id="fddBtn" aria-haspopup="listbox" aria-expanded="false">
           <span id="fddLabel">בחרו טיסה</span><span class="caret">▾</span>
@@ -1117,6 +1117,20 @@ footer a{color:#8a8a94}
     var back = row ? row.cells[2].textContent.trim() : '';
     if(!/\d:\d/.test(back)) back = '';   // the cell holds a check link, not a time
     curFlight = {name:name, out:out, back:back, price:price};
+    // the chosen flight's own Google search — follows BOTH the flight and the night count
+    if(G('fgo')){
+      var gair = row ? row.cells[0].querySelector('a[data-air]') : null;
+      var gback = (d === 3) ? '2027-07-26' : '2027-07-25';
+      if(gair){
+        G('fgo').href = 'https://www.google.com/travel/flights?hl=he&curr=ILS&q=' +
+          encodeURIComponent('Flights from TLV to LCA on 2027-07-23 through ' + gback +
+                             ' on ' + gair.getAttribute('data-air'));
+        G('fgo').textContent = '🔎 ' + name + ' · ' + d + ' לילות ↗';
+        G('fgo').hidden = false;
+      }else{
+        G('fgo').hidden = true;
+      }
+    }
     if(G('fcap') && row){
       G('fcap').innerHTML = '<b>' + name + '</b> · יציאה ' + out +
         (back ? ', חזרה ' + back : '') +
