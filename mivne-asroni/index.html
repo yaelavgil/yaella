@@ -16,10 +16,11 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap">
 <style>
 :root{
-  --bg:#f4f6fb; --panel:#ffffff; --ink:#15213a; --soft:#5d6b89; --line:#dbe2f0;
-  --blue:#1b3a6b; --sky:#2f7fd4; --green:#117a4a; --greenbg:#e4f6ec;
-  --red:#c02b3a; --redbg:#fdeaec; --amber:#8a5a00; --amberbg:#fff5e0;
-  --gold:#f0a500; --shadow:0 2px 10px rgba(21,33,58,.07); --btnink:#ffffff;
+  --bg:#fdf6ec; --panel:#ffffff; --ink:#1f2340; --soft:#6b6f92; --line:#e7dfd2;
+  --blue:#5b3fd6; --sky:#2f7fd4; --green:#0f8a52; --greenbg:#e2f7ec;
+  --red:#d63a4a; --redbg:#fdeaec; --amber:#9a5a00; --amberbg:#fff3d8;
+  --gold:#ffb703; --pink:#ff6b9d; --mint:#2ec4a6;
+  --shadow:0 3px 0 rgba(31,35,64,.07), 0 6px 18px rgba(31,35,64,.06); --btnink:#ffffff;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0e1420; --panel:#161f30; --ink:#eef2fa; --soft:#9aa8c2; --line:#2a364c;
@@ -67,7 +68,7 @@ header p{margin:0; color:#cfe2fb; font-size:.95rem; font-weight:300}
 .part-h h2{margin:0; font-size:1.18rem; font-weight:900; letter-spacing:-.01em}
 .part > p.lead{margin:0 0 12px; color:var(--soft); font-size:.92rem}
 
-.q{background:var(--panel); border:1px solid var(--line); border-radius:14px;
+.q{background:var(--panel); border:2px solid var(--line); border-radius:18px;
   padding:16px 16px 14px; margin-bottom:12px; box-shadow:var(--shadow)}
 .q.ok{border-color:var(--green)}
 .q.bad{border-color:var(--red)}
@@ -115,8 +116,40 @@ input:disabled{opacity:1}
   background:transparent; border:2px solid var(--line); border-radius:9px; padding:6px 12px}
 .del:hover{border-color:var(--red); color:var(--red)}
 .padcap{width:100%; text-align:center; color:var(--soft); font-size:.82rem; margin-top:-4px}
-.remember{background:var(--amberbg); color:var(--amber); border-radius:10px; padding:9px 13px;
-  margin:0 0 12px; font-size:.9rem; font-weight:700}
+.remember{background:var(--amberbg); color:var(--amber); border-radius:12px; padding:10px 14px;
+  margin:0 0 12px; font-size:.9rem; font-weight:700; border:2px dashed rgba(255,183,3,.5)}
+
+/* ---- the little number pictures ---- */
+.art{display:block; margin:0 auto 10px; max-width:100%}
+.hero-art{width:min(100%,460px); margin:14px auto 0}
+.part-art{width:min(100%,330px); margin:2px auto 12px}
+.legend{display:flex; justify-content:center; gap:14px; flex-wrap:wrap; margin:-4px 0 12px;
+  font-size:.8rem; font-weight:700; color:var(--soft)}
+.legend i{display:inline-block; width:12px; height:12px; border-radius:3px; margin-inline-end:5px; vertical-align:-1px}
+
+/* ---- the virtual keyboard ---- */
+.kbd{margin-top:12px; border-top:2px dashed var(--line); padding-top:10px}
+.kbd-h{display:flex; align-items:center; gap:8px; justify-content:space-between; margin-bottom:7px}
+.kbd-h span{font-size:.8rem; font-weight:700; color:var(--soft)}
+.kbd-keys{display:flex; flex-wrap:wrap; gap:6px; justify-content:center}
+.key{font:inherit; font-weight:800; cursor:pointer; min-width:40px; padding:9px 10px;
+  background:var(--panel); color:var(--ink); border:2px solid var(--line); border-bottom-width:4px;
+  border-radius:10px; transition:.1s; font-size:1.02rem}
+.key:hover{border-color:var(--blue); color:var(--blue)}
+.key:active{transform:translateY(2px); border-bottom-width:2px}
+.key.wide{min-width:84px; color:var(--soft)}
+.key.del{color:var(--red); border-color:rgba(214,58,74,.35)}
+.kbd-tog{font:inherit; font-size:.8rem; font-weight:700; cursor:pointer; color:var(--blue);
+  background:transparent; border:2px solid var(--line); border-radius:9px; padding:4px 11px}
+
+#restored{background:var(--greenbg); color:var(--green); border:2px solid rgba(15,138,82,.25);
+  border-radius:12px; padding:10px 14px; margin-top:14px; font-size:.9rem}
+.share{display:flex; gap:9px; justify-content:center; flex-wrap:wrap; margin-top:16px}
+.share .btn{background:var(--mint)}
+.share .btn.alt{background:var(--blue)}
+.sumbox{width:100%; min-height:150px; margin-top:12px; font:inherit; font-size:.82rem; line-height:1.5;
+  border:2px solid var(--line); border-radius:11px; padding:10px; background:var(--bg); color:var(--ink);
+  resize:vertical; text-align:right}
 
 .chips{display:flex; gap:8px; flex-wrap:wrap}
 .chip{font:inherit; font-weight:700; cursor:pointer; background:var(--bg); color:var(--ink);
@@ -186,6 +219,7 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--line); colo
   </div>
 </div>
 
+<div class="wrap"><div id="restored" hidden></div></div>
 <div class="wrap" id="app"></div>
 
 <div class="wrap">
@@ -198,7 +232,13 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--line); colo
     <p id="rmsg"></p>
     <p id="fixLine" style="font-size:.88rem"></p>
     <div class="bd" id="bd"></div>
-    <div style="margin-top:18px"><button class="btn ghost" onclick="location.reload()">להתחיל מחדש</button></div>
+    <div class="share">
+      <a class="btn" id="waBtn" target="_blank" rel="noopener">📲 לשלוח לאמא בוואטסאפ</a>
+      <button class="btn alt" type="button" id="copyBtn">📋 להעתיק הכול</button>
+    </div>
+    <p style="font-size:.84rem">הסיכום כולל את הציון, כל שאלה, מה שכתבת בכל שורה ומה הייתה התשובה הנכונה.</p>
+    <textarea class="sumbox" id="sumBox" readonly></textarea>
+    <div style="margin-top:14px"><button class="btn ghost" type="button" id="againBtn">להתחיל מחדש</button></div>
   </div>
   <footer>
     התרגילים והניסוחים לקוחים מדף העבודה ״מבנה עשרוני של מספר — כתיבה וקריאת מספרים״ (ריקי עמר) ומ״משימה במתמטיקה״ של ביה״ס שדות בת חפר, לפי הסדר שבדפים.<br>
@@ -237,6 +277,7 @@ function diffPair(bad, good){
   return {a: esc(a.slice(0,p)) + (am?'<mark>'+esc(am)+'</mark>':'') + esc(a.slice(sa)),
           b: esc(b.slice(0,p)) + (bm?'<mark>'+esc(bm)+'</mark>':'') + esc(b.slice(sb))};
 }
+function txt(h){ var d=document.createElement('div'); d.innerHTML=String(h==null?'':h); return (d.textContent||'').replace(/\s+/g,' ').trim() }
 function diffLine(bad, good){
   if(!String(bad).trim()) return 'הנכון: <b>' + esc(good) + '</b>';
   var d = diffPair(bad, good);
@@ -416,9 +457,63 @@ var SLOTS = [], QL = [];
 function addSlot(o){
   o.tries=0; o.locked=false; o.got=0; o.firstOk=false; o.last=null; o.why=''; o.spellNote=''; o.failHtml='';
   o.scored = (o.scored !== false);
+  if(!o.write && o.el) o.write = function(v){ o.el.value = v };
+  if(!o.label) o.label = '';
   SLOTS.push(o); o.q._slots.push(o);
   return o;
 }
+
+/* ---------- progress, kept in this browser ---------- */
+var SKEY = 'mivne-asroni-v2';
+function saveProgress(){
+  try{
+    var data = SLOTS.map(function(s){
+      return {v:s.read(), t:s.tries, l:s.locked?1:0, g:s.got, f:s.firstOk?1:0,
+              w:s.why, sn:s.spellNote, fh:s.failHtml};
+    });
+    localStorage.setItem(SKEY, JSON.stringify({at:Date.now(), d:data}));
+  }catch(e){}
+}
+function loadProgress(){
+  var raw;
+  try{ raw = localStorage.getItem(SKEY) }catch(e){ return }
+  if(!raw) return;
+  var saved;
+  try{ saved = JSON.parse(raw) }catch(e){ return }
+  if(!saved || !saved.d || saved.d.length !== SLOTS.length) return;
+  SLOTS.forEach(function(s, i){
+    var d = saved.d[i]; if(!d) return;
+    if(d.v && s.write) s.write(d.v);
+    s.tries=d.t||0; s.locked=!!d.l; s.got=d.g||0; s.firstOk=!!d.f;
+    s.why=d.w||''; s.spellNote=d.sn||''; s.failHtml=d.fh||'';
+    s.last = s.tries ? s.read() : null;
+    if(s.el){
+      s.el.className = String(s.el.className).replace(/ ?(good|wrong|half|active)/g,'');
+      if(s.locked){ s.el.className += (s.got>0 ? (s.spellNote?' half':' good') : ' wrong'); s.el.disabled = true }
+      else if(s.tries) s.el.className += ' wrong';
+    }
+  });
+  QL.forEach(function(q){
+    paintGroups(q);
+    if(qDone(q)){
+      var mine=q._slots.filter(function(s){ return s.scored });
+      var got=mine.reduce(function(a,s){ return a+s.got },0), pts=mine.length;
+      q._ui.card.className='q '+(got===pts?'ok':(got>0?'':'bad'));
+      setMark(q,(got===pts?'✓ ':'')+(Math.round(got*10)/10)+' מתוך '+pts+' נק׳', got===pts?'ok':(got>0?'half':'bad'));
+      q._ui.btn.disabled=true;
+      if(q.lockExtras) q.lockExtras();
+      if(q.afterTxt) say(q,'sol','', q.afterTxt);
+    }else{
+      setActive(q, firstOpen(q));
+    }
+  });
+  var touched = SLOTS.some(function(s){ return s.tries || s.locked || String(s.read()).trim() });
+  if(touched){
+    var n = document.getElementById('restored');
+    if(n){ n.hidden = false; n.innerHTML = '↩︎ <b>המשכנו מאיפה שהפסקת.</b> ההתקדמות נשמרת בדפדפן הזה לבד, גם אם תסגור את הדף.' }
+  }
+}
+function clearProgress(){ try{ localStorage.removeItem(SKEY) }catch(e){} }
 function isEmpty(s){ return !String(s.read()).trim() }
 function setMark(q,t,c){ q._ui.mark.className='mark '+c; q._ui.mark.textContent=t }
 function say(q,cls,title,html){
@@ -483,6 +578,7 @@ function paintBar(){
   document.getElementById('scoreTxt').textContent=(Math.round(t.got*10)/10)+' / '+t.pts;
   document.getElementById('progBar').style.width=(done/QL.length*100)+'%';
   document.getElementById('doneTxt').textContent=done+' מתוך '+QL.length+' שאלות';
+  saveProgress();
   if(done===QL.length && QL.length) showResult();
 }
 function onCheck(q){
@@ -554,8 +650,11 @@ function onCheck(q){
 function focusInput(q, inp){ try{ inp.focus(); inp.select() }catch(e){} setActive(q, inp) }
 function setActive(q, inp){
   q._active = inp;
-  q._ui.body.querySelectorAll('input').forEach(function(i){ i.className=String(i.className).replace(/ ?active/g,'') });
+  Array.prototype.forEach.call(q._ui.body.querySelectorAll('input'), function(i){
+    i.className = String(i.className).replace(/ ?active/g,'');
+  });
   if(inp && !inp.disabled) inp.className += ' active';
+  renderKbd(q);
 }
 function firstOpen(q){
   var all=Array.prototype.filter.call(q._ui.body.querySelectorAll('input'), function(i){ return !i.disabled });
@@ -645,6 +744,115 @@ function judgeWords(v, list){
   return {ok:false, best:best};
 }
 
+/* ============ the little number pictures ============ */
+var ART = {};
+ART.hero = function(){
+  var s='<svg class="art hero-art" viewBox="0 0 470 136" role="img" aria-label="מאה, שתי עשרות ושלוש יחידות — יחד 123">', r,c,k,t,u;
+  for(r=0;r<10;r++) for(c=0;c<10;c++)
+    s+='<rect x="'+(14+c*9)+'" y="'+(14+r*9)+'" width="7.4" height="7.4" rx="1.6" fill="var(--blue)" opacity="'+(0.45+0.05*((r+c)%4))+'"/>';
+  s+='<text x="56" y="124" text-anchor="middle" font-size="12" font-weight="800" fill="var(--soft)">1 מאה</text>';
+  for(t=0;t<2;t++){ var x=124+t*22;
+    for(k=0;k<10;k++) s+='<rect x="'+x+'" y="'+(14+k*9)+'" width="7.4" height="7.4" rx="1.6" fill="var(--mint)"/>'; }
+  s+='<text x="142" y="124" text-anchor="middle" font-size="12" font-weight="800" fill="var(--soft)">2 עשרות</text>';
+  for(u=0;u<3;u++) s+='<rect x="'+(190+u*11)+'" y="88" width="7.4" height="7.4" rx="1.6" fill="var(--pink)"/>';
+  s+='<text x="201" y="124" text-anchor="middle" font-size="12" font-weight="800" fill="var(--soft)">3 יחידות</text>';
+  s+='<text x="258" y="66" font-size="24" font-weight="900" fill="var(--soft)">=</text>';
+  s+='<text x="370" y="78" text-anchor="middle" font-size="52" font-weight="900" fill="var(--gold)">123</text>';
+  return s+'</svg>';
+};
+ART.p1 = function(){
+  return '<svg class="art part-art" viewBox="0 0 320 86" role="img" aria-label="מספר והמילים שלו">'+
+  '<rect x="8" y="16" width="96" height="54" rx="12" fill="var(--panel)" stroke="var(--blue)" stroke-width="2.5"/>'+
+  '<text x="56" y="56" text-anchor="middle" font-size="31" font-weight="900" fill="var(--blue)">623</text>'+
+  '<path d="M112 43 H146" stroke="var(--soft)" stroke-width="2.5" stroke-linecap="round"/>'+
+  '<path d="M140 37 l7 6 -7 6" fill="none" stroke="var(--soft)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'+
+  '<rect x="152" y="14" width="160" height="42" rx="14" fill="var(--greenbg)" stroke="var(--green)" stroke-width="2.5"/>'+
+  '<path d="M172 56 l-6 14 16 -14z" fill="var(--greenbg)" stroke="var(--green)" stroke-width="2.5" stroke-linejoin="round"/>'+
+  '<text x="232" y="41" text-anchor="middle" font-size="14" font-weight="800" fill="var(--green)">שש מאות עשרים ושלוש</text></svg>';
+};
+ART.p2 = function(){
+  var s='<svg class="art part-art" viewBox="0 0 300 92" role="img" aria-label="שלושה קלפים מרכיבים מספרים">';
+  [[20,-7,'5','var(--pink)'],[88,4,'1','var(--mint)'],[156,-4,'6','var(--gold)']].forEach(function(c){
+    s+='<g transform="translate('+c[0]+',18) rotate('+c[1]+',26,33)">'+
+       '<rect x="0" y="0" width="52" height="66" rx="10" fill="var(--panel)" stroke="'+c[3]+'" stroke-width="3"/>'+
+       '<text x="26" y="46" text-anchor="middle" font-size="30" font-weight="900" fill="'+c[3]+'">'+c[2]+'</text></g>';
+  });
+  s+='<text x="258" y="58" text-anchor="middle" font-size="18" font-weight="900" fill="var(--soft)">→</text>';
+  return s+'</svg>';
+};
+ART.p3 = function(){
+  var s='<svg class="art part-art" viewBox="0 0 330 96" role="img" aria-label="חמש ספרות בחמישה מקומות">';
+  var names=['יחידות','עשרות','מאות','אלפים','עשרות אלפים'], d=['8','7','5','0','2'];
+  var cols=['var(--pink)','var(--mint)','var(--gold)','var(--sky)','var(--blue)'];
+  for(var i=0;i<5;i++){
+    var x=270-i*62;
+    s+='<rect x="'+x+'" y="12" width="56" height="48" rx="11" fill="var(--panel)" stroke="'+cols[i]+'" stroke-width="3"/>'+
+       '<text x="'+(x+28)+'" y="47" text-anchor="middle" font-size="26" font-weight="900" fill="'+cols[i]+'">'+d[i]+'</text>'+
+       '<text x="'+(x+28)+'" y="78" text-anchor="middle" font-size="9.5" font-weight="800" fill="var(--soft)">'+names[i]+'</text>';
+  }
+  return s+'</svg>';
+};
+ART.p4 = function(){
+  var s='<svg class="art part-art" viewBox="0 0 320 70" role="img" aria-label="ישר המספרים">';
+  s+='<line x1="16" y1="40" x2="304" y2="40" stroke="var(--soft)" stroke-width="2.5"/>';
+  for(var t=0;t<=10;t++){ var x=16+t*28.8, big=(t%2===0);
+    s+='<line x1="'+x+'" y1="'+(big?30:34)+'" x2="'+x+'" y2="'+(big?50:46)+'" stroke="var(--soft)" stroke-width="2.5"/>';
+    if(big) s+='<text x="'+x+'" y="64" text-anchor="middle" font-size="10" font-weight="800" fill="var(--soft)">'+(t*10)+'</text>';
+  }
+  [[16,'var(--pink)'],[19,'var(--mint)'],[61,'var(--gold)']].forEach(function(p){
+    var x=16+288*p[0]/100;
+    s+='<line x1="'+x+'" y1="16" x2="'+x+'" y2="40" stroke="'+p[1]+'" stroke-width="3"/><circle cx="'+x+'" cy="14" r="7" fill="'+p[1]+'"/>';
+  });
+  return s+'</svg>';
+};
+
+/* ============ the on-screen keyboard ============ */
+var HE_KEYS = ['א','ב','ג','ד','ה','ו','ז','ח','ט','י','כ','ל','מ','נ','ס','ע','פ','צ','ק','ר','ש','ת','ך','ם','ן','ף','ץ'];
+var NUM_KEYS = ['1','2','3','4','5','6','7','8','9','0'];
+function buildKbd(q){
+  var wrap=el('div','kbd');
+  var h=el('div','kbd-h');
+  var lbl=el('span','','⌨ מקלדת');
+  var tog=el('button','kbd-tog','הסתר'); tog.type='button';
+  h.appendChild(lbl); h.appendChild(tog);
+  var keys=el('div','kbd-keys');
+  wrap.appendChild(h); wrap.appendChild(keys);
+  q._kbd={wrap:wrap, keys:keys, lbl:lbl, open:true, mode:''};
+  tog.addEventListener('click',function(){
+    q._kbd.open=!q._kbd.open;
+    keys.hidden=!q._kbd.open;
+    tog.textContent=q._kbd.open?'הסתר':'הצג';
+  });
+  q._ui.body.appendChild(wrap);
+  renderKbd(q);
+}
+function renderKbd(q){
+  if(!q._kbd) return;
+  var a=q._active;
+  var mode=(a && a.getAttribute('inputmode')==='text') ? 'he' : 'num';
+  if(mode===q._kbd.mode) return;
+  q._kbd.mode=mode;
+  var list = mode==='he' ? HE_KEYS : NUM_KEYS;
+  q._kbd.lbl.textContent = mode==='he' ? '⌨ אותיות — כאן התשובה במילים' : '⌨ מספרים';
+  var html='';
+  list.forEach(function(k){ html+='<button type="button" class="key" data-k="'+k+'">'+k+'</button>' });
+  if(mode==='he') html+='<button type="button" class="key wide" data-k=" ">רווח</button>';
+  html+='<button type="button" class="key del" data-k="DEL">⌫</button>';
+  q._kbd.keys.innerHTML=html;
+  Array.prototype.forEach.call(q._kbd.keys.querySelectorAll('.key'),function(b){
+    b.addEventListener('mousedown',function(e){ e.preventDefault() });
+    b.addEventListener('click',function(){
+      var t=q._active;
+      if(!t||t.disabled){ t=firstOpen(q); setActive(q,t) }
+      if(!t) return;
+      if(b.getAttribute('data-k')==='DEL') t.value=String(t.value).slice(0,-1);
+      else t.value=String(t.value)+b.getAttribute('data-k');
+      try{ t.focus() }catch(e){}
+      saveProgress();
+    });
+  });
+}
+
 /* ============ builders ============ */
 function buildItems(q, items){
   var rows=el('div','rows');
@@ -656,7 +864,7 @@ function buildItems(q, items){
     m.row.appendChild(inp);
     finishRow(m);
     var sol=Array.isArray(it.a)?it.a[0]:it.a;
-    addSlot({q:q, el:inp, group:m.g, read:reader(inp), sol:String(sol),
+    addSlot({q:q, el:inp, group:m.g, read:reader(inp), sol:String(sol), label:txt(it.l),
       failFn:function(v){ return diffLine(v, sol) },
       ev:function(){
         var v=String(inp.value).trim();
@@ -683,7 +891,7 @@ function buildCards(q){
       wIn.setAttribute('inputmode','text'); wIn.placeholder='המספר במילים';
       m.row.appendChild(nIn); m.row.appendChild(wIn);
       finishRow(m);
-      addSlot({q:q, el:nIn, group:m.g, read:reader(nIn), sol:'',
+      addSlot({q:q, el:nIn, group:m.g, read:reader(nIn), sol:'', label:'מספר '+(idx+1),
         failFn:function(){ return 'האפשרויות כאן: <b>'+q.pool.join(' · ')+'</b>' },
         ev:function(ctx){
           var v=String(nIn.value).trim();
@@ -695,7 +903,7 @@ function buildCards(q){
           for(var j=0;j<idx;j++){ var o=String(ctx.vals[j*2]); if(isNum(o)&&+o===n) return {ok:false, why:'<b>'+n+'</b> כבר נכתב למעלה. כל מספר פעם אחת.'} }
           return {ok:true};
         }});
-      addSlot({q:q, el:wIn, group:m.g, read:reader(wIn), sol:'',
+      addSlot({q:q, el:wIn, group:m.g, read:reader(wIn), sol:'', label:'מספר '+(idx+1)+' במילים',
         failFn:function(v){ var n=+String(nIn.value).trim(); return isNum(String(nIn.value).trim())?diffLine(v, heMain(n)):'' },
         ev:function(){
           var num=String(nIn.value).trim(), v=String(wIn.value).trim();
@@ -727,7 +935,7 @@ function buildSeq(q){
     var step=known.length>1?(known[1]-known[0]):10;
     var full=function(){ var k=0; return s.cells.map(function(c){ return c===null?'<b>'+s.ans[k++]+'</b>':c }).join(' · ') };
     inputs.forEach(function(inp,i){
-      addSlot({q:q, el:inp, group:m.g, read:reader(inp), sol:String(s.ans[i]),
+      addSlot({q:q, el:inp, group:m.g, read:reader(inp), sol:String(s.ans[i]), label:'סדרה '+s.l+', משבצת '+(i+1),
         failFn:function(){ return 'הסדרה המלאה: ' + full() },
         ev:function(){
           var v=String(inp.value).trim();
@@ -757,7 +965,8 @@ function buildChoice(q){
   });
   m.row.appendChild(chips); finishRow(m);
   function rd(){ var s=chips.querySelector('.chip[aria-pressed="true"]'); return s?s.dataset.v:'' }
-  addSlot({q:q, el:null, group:m.g, read:rd, sol:String(q.a),
+  function wr(v){ var b=chips.querySelector('.chip[data-v="'+v+'"]'); if(b) b.setAttribute('aria-pressed','true') }
+  addSlot({q:q, el:null, group:m.g, read:rd, write:wr, label:'התשובה שנבחרה', sol:String(q.a),
     failFn:function(v){ return 'הנכון: <b>'+q.a+'</b> — 50 עשרות הן 500, ועוד 9 יחידות.' },
     ev:function(){
       var v=rd();
@@ -778,7 +987,7 @@ function buildAsc(q){
   }
   m.row.appendChild(strip); finishRow(m);
   inputs.forEach(function(inp,idx){
-    addSlot({q:q, el:inp, group:m.g, read:reader(inp), sol:'',
+    addSlot({q:q, el:inp, group:m.g, read:reader(inp), sol:'', label:'מספר '+(idx+1),
       failFn:function(){ return 'למשל: <b>20578 &lt; 25078 &lt; 70258 &lt; 80257</b> — כל ארבעה מספרים חוקיים בסדר עולה נכונים.' },
       ev:function(ctx){
         var v=String(inp.value).trim();
@@ -806,13 +1015,13 @@ function buildId(q){
     var s=String(+v);
     return s.length===5 && s.split('').sort().join('')==='02578';
   }
-  addSlot({q:q, el:pick, group:m0.g, read:reader(pick), scored:false, sol:'',
+  addSlot({q:q, el:pick, group:m0.g, read:reader(pick), scored:false, sol:'', label:'המספר שבחרתי',
     ev:function(){ return {ok:validPick(), why:'חייב להיות מספר בן חמש ספרות מהספרות 8, 2, 0, 5, 7, כל אחת פעם אחת, ולא מתחיל ב‑0.'} }});
   q.pre=function(){ return validPick()?'':'המספר שבחרת למעלה עדיין לא חוקי — חמש ספרות מתוך 8, 2, 0, 5, 7, כל אחת פעם אחת, ולא מתחיל ב‑0. <b>זה לא נחשב ניסיון.</b>' };
 
   var mw=mkRow(rows,'השם במילים');
   var wIn=mkInput('wide'); wIn.setAttribute('inputmode','text'); mw.row.appendChild(wIn); finishRow(mw);
-  addSlot({q:q, el:wIn, group:mw.g, read:reader(wIn), sol:'',
+  addSlot({q:q, el:wIn, group:mw.g, read:reader(wIn), sol:'', label:'השם במילים',
     failFn:function(v){ return validPick()?diffLine(v, heMain(+pickVal())):'' },
     ev:function(){
       var r=judgeWords(String(wIn.value).trim(), heVariants(+pickVal()));
@@ -822,7 +1031,7 @@ function buildId(q){
 
   var md=mkRow(rows,'מספר הספרות');
   var dIn=mkInput('num'); md.row.appendChild(dIn); finishRow(md);
-  addSlot({q:q, el:dIn, group:md.g, read:reader(dIn), sol:'5',
+  addSlot({q:q, el:dIn, group:md.g, read:reader(dIn), sol:'5', label:'מספר הספרות',
     failFn:function(v){ return diffLine(v,'5') },
     ev:function(){ var v=String(dIn.value).trim(); return {ok:isNum(v)&&+v===5, why:'סְפור כמה ספרות יש במספר שבחרת.'} }});
 
@@ -839,7 +1048,7 @@ function buildId(q){
   mt.row.appendChild(holder);
   finishRow(mt);
   cells.forEach(function(inp,i){
-    addSlot({q:q, el:inp, group:mt.g, read:reader(inp), sol:'',
+    addSlot({q:q, el:inp, group:mt.g, read:reader(inp), sol:'', label:'חשבונייה · '+heads[i],
       failFn:function(){ return validPick()?('הנכון, מימין לשמאל: <b>'+String(+pickVal()).split('').reverse().join(' · ')+'</b>'):'' },
       ev:function(){
         var s=String(+pickVal()), want=s.charAt(s.length-1-i);
@@ -853,7 +1062,7 @@ function buildId(q){
   ].forEach(function(t){
     var mm=mkRow(rows,t[0]);
     var inp=mkInput('num'); mm.row.appendChild(inp); finishRow(mm);
-    addSlot({q:q, el:inp, group:mm.g, read:reader(inp), sol:'',
+    addSlot({q:q, el:inp, group:mm.g, read:reader(inp), sol:'', label:t[0],
       failFn:function(v){ return validPick()?diffLine(v, String(t[1](+pickVal()))):'' },
       ev:function(){
         var v=String(inp.value).trim();
@@ -876,7 +1085,8 @@ function buildId(q){
   });
   mp.row.appendChild(chips); finishRow(mp);
   function rdPar(){ var s=chips.querySelector('.chip[aria-pressed="true"]'); return s?s.dataset.par:'' }
-  addSlot({q:q, el:null, group:mp.g, read:rdPar, sol:'',
+  function wrPar(v){ var b=chips.querySelector('.chip[data-par="'+v+'"]'); if(b) b.setAttribute('aria-pressed','true') }
+  addSlot({q:q, el:null, group:mp.g, read:rdPar, write:wrPar, label:'זוגי או אי־זוגי', sol:'',
     failFn:function(){ var n=+pickVal(); return 'הנכון: <b>'+((n%2===0)?'זוגי':'אי‑זוגי')+'</b> — לפי ספרת היחידות.' },
     ev:function(){
       var n=+pickVal(), want=(n%2===0)?'זוגי':'אי‑זוגי', v=rdPar();
@@ -901,7 +1111,7 @@ function build4(q){
     var inp=mkInput('',70); strip.appendChild(inp);
     strip.appendChild(el('span','fix',t[1]));
     m.row.appendChild(strip); finishRow(m);
-    addSlot({q:q, el:inp, group:m.g, read:reader(inp), sol:'',
+    addSlot({q:q, el:inp, group:m.g, read:reader(inp), sol:'', label:t[0],
       failFn:function(){ return idx===0?'הנכון: <b>7</b>':'כל מספר <b>גדול מ‑7</b>, למשל 8 או 9 — ושונה מזה שבסעיף הקודם.' },
       ev:function(ctx){
         var v=String(inp.value).trim();
@@ -921,8 +1131,14 @@ function build5(q){
     (function(idx){
       var m=mkRow(rows,'מספר '+(idx+1));
       var inp=mkInput('num'); m.row.appendChild(inp); finishRow(m);
-      addSlot({q:q, el:inp, group:m.g,
+      addSlot({q:q, el:inp, group:m.g, label:'מספר '+(idx+1),
         read:function(){ return String(inp.value).trim()+'|'+(q._pins[idx]==null?'':q._pins[idx]) },
+        write:function(v){
+          var p=String(v).split('|');
+          inp.value=p[0]||'';
+          q._pins[idx] = (p[1]==='' || p[1]==null) ? null : +p[1];
+          if(q._redraw) q._redraw();
+        },
         sol:'',
         failFn:function(){ return 'אפשר: <b>16 · 19 · 61 · 69 · 91 · 96</b> — שלושה מהם, כל אחד מסומן במקומו על הציר.' },
         ev:function(ctx){
@@ -955,6 +1171,7 @@ function build5(q){
   q._ui.body.appendChild(nl);
   q._pins=[null,null,null];
   var svgEl=nl.querySelector('svg');
+  q._redraw=function(){ drawPins(q,svgEl,W,L,R) };
   svgEl.addEventListener('click',function(ev){
     var at=-1, i;
     for(i=0;i<3;i++) if(!q._slots[i].locked && q._pins[i]==null){ at=i; break }
@@ -964,6 +1181,7 @@ function build5(q){
     var val=Math.round(((ev.clientX-rr.left)/rr.width*W-L)/(R-L)*100);
     q._pins[at]=Math.max(0,Math.min(100,val));
     drawPins(q,svgEl,W,L,R);
+    saveProgress();
   });
 }
 function drawPins(q,svgEl,W,L,R){
@@ -982,12 +1200,19 @@ function drawPins(q,svgEl,W,L,R){
 /* ============ render ============ */
 function render(){
   var app=document.getElementById('app');
+  var hero=el('div'); hero.innerHTML=ART.hero(); app.appendChild(hero);
+  app.appendChild(el('p','legend',
+    '<span><i style="background:var(--blue)"></i>מאות</span>'+
+    '<span><i style="background:var(--mint)"></i>עשרות</span>'+
+    '<span><i style="background:var(--pink)"></i>יחידות</span>'));
+  var ARTS={'חלק 1':ART.p1,'חלק 2':ART.p2,'חלק 3':ART.p3,'חלק 4':ART.p4};
   PARTS.forEach(function(p){
     var sec=el('section','part');
     var h=el('div','part-h');
     h.appendChild(el('span','',p.n));
     h.appendChild(el('h2','',p.h));
     sec.appendChild(h);
+    if(ARTS[p.n]){ var pa=el('div'); pa.innerHTML=ARTS[p.n](); sec.appendChild(pa) }
     if(p.lead) sec.appendChild(el('p','lead',p.lead));
     var boxHost=null;
     if(p.box){ boxHost=el('div'); sec.appendChild(boxHost) }
@@ -1004,10 +1229,12 @@ function render(){
       else if(q.kind==='four') build4(q);
       else if(q.kind==='line') build5(q);
       if(p.box) digitPad(q, q._ui.body, p.box, 5, true);
+      buildKbd(q);
       q._part=p;
       q._ui.btn.addEventListener('click',function(){ onCheck(q) });
       Array.prototype.forEach.call(q._ui.body.querySelectorAll('input'),function(i){
         i.addEventListener('focus',function(){ setActive(q,i) });
+        i.addEventListener('input', saveProgress);
       });
       q._ui.body.addEventListener('keydown',function(e){
         if(e.key!=='Enter') return;
@@ -1023,6 +1250,7 @@ function render(){
     });
     app.appendChild(sec);
   });
+  loadProgress();
   paintBar();
 }
 function pct(x,t){ return t?Math.round(x/t*100):0 }
@@ -1053,8 +1281,63 @@ function showResult(){
     line.innerHTML='<span>'+p.n+' · '+p.h+'</span><b>'+(Math.round(f*10)/10)+'/'+tot+'</b><b>'+(Math.round(g*10)/10)+'/'+tot+'</b>';
     bd.appendChild(line);
   });
+  var sum=buildSummary();
+  var box=document.getElementById('sumBox'); if(box) box.value=sum;
+  var wa=document.getElementById('waBtn');
+  if(wa) wa.href='https://wa.me/?text='+encodeURIComponent(sum);
+  var cp=document.getElementById('copyBtn');
+  if(cp && !cp._wired){
+    cp._wired=true;
+    cp.addEventListener('click',function(){
+      var t=document.getElementById('sumBox');
+      function done(){ cp.textContent='✓ הועתק'; setTimeout(function(){ cp.textContent='📋 להעתיק הכול' },1800) }
+      try{
+        navigator.clipboard.writeText(t.value).then(done, function(){ t.focus(); t.select(); done() });
+      }catch(e){ t.focus(); t.select(); done() }
+    });
+  }
+  var ag=document.getElementById('againBtn');
+  if(ag && !ag._wired){ ag._wired=true; ag.addEventListener('click',function(){ clearProgress(); location.reload() }) }
   document.getElementById('result').hidden=false;
   document.getElementById('result').scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+/* the whole thing in plain text — score, every row, and the right answer where he missed */
+function fmtVal(s){
+  var v=String(s.read());
+  if(v.indexOf('|')>-1){
+    var p=v.split('|');
+    return p[0] + (p[1]!==''? ' (סומן על ' + p[1] + ')' : ' (לא סומן על הציר)');
+  }
+  return v;
+}
+function buildSummary(){
+  var t=totals(), L=[];
+  L.push('📘 מבנה עשרוני — דף התרגול');
+  L.push('ציון אחרי הבדיקה: ' + pct(t.first,t.pts));
+  L.push('ציון אחרי התיקונים: ' + pct(t.got,t.pts));
+  L.push('(' + (Math.round(t.got*10)/10) + ' מתוך ' + t.pts + ' נקודות)');
+  L.push('');
+  PARTS.forEach(function(p){
+    L.push('━━ ' + p.n + ' · ' + p.h);
+    p.qs.forEach(function(q){
+      var mine=q._slots.filter(function(s){ return s.scored });
+      var got=mine.reduce(function(a,s){ return a+s.got },0);
+      L.push('');
+      L.push(txt(q.title) + '  [' + (Math.round(got*10)/10) + '/' + mine.length + ']');
+      q._slots.forEach(function(s){
+        if(!s.scored) return;
+        var icon = s.got===1 ? '✓' : (s.got>0 ? '½' : '✗');
+        var line = '  ' + icon + ' ' + (s.label ? s.label + ': ' : '') + fmtVal(s);
+        if(s.got===0 && s.failHtml) line += '  ← ' + txt(s.failHtml);
+        else if(s.spellNote) line += '  ← ' + txt(s.spellNote);
+        L.push(line);
+      });
+    });
+    L.push('');
+  });
+  L.push('— נוצר בדף התרגול: https://yaelavgil.github.io/yaella/mivne-asroni/');
+  return L.join('\n');
 }
 render();
 </script>
