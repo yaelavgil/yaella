@@ -1,0 +1,844 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>מבנה עשרוני · תרגול למבחן</title>
+<meta name="description" content="כל התרגול של מבנה עשרוני — קריאה וכתיבה של מספרים, קלפים, סדרות וציר המספרים. בודק לבד, נותן רמז כשטועים, ומסכם בציון.">
+<meta name="theme-color" content="#1b3a6b">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="he_IL">
+<meta property="og:title" content="מבנה עשרוני · תרגול למבחן">
+<meta property="og:description" content="שני דפי העבודה, על המסך. בודק לבד, נותן רמז כשטועים, ומסכם בציון.">
+<meta property="og:url" content="https://yaelavgil.github.io/yaella/mivne-asroni/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap">
+<style>
+:root{
+  --bg:#f4f6fb; --panel:#ffffff; --ink:#15213a; --soft:#5d6b89; --line:#dbe2f0;
+  --blue:#1b3a6b; --sky:#2f7fd4; --green:#117a4a; --greenbg:#e4f6ec;
+  --red:#c02b3a; --redbg:#fdeaec; --amber:#8a5a00; --amberbg:#fff5e0;
+  --gold:#f0a500; --shadow:0 2px 10px rgba(21,33,58,.07);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1420; --panel:#161f30; --ink:#eef2fa; --soft:#9aa8c2; --line:#2a364c;
+  --blue:#7fb4f0; --sky:#6fb0ee; --green:#5fd39a; --greenbg:#10301f;
+  --red:#ff8a96; --redbg:#36151a; --amber:#ffc864; --amberbg:#362a0e;
+  --gold:#ffc24a; --shadow:0 2px 12px rgba(0,0,0,.4); color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0e1420; --panel:#161f30; --ink:#eef2fa; --soft:#9aa8c2; --line:#2a364c;
+  --blue:#7fb4f0; --sky:#6fb0ee; --green:#5fd39a; --greenbg:#10301f;
+  --red:#ff8a96; --redbg:#36151a; --amber:#ffc864; --amberbg:#362a0e;
+  --gold:#ffc24a; --shadow:0 2px 12px rgba(0,0,0,.4); color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0; padding:0}
+body{background:var(--bg); color:var(--ink);
+  font-family:'Heebo',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
+  font-size:17px; line-height:1.55; -webkit-text-size-adjust:100%}
+img{display:block; max-width:100%}
+[hidden]{display:none !important}
+
+.wrap{max-width:780px; margin:0 auto;
+  padding-left:max(16px, env(safe-area-inset-left,0px));
+  padding-right:max(16px, env(safe-area-inset-right,0px));
+  padding-block:0 60px}
+
+/* ---------- top ---------- */
+header{background:linear-gradient(160deg,#1b3a6b,#2f7fd4); color:#fff; padding-block:26px 22px; margin-bottom:0}
+header .wrap{padding-block:0}
+h1{margin:0 0 4px; font-size:clamp(1.5rem,5.4vw,2.1rem); font-weight:900; letter-spacing:-.02em; text-wrap:balance}
+header p{margin:0; color:#cfe2fb; font-size:.95rem; font-weight:300}
+.who{display:inline-block; margin-top:12px; background:rgba(255,255,255,.17); border:1px solid rgba(255,255,255,.3);
+  border-radius:999px; padding:5px 14px; font-size:.86rem; font-weight:500}
+
+/* ---------- sticky score ---------- */
+.bar{position:sticky; top:0; z-index:40; background:var(--panel); border-bottom:1px solid var(--line);
+  box-shadow:var(--shadow); padding-block:9px}
+.bar .wrap{display:flex; align-items:center; gap:12px; padding-block:0}
+.prog{flex:1; min-width:0; height:9px; border-radius:999px; background:var(--line); overflow:hidden}
+.prog i{display:block; height:100%; width:0; background:linear-gradient(90deg,var(--sky),var(--green)); transition:width .35s ease}
+.bar b{font-variant-numeric:tabular-nums; font-size:.92rem; white-space:nowrap}
+.bar .pts{color:var(--soft); font-weight:400; font-size:.84rem; white-space:nowrap}
+
+/* ---------- parts ---------- */
+.part{margin-top:30px}
+.part-h{display:flex; align-items:baseline; gap:10px; margin-bottom:4px}
+.part-h span{background:var(--blue); color:var(--panel); font-weight:900; font-size:.8rem;
+  border-radius:8px; padding:3px 9px; white-space:nowrap}
+:root[data-theme="dark"] .part-h span, :root:not([data-theme="light"]) .part-h span{color:#0e1420}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .part-h span{color:#fff}}
+.part-h h2{margin:0; font-size:1.18rem; font-weight:900; letter-spacing:-.01em}
+.part > p.lead{margin:0 0 14px; color:var(--soft); font-size:.92rem}
+
+/* ---------- question card ---------- */
+.q{background:var(--panel); border:1px solid var(--line); border-radius:14px;
+  padding:16px 16px 14px; margin-bottom:12px; box-shadow:var(--shadow)}
+.q.ok{border-color:var(--green)}
+.q.bad{border-color:var(--red)}
+.q-t{font-weight:700; margin:0 0 4px; font-size:1.02rem}
+.q-s{margin:0 0 12px; color:var(--soft); font-size:.88rem}
+.rows{display:grid; gap:8px}
+.row{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+.row .lbl{flex:1; min-width:150px; font-weight:500}
+.row .lbl b{font-variant-numeric:tabular-nums; font-size:1.1rem}
+input[type=text], input[type=number]{font:inherit; color:var(--ink); background:var(--bg);
+  border:2px solid var(--line); border-radius:9px; padding:7px 11px; width:100%; min-width:0;
+  font-variant-numeric:tabular-nums; transition:border-color .15s}
+input:focus{outline:none; border-color:var(--sky)}
+input.num{width:108px; flex:none; text-align:center; font-weight:700; font-size:1.05rem}
+input.wide{flex:1; min-width:170px}
+input.good{border-color:var(--green); background:var(--greenbg)}
+input.wrong{border-color:var(--red); background:var(--redbg)}
+input:disabled{opacity:1}
+.chips{display:flex; gap:8px; flex-wrap:wrap}
+.chip{font:inherit; font-weight:700; cursor:pointer; background:var(--bg); color:var(--ink);
+  border:2px solid var(--line); border-radius:10px; padding:8px 16px; transition:.15s}
+.chip:hover{border-color:var(--sky)}
+.chip[aria-pressed="true"]{background:var(--sky); border-color:var(--sky); color:#fff}
+.cards{display:flex; gap:9px; justify-content:center; margin:4px 0 12px}
+.card{width:54px; height:68px; border-radius:10px; border:2px solid var(--blue); background:var(--panel);
+  display:flex; align-items:center; justify-content:center; font-size:1.7rem; font-weight:900; color:var(--blue)}
+.strip{display:flex; direction:ltr; gap:7px; align-items:center; justify-content:center; flex-wrap:wrap;
+  background:var(--bg); border-radius:11px; padding:11px 8px}
+.strip .fix{font-weight:900; font-size:1.12rem; font-variant-numeric:tabular-nums; min-width:52px; text-align:center}
+.strip input{width:66px; text-align:center; font-weight:700; padding:5px 4px}
+.strip .sep{color:var(--soft)}
+
+.act{display:flex; align-items:center; gap:10px; margin-top:13px; flex-wrap:wrap}
+.btn{font:inherit; font-weight:700; cursor:pointer; border:0; border-radius:10px; padding:9px 20px;
+  background:var(--blue); color:#fff; transition:.15s}
+:root[data-theme="dark"] .btn, :root:not([data-theme="light"]) .btn{color:#0e1420}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .btn{color:#fff}}
+.btn:hover{filter:brightness(1.12)}
+.btn[disabled]{opacity:.45; cursor:default; filter:none}
+.btn.ghost{background:transparent; color:var(--sky); border:2px solid var(--line); padding:7px 16px}
+.mark{font-weight:700; font-size:.92rem}
+.mark.ok{color:var(--green)} .mark.bad{color:var(--red)} .mark.half{color:var(--amber)}
+
+.note{margin-top:11px; border-radius:11px; padding:11px 13px; font-size:.93rem; line-height:1.5}
+.note.hint{background:var(--amberbg); color:var(--amber); border:1px solid rgba(240,165,0,.3)}
+.note.sol{background:var(--greenbg); color:var(--green); border:1px solid rgba(17,122,74,.28)}
+.note b{font-weight:900}
+.note .t{display:block; font-weight:900; margin-bottom:3px}
+
+/* number line */
+.nl{direction:ltr; margin:6px 0 2px; user-select:none}
+.nl svg{width:100%; height:92px; display:block; cursor:crosshair}
+.nl .cap{text-align:center; color:var(--soft); font-size:.85rem; margin-top:2px}
+
+/* result */
+.result{background:var(--panel); border:3px solid var(--gold); border-radius:18px; padding:24px 20px;
+  text-align:center; margin-top:26px; box-shadow:var(--shadow)}
+.result .big{font-size:3.6rem; font-weight:900; line-height:1; letter-spacing:-.03em; color:var(--blue)}
+.result .band{font-size:1.25rem; font-weight:900; margin-top:6px}
+.result p{color:var(--soft); margin:10px 0 0; font-size:.94rem}
+.bd{display:grid; gap:7px; margin-top:18px; text-align:right}
+.bd div{display:flex; justify-content:space-between; gap:10px; background:var(--bg);
+  border-radius:9px; padding:8px 12px; font-size:.9rem}
+.bd b{font-variant-numeric:tabular-nums; white-space:nowrap}
+footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--line); color:var(--soft); font-size:.82rem}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>מבנה עשרוני — התרגול למבחן</h1>
+    <p>שני דפי העבודה, על המסך. בודק לבד, ואם טועים — מסביר למה ונותן עוד הזדמנות.</p>
+    <span class="who">ביה״ס שדות בת חפר · מתמטיקה</span>
+  </div>
+</header>
+
+<div class="bar">
+  <div class="wrap">
+    <b id="scoreTxt">0 / 0</b>
+    <div class="prog"><i id="progBar"></i></div>
+    <span class="pts" id="doneTxt">טרם התחלת</span>
+  </div>
+</div>
+
+<div class="wrap" id="app"></div>
+
+<div class="wrap">
+  <div class="result" id="result" hidden>
+    <div class="big" id="grade">—</div>
+    <div class="band" id="band"></div>
+    <p id="rmsg"></p>
+    <div class="bd" id="bd"></div>
+    <div style="margin-top:18px"><button class="btn ghost" onclick="location.reload()">להתחיל מחדש</button></div>
+  </div>
+  <footer>
+    התרגילים לקוחים מדף העבודה ״מבנה עשרוני של מספר — כתיבה וקריאת מספרים״ (ריקי עמר) ומ״משימה במתמטיקה״ של ביה״ס שדות בת חפר.<br>
+    תשובה נכונה בניסיון ראשון — נקודה מלאה. בניסיון שני — חצי נקודה.
+  </footer>
+</div>
+
+<script>
+/* ============ helpers ============ */
+function el(t,c,x){var e=document.createElement(t); if(c)e.className=c; if(x!=null)e.innerHTML=x; return e}
+function nz(s){return (s||'').replace(/[֑-ׇ]/g,'').replace(/[\s\-–—׳״'"`.,]/g,'').trim()}
+function digits(s){return (s||'').replace(/[^\d]/g,'')}
+function isNum(s){return /^\s*-?\d+\s*$/.test(s||'')}
+function rev(n){return String(n).split('').reverse().join('')}
+
+/* ============ the question bank ============ */
+/* kind: num | words | choice | set | seq | fn
+   each field => one point */
+
+var WORDS = {
+  603:['שש מאות ושלוש','שש מאות שלוש'],
+  821:['שמונה מאות עשרים ואחת','שמונה מאות עשרים ואחד'],
+  519:['חמש מאות תשע עשרה','חמש מאות ותשע עשרה'],
+  400:['ארבע מאות'],
+  210:['מאתיים ועשר','מאתיים עשר','מאתים ועשר','מאתים עשר'],
+  197:['מאה תשעים ושבע','מאה תשעים ושבעה'],
+  363:['שלוש מאות שישים ושלוש','שלוש מאות ששים ושלוש'],
+  702:['שבע מאות ושתיים','שבע מאות שתיים','שבע מאות ושתים','שבע מאות שתים'],
+  399:['שלוש מאות תשעים ותשע','שלוש מאות תשעים ותשעה']
+};
+
+function numQ(id,title,sub,items,hint){
+  return {id:id, kind:'num', title:title, sub:sub, items:items, hint:hint};
+}
+
+var PARTS = [
+{
+ n:'חלק 1', h:'לכתוב ולקרוא מספרים', lead:'מדף העבודה של ריקי עמר, עמוד 1.',
+ qs:[
+  numQ('q1a','א. כתבו את המספרים בספרות','כותבים רק ספרות, בלי רווחים.',[
+    {l:'שש מאות עשרים ושלוש', a:623},
+    {l:'שמונה מאות ארבעים וחמש', a:845},
+    {l:'ארבע מאות ותשע', a:409},
+    {l:'שבע מאות שמונים ואחת', a:781},
+    {l:'מאה שלושים', a:130},
+    {l:'מאתיים ושבע עשרה', a:217},
+    {l:'תשע מאות ושתיים', a:902},
+    {l:'חמש מאות', a:500}
+  ],'כל חלק במילים הוא <b>ספרה אחת</b> במקום שלו: ״שש מאות״ = הספרה 6 במקום המאות. ואם אין עשרות או אין אחדות — כותבים שם <b>0</b>, לא מדלגים.'),
+
+  {id:'q1b', kind:'words', title:'ב. כתבו במילים את המספרים', sub:'אפשר לכתוב ״ו״ לפני החלק האחרון או בלי — שתי הצורות מתקבלות.',
+   items:[603,821,519,400,210,197,363,702].map(function(n){return {l:String(n), a:WORDS[n]}}),
+   hint:'קוראים את המספר לפי המקומות: קודם המאות, אחר כך העשרות, ובסוף האחדות. <b>אם במקום יש 0 — פשוט לא אומרים אותו בכלל.</b> למשל 603 נקרא ״שש מאות ושלוש״, בלי לומר כלום על העשרות.'},
+
+  numQ('q1c','ג. מי המספר? כתבו בספרות','שימו לב איזה מקום מופיע ואיזה לא.',[
+    {l:'4 עשרות ו‑7 אחדות בודדות', a:47},
+    {l:'3 מאות, 2 עשרות ו‑5 אחדות בודדות', a:325},
+    {l:'2 מאות, 1 עשרות ו‑8 אחדות בודדות', a:218},
+    {l:'5 עשרות', a:50},
+    {l:'1 מאות ו‑4 אחדות בודדות', a:104},
+    {l:'6 מאות ו‑9 עשרות', a:690}
+  ],'<b>מקום שלא הוזכר — מקבל 0, והוא תופס מקום.</b> ״5 עשרות״ זה 50 ולא 5, כי אחריו חייב לבוא מקום האחדות. ו״6 מאות ו‑9 עשרות״ זה 690 — ה‑0 בסוף הוא מה שמחזיק את ה‑9 במקום העשרות.')
+ ]
+},
+
+{
+ n:'חלק 2', h:'שלושה קלפים', lead:'מדף העבודה של ריקי עמר, עמוד 2 — מבנה עשרוני בתחום האלף.',
+ qs:[
+  {id:'q2a', kind:'set', title:'הקלפים 5, 1, 6 — הרכיבו מהם את כל המספרים התלת‑ספרתיים', sub:'כל קלף פעם אחת בכל מספר. יש בדיוק שישה.',
+   cards:[5,1,6], slots:6, pool:[156,165,516,561,615,651],
+   hint:'עבדו בשיטה ולא בניחוש: <b>קבעו איזו ספרה עומדת ראשונה, ואז הפכו את שתי הנותרות.</b> עם 5 בהתחלה יוצאים 516 ו‑561. עכשיו עשו את אותו דבר כשה‑1 ראשון, ואז כשה‑6 ראשון.'},
+
+  {id:'q2b', kind:'set', title:'הקלפים 9, 0, 3 — הרכיבו את כל המספרים התלת‑ספרתיים', sub:'שימו לב: הפעם אין שישה. חשבו למה.',
+   cards:[9,0,3], slots:4, pool:[309,390,903,930],
+   hint:'<b>מספר לא מתחיל ב‑0.</b> ״039״ זה בעצם 39, מספר דו‑ספרתי — אז הוא לא נחשב. לכן בהתחלה יכולים לעמוד רק 9 או 3, ונשארות ארבע אפשרויות.'},
+
+  numQ('q2c','כתבו את המספרים','שימו לב לסדר — הוא לא תמיד מאות, עשרות, אחדות.',[
+    {l:'6 אחדות בודדות, 2 עשרות ו‑3 מאות', a:326},
+    {l:'0 עשרות, 8 אחדות ו‑2 מאות', a:208},
+    {l:'5 מאות ו‑0 עשרות', a:500},
+    {l:'8 מאות ו‑2 אחדות בודדות', a:802},
+    {l:'6 עשרות ו‑7 מאות', a:760}
+  ],'<b>אל תכתבו לפי הסדר שבו זה כתוב — כתבו לפי המקומות.</b> קודם מצאו את המאות, אחר כך את העשרות ואחר כך את האחדות, גם אם במשפט הם מופיעים הפוך. ״6 עשרות ו‑7 מאות״ זה 760, לא 67.')
+ ]
+},
+
+{
+ n:'חלק 3', h:'חמש הספרות', lead:'מדף העבודה של ריקי עמר, עמוד 3. הספרות 8, 2, 0, 5, 7 — בכל מספר כל ספרה פעם אחת בדיוק.',
+ qs:[
+  numQ('q3a','א. הרכיבו את המספר הגדול ביותר','חמש ספרות, כל אחת פעם אחת.',[
+    {l:'המספר הגדול ביותר', a:87520, w:140}
+  ],'<b>המקום השמאלי ביותר שווה הכי הרבה</b>, אז שם שמים את הספרה הכי גדולה. אחר כך ממשיכים לפי הגודל, מהגדולה לקטנה, עד שה‑0 נשאר אחרון.'),
+
+  numQ('q3b','ב. הרכיבו את המספר הקטן ביותר','גם כאן — חמש ספרות, כל אחת פעם אחת.',[
+    {l:'המספר הקטן ביותר', a:20578, w:140}
+  ],'<b>הכי קטן זה לא פשוט ״לסדר מהקטן לגדול״</b>, כי אז המספר היה מתחיל ב‑0 — וזה כבר לא מספר בן חמש ספרות. אז בהתחלה שמים את <b>הספרה הקטנה ביותר שאיננה 0</b>, ומיד אחריה את ה‑0.'),
+
+  numQ('q3c','ג. במספר הקטן ביותר שהרכבתם — איזו ספרה בכל מקום?','כותבים ספרה אחת בכל שדה.',[
+    {l:'ספרת היחידות', a:8}, {l:'ספרת העשרות', a:7}, {l:'ספרת המאות', a:5},
+    {l:'ספרת יחידות האלפים', a:0}, {l:'ספרת עשרות האלפים', a:2}
+  ],'<b>סופרים תמיד מימין לשמאל:</b> יחידות, עשרות, מאות, יחידות אלפים, עשרות אלפים. הספרה הימנית ביותר היא היחידות — לא השמאלית.'),
+
+  {id:'q3d', kind:'fn', title:'ד. הרכיבו עוד ארבעה מספרים שונים וסדרו אותם מהקטן לגדול', sub:'כל מספר בן חמש ספרות, מהספרות 8, 2, 0, 5, 7, כל אחת פעם אחת.',
+   slots:4, asc:true,
+   check:function(vals){
+     var bad=[];
+     for(var i=0;i<vals.length;i++){
+       var v=vals[i];
+       if(!isNum(v)){bad.push('חסר מספר'); continue}
+       var s=String(+v);
+       if(s.length!==5){bad.push('״'+s+'״ איננו בן חמש ספרות')}
+       else if(s[0]==='0'){bad.push('מספר לא מתחיל ב‑0')}
+       else if(s.split('').sort().join('')!=='02578'){bad.push('״'+s+'״ לא בנוי בדיוק מהספרות 8,2,0,5,7')}
+     }
+     if(bad.length) return {ok:false, why:bad[0]};
+     var ns=vals.map(Number);
+     for(var j=0;j<ns.length;j++) for(var k=j+1;k<ns.length;k++) if(ns[j]===ns[k]) return {ok:false, why:'יש אצלך שני מספרים זהים — הם צריכים להיות שונים'};
+     for(var m=1;m<ns.length;m++) if(ns[m]<=ns[m-1]) return {ok:false, why:'הסדר לא עולה — '+ns[m]+' איננו גדול מ‑'+ns[m-1]};
+     return {ok:true};
+   },
+   hint:'שתי בדיקות לפני שממשיכים: <b>(1)</b> בכל מספר חייבות להופיע כל חמש הספרות 8,2,0,5,7, כל אחת בדיוק פעם אחת, ואסור שה‑0 יעמוד ראשון. <b>(2)</b> להשוות שני מספרים בני חמש ספרות מתחילים <b>מהספרה השמאלית</b> — מי שגדולה שם, המספר שלו גדול יותר.',
+   sol:'למשל: 20758 &lt; 25078 &lt; 70258 &lt; 80257 — אבל כל ארבעה מספרים חוקיים בסדר עולה נכונים.'},
+
+  {id:'q3e', kind:'fn', title:'ה. תעודת זהות למספר', sub:'בחרו אחד מהמספרים שהרכבתם, כתבו אותו, ומלאו עליו את הפרטים.',
+   idcard:true,
+   hint:'<b>המספר הקודם</b> הוא פחות 1, <b>המספר העוקב</b> הוא ועוד 1. <b>וזוגי או אי‑זוגי נקבע רק לפי ספרת היחידות</b> — הספרה הימנית ביותר. אם היא 0, 2, 4, 6 או 8 — המספר זוגי.'}
+ ]
+},
+
+{
+ n:'חלק 4', h:'המשימה של בית הספר', lead:'מתוך ״משימה במתמטיקה״, ביה״ס שדות בת חפר.',
+ qs:[
+  {id:'q4a', kind:'mixed', title:'שאלה 1 · נתון המספר 399', sub:'',
+   items:[
+     {l:'א. כתבו את המספר במילים', kind:'words', a:WORDS[399], w:'wide'},
+     {l:'ב. כתבו את המספר העוקב למספר הנתון', kind:'num', a:400}
+   ],
+   hint:'״עוקב״ זה <b>המספר שבא מיד אחרי</b> — ועוד 1. ושימו לב מה קורה כאן: גם האחדות וגם העשרות מלאות ב‑9, אז שתיהן מתאפסות <b>והמאות עולות באחת</b>.'},
+
+  {id:'q4b', kind:'choice', title:'שאלה 2 · מי מבין המספרים הבאים שווה ל‑9 יחידות ועוד 50 עשרות?', sub:'בחרו תשובה אחת.',
+   opts:[59,950,509,590], a:509,
+   why:function(v){
+     if(+v===59) return 'ספרת את 50 העשרות כאילו הן 50 יחידות. <b>עשרה אחת שווה 10</b>, אז 50 עשרות זה הרבה יותר מ‑50.';
+     if(+v===590) return 'חישבת 50 עשרות + 9 <b>עשרות</b>. אבל כתוב 9 <b>יחידות</b> — והן נכנסות למקום הימני ביותר.';
+     if(+v===950) return 'הפכת בין התפקידים: שמת את ה‑9 במאות ואת ה‑50 אחריו. תחשבו קודם <b>כמה שווה 50 עשרות לבד</b>, ורק אחר כך הוסיפו את היחידות.';
+     return '';
+   },
+   hint:'תרגמו כל חלק למספר בנפרד ורק אז חברו. <b>50 עשרות = 50 × 10.</b> כמה זה? ועכשיו הוסיפו 9 יחידות.'},
+
+  {id:'q4c', kind:'seq', title:'שאלה 3 · סדרות הקפיצות', sub:'כל סדרה ממשיכה באותן קפיצות. השלימו את המספרים החסרים.',
+   seqs:[
+     {l:'א.', cells:[null,null,null,85,75,65], ans:[115,105,95]},
+     {l:'ב.', cells:[null,324,314,304,null], ans:[334,294]},
+     {l:'ג.', cells:[null,470,480,490,null,null], ans:[460,500,510]}
+   ],
+   hint:'<b>קודם מצאו את גודל הקפיצה</b> — ההפרש בין שני מספרים שכבר כתובים. אחר כך בדקו <b>לאיזה כיוון</b> היא הולכת: אם המספרים קטֵנים משמאל לימין, אז כשחוזרים אחורה — מוסיפים.'},
+
+  {id:'q4d', kind:'fn', title:'שאלה 4 · חיסור והשוואה', sub:'',
+   four:true,
+   hint:'בסעיף א יש <b>תשובה אחת בלבד</b> — חפשו מה צריך להוריד מ‑13 כדי להישאר עם 6. בסעיפים ב ו‑ג יש <b>הרבה תשובות נכונות</b>: כל מספר שיגרום לתוצאה להיות <b>קטנה מ‑6</b>, כלומר כל מספר <b>גדול</b> מזה שבסעיף א. ושתי התשובות צריכות להיות שונות זו מזו.'},
+
+  {id:'q4e', kind:'fn', title:'שאלה 5 · הספרות 1, 6, 9', sub:'כתבו שלושה מספרים דו‑ספרתיים שונים מהספרות האלה, ואז סמנו כל אחד על ציר המספרים.',
+   line:true,
+   hint:'מספר דו‑ספרתי בנוי משתי ספרות מתוך השלוש — למשל 16 או 61. <b>ולסימון על הציר:</b> הציר מ‑0 עד 100 והקווים הקטנים הם כל 10. מצאו קודם בין איזה שני קווים המספר נמצא, ואז סמנו בערך במקום הנכון ביניהם.'},
+
+  {id:'q4f', kind:'mixed', title:'שאלה 6 · 17 + 40 = 27 + ____', sub:'',
+   items:[{l:'א. השלימו את המספר החסר', kind:'num', a:30}],
+   hint:'אל תחשבו את 40 + 17. <b>השוו את שני הצדדים זה לזה:</b> 27 גדול מ‑17 ב‑10 בדיוק. אם צד אחד גדל ב‑10 והתוצאה צריכה להישאר אותו דבר — מה חייב לקרות למספר השני?',
+   after:'<b>ולמה זה עובד בלי לחשב:</b> 27 גדול מ‑17 בעשר. כדי שהסכום יישאר שווה, המספר השני חייב להיות <b>קטן בעשר</b> מ‑40. זה בדיוק מה שמסבירים בסעיף ב של דף העבודה.'}
+ ]
+}
+];
+
+/* ============ engine ============ */
+var state = {}, totalPts = 0, gotPts = 0, answered = 0, totalQ = 0;
+
+function reg(id,pts){ state[id]={pts:pts, tries:0, done:false, got:0}; totalPts+=pts; totalQ++; }
+
+function paintBar(){
+  document.getElementById('scoreTxt').textContent = (Math.round(gotPts*10)/10) + ' / ' + totalPts;
+  document.getElementById('progBar').style.width = (answered/totalQ*100) + '%';
+  document.getElementById('doneTxt').textContent = answered + ' מתוך ' + totalQ + ' שאלות';
+  if(answered===totalQ) showResult();
+}
+
+function award(id, firstTry){
+  var s = state[id];
+  s.got = firstTry ? s.pts : s.pts/2;
+  s.done = true; gotPts += s.got; answered++; paintBar();
+  return s.got;
+}
+function fail(id){ var s=state[id]; s.got=0; s.done=true; answered++; paintBar(); }
+
+function mkCard(q, partName){
+  var c = el('div','q'); c.id = 'c-'+q.id;
+  c.appendChild(el('p','q-t', q.title));
+  if(q.sub) c.appendChild(el('p','q-s', q.sub));
+  var body = el('div'); c.appendChild(body);
+  var act = el('div','act');
+  var btn = el('button','btn','בדוק'); btn.type='button';
+  var mark = el('span','mark');
+  act.appendChild(btn); act.appendChild(mark);
+  c.appendChild(act);
+  var note = el('div'); c.appendChild(note);
+  q._ui = {card:c, body:body, btn:btn, mark:mark, note:note};
+  return c;
+}
+
+function showHint(q, extra){
+  q._ui.note.innerHTML = '';
+  var n = el('div','note hint');
+  n.innerHTML = '<span class="t">🤔 כמעט. בוא נבדוק יחד</span>' +
+    (extra ? '<div style="margin-bottom:7px">'+extra+'</div>' : '') + q.hint +
+    '<div style="margin-top:8px; font-weight:700">נסה שוב — תשובה נכונה עכשיו שווה חצי נקודה.</div>';
+  q._ui.note.appendChild(n);
+}
+function showSol(q, html){
+  q._ui.note.innerHTML = '';
+  var n = el('div','note sol');
+  n.innerHTML = '<span class="t">✓ התשובה הנכונה</span>' + html;
+  q._ui.note.appendChild(n);
+}
+function showDone(q, html){
+  q._ui.note.innerHTML = '';
+  if(!html) return;
+  var n = el('div','note sol'); n.innerHTML = html; q._ui.note.appendChild(n);
+}
+function lock(q){
+  q._ui.btn.disabled = true;
+  Array.prototype.forEach.call(q._ui.body.querySelectorAll('input'), function(i){ i.disabled = true });
+  Array.prototype.forEach.call(q._ui.body.querySelectorAll('.chip'), function(b){ b.disabled = true });
+}
+function setMark(q, txt, cls){ q._ui.mark.className = 'mark ' + cls; q._ui.mark.textContent = txt; }
+
+/* ---- generic numeric / words / mixed ---- */
+function buildItems(q, items){
+  var rows = el('div','rows');
+  items.forEach(function(it, i){
+    var r = el('div','row');
+    r.appendChild(el('span','lbl', it.l.indexOf('<')>-1 ? it.l : '<span>'+it.l+'</span>'));
+    var inp = document.createElement('input');
+    inp.type = 'text';
+    inp.className = (it.kind==='words' || q.kind==='words' || it.w==='wide') ? 'wide' : 'num';
+    if(it.w && it.w!=='wide') inp.style.width = it.w+'px';
+    inp.setAttribute('inputmode', (it.kind==='words'||q.kind==='words') ? 'text' : 'numeric');
+    inp.dataset.i = i;
+    r.appendChild(inp);
+    rows.appendChild(r);
+  });
+  q._ui.body.appendChild(rows);
+}
+
+function checkItems(q, items){
+  var inputs = q._ui.body.querySelectorAll('input');
+  var wrong = 0, blank = 0, diag = '';
+  items.forEach(function(it, i){
+    var v = inputs[i].value, isW = (it.kind==='words' || q.kind==='words');
+    var good;
+    if(!String(v).trim()){ blank++; good = false; }
+    else if(isW){
+      var a = Array.isArray(it.a) ? it.a : [it.a];
+      good = a.some(function(x){ return nz(x) === nz(v) });
+      if(!good && digits(v)) diag = 'שים לב — בסעיף הזה צריך לכתוב <b>במילים</b>, לא בספרות.';
+    }else{
+      good = isNum(v) && (+v === +it.a);
+      if(!good && isNum(v)){
+        var s = digits(v), t = String(it.a);
+        if(s.length > t.length && !diag) diag = '״'+s+'״ ארוך מדי. כנראה כתבת כל חלק בנפרד והדבקת אותם — אבל כל חלק הוא <b>ספרה אחת</b>.';
+        else if(s === rev(t) && !diag) diag = 'הספרות נכונות אבל <b>הסדר הפוך</b>. בדוק מה במקום האחדות (הימני) ומה במקום המאות (השמאלי).';
+      }
+    }
+    inputs[i].className = inputs[i].className.replace(/ ?(good|wrong)/g,'') + (good ? ' good' : ' wrong');
+    if(!good) wrong++;
+  });
+  if(blank) diag = 'יש סעיפים ריקים — צריך למלא את כולם.';
+  return {wrong:wrong, diag:diag};
+}
+
+function solItems(items, q){
+  return items.map(function(it){
+    var a = Array.isArray(it.a) ? it.a[0] : it.a;
+    return '<div>' + it.l + ' → <b>' + a + '</b></div>';
+  }).join('');
+}
+
+/* ---- set of numbers from cards ---- */
+function buildSet(q){
+  var cards = el('div','cards');
+  q.cards.forEach(function(d){ cards.appendChild(el('div','card', String(d))) });
+  q._ui.body.appendChild(cards);
+  var rows = el('div','rows'); var row = el('div','row');
+  row.style.justifyContent = 'center';
+  for(var i=0;i<q.slots;i++){
+    var inp = document.createElement('input');
+    inp.type='text'; inp.className='num'; inp.setAttribute('inputmode','numeric');
+    row.appendChild(inp);
+  }
+  rows.appendChild(row); q._ui.body.appendChild(rows);
+}
+function checkSet(q){
+  var inputs = q._ui.body.querySelectorAll('input');
+  var vals = [], seen = {}, wrong = 0, diag = '';
+  Array.prototype.forEach.call(inputs, function(inp){
+    var v = String(inp.value).trim(), good = false;
+    if(isNum(v)){
+      var n = +v;
+      if(q.pool.indexOf(n) > -1 && !seen[n]){ good = true; seen[n] = 1 }
+      else if(seen[n]){ diag = diag || 'כתבת את <b>'+n+'</b> פעמיים. כל מספר צריך להופיע רק פעם אחת.' }
+      else{
+        var s = String(n);
+        if(s.length !== q.cards.length) diag = diag || '״'+s+'״ איננו בן '+q.cards.length+' ספרות.';
+        else if(s[0] === '0') diag = diag || 'מספר לא יכול להתחיל ב‑0.';
+        else diag = diag || '״'+s+'״ לא בנוי בדיוק מהקלפים '+q.cards.join(', ')+', כל אחד פעם אחת.';
+      }
+    }
+    inp.className = 'num' + (good ? ' good' : ' wrong');
+    if(!good) wrong++;
+  });
+  return {wrong:wrong, diag:diag};
+}
+
+/* ---- sequences ---- */
+function buildSeq(q){
+  q.seqs.forEach(function(s){
+    var wrapr = el('div','row'); wrapr.style.alignItems='center';
+    wrapr.appendChild(el('span','', '<b>'+s.l+'</b>'));
+    var strip = el('div','strip'); strip.style.flex='1';
+    s.cells.forEach(function(c, i){
+      if(i) strip.appendChild(el('span','sep','·'));
+      if(c === null){
+        var inp = document.createElement('input');
+        inp.type='text'; inp.setAttribute('inputmode','numeric'); inp.dataset.seq = s.l;
+        strip.appendChild(inp);
+      } else strip.appendChild(el('span','fix', String(c)));
+    });
+    wrapr.appendChild(strip);
+    q._ui.body.appendChild(wrapr);
+  });
+}
+function checkSeq(q){
+  var wrong = 0, diag = '';
+  q.seqs.forEach(function(s){
+    var inputs = q._ui.body.querySelectorAll('input[data-seq="'+s.l+'"]');
+    Array.prototype.forEach.call(inputs, function(inp, i){
+      var good = isNum(inp.value) && (+inp.value === s.ans[i]);
+      inp.className = good ? 'good' : 'wrong';
+      if(!good){
+        wrong++;
+        if(!diag && isNum(inp.value)){
+          var d = Math.abs(+inp.value - s.ans[i]);
+          if(d === 20) diag = 'בסדרה '+s.l+' קפצת <b>פעמיים</b> במקום פעם אחת.';
+          else if(+inp.value === s.ans[i] - 2*(s.ans[i] - (s.cells.filter(function(c){return c!==null})[0]||0))) diag = '';
+        }
+      }
+    });
+  });
+  if(!diag) diag = 'בדוק שוב את <b>כיוון</b> הקפיצה בכל סדרה בנפרד — הן לא כולן באותו כיוון.';
+  return {wrong:wrong, diag:diag};
+}
+function solSeq(q){
+  return q.seqs.map(function(s){
+    var k = 0;
+    return '<div><b>'+s.l+'</b> ' + s.cells.map(function(c){ return c===null ? '<b>'+s.ans[k++]+'</b>' : c }).join(' · ') + '</div>';
+  }).join('');
+}
+
+/* ---- question 4 (13 − ?) ---- */
+function build4(q){
+  var rows = el('div','rows');
+  [['א. השלימו את המספר החסר','13 − ','= 6'],
+   ['ב. השלימו מספר מתאים','13 − ','&lt; 6'],
+   ['ג. כתבו אפשרות נוספת','13 − ','&lt; 6']].forEach(function(t,i){
+    var r = el('div','row');
+    r.appendChild(el('span','lbl', t[0]));
+    var strip = el('div','strip');
+    strip.appendChild(el('span','fix', t[1]));
+    var inp = document.createElement('input'); inp.type='text'; inp.setAttribute('inputmode','numeric'); inp.dataset.k=i;
+    strip.appendChild(inp);
+    strip.appendChild(el('span','fix', t[2]));
+    r.appendChild(strip);
+    rows.appendChild(r);
+  });
+  q._ui.body.appendChild(rows);
+}
+function check4(q){
+  var inputs = q._ui.body.querySelectorAll('input');
+  var v = [], ok = [], diag = '';
+  Array.prototype.forEach.call(inputs, function(i){ v.push(String(i.value).trim()) });
+  ok[0] = isNum(v[0]) && (13 - +v[0] === 6);
+  if(!ok[0] && isNum(v[0])) diag = '13 פחות ' + (+v[0]) + ' זה ' + (13 - +v[0]) + ', ואנחנו רוצים בדיוק 6.';
+  [1,2].forEach(function(k){
+    ok[k] = isNum(v[k]) && (13 - +v[k] < 6);
+    if(!ok[k] && isNum(v[k]) && !diag) diag = '13 פחות ' + (+v[k]) + ' זה ' + (13 - +v[k]) + ', וזה <b>לא קטן</b> מ‑6.';
+  });
+  if(ok[1] && ok[2] && v[1] === v[2]){ ok[2] = false; diag = diag || 'שתי התשובות זהות — סעיף ג מבקש <b>אפשרות נוספת</b>, כלומר מספר אחר.' }
+  Array.prototype.forEach.call(inputs, function(i,k){ i.className = ok[k] ? 'good' : 'wrong' });
+  return {wrong: ok.filter(function(x){return !x}).length, diag:diag};
+}
+
+/* ---- question 5: numbers + number line ---- */
+function build5(q){
+  var rows = el('div','rows'), row = el('div','row');
+  row.appendChild(el('span','lbl','שלושה מספרים דו‑ספרתיים מהספרות 1, 6, 9'));
+  for(var i=0;i<3;i++){
+    var inp = document.createElement('input');
+    inp.type='text'; inp.className='num'; inp.setAttribute('inputmode','numeric'); inp.dataset.n=i;
+    row.appendChild(inp);
+  }
+  rows.appendChild(row); q._ui.body.appendChild(rows);
+
+  var nl = el('div','nl');
+  var W = 600, H = 92, L = 20, R = W - 20;
+  var svg = '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="ציר מספרים מאפס עד מאה">';
+  svg += '<line x1="'+L+'" y1="46" x2="'+R+'" y2="46" stroke="currentColor" stroke-width="2"/>';
+  for(var t=0;t<=100;t+=10){
+    var x = L + (R-L)*t/100;
+    var big = (t % 20 === 0);
+    svg += '<line x1="'+x+'" y1="'+(big?34:38)+'" x2="'+x+'" y2="'+(big?58:54)+'" stroke="currentColor" stroke-width="2"/>';
+    if(big) svg += '<text x="'+x+'" y="76" text-anchor="middle" font-size="15" font-weight="700" fill="currentColor">'+t+'</text>';
+  }
+  svg += '<g id="pins-'+q.id+'"></g></svg>';
+  nl.innerHTML = svg;
+  nl.appendChild(el('div','cap','לחצו על הציר כדי לסמן. לחיצה נוספת מזיזה את הסימון שנבחר.'));
+  q._ui.body.appendChild(nl);
+
+  q._pins = [];
+  var svgEl = nl.querySelector('svg');
+  svgEl.addEventListener('click', function(ev){
+    if(q._ui.btn.disabled) return;
+    var r = svgEl.getBoundingClientRect();
+    var val = Math.round(((ev.clientX - r.left) / r.width * W - L) / (R - L) * 100);
+    val = Math.max(0, Math.min(100, val));
+    if(q._pins.length < 3) q._pins.push(val); else q._pins[q._sel || 0] = val;
+    q._sel = ((q._sel || 0) + 1) % 3;
+    drawPins(q, svgEl, W, L, R);
+  });
+}
+function drawPins(q, svgEl, W, L, R){
+  var g = svgEl.querySelector('#pins-'+q.id), s = '';
+  var cols = ['#c02b3a','#117a4a','#2f7fd4'];
+  q._pins.forEach(function(v,i){
+    var x = L + (R-L)*v/100;
+    s += '<g><line x1="'+x+'" y1="20" x2="'+x+'" y2="46" stroke="'+cols[i]+'" stroke-width="3"/>' +
+         '<circle cx="'+x+'" cy="18" r="9" fill="'+cols[i]+'"/>' +
+         '<text x="'+x+'" y="22" text-anchor="middle" font-size="11" font-weight="900" fill="#fff">'+(i+1)+'</text></g>';
+  });
+  g.innerHTML = s;
+}
+function check5(q){
+  var inputs = q._ui.body.querySelectorAll('input');
+  var pool = [16,19,61,69,91,96], vals = [], wrong = 0, diag = '', seen = {};
+  Array.prototype.forEach.call(inputs, function(inp){
+    var v = String(inp.value).trim(), good = false, n = +v;
+    if(isNum(v)){
+      if(pool.indexOf(n) > -1 && !seen[n]){ good = true; seen[n] = 1 }
+      else if(seen[n]) diag = diag || 'כתבת את <b>'+n+'</b> פעמיים — צריך שלושה מספרים <b>שונים</b>.';
+      else if(String(n).length !== 2) diag = diag || '״'+n+'״ איננו דו‑ספרתי.';
+      else diag = diag || '״'+n+'״ לא בנוי משתיים מהספרות 1, 6 ו‑9.';
+    }
+    inp.className = 'num' + (good ? ' good' : ' wrong');
+    if(good) vals.push(n); else wrong++;
+  });
+  if(wrong) return {wrong:wrong, diag:diag};
+  if(q._pins.length < 3) return {wrong:1, diag:'המספרים נכונים! נשאר <b>לסמן את שלושתם על הציר</b> — לחצו על הציר שלוש פעמים.'};
+  var sorted = vals.slice().sort(function(a,b){return a-b});
+  var pins = q._pins.slice().sort(function(a,b){return a-b});
+  var off = [];
+  for(var i=0;i<3;i++) if(Math.abs(pins[i] - sorted[i]) > 6) off.push(sorted[i]);
+  if(off.length) return {wrong:off.length, diag:'הסימון של <b>'+off.join(' ו‑')+'</b> רחוק מדי מהמקום הנכון. מצאו קודם בין אילו שני קווים (עשרות) המספר נמצא.'};
+  return {wrong:0, diag:''};
+}
+
+/* ---- id card ---- */
+function buildId(q){
+  var rows = el('div','rows');
+  var r0 = el('div','row');
+  r0.appendChild(el('span','lbl','<b>המספר שבחרתי</b> (אחד מארבעת המספרים שהרכבת)'));
+  var pick = document.createElement('input');
+  pick.type='text'; pick.className='num'; pick.setAttribute('inputmode','numeric'); pick.dataset.id='pick';
+  r0.appendChild(pick); rows.appendChild(r0);
+  [['digits','מספר הספרות'],['prev','המספר הקודם'],['next','המספר העוקב']].forEach(function(t){
+    var r = el('div','row');
+    r.appendChild(el('span','lbl', t[1]));
+    var inp = document.createElement('input');
+    inp.type='text'; inp.className='num'; inp.setAttribute('inputmode','numeric'); inp.dataset.id=t[0];
+    r.appendChild(inp); rows.appendChild(r);
+  });
+  var rp = el('div','row');
+  rp.appendChild(el('span','lbl','זוגי או אי‑זוגי'));
+  var chips = el('div','chips');
+  ['זוגי','אי‑זוגי'].forEach(function(t){
+    var b = el('button','chip', t); b.type='button'; b.dataset.par = t;
+    b.setAttribute('aria-pressed','false');
+    b.addEventListener('click', function(){
+      Array.prototype.forEach.call(chips.querySelectorAll('.chip'), function(x){ x.setAttribute('aria-pressed','false') });
+      b.setAttribute('aria-pressed','true');
+    });
+    chips.appendChild(b);
+  });
+  rp.appendChild(chips); rows.appendChild(rp);
+  q._ui.body.appendChild(rows);
+}
+function checkId(q){
+  var g = function(k){ return q._ui.body.querySelector('input[data-id="'+k+'"]') };
+  var pick = g('pick'), v = String(pick.value).trim(), diag = '', wrong = 0;
+  var s = digits(v);
+  if(!isNum(v) || s.length !== 5 || s[0] === '0' || s.split('').sort().join('') !== '02578'){
+    pick.className = 'num wrong';
+    return {wrong:1, diag:'המספר שבחרת חייב להיות בן חמש ספרות, בנוי מהספרות 8, 2, 0, 5, 7 — כל אחת פעם אחת — ולא להתחיל ב‑0.'};
+  }
+  pick.className = 'num good';
+  var n = +v;
+  var want = {digits:5, prev:n-1, next:n+1};
+  ['digits','prev','next'].forEach(function(k){
+    var inp = g(k), good = isNum(inp.value) && (+inp.value === want[k]);
+    inp.className = 'num' + (good ? ' good' : ' wrong');
+    if(!good){
+      wrong++;
+      if(k === 'prev' && !diag) diag = 'המספר הקודם הוא ' + n + ' <b>פחות 1</b>.';
+      if(k === 'next' && !diag) diag = 'המספר העוקב הוא ' + n + ' <b>ועוד 1</b>.';
+      if(k === 'digits' && !diag) diag = 'סִפרו כמה ספרות יש ב‑' + n + '.';
+    }
+  });
+  var sel = q._ui.body.querySelector('.chip[aria-pressed="true"]');
+  var wantPar = (n % 2 === 0) ? 'זוגי' : 'אי‑זוגי';
+  if(!sel || sel.dataset.par !== wantPar){
+    wrong++;
+    if(!diag) diag = 'זוגיות נקבעת <b>רק לפי ספרת היחידות</b> — הספרה הימנית ביותר של ' + n + '.';
+  }
+  return {wrong:wrong, diag:diag};
+}
+
+/* ============ wiring ============ */
+function render(){
+  var app = document.getElementById('app');
+  PARTS.forEach(function(p){
+    var sec = el('section','part');
+    var h = el('div','part-h');
+    h.appendChild(el('span','', p.n));
+    h.appendChild(el('h2','', p.h));
+    sec.appendChild(h);
+    if(p.lead) sec.appendChild(el('p','lead', p.lead));
+    p.qs.forEach(function(q){
+      var card = mkCard(q, p.n);
+      sec.appendChild(card);
+      var pts;
+      if(q.kind === 'num' || q.kind === 'words' || q.kind === 'mixed'){ buildItems(q, q.items); pts = q.items.length }
+      else if(q.kind === 'set'){ buildSet(q); pts = q.slots }
+      else if(q.kind === 'seq'){ buildSeq(q); pts = q.seqs.reduce(function(a,s){return a+s.ans.length},0) }
+      else if(q.kind === 'choice'){ buildChoice(q); pts = 1 }
+      else if(q.id === 'q3d'){ buildAsc(q); pts = 4 }
+      else if(q.id === 'q3e'){ buildId(q); pts = 4 }
+      else if(q.id === 'q4d'){ build4(q); pts = 3 }
+      else if(q.id === 'q4e'){ build5(q); pts = 3 }
+      reg(q.id, pts);
+      q._ui.btn.addEventListener('click', function(){ onCheck(q) });
+      q._ui.body.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); onCheck(q) } });
+    });
+    app.appendChild(sec);
+  });
+  paintBar();
+}
+
+function buildChoice(q){
+  var chips = el('div','chips');
+  q.opts.forEach(function(o){
+    var b = el('button','chip', String(o)); b.type='button'; b.dataset.v = o;
+    b.setAttribute('aria-pressed','false');
+    b.addEventListener('click', function(){
+      Array.prototype.forEach.call(chips.querySelectorAll('.chip'), function(x){ x.setAttribute('aria-pressed','false') });
+      b.setAttribute('aria-pressed','true');
+    });
+    chips.appendChild(b);
+  });
+  q._ui.body.appendChild(chips);
+}
+function buildAsc(q){
+  var row = el('div','row'); row.style.justifyContent='center';
+  var strip = el('div','strip'); strip.style.flex='1';
+  for(var i=0;i<q.slots;i++){
+    if(i) strip.appendChild(el('span','sep','&lt;'));
+    var inp = document.createElement('input');
+    inp.type='text'; inp.setAttribute('inputmode','numeric'); inp.style.width='92px';
+    strip.appendChild(inp);
+  }
+  row.appendChild(strip); q._ui.body.appendChild(row);
+}
+
+function onCheck(q){
+  var s = state[q.id];
+  if(s.done) return;
+  var res;
+  if(q.kind === 'num' || q.kind === 'words' || q.kind === 'mixed') res = checkItems(q, q.items);
+  else if(q.kind === 'set') res = checkSet(q);
+  else if(q.kind === 'seq') res = checkSeq(q);
+  else if(q.kind === 'choice'){
+    var sel = q._ui.body.querySelector('.chip[aria-pressed="true"]');
+    var good = sel && (+sel.dataset.v === q.a);
+    Array.prototype.forEach.call(q._ui.body.querySelectorAll('.chip'), function(b){
+      b.style.borderColor = ''; b.style.opacity = '';
+    });
+    res = {wrong: good ? 0 : 1, diag: (!good && sel && q.why) ? q.why(sel.dataset.v) : (sel ? '' : 'לא בחרת תשובה.')};
+  }
+  else if(q.id === 'q3d'){
+    var vals = Array.prototype.map.call(q._ui.body.querySelectorAll('input'), function(i){ return String(i.value).trim() });
+    var r = q.check(vals);
+    Array.prototype.forEach.call(q._ui.body.querySelectorAll('input'), function(i){ i.className = r.ok ? 'good' : '' });
+    res = {wrong: r.ok ? 0 : 4, diag: r.ok ? '' : r.why};
+  }
+  else if(q.id === 'q3e') res = checkId(q);
+  else if(q.id === 'q4d') res = check4(q);
+  else if(q.id === 'q4e') res = check5(q);
+
+  s.tries++;
+  if(res.wrong === 0){
+    var pts = award(q.id, s.tries === 1);
+    setMark(q, s.tries === 1 ? '✓ מצוין! ' + pts + ' נק׳' : '✓ נכון! ' + pts + ' נק׳', s.tries === 1 ? 'ok' : 'half');
+    q._ui.card.className = 'q ok';
+    showDone(q, q.after || '');
+    lock(q);
+    return;
+  }
+  q._ui.card.className = 'q bad';
+  if(s.tries === 1){
+    setMark(q, 'עוד ניסיון אחד', 'bad');
+    showHint(q, res.diag);
+  }else{
+    fail(q.id);
+    setMark(q, '0 נק׳', 'bad');
+    lock(q);
+    var sol;
+    if(q.kind === 'num' || q.kind === 'words' || q.kind === 'mixed') sol = solItems(q.items, q);
+    else if(q.kind === 'set') sol = '<div>' + q.pool.join(' · ') + '</div>';
+    else if(q.kind === 'seq') sol = solSeq(q);
+    else if(q.kind === 'choice') sol = '<div><b>' + q.a + '</b> — כי 50 עשרות הן 500, ועוד 9 יחידות.</div>';
+    else if(q.id === 'q3d') sol = q.sol;
+    else if(q.id === 'q3e') sol = 'חמש ספרות · הקודם = המספר פחות 1 · העוקב = ועוד 1 · זוגי אם ספרת היחידות היא 0, 2, 4, 6 או 8.';
+    else if(q.id === 'q4d') sol = '<div>א. <b>7</b></div><div>ב. ו‑ג. כל שני מספרים שונים <b>גדולים מ‑7</b>, למשל 8 ו‑9.</div>';
+    else if(q.id === 'q4e') sol = '<div>אפשר: <b>16, 19, 61</b> (גם 69, 91, 96 נכונים) — וכל אחד מסומן בין הקווים המתאימים.</div>';
+    showSol(q, sol + (q.after ? '<div style="margin-top:8px">' + q.after + '</div>' : ''));
+  }
+}
+
+function showResult(){
+  var pc = Math.round(gotPts / totalPts * 100);
+  var r = document.getElementById('result');
+  document.getElementById('grade').textContent = pc;
+  var band, msg;
+  if(pc >= 95){ band = '🏆 מעולה'; msg = 'כמעט הכול בניסיון ראשון. אתה מוכן למבחן.' }
+  else if(pc >= 85){ band = '🌟 טוב מאוד'; msg = 'שליטה יפה בחומר. שווה לעבור שוב על הסעיפים שקיבלו חצי נקודה.' }
+  else if(pc >= 70){ band = '👍 טוב'; msg = 'הבסיס שם. חזור על החלקים שבהם היו טעויות — ואז עשה את הדף שוב מההתחלה.' }
+  else if(pc >= 55){ band = '📘 כמעט'; msg = 'יש כאן נושא אחד או שניים שצריך לחזור עליהם. הרמזים בדף מסבירים בדיוק איפה.' }
+  else{ band = '💪 עוד סיבוב'; msg = 'זה חומר שנבנה שכבה על שכבה. קרא את הרמזים לאט, ואז התחל מחדש — זה יילך הרבה יותר חלק.' }
+  document.getElementById('band').textContent = band;
+  document.getElementById('rmsg').textContent = msg;
+
+  var bd = document.getElementById('bd'); bd.innerHTML = '';
+  PARTS.forEach(function(p){
+    var got = 0, tot = 0;
+    p.qs.forEach(function(q){ got += state[q.id].got; tot += state[q.id].pts });
+    var line = el('div');
+    line.appendChild(el('span','', p.n + ' · ' + p.h));
+    line.appendChild(el('b','', (Math.round(got*10)/10) + ' / ' + tot));
+    bd.appendChild(line);
+  });
+  r.hidden = false;
+  r.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+render();
+</script>
+</body>
+</html>
