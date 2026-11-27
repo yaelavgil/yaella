@@ -748,7 +748,7 @@ function digitPad(q, host, list, maxLen, boxed){
       pad.appendChild(b);
     });
   }
-  var del=el('button','del','⌫ מחק'); del.type='button';
+  var del=el('button','del','מחק ספרה'); del.type='button';
   del.addEventListener('click', function(){
     var t=q._active; if(!t||t.disabled) return;
     t.value=String(t.value).slice(0,-1); focusInput(q,t);
@@ -863,7 +863,7 @@ function renderKbd(q){
   var html='';
   list.forEach(function(k){ html+='<button type="button" class="key" data-k="'+k+'">'+k+'</button>' });
   if(mode==='he') html+='<button type="button" class="key wide" data-k=" ">רווח</button>';
-  html+='<button type="button" class="key del" data-k="DEL">⌫</button>';
+  html+='<button type="button" class="key del wide" data-k="DEL">מחק</button>';
   q._kbd.keys.innerHTML=html;
   Array.prototype.forEach.call(q._kbd.keys.querySelectorAll('.key'),function(b){
     b.addEventListener('mousedown',function(e){ e.preventDefault() });
