@@ -657,8 +657,21 @@ function clearProgress(){ try{ localStorage.removeItem(SKEY) }catch(e){} }
    ============================================================ */
 var LRN = (function(){
   var DB   = 'https://home-picks-47450-default-rtdb.europe-west1.firebasedatabase.app';
-  var SECT = 'lrn_mivne_a19f7c';            /* מדור בתוך board/ */
-  var NODE = DB + '/board/' + SECT;
+  /* ---- הנתיב בנוי לרב־מקצועיות מהיום הראשון ----
+     `<מדור>/<מקצוע>/<תרגול>/<סבב>`, ולא סבבים שטוחים תחת מדור אחד.
+     התרגול הזה הוא מתמטיקה/מבנה-עשרוני; תרגול הבא — אנגלית, מדעים —
+     נכנס כאח שלו באותו מדור, בלי לגעת במה שכבר נכתב.
+
+     ⚠️ ולכן הדף הזה **לא** מתיימר להיות המקום היחיד: `dtitle` נכתב
+     לתוך כל סבב, כדי שתצוגת ההורים תדע לקרוא לתרגול בשמו גם
+     כשהיא פוגשת תרגול שהיא לא מכירה. נמדד שהנתיב העמוק נכתב,
+     ושאפשר לקרוא מקצוע אחד לבדו בלי לשאוב את כל היומן. */
+  var SECT   = 'lrn_avgil_a19f7c';          /* שורש היומן, מדור בתוך board/ */
+  var SUBJ   = 'math';
+  var DRILL  = 'mivne-asroni';
+  var DTITLE = 'מבנה עשרוני';
+  var SCHEMA = 1;
+  var NODE = DB + '/board/' + SECT + '/' + SUBJ + '/' + DRILL;
   var LKEY = 'mivne-asroni-log-v1';
   var KEEP = 12;                            /* כמה סבבים לשמור מקומית */
 
@@ -737,7 +750,8 @@ var LRN = (function(){
     var s = load();
     var jobs = ids.map(function(id){
       var r = s.r[id], at = r.ver;      /* ננעל על הגרסה שנשלחת */
-      var body = {n:r.n, t0:r.t0, t1:r.t1, end:r.end, sent:r.sent, qs:r.qs, ev:r.ev,
+      var body = {v:SCHEMA, subj:SUBJ, drill:DRILL, dtitle:DTITLE,
+                  n:r.n, t0:r.t0, t1:r.t1, end:r.end, sent:r.sent, qs:r.qs, ev:r.ev,
                   pts:r.pts, first:r.first, got:r.got, qdone:r.qdone, qtotal:r.qtotal,
                   wrote:Date.now()};
       var o = {method:'PUT', body:JSON.stringify(body)};

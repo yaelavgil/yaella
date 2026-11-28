@@ -75,6 +75,7 @@ header p{margin:0; color:#cfe2fb; font-size:.92rem; font-weight:300}
 .tag.reset{background:var(--amberbg); color:var(--amber)}
 .tag.open{background:var(--redbg); color:var(--red)}
 .tag.sent{background:var(--blue); color:#fff}
+.tag.drill{background:var(--line); color:var(--soft)}
 .rbody{padding:0 15px 14px; border-top:1px solid var(--line)}
 .qgrp{margin-top:12px}
 .qgrp > p{margin:0 0 5px; font-weight:700; font-size:.94rem}
@@ -154,6 +155,28 @@ function mins(a,b){
 }
 function pct(x,t){ return t?Math.round(x/t*100):0 }
 
+/* ---- איסוף הסבבים מתוך עץ `<מקצוע>/<תרגול>/<סבב>` ----
+   הולך לעומק ואוסף כל דבר שנראה כמו סבב (יש לו `t0`), ולא מניח
+   עומק קבוע. ככה הדף הזה יציג גם תרגול שנוסף אחרי שנכתב — באנגלית,
+   במדעים — בלי שורת קוד נוספת, וגם לא יישבר אם המבנה יזוז. */
+var SUBJ_HE={math:'מתמטיקה', english:'אנגלית', science:'מדעים', hebrew:'עברית', bible:'תנ״ך', history:'היסטוריה'};
+function collect(node, path, out){
+  out = out || []; path = path || [];
+  if(!node || typeof node!=='object') return out;
+  if(node.t0 && (node.ev || node.n!=null)){        /* זה סבב */
+    node.ev = node.ev || [];
+    node._subj  = node.subj  || path[0] || '';
+    node._drill = node.drill || path[1] || path[0] || '';
+    node._dtitle= node.dtitle || node._drill;
+    out.push(node);
+    return out;
+  }
+  if(path.length>3) return out;                    /* עומק שפוי */
+  Object.keys(node).forEach(function(k){ collect(node[k], path.concat(k), out) });
+  return out;
+}
+function subjHe(s){ return SUBJ_HE[s] || s || '' }
+
 /* כל האירועים של שורה אחת, לפי הסדר — זה מה שעונה על
    ״כמה ניסיונות עד שצדק, ואם בכלל״ */
 function bySlot(r){
@@ -197,11 +220,13 @@ function slotRow(o){
   return row;
 }
 
-function roundCard(r, idx){
+function roundCard(r, idx, showDrill){
   var card=el('div','rnd');
   var hd=el('button','rhd'); hd.type='button';
   var ttl=el('span','ttl','סבב '+r.n+' · '+when(r.t0));
   hd.appendChild(ttl);
+  /* שם התרגול מופיע רק כשיש יותר מאחד — אחרת זו חזרה מיותרת */
+  if(showDrill) hd.appendChild(el('span','tag drill', esc(subjHe(r._subj)+' · '+r._dtitle)));
   var endTag = r.end==='done' ? ['done','סיים'] :
                r.end==='reset'? ['reset','איפס באמצע'] :
                r.end==='abandoned'? ['reset','נעזב'] : ['open','באמצע'];
@@ -252,11 +277,14 @@ function trouble(rounds){
   rounds.forEach(function(r){
     bySlot(r).forEach(function(o){
       var t=(r.qs&&r.qs[o.q])||o.q;
-      if(!m[o.q]) m[o.q]={q:o.q, t:t, seen:0, err:0, miss:0};
-      if(m[o.q].t===o.q && t!==o.q) m[o.q].t=t;
-      m[o.q].seen++;
-      if(!o.firstTry) m[o.q].err++;
-      if(!o.solved && !o.stillOpen) m[o.q].miss++;
+      /* המפתח כולל את התרגול: ״שאלה 1״ של מתמטיקה ו״שאלה 1״ של
+         אנגלית הן לא אותה שאלה, וללא זה הן היו נספרות יחד */
+      var k=r._drill+'|'+o.q;
+      if(!m[k]) m[k]={q:o.q, t:t, seen:0, err:0, miss:0};
+      if(m[k].t===o.q && t!==o.q) m[k].t=t;
+      m[k].seen++;
+      if(!o.firstTry) m[k].err++;
+      if(!o.solved && !o.stillOpen) m[k].miss++;
     });
   });
   return Object.keys(m).map(function(k){ return m[k] })
@@ -264,22 +292,9 @@ function trouble(rounds){
     .sort(function(a,b){ return (b.miss-a.miss) || (b.err-a.err) });
 }
 
-function render(rounds){
-  var out=$('out'); out.innerHTML=''; out.hidden=false;
-
-  var head=el('div','box');
-  var last=rounds[0];
-  head.innerHTML='<h2>'+rounds.length+' '+(rounds.length===1?'סבב':'סבבים')+'</h2>'+
-    '<p class="muted" style="margin:0">האחרון: '+esc(when(last.t0))+' · '+
-    (last.end==='done' ? 'ציון '+pct(last.first,last.pts)+' → '+pct(last.got,last.pts)
-                       : (last.qdone||0)+' מתוך '+(last.qtotal||0)+' שאלות')+' · '+
-    (last.end==='done'?'סיים את הדף':(last.end==='reset'?'איפס באמצע':(last.end==='abandoned'?'יצא באמצע':'עדיין באמצע')))+'.<br>'+
-    'מתעדכן מעצמו בזמן שגור מתרגל — גם בלי שהוא לוחץ ״שלח״.</p>';
-  out.appendChild(head);
-
-  var tr=trouble(rounds);
-  var tb=el('div','box');
-  tb.appendChild(el('h2','','השורות שלא יצאו בניסיון ראשון'));
+function troubleBox(rounds, heading){
+  var tr=trouble(rounds), tb=el('div','box');
+  tb.appendChild(el('h2','', heading));
   if(!tr.length) tb.appendChild(el('p','muted','הכול יצא בניסיון ראשון.'));
   else tr.forEach(function(x){
     var row=el('div','trb');
@@ -290,9 +305,43 @@ function render(rounds){
     tb.appendChild(row);
   });
   tb.appendChild(el('p','muted','<span style="font-size:.82rem">המספר הוא כמה שורות בשאלה הזאת דרשו יותר מניסיון אחד, על פני כל הסבבים.</span>'));
-  out.appendChild(tb);
+  return tb;
+}
 
-  rounds.forEach(function(r,i){ out.appendChild(roundCard(r,i)) });
+function render(rounds){
+  var out=$('out'); out.innerHTML=''; out.hidden=false;
+
+  /* התרגולים שיש ביומן. היום אחד — ולכן הדף לא מזכיר אותם בכלל;
+     ברגע שיהיה שני, הוא מתחיל לקבץ לפיהם מעצמו */
+  var drills=[], byDrill={};
+  rounds.forEach(function(r){
+    if(!byDrill[r._drill]){ byDrill[r._drill]=[]; drills.push(r._drill) }
+    byDrill[r._drill].push(r);
+  });
+  var many = drills.length>1;
+
+  var head=el('div','box');
+  var last=rounds[0];
+  head.innerHTML='<h2>'+rounds.length+' '+(rounds.length===1?'סבב':'סבבים')+
+    (many?' · '+drills.length+' תרגולים':'')+'</h2>'+
+    '<p class="muted" style="margin:0">האחרון: '+
+    (many? esc(last._dtitle)+' · ' : '')+esc(when(last.t0))+' · '+
+    (last.end==='done' ? 'ציון '+pct(last.first,last.pts)+' → '+pct(last.got,last.pts)
+                       : (last.qdone||0)+' מתוך '+(last.qtotal||0)+' שאלות')+' · '+
+    (last.end==='done'?'סיים את הדף':(last.end==='reset'?'איפס באמצע':(last.end==='abandoned'?'יצא באמצע':'עדיין באמצע')))+'.<br>'+
+    'מתעדכן מעצמו בזמן שגור מתרגל — גם בלי שהוא לוחץ ״שלח״.</p>';
+  out.appendChild(head);
+
+  if(!many){
+    out.appendChild(troubleBox(rounds,'השורות שלא יצאו בניסיון ראשון'));
+  }else{
+    drills.forEach(function(dk){
+      var rs=byDrill[dk];
+      out.appendChild(troubleBox(rs, esc(rs[0]._dtitle)+' — מה שלא יצא בניסיון ראשון'));
+    });
+  }
+
+  rounds.forEach(function(r,i){ out.appendChild(roundCard(r,i,many)) });
 
   var f=$('foot'); f.hidden=false;
   f.innerHTML='היומן נכתב ממכשיר התרגול בזמן אמת. סבב שנכתב בלי רשת נשלח בפעם הבאה שהדף נפתח מחובר, '+
@@ -306,11 +355,7 @@ function boot(){
     .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json() })
     .then(function(d){
       $('load').hidden=true;
-      var rounds=[];
-      Object.keys(d||{}).forEach(function(id){
-        var r=d[id]; if(!r||typeof r!=='object') return;
-        r._id=id; r.ev=r.ev||[]; rounds.push(r);
-      });
+      var rounds=collect(d);
       if(!rounds.length){
         $('out').hidden=false;
         $('out').innerHTML='<div class="box"><b>עוד אין סבבים.</b>'+
