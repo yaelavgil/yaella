@@ -784,11 +784,28 @@ function digitPad(q, host, list, maxLen, boxed){
   var del=el('button','del','מחק ספרה'); del.type='button';
   del.addEventListener('click', function(){
     var t=q._active; if(!t||t.disabled) return;
-    t.value=String(t.value).slice(0,-1); focusInput(q,t);
+    t.value=String(t.value).slice(0,-1); fireInput(t); focusInput(q,t);
   });
   pad.appendChild(del);
   pad.appendChild(el('div','padcap','לוחצים על ספרה והיא נכנסת לתיבה המסומנת. Enter או לחיצה עוברים לתיבה הבאה.'));
   host.appendChild(pad);
+}
+/* ⚠️ כתיבה בקוד ל-`input.value` **אינה** משדרת אירוע `input` — זה
+   הדפדפן, לא באג. ולכן כל מאזין `input` בדף פשוט לא רץ כשממלאים
+   דרך אריחי הספרות, שזה מה שהדף עצמו מבקש לעשות
+   (״לוחצים על ספרה והיא נכנסת לתיבה המסומנת״).
+
+   יעל, 28.11: ״אני לא מצליחה למתוח קו שם.״ — בשאלת ישר המספרים
+   העיגולים לגרירה נבנים רק מתוך מאזין ה-`input`, ולכן הם לא הופיעו
+   כלל. בהקלדה במקלדת הם כן הופיעו, וזה מה שהסתיר את התקלה.
+
+   🔴 ולכן השידור יושב כאן, בנקודה אחת שכל המילוי עובר דרכה, ולא
+   בשאלה שהתלוננו עליה: אותו פער הפיל גם את המאזין השני בדף, וכל
+   מאזין שייכתב בעתיד היה נופל בשקט באותו אופן. */
+function fireInput(t){
+  try{ t.dispatchEvent(new Event('input',{bubbles:true})) }
+  catch(e){ var ev=document.createEvent('Event');
+    ev.initEvent('input',true,false); t.dispatchEvent(ev) }
 }
 function typeDigit(q, d, maxLen){
   var t=q._active;
@@ -796,6 +813,7 @@ function typeDigit(q, d, maxLen){
   if(!t) return;
   if(maxLen && String(t.value).length >= maxLen) return;
   t.value = String(t.value) + d;
+  fireInput(t);
   try{ t.focus() }catch(e){}
 }
 
