@@ -162,12 +162,17 @@ function bySlot(r){
     if(!m[e.s]){ m[e.s]={s:e.s, q:String(e.s).split('#')[0], l:e.l, ev:[]}; order.push(e.s) }
     m[e.s].ev.push(e);
   });
+  var ended = !!r.end;
   return order.map(function(k){
     var o=m[k], last=o.ev[o.ev.length-1];
     o.solved = !!(last && last.ok);
     o.half   = !!(last && last.ok && last.h);
     o.firstTry = o.ev.length===1 && o.solved && !o.half;
     o.tries  = o.ev.length;
+    /* שורה נסגרת על 0 רק אחרי שני ניסיונות. בסבב שעוד רץ, שורה
+       עם ניסיון שגוי אחד היא ״עוד לא תוקן״ ולא ״לא הגיע לנכון״ —
+       ההבדל הזה הוא בדיוק מה שיעל שואלת עליו */
+    o.stillOpen = !o.solved && o.ev.length<2 && !ended;
     return o;
   });
 }
@@ -186,6 +191,7 @@ function slotRow(o){
   var v;
   if(o.firstTry) v=el('span','vd first','✓ ראשון');
   else if(o.solved) v=el('span','vd fix','½ אחרי '+o.tries);
+  else if(o.stillOpen) v=el('span','vd fix','⋯ עוד לא תיקן');
   else v=el('span','vd miss','✗ לא הגיע');
   row.appendChild(v);
   return row;
@@ -216,7 +222,7 @@ function roundCard(r, idx){
   sub.innerHTML = (r.qdone||0)+' מתוך '+(r.qtotal||0)+' שאלות · '+
     mins(r.t0, r.t1||r.wrote)+' · '+
     slots.filter(function(o){return !o.firstTry && o.solved}).length+' תוקנו · '+
-    '<b>'+slots.filter(function(o){return !o.solved}).length+' לא הגיעו לנכון</b>';
+    '<b>'+slots.filter(function(o){return !o.solved && !o.stillOpen}).length+' לא הגיעו לנכון</b>';
   body.appendChild(sub);
 
   var seen={};
@@ -250,7 +256,7 @@ function trouble(rounds){
       if(m[o.q].t===o.q && t!==o.q) m[o.q].t=t;
       m[o.q].seen++;
       if(!o.firstTry) m[o.q].err++;
-      if(!o.solved) m[o.q].miss++;
+      if(!o.solved && !o.stillOpen) m[o.q].miss++;
     });
   });
   return Object.keys(m).map(function(k){ return m[k] })
