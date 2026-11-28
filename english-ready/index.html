@@ -2437,7 +2437,10 @@ async function bootKid(id, mode) {
     home();
     try { (await api()).onUser(u => { if (!u || u.uid !== k.owner || $('.ownbar')) return;
       const b = document.createElement('div'); b.className = 'ownbar';
-      b.innerHTML = `<span>👀 זה המסך של <b>${esc(k.name)}</b>, כמו שהוא רואה אותו.</span><a href="${location.pathname}${DEMO ? '?demo' : ''}">לאזור ההורים ←</a>`;
+      // ?p=1 is what the boot checks (line ~7053): without it a device that REMEMBERS
+      // the child boots straight back into his screen, so the link did nothing. It
+      // worked only while the address still carried ?k=, which is why it broke later.
+      b.innerHTML = `<span>👀 זה המסך של <b>${esc(k.name)}</b>, כמו שהוא רואה אותו.</span><a href="${location.pathname}?p=1${DEMO ? '&demo' : ''}">לאזור ההורים ←</a>`;
       app.parentNode.insertBefore(b, app); }); } catch (e) {}
     // a parent's change in the settings reaches this screen at once (no refresh): settings, name and photo only,
     // the progress stays what this device has
