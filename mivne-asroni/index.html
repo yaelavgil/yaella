@@ -60,6 +60,20 @@ header p{margin:0; color:#cfe2fb; font-size:.95rem; font-weight:300}
 .prog i{display:block; height:100%; width:0; background:linear-gradient(90deg,var(--sky),var(--green)); transition:width .35s ease}
 .bar b{font-variant-numeric:tabular-nums; font-size:.92rem; white-space:nowrap}
 .bar .pts{color:var(--soft); font-weight:400; font-size:.84rem; white-space:nowrap}
+/* איפוס שתמיד בהישג יד — בסרגל הדביק, ולא רק בלוח התוצאות בסוף */
+.rst{font:inherit; font-weight:700; font-size:.84rem; white-space:nowrap; cursor:pointer;
+  color:var(--soft); background:transparent; border:2px solid var(--line);
+  border-radius:9px; padding:5px 11px; flex:none}
+.rst:hover{border-color:var(--red); color:var(--red)}
+/* ...ולחיצה אחת לא מוחקת כלום: קודם נפתחת השאלה הזאת */
+.rstask{position:sticky; top:0; z-index:39; background:var(--redbg);
+  border-bottom:2px solid var(--red); padding-block:12px}
+.rstask .wrap{padding-block:0}
+.rstask b{display:block; color:var(--red); font-size:1.02rem; margin-bottom:2px}
+.rstask p{margin:0 0 10px; color:var(--ink); font-size:.88rem; line-height:1.5}
+.rstask p i{font-style:normal; font-weight:900}
+.rstbtns{display:flex; gap:9px; flex-wrap:wrap}
+.btn.danger{background:var(--red); color:#fff}
 
 .part{margin-top:30px}
 .part-h{display:flex; align-items:baseline; gap:10px; margin-bottom:4px; flex-wrap:wrap}
@@ -258,6 +272,18 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--line); colo
     <b id="scoreTxt">0 / 0</b>
     <div class="prog"><i id="progBar"></i></div>
     <span class="pts" id="doneTxt">טרם התחלת</span>
+    <button class="rst" type="button" id="rstBtn">↺ מהתחלה</button>
+  </div>
+</div>
+
+<div class="rstask" id="rstAsk" hidden>
+  <div class="wrap">
+    <b>להתחיל את כל הדף מחדש?</b>
+    <p id="rstWhat"></p>
+    <div class="rstbtns">
+      <button class="btn ghost" type="button" id="rstNo">לא, להישאר כאן</button>
+      <button class="btn danger" type="button" id="rstYes">כן, למחוק ולהתחיל</button>
+    </div>
   </div>
 </div>
 
@@ -283,9 +309,10 @@ footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--line); colo
     <p id="fixLine" style="font-size:.88rem"></p>
     <div class="bd" id="bd"></div>
     <div class="share">
-      <a class="btn" id="waBtn" target="_blank" rel="noopener">📲 לשלוח לאמא בוואטסאפ</a>
+      <a class="btn" id="waBtn" target="_blank" rel="noopener">📤 לשלוח להורים את התוצאות</a>
       <button class="btn alt" type="button" id="copyBtn">📋 להעתיק הכול</button>
     </div>
+    <p id="sentNote" hidden style="font-size:.9rem; font-weight:700; color:var(--green)">✓ נשלח. ההורים יראו את הסיכום.</p>
     <p style="font-size:.84rem">הסיכום כולל את הציון, כל שאלה, מה שכתבת בכל שורה ומה הייתה התשובה הנכונה.</p>
     <textarea class="sumbox" id="sumBox" readonly></textarea>
     <div style="margin-top:14px"><button class="btn ghost" type="button" id="againBtn">להתחיל מחדש</button></div>
@@ -599,6 +626,203 @@ function loadProgress(){
   }
 }
 function clearProgress(){ try{ localStorage.removeItem(SKEY) }catch(e){} }
+
+/* ============================================================
+   יומן הניסיונות
+   ============================================================
+
+   יעל, 28.11: ״תאפשר לאפס אבל תשמור היסטוריה שאוכל לדעת מתי טעה
+   וכמה נסיונות עד שצדק — גם אם הוא לא שלח.״
+
+   🔴 שלושה כללים שהיומן בנוי סביבם, ואסור לשבור אף אחד מהם:
+
+   1. **היומן יוצא מהדפדפן.** גור מתרגל במכשיר שלו, ולכן
+      `localStorage` לבדו לא עונה על ״גם אם לא שלח״ — הוא נשאר אצלו.
+      ה-localStorage כאן הוא רק התור היוצא: המקור שממנו משדרים, ומה
+      שמחזיק את הנתונים כשהרשת נופלת.
+
+   2. **גור לא רואה מכאן כלום.** לא מונה ניסיונות, לא נורית סנכרון,
+      לא הודעת שגיאה. יעל: ילד שיודע שכל ניסיון נספר מנחש פחות
+      ונתקע יותר. ולכן כל כשל כאן נבלע בשקט ורק נרשם לניסיון חדש.
+
+   3. **איפוס לא נוגע ביומן.** `clearProgress()` מוחק את מצב התרגול
+      בלבד (SKEY). היומן יושב במפתח אחר (LKEY), וסבב שנסגר באיפוס
+      נשמר כמו כל סבב אחר — עם `end:'reset'`, שזה בעצמו מידע.
+
+   ⚠️ לאן כותבים, ולמה דווקא לשם: שורש המסד נעול, ולכן ענף עליון
+   חדש מחזיר 401 (נמדד). `board/<מדור>/<מפתח>` כן נכתב, ולכן היומן
+   יושב כמדור בתוך `board`. הענף `board` **קריא לכל מי שיודע את
+   כתובת המסד** — ולכן אין כאן שם, כיתה או בית ספר, אלא מספרי שאלה
+   ומה שהוקלד בהן. עדכון הרשאות ייתן ענף פרטי באמת; עד אז זו ההגנה.
+   ============================================================ */
+var LRN = (function(){
+  var DB   = 'https://home-picks-47450-default-rtdb.europe-west1.firebasedatabase.app';
+  var SECT = 'lrn_mivne_a19f7c';            /* מדור בתוך board/ */
+  var NODE = DB + '/board/' + SECT;
+  var LKEY = 'mivne-asroni-log-v1';
+  var KEEP = 12;                            /* כמה סבבים לשמור מקומית */
+
+  var st = null;        /* {dev, n, curId, r:{id:round}} */
+  var timer = null, backoff = 0, flying = false;
+
+  function rnd(n){
+    var s='', a='abcdefghijkmnpqrstuvwxyz23456789';
+    for(var i=0;i<n;i++) s += a.charAt(Math.floor(Math.random()*a.length));
+    return s;
+  }
+  function read(){
+    try{ var raw=localStorage.getItem(LKEY); if(raw) return JSON.parse(raw) }catch(e){}
+    return null;
+  }
+  function write(){
+    try{ localStorage.setItem(LKEY, JSON.stringify(st)) }catch(e){}
+  }
+  function load(){
+    if(st) return st;
+    st = read();
+    if(!st || !st.r){ st = {dev:'d'+rnd(6), n:0, curId:null, r:{}} }
+    return st;
+  }
+  function cur(){ var s=load(); return s.curId ? s.r[s.curId] : null }
+
+  /* סבב חדש נפתח רק כשגור באמת נגע בשאלה — פתיחת הדף לבדה
+     לא מייצרת סבב, אחרת היומן היה מתמלא סבבים ריקים */
+  function open(){
+    var s=load();
+    s.n++;
+    var id = 'r' + String(s.n) + '_' + rnd(4);
+    s.r[id] = {n:s.n, dev:s.dev, t0:Date.now(), t1:null, end:null, sent:0,
+               qs:{}, ev:[], pts:0, first:0, got:0, qdone:0, qtotal:0, ver:1, sv:0};
+    s.curId = id;
+    prune(s);
+    write();
+    return s.r[id];
+  }
+  function prune(s){
+    var ids = Object.keys(s.r);
+    if(ids.length <= KEEP) return;
+    /* הכי ישנים יוצאים — אבל רק סבב שכבר הגיע לשרת במלואו, כדי
+       שסבב שנכתב אופליין לא ייעלם לפני שהספיק להישלח */
+    ids.sort(function(a,b){ return (s.r[a].t0||0)-(s.r[b].t0||0) });
+    var over = ids.length - KEEP;
+    for(var i=0;i<ids.length && over>0;i++){
+      if(ids[i]===s.curId) continue;
+      if(s.r[ids[i]].sv !== s.r[ids[i]].ver) continue;
+      delete s.r[ids[i]]; over--;
+    }
+  }
+  function ensure(){ return cur() || open() }
+
+  /* ---- השידור: כל סבב מלוכלך נכתב בשלמותו (PUT), ולא כתוספת ----
+     ככה אין מצב חלקי, וניסיון חוזר אחרי נפילת רשת פשוט דורס
+     באותו תוכן. זה גם מה שהופך את ההתאוששות לטריוויאלית. */
+  function dirty(){
+    var s=load(), out=[];
+    Object.keys(s.r).forEach(function(id){ if(s.r[id].sv !== s.r[id].ver) out.push(id) });
+    return out;
+  }
+  function bump(r){ if(r) r.ver=(r.ver||0)+1 }
+  function mark(){ bump(cur()); write(); schedule(400) }
+
+  function schedule(ms){
+    if(timer) clearTimeout(timer);
+    timer = setTimeout(function(){ timer=null; flush() }, ms==null?1200:ms);
+  }
+  function flush(force){
+    if(flying) return;
+    var ids = dirty();
+    if(!ids.length){ backoff=0; return }
+    if(typeof fetch !== 'function') return;
+    flying = true;
+    var s = load();
+    var jobs = ids.map(function(id){
+      var r = s.r[id], at = r.ver;      /* ננעל על הגרסה שנשלחת */
+      var body = {n:r.n, t0:r.t0, t1:r.t1, end:r.end, sent:r.sent, qs:r.qs, ev:r.ev,
+                  pts:r.pts, first:r.first, got:r.got, qdone:r.qdone, qtotal:r.qtotal,
+                  wrote:Date.now()};
+      var o = {method:'PUT', body:JSON.stringify(body)};
+      if(force) o.keepalive = true;
+      return fetch(NODE + '/' + s.dev + '_' + id + '.json', o)
+        .then(function(res){
+          if(!res.ok) throw new Error('HTTP '+res.status);
+          /* ולא על הגרסה הנוכחית: אם גור הספיק לענות עוד שורה בזמן
+             הטיסה, הסבב נשאר מלוכלך וייכתב שוב */
+          if(r.sv < at) r.sv = at;
+          return true;
+        });
+    });
+    Promise.all(jobs.map(function(p){ return p.then(function(){return 1},function(){return 0}) }))
+      .then(function(res){
+        flying=false; write();
+        var bad = res.filter(function(x){ return !x }).length;
+        if(bad){
+          backoff = Math.min(backoff ? backoff*2 : 4000, 90000);
+          schedule(backoff);
+        }else{
+          backoff=0;
+          /* נכתב בזמן הטיסה? עוד סבב מיד */
+          if(dirty().length) schedule(600);
+        }
+      });
+  }
+
+  /* ---- מה שנרשם ---- */
+  return {
+    /* נקרא פעם אחת בעליית הדף, אחרי loadProgress */
+    boot: function(hasProgress){
+      var s=load(), r=cur();
+      /* סבב פתוח שאין לו יותר מצב תרגול בדפדפן — נסגר כנעזב, כדי
+         שהניסיונות הבאים לא ייתלו בסבב שכבר לא קיים על המסך */
+      if(r && !hasProgress && r.ev.length){ r.t1=Date.now(); r.end='abandoned'; bump(r); s.curId=null; write() }
+      flush();                                   /* כל מה שנשאר תקוע מפעם קודמת */
+      try{
+        window.addEventListener('online', function(){ backoff=0; flush() });
+        document.addEventListener('visibilitychange', function(){
+          if(!document.hidden){ backoff=0; flush() }
+        });
+      }catch(e){}
+    },
+    /* ניסיון אחד על שורה אחת — נקרא מתוך onCheck, הנקודה היחידה
+       שכל בדיקה בדף עוברת דרכה */
+    att: function(q, s, i, r){
+      var rd = ensure();
+      if(!rd.qs[q.id]) rd.qs[q.id] = txt(q.title).slice(0,120);
+      rd.ev.push({s:q.id+'#'+i, l:(s.label||'').slice(0,60),
+                  v:String(s.read()).slice(0,80),
+                  ok:r.ok?1:0, h:(r.ok&&r.half)?1:0, tr:s.tries, at:Date.now()});
+      mark();
+    },
+    /* התמונה המסכמת של הסבב, מתעדכנת בכל בדיקה */
+    tally: function(t, qdone, qtotal){
+      var rd=cur(); if(!rd) return;
+      rd.pts=t.pts; rd.first=t.first; rd.got=Math.round(t.got*10)/10;
+      rd.qdone=qdone; rd.qtotal=qtotal; bump(rd); write();
+    },
+    done: function(){
+      var rd=cur(); if(!rd || rd.end) return;
+      rd.t1=Date.now(); rd.end='done'; bump(rd);
+      load().curId=null; write(); flush();
+    },
+    /* ״שלח להורים״ — הנתונים כבר אצל יעל, ולכן זה סימון ולא העברה */
+    sent: function(){
+      var s=load(), rd=null;
+      /* הסבב נסגר כבר ב-done(), ולכן מסמנים את האחרון שנגמר */
+      Object.keys(s.r).forEach(function(id){
+        if(!rd || (s.r[id].t0||0) > (rd.t0||0)) rd = s.r[id];
+      });
+      if(!rd) return;
+      rd.sent = Date.now(); bump(rd); write(); flush(true);
+    },
+    /* איפוס: הסבב נסגר ונשמר, ורק מצב התרגול נמחק */
+    reset: function(){
+      var s=load(), rd=cur();
+      if(rd && rd.ev.length){ rd.t1=Date.now(); rd.end='reset'; bump(rd) }
+      else if(rd){ delete s.r[s.curId] }   /* סבב שלא נגעו בו — אין מה לשמור */
+      s.curId=null; write(); flush(true);
+    }
+  };
+})();
+
 function isEmpty(s){ return !String(s.read()).trim() }
 function setMark(q,t,c){ q._ui.mark.className='mark '+c; q._ui.mark.textContent=t }
 function say(q,cls,title,html){
@@ -664,6 +888,7 @@ function paintBar(){
   document.getElementById('progBar').style.width=(done/QL.length*100)+'%';
   document.getElementById('doneTxt').textContent=done+' מתוך '+QL.length+' שאלות';
   saveProgress();
+  LRN.tally(t, done, QL.length);
   if(done===QL.length && QL.length) showResult();
 }
 function onCheck(q){
@@ -685,6 +910,11 @@ function onCheck(q){
     if(s.tries>0 && s.read()===s.last){ s.pending=true; return }
     touched++;
     var r=s.ev(ctx,q);
+    /* 🔴 היומן נתלה כאן, לפני כל שינוי מצב, ובמקום אחד בלבד:
+       `s.tries` כאן הוא עוד מספר הניסיונות *שלפני* הנסיון הזה,
+       ו-`s.read()` הוא בדיוק מה שגור כתב. כל 17 השאלות עוברות
+       דרך השורה הזאת, ולכן אין צורך בקוד יומן באף שאלה. */
+    LRN.att(q, s, q._slots.indexOf(s), r);
     s.last=s.read();
     if(r.ok){
       if(s.tries===0 && !r.half){ s.firstOk=true; s.got=s.scored?1:0 }
@@ -1515,7 +1745,46 @@ function render(){
     app.appendChild(sec);
   });
   loadProgress();
+  var hasProgress = SLOTS.some(function(s){ return s.tries || s.locked || String(s.read()).trim() });
+  document.getElementById('rstBtn').addEventListener('click',askReset);
+  document.getElementById('rstNo').addEventListener('click',hideReset);
+  document.getElementById('rstYes').addEventListener('click',doReset);
+  LRN.boot(hasProgress);
   paintBar();
+}
+/* ============ איפוס, בשני שלבים ============
+   כפתור האיפוס יושב בסרגל הדביק ולכן הוא בהישג יד בכל רגע — וגם
+   בהישג יד של לחיצה בטעות. ולכן הלחיצה הראשונה רק *שואלת*, ואומרת
+   בדיוק כמה עבודה עומדת להימחק. אין כאן confirm() של הדפדפן: בנייד
+   הוא נראה כמו שגיאה, וקל מדי לאשר אותו בלי לקרוא. */
+var rstT=null;
+function askReset(){
+  var ask=document.getElementById('rstAsk'), what=document.getElementById('rstWhat');
+  if(!ask) return;
+  var done=QL.filter(qDone).length, t=totals();
+  what.innerHTML = done
+    ? 'השלמת <i>'+done+' מתוך '+QL.length+'</i> שאלות, ואספת <i>'+(Math.round(t.got*10)/10)+'</i> נקודות. '+
+      'הכול יימחק והשאלות יחזרו ריקות.'
+    : 'עוד לא ענית על שאלה, ולכן אין מה למחוק — הדף פשוט ייפתח מחדש.';
+  ask.hidden=false;
+  try{ document.getElementById('rstNo').focus() }catch(e){}
+  ask.scrollIntoView({block:'center'});
+  if(rstT) clearTimeout(rstT);
+  rstT=setTimeout(hideReset, 12000);   /* שאלה שנשארה פתוחה נסגרת לבד */
+}
+function hideReset(){
+  if(rstT){ clearTimeout(rstT); rstT=null }
+  var ask=document.getElementById('rstAsk'); if(ask) ask.hidden=true;
+}
+function doReset(){
+  hideReset();
+  var y=document.getElementById('rstYes');
+  if(y){ y.disabled=true; y.textContent='רגע…' }
+  /* הסבב נסגר ביומן ונשלח *לפני* הרענון. מצב התרגול נמחק רק אחרי
+     זה — והיומן עצמו (LKEY) לא נגוע, ולכן גם אם השידור נכשל כאן
+     הסבב נשאר בתור ויישלח בפתיחה הבאה. */
+  try{ LRN.reset() }catch(e){}
+  setTimeout(function(){ clearProgress(); location.reload() }, 450);
 }
 function pct(x,t){ return t?Math.round(x/t*100):0 }
 function showResult(){
@@ -1548,7 +1817,20 @@ function showResult(){
   var sum=buildSummary();
   var box=document.getElementById('sumBox'); if(box) box.value=sum;
   var wa=document.getElementById('waBtn');
-  if(wa) wa.href='https://wa.me/?text='+encodeURIComponent(sum);
+  if(wa){
+    wa.href='https://wa.me/?text='+encodeURIComponent(sum);
+    /* ״שלח להורים״ הוא **סיכום ולא המקור** — היומן כבר הגיע ליעל
+       בזמן התרגול. ולכן הלחיצה עושה שני דברים: מסמנת את הסבב
+       כ״נשלח״ ביומן (ככה היא רואה שגור בחר להראות את זה), ופותחת
+       את השיתוף בוואטסאפ עם הסיכום המלא. */
+    if(!wa._wired){
+      wa._wired=true;
+      wa.addEventListener('click',function(){
+        try{ LRN.sent() }catch(e){}
+        var n=document.getElementById('sentNote'); if(n) n.hidden=false;
+      });
+    }
+  }
   var cp=document.getElementById('copyBtn');
   if(cp && !cp._wired){
     cp._wired=true;
@@ -1560,8 +1842,9 @@ function showResult(){
       }catch(e){ t.focus(); t.select(); done() }
     });
   }
+  LRN.done();
   var ag=document.getElementById('againBtn');
-  if(ag && !ag._wired){ ag._wired=true; ag.addEventListener('click',function(){ clearProgress(); location.reload() }) }
+  if(ag && !ag._wired){ ag._wired=true; ag.addEventListener('click',askReset) }
   document.getElementById('result').hidden=false;
   document.getElementById('result').scrollIntoView({behavior:'smooth', block:'center'});
 }

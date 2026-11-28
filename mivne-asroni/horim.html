@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>יומן התרגול · מבנה עשרוני</title>
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#1b3a6b">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap">
+<style>
+:root{
+  --bg:#fdf6ec; --panel:#ffffff; --ink:#1f2340; --soft:#6b6f92; --line:#e7dfd2;
+  --blue:#5b3fd6; --sky:#2f7fd4; --green:#0f8a52; --greenbg:#e2f7ec;
+  --red:#d63a4a; --redbg:#fdeaec; --amber:#9a5a00; --amberbg:#fff3d8;
+  --shadow:0 3px 0 rgba(31,35,64,.07), 0 6px 18px rgba(31,35,64,.06);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1420; --panel:#161f30; --ink:#eef2fa; --soft:#9aa8c2; --line:#2a364c;
+  --blue:#7fb4f0; --sky:#6fb0ee; --green:#5fd39a; --greenbg:#10301f;
+  --red:#ff8a96; --redbg:#36151a; --amber:#ffc864; --amberbg:#362a0e;
+  --shadow:0 2px 12px rgba(0,0,0,.4); color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0e1420; --panel:#161f30; --ink:#eef2fa; --soft:#9aa8c2; --line:#2a364c;
+  --blue:#7fb4f0; --sky:#6fb0ee; --green:#5fd39a; --greenbg:#10301f;
+  --red:#ff8a96; --redbg:#36151a; --amber:#ffc864; --amberbg:#362a0e;
+  --shadow:0 2px 12px rgba(0,0,0,.4); color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0; padding:0}
+body{background:var(--bg); color:var(--ink);
+  font-family:'Heebo',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
+  font-size:17px; line-height:1.55; -webkit-text-size-adjust:100%}
+[hidden]{display:none !important}
+.wrap{max-width:780px; margin:0 auto;
+  padding-left:max(16px, env(safe-area-inset-left,0px));
+  padding-right:max(16px, env(safe-area-inset-right,0px)); padding-block:0 60px}
+header{background:linear-gradient(160deg,#1b3a6b,#2f7fd4); color:#fff; padding-block:24px 20px}
+header .wrap{padding-block:0}
+h1{margin:0 0 4px; font-size:clamp(1.4rem,5vw,1.9rem); font-weight:900; letter-spacing:-.02em}
+header p{margin:0; color:#cfe2fb; font-size:.92rem; font-weight:300}
+
+.box{background:var(--panel); border:2px solid var(--line); border-radius:16px;
+  padding:16px; margin-top:16px; box-shadow:var(--shadow)}
+.box h2{margin:0 0 10px; font-size:1.05rem; font-weight:900}
+.muted{color:var(--soft); font-size:.9rem}
+.err{border-color:var(--red); background:var(--redbg)}
+.err b{color:var(--red)}
+
+/* ---- השאלות שחוזרות ---- */
+.trb{display:flex; align-items:baseline; gap:9px; padding:9px 0; border-top:1px solid var(--line); flex-wrap:wrap}
+.trb:first-of-type{border-top:0}
+.trb .n{flex:none; font-weight:900; font-variant-numeric:tabular-nums; min-width:34px;
+  border-radius:8px; padding:2px 7px; text-align:center; font-size:.85rem}
+.trb .n.hot{background:var(--redbg); color:var(--red)}
+.trb .n.warm{background:var(--amberbg); color:var(--amber)}
+.trb .n.cool{background:var(--greenbg); color:var(--green)}
+.trb .t{flex:1; min-width:150px; font-weight:500; font-size:.95rem}
+.trb .s{color:var(--soft); font-size:.84rem; white-space:nowrap}
+
+/* ---- סבב ---- */
+.rnd{background:var(--panel); border:2px solid var(--line); border-radius:16px;
+  margin-top:12px; box-shadow:var(--shadow); overflow:hidden}
+.rnd.open{border-color:var(--sky)}
+.rhd{display:flex; align-items:center; gap:10px; padding:13px 15px; cursor:pointer;
+  flex-wrap:wrap; background:transparent; border:0; width:100%; font:inherit; color:inherit; text-align:start}
+.rhd .ttl{flex:1; min-width:130px; font-weight:900}
+.rhd .sc{font-variant-numeric:tabular-nums; font-weight:900; white-space:nowrap}
+.rhd .car{color:var(--soft); flex:none}
+.tag{font-size:.74rem; font-weight:900; border-radius:999px; padding:2px 9px; white-space:nowrap}
+.tag.done{background:var(--greenbg); color:var(--green)}
+.tag.reset{background:var(--amberbg); color:var(--amber)}
+.tag.open{background:var(--redbg); color:var(--red)}
+.tag.sent{background:var(--blue); color:#fff}
+.rbody{padding:0 15px 14px; border-top:1px solid var(--line)}
+.qgrp{margin-top:12px}
+.qgrp > p{margin:0 0 5px; font-weight:700; font-size:.94rem}
+.srow{display:flex; align-items:baseline; gap:8px; padding:4px 0; flex-wrap:wrap; font-size:.9rem}
+.srow .lb{color:var(--soft); flex:1; min-width:120px}
+.srow .ch{font-variant-numeric:tabular-nums; direction:ltr; unicode-bidi:isolate}
+.srow .ch i{font-style:normal; border-radius:6px; padding:1px 6px; font-weight:700}
+.srow .ch i.bad{background:var(--redbg); color:var(--red); text-decoration:line-through}
+.srow .ch i.good{background:var(--greenbg); color:var(--green)}
+.srow .ch i.half{background:var(--amberbg); color:var(--amber)}
+.srow .ch .ar{color:var(--soft); padding:0 3px}
+.vd{font-size:.78rem; font-weight:900; white-space:nowrap}
+.vd.first{color:var(--green)} .vd.fix{color:var(--amber)} .vd.miss{color:var(--red)}
+.empty{color:var(--soft); font-size:.9rem; padding:8px 0}
+footer{margin-top:30px; padding-top:14px; border-top:1px solid var(--line); color:var(--soft); font-size:.8rem}
+code{background:var(--line); border-radius:5px; padding:1px 5px; font-size:.88em}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <h1>יומן התרגול</h1>
+  <p>מבנה עשרוני · כל סבב, כל ניסיון, גם מה שלא נשלח</p>
+</div></header>
+
+<div class="wrap">
+  <div id="gate" class="box err" hidden>
+    <b>חסר המפתח בכתובת.</b>
+    <p class="muted" style="margin:6px 0 0">הדף הזה נפתח רק עם המפתח בסוף הכתובת, אחרי הסולמית.
+    בלעדיו הוא לא יודע לאן להסתכל, ולכן לא מציג כלום.</p>
+  </div>
+  <div id="load" class="box"><span class="muted">טוען…</span></div>
+  <div id="out" hidden></div>
+  <footer id="foot" hidden></footer>
+</div>
+
+<script>
+/* ============================================================
+   תצוגת ההורים
+   ============================================================
+   הדף הזה יושב בריפו ציבורי, ולכן הוא **לא מכיר את כתובת היומן
+   מראש** — היא מגיעה מהסולמית שבכתובת (`#k=...`), שהדפדפן לא
+   שולח לשום שרת ולא נשמר בשום לוג. בלי המפתח הדף ריק.
+
+   ⚠️ וזו הגנה חלקית ביודעין: ענף `board` במסד קריא לכל מי שיודע
+   את כתובת המסד, וזו מופיעה בקוד מקור ציבורי. ולכן ביומן עצמו אין
+   שם, כיתה או בית ספר — רק מספרי שאלה ומה שהוקלד. עדכון הרשאות
+   בקונסול ייתן ענף פרטי באמת.
+   ============================================================ */
+var DB='https://home-picks-47450-default-rtdb.europe-west1.firebasedatabase.app';
+
+function $(i){ return document.getElementById(i) }
+function el(t,c,h){ var e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+
+function key(){
+  var h=String(location.hash||'').replace(/^#/,'');
+  var m=/(?:^|&)k=([A-Za-z0-9_\-]+)/.exec(h);
+  return m?m[1]:'';
+}
+var HE=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+function when(ms){
+  if(!ms) return '';
+  var d=new Date(ms), now=new Date();
+  var hm=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  var same=d.toDateString()===now.toDateString();
+  var y=new Date(now.getTime()-864e5);
+  if(same) return 'היום '+hm;
+  if(d.toDateString()===y.toDateString()) return 'אתמול '+hm;
+  return 'יום '+HE[d.getDay()]+' '+d.getDate()+'.'+(d.getMonth()+1)+' '+hm;
+}
+function mins(a,b){
+  if(!a||!b) return '';
+  var m=Math.round((b-a)/60000);
+  if(m<1) return 'פחות מדקה';
+  return m+' דק׳';
+}
+function pct(x,t){ return t?Math.round(x/t*100):0 }
+
+/* כל האירועים של שורה אחת, לפי הסדר — זה מה שעונה על
+   ״כמה ניסיונות עד שצדק, ואם בכלל״ */
+function bySlot(r){
+  var m={}, order=[];
+  (r.ev||[]).forEach(function(e){
+    if(!m[e.s]){ m[e.s]={s:e.s, q:String(e.s).split('#')[0], l:e.l, ev:[]}; order.push(e.s) }
+    m[e.s].ev.push(e);
+  });
+  return order.map(function(k){
+    var o=m[k], last=o.ev[o.ev.length-1];
+    o.solved = !!(last && last.ok);
+    o.half   = !!(last && last.ok && last.h);
+    o.firstTry = o.ev.length===1 && o.solved && !o.half;
+    o.tries  = o.ev.length;
+    return o;
+  });
+}
+
+function slotRow(o){
+  var row=el('div','srow');
+  row.appendChild(el('span','lb', esc(o.l||o.s)));
+  var ch=el('span','ch'), parts=[];
+  o.ev.forEach(function(e){
+    parts.push('<i class="'+(e.ok?(e.h?'half':'good'):'bad')+'">'+esc(e.v||'(ריק)')+'</i>');
+  });
+  /* הרצועה הזאת כפויה ל-LTR כדי שמספרים לא יתהפכו, ולכן החץ בה
+     מצביע שמאלה→ימינה: ראשון, ואז מה שבא אחריו */
+  ch.innerHTML=parts.join('<span class="ar">→</span>');
+  row.appendChild(ch);
+  var v;
+  if(o.firstTry) v=el('span','vd first','✓ ראשון');
+  else if(o.solved) v=el('span','vd fix','½ אחרי '+o.tries);
+  else v=el('span','vd miss','✗ לא הגיע');
+  row.appendChild(v);
+  return row;
+}
+
+function roundCard(r, idx){
+  var card=el('div','rnd');
+  var hd=el('button','rhd'); hd.type='button';
+  var ttl=el('span','ttl','סבב '+r.n+' · '+when(r.t0));
+  hd.appendChild(ttl);
+  var endTag = r.end==='done' ? ['done','סיים'] :
+               r.end==='reset'? ['reset','איפס באמצע'] :
+               r.end==='abandoned'? ['reset','נעזב'] : ['open','באמצע'];
+  hd.appendChild(el('span','tag '+endTag[0], endTag[1]));
+  if(r.sent) hd.appendChild(el('span','tag sent','📤 שלח'));
+  /* ציון באחוזים רק לסבב שנגמר. בסבב שנעצר באמצע אחוז מתוך כל
+     הדף נראה כמו כישלון, בזמן שהוא פשוט לא הגיע לשם */
+  hd.appendChild(el('span','sc', r.end==='done'
+    ? pct(r.first,r.pts)+' → '+pct(r.got,r.pts)
+    : (Math.round((r.got||0)*10)/10)+'/'+(r.pts||0)+' נק׳'));
+  var car=el('span','car','▾'); hd.appendChild(car);
+  card.appendChild(hd);
+
+  var body=el('div','rbody'); body.hidden=true;
+  var slots=bySlot(r);
+  var sub=el('p','muted');
+  sub.style.margin='10px 0 0';
+  sub.innerHTML = (r.qdone||0)+' מתוך '+(r.qtotal||0)+' שאלות · '+
+    mins(r.t0, r.t1||r.wrote)+' · '+
+    slots.filter(function(o){return !o.firstTry && o.solved}).length+' תוקנו · '+
+    '<b>'+slots.filter(function(o){return !o.solved}).length+' לא הגיעו לנכון</b>';
+  body.appendChild(sub);
+
+  var seen={};
+  slots.forEach(function(o){
+    if(!seen[o.q]){
+      seen[o.q]=el('div','qgrp');
+      seen[o.q].appendChild(el('p','', esc((r.qs&&r.qs[o.q])||o.q)));
+      body.appendChild(seen[o.q]);
+    }
+    seen[o.q].appendChild(slotRow(o));
+  });
+  if(!slots.length) body.appendChild(el('div','empty','הסבב נפתח אבל לא נרשם בו אף ניסיון.'));
+  card.appendChild(body);
+
+  hd.addEventListener('click',function(){
+    body.hidden=!body.hidden;
+    card.className='rnd'+(body.hidden?'':' open');
+    car.textContent=body.hidden?'▾':'▴';
+  });
+  if(idx===0) hd.click();           /* האחרון פתוח מאליו */
+  return card;
+}
+
+/* הערך האמיתי של ההיסטוריה: מה חוזר, ולא מה קרה פעם אחת */
+function trouble(rounds){
+  var m={};
+  rounds.forEach(function(r){
+    bySlot(r).forEach(function(o){
+      var t=(r.qs&&r.qs[o.q])||o.q;
+      if(!m[o.q]) m[o.q]={q:o.q, t:t, seen:0, err:0, miss:0};
+      if(m[o.q].t===o.q && t!==o.q) m[o.q].t=t;
+      m[o.q].seen++;
+      if(!o.firstTry) m[o.q].err++;
+      if(!o.solved) m[o.q].miss++;
+    });
+  });
+  return Object.keys(m).map(function(k){ return m[k] })
+    .filter(function(x){ return x.err })
+    .sort(function(a,b){ return (b.miss-a.miss) || (b.err-a.err) });
+}
+
+function render(rounds){
+  var out=$('out'); out.innerHTML=''; out.hidden=false;
+
+  var head=el('div','box');
+  var last=rounds[0];
+  head.innerHTML='<h2>'+rounds.length+' '+(rounds.length===1?'סבב':'סבבים')+'</h2>'+
+    '<p class="muted" style="margin:0">האחרון: '+esc(when(last.t0))+' · '+
+    (last.end==='done' ? 'ציון '+pct(last.first,last.pts)+' → '+pct(last.got,last.pts)
+                       : (last.qdone||0)+' מתוך '+(last.qtotal||0)+' שאלות')+' · '+
+    (last.end==='done'?'סיים את הדף':(last.end==='reset'?'איפס באמצע':(last.end==='abandoned'?'יצא באמצע':'עדיין באמצע')))+'.<br>'+
+    'מתעדכן מעצמו בזמן שגור מתרגל — גם בלי שהוא לוחץ ״שלח״.</p>';
+  out.appendChild(head);
+
+  var tr=trouble(rounds);
+  var tb=el('div','box');
+  tb.appendChild(el('h2','','השורות שלא יצאו בניסיון ראשון'));
+  if(!tr.length) tb.appendChild(el('p','muted','הכול יצא בניסיון ראשון.'));
+  else tr.forEach(function(x){
+    var row=el('div','trb');
+    var cls = x.miss? 'hot' : (x.err>1?'warm':'cool');
+    row.appendChild(el('span','n '+cls, String(x.err)));
+    row.appendChild(el('span','t', esc(x.t)));
+    row.appendChild(el('span','s', x.miss? x.miss+' פעמים לא הגיע לנכון' : 'תיקן בכל פעם'));
+    tb.appendChild(row);
+  });
+  tb.appendChild(el('p','muted','<span style="font-size:.82rem">המספר הוא כמה שורות בשאלה הזאת דרשו יותר מניסיון אחד, על פני כל הסבבים.</span>'));
+  out.appendChild(tb);
+
+  rounds.forEach(function(r,i){ out.appendChild(roundCard(r,i)) });
+
+  var f=$('foot'); f.hidden=false;
+  f.innerHTML='היומן נכתב ממכשיר התרגול בזמן אמת. סבב שנכתב בלי רשת נשלח בפעם הבאה שהדף נפתח מחובר, '+
+    'ולכן סבב אחרון עשוי לאחר. גור לא רואה את הדף הזה ולא יודע שהניסיונות נספרים.';
+}
+
+function boot(){
+  var k=key();
+  if(!k){ $('load').hidden=true; $('gate').hidden=false; return }
+  fetch(DB+'/board/'+encodeURIComponent(k)+'.json')
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json() })
+    .then(function(d){
+      $('load').hidden=true;
+      var rounds=[];
+      Object.keys(d||{}).forEach(function(id){
+        var r=d[id]; if(!r||typeof r!=='object') return;
+        r._id=id; r.ev=r.ev||[]; rounds.push(r);
+      });
+      if(!rounds.length){
+        $('out').hidden=false;
+        $('out').innerHTML='<div class="box"><b>עוד אין סבבים.</b>'+
+          '<p class="muted" style="margin:6px 0 0">ברגע שגור יענה על שאלה ראשונה, היא תופיע כאן.</p></div>';
+        return;
+      }
+      rounds.sort(function(a,b){ return (b.t0||0)-(a.t0||0) });
+      render(rounds);
+    })
+    .catch(function(e){
+      $('load').hidden=true;
+      $('gate').hidden=false;
+      $('gate').innerHTML='<b>לא הצלחתי לקרוא את היומן.</b>'+
+        '<p class="muted" style="margin:6px 0 0">'+esc(e.message)+'. '+
+        'אם המפתח בכתובת נכון, כנראה שאין רשת — שווה לנסות שוב בעוד רגע.</p>';
+    });
+}
+window.addEventListener('hashchange', function(){ location.reload() });
+boot();
+</script>
+</body>
+</html>
